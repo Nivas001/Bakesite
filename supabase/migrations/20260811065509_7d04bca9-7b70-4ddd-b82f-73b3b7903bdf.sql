@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.grant_bootstrap_admin() FROM PUBLIC, anon, authenticated;
