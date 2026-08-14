@@ -39,6 +39,16 @@ const SLOT_METADATA: Record<string, { icon: typeof Sunrise; tag: string; period:
   evening: { icon: Moon, tag: "Evening bakes", period: "Evening" },
 };
 
+function parseDateParts(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const dateObj = new Date(y!, (m ?? 1) - 1, d);
+  const weekdayShort = dateObj.toLocaleDateString("en-IN", { weekday: "short" });
+  const weekdayLong = dateObj.toLocaleDateString("en-IN", { weekday: "long" });
+  const day = d!;
+  const monthShort = dateObj.toLocaleDateString("en-IN", { month: "short" });
+  return { weekdayShort, weekdayLong, day, monthShort };
+}
+
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
@@ -164,7 +174,7 @@ function CheckoutPage() {
 
           {/* Separate Date and Time Window Cards */}
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Date Card */}
+            {/* Bento Date Card */}
             <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-3">
@@ -174,24 +184,102 @@ function CheckoutPage() {
                 <p className="mb-3 text-xs text-muted-foreground">
                   Select next available baking & dispatch day
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  {dates.map((date) => {
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {dates.map((date, idx) => {
+                    const { weekdayShort, weekdayLong, day, monthShort } = parseDateParts(date);
                     const isSelected = slotDate === date;
+                    const isEarliest = idx === 0;
+
+                    if (isEarliest) {
+                      return (
+                        <button
+                          key={date}
+                          type="button"
+                          onClick={() => setSlotDate(date)}
+                          className={`group relative sm:col-span-2 flex items-center justify-between overflow-hidden rounded-2xl border p-3.5 text-left transition-all duration-200 cursor-pointer ${
+                            isSelected
+                              ? "border-berry bg-berry/10 text-foreground ring-2 ring-berry shadow-xs"
+                              : "border-border bg-background/50 hover:border-berry/40 hover:bg-card"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl transition-colors ${
+                                isSelected
+                                  ? "bg-berry text-berry-foreground font-bold"
+                                  : "bg-muted text-foreground group-hover:bg-berry/10 group-hover:text-berry"
+                              }`}
+                            >
+                              <span className="text-[10px] uppercase font-bold tracking-wider leading-none">
+                                {weekdayShort}
+                              </span>
+                              <span className="text-base font-extrabold leading-none mt-0.5">{day}</span>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-sans font-bold text-sm text-foreground tracking-tight">
+                                  {weekdayLong}, {day} {monthShort}
+                                </p>
+                              </div>
+                              <p className="text-[11px] text-muted-foreground">Next Available Dispatch</p>
+                            </div>
+                          </div>
+
+                          <div>
+                            {isSelected ? (
+                              <span className="flex items-center gap-1 rounded-full bg-berry px-2 py-0.5 text-[10px] font-bold text-berry-foreground">
+                                <Check className="h-3 w-3" /> Selected
+                              </span>
+                            ) : (
+                              <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-semibold text-secondary-foreground">
+                                Earliest
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    }
+
                     return (
-                      <Button
+                      <button
                         key={date}
                         type="button"
-                        size="sm"
-                        variant={isSelected ? "default" : "outline"}
                         onClick={() => setSlotDate(date)}
-                        className={`rounded-xl transition-all ${
+                        className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-3 text-left transition-all duration-200 cursor-pointer ${
                           isSelected
-                            ? "bg-berry text-berry-foreground font-semibold shadow-xs"
-                            : "hover:border-berry/50 hover:bg-berry/5"
+                            ? "border-berry bg-berry/10 text-foreground ring-2 ring-berry shadow-xs"
+                            : "border-border bg-background/50 hover:border-berry/40 hover:bg-card"
                         }`}
                       >
-                        {formatSlotDate(date)}
-                      </Button>
+                        <div className="flex items-start justify-between">
+                          <span
+                            className={`rounded-lg px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                              isSelected
+                                ? "bg-berry text-berry-foreground"
+                                : "bg-muted text-muted-foreground group-hover:text-berry"
+                            }`}
+                          >
+                            {weekdayShort}
+                          </span>
+                          {isSelected ? (
+                            <span className="flex items-center gap-0.5 rounded-full bg-berry px-1.5 py-0.5 text-[9px] font-bold text-berry-foreground">
+                              <Check className="h-2.5 w-2.5" /> Selected
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground">{monthShort}</span>
+                          )}
+                        </div>
+
+                        <div className="mt-2.5 flex items-baseline gap-1.5">
+                          <span className="font-sans text-xl font-extrabold text-foreground leading-none">
+                            {day}
+                          </span>
+                          <span className="font-sans text-xs font-semibold text-muted-foreground">
+                            {monthShort}
+                          </span>
+                        </div>
+                      </button>
                     );
                   })}
                 </div>
