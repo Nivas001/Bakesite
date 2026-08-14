@@ -38,10 +38,13 @@ export async function notifyCustomerOrderUpdate(input: {
   email?: string | null | undefined;
 }): Promise<void> {
   const shortId = input.orderId.slice(0, 8);
+  const appUrl = process.env["APP_URL"] || "https://bakesite.vercel.app";
+  const ordersPageUrl = `${appUrl}/orders`;
+
   const messages: Record<string, string> = {
-    awaiting_payment: `Hi ${input.name ?? "there"},\n\nYour Sweet Crumb bakery order #${shortId} is approved!\n\nTotal: ${formatINR(input.total)}\n${input.paymentLink ? `Pay your bill here: ${input.paymentLink}\n\n` : ""}Please complete the payment to secure your baking slot.\n\nSweet Crumb Bakery`,
-    confirmed: `Hi ${input.name ?? "there"},\n\nYour Sweet Crumb bakery order #${shortId} is confirmed! Our bakers are preparing your fresh bakes for your scheduled slot.\n\nThank you for choosing Sweet Crumb!`,
-    rejected: `Hi ${input.name ?? "there"},\n\nSorry, we are unable to accept order #${shortId} for that slot due to high bakery demand. Please feel free to choose another available time slot.\n\nSweet Crumb Bakery`,
+    awaiting_payment: `Hi ${input.name ?? "there"},\n\nYour Sweet Crumb bakery order #${shortId} is approved!\n\nTotal: ${formatINR(input.total)}\n\nPlease view your order and complete payment on our website to secure your baking slot:\n👉 ${ordersPageUrl}\n\nSweet Crumb Bakery`,
+    confirmed: `Hi ${input.name ?? "there"},\n\nYour Sweet Crumb bakery order #${shortId} is confirmed! Our bakers are preparing your fresh bakes for your scheduled slot.\n\nYou can track your order status anytime at:\n👉 ${ordersPageUrl}\n\nThank you for choosing Sweet Crumb!`,
+    rejected: `Hi ${input.name ?? "there"},\n\nSorry, we are unable to accept order #${shortId} for that slot due to high bakery demand. Please feel free to choose another available time slot at ${appUrl}.\n\nSweet Crumb Bakery`,
   };
 
   const body = messages[input.status];
