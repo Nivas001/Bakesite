@@ -50,6 +50,22 @@ const STATUS_LABELS: Record<string, string> = {
   rejected: "Rejected",
 };
 
+const STATUS_ORDER_PRIORITY: Record<string, number> = {
+  pending_approval: 0,
+  awaiting_payment: 1,
+  confirmed: 2,
+  completed: 3,
+  rejected: 4,
+};
+
+const STATUS_BADGE_STYLES: Record<string, string> = {
+  pending_approval: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+  awaiting_payment: "bg-berry/15 text-berry dark:text-berry-foreground border-berry/30",
+  confirmed: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
+  completed: "bg-muted text-muted-foreground border-border",
+  rejected: "bg-destructive/15 text-destructive border-destructive/30",
+};
+
 type ProductForm = {
   id?: string;
   name: string;
@@ -156,6 +172,13 @@ function AdminDashboard() {
 
   const pending = data.orders.filter((o) => o.status === "pending_approval").length;
 
+  const sortedOrders = [...data.orders].sort((a, b) => {
+    const pA = STATUS_ORDER_PRIORITY[a.status] ?? 99;
+    const pB = STATUS_ORDER_PRIORITY[b.status] ?? 99;
+    if (pA !== pB) return pA - pB;
+    return new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime();
+  });
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12">
       <h1 className="font-display text-4xl font-bold text-cocoa">Bakery admin</h1>
@@ -173,79 +196,136 @@ function AdminDashboard() {
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="orders" className="mt-6 space-y-4">
-          {data.orders.length === 0 && (
+        <TabsContent value="orders" className="mt-6">
+          {sortedOrders.length === 0 ? (
             <p className="text-sm text-muted-foreground">No orders yet.</p>
-          )}
-          {data.orders.map((order) => (
-            <article key={order.id} className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-display text-lg font-semibold">
-                    {order.contact_name ?? "Customer"} · {formatCurrency(Number(order.total))}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {order.fulfilment_type} · {order.slot_date} {order.slot_start.slice(0, 5)}–
-                    {order.slot_end.slice(0, 5)} · {order.contact_phone}
-                  </p>
-                  {order.delivery_address && (
-                    <p className="mt-1 text-sm text-muted-foreground">{order.delivery_address}</p>
-                  )}
-                  {order.delivery_lat != null && order.delivery_lng != null && (
-                    <a
-                      className="text-sm text-berry underline"
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`https://www.openstreetmap.org/?mlat=${order.delivery_lat}&mlon=${order.delivery_lng}#map=17/${order.delivery_lat}/${order.delivery_lng}`}
-                    >
-                      View map pin
-                    </a>
-                  )}
-                  <ul className="mt-2 text-sm text-muted-foreground">
-                    {order.order_items.map((item, index) => (
-                      <li key={index}>
-                        {item.quantity} × {item.product_name} — {formatCurrency(Number(item.line_total))}
-                      </li>
-                    ))}
-                  </ul>
-                  {order.notes && <p className="mt-2 text-sm italic">“{order.notes}”</p>}
-                  {order.payment_link_url && (
-                    <a
-                      className="mt-2 block text-sm text-berry underline"
-                      href={order.payment_link_url}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Payment link
-                    </a>
-                  )}
-                </div>
-                <span className="rounded-full bg-matcha px-3 py-1 text-xs font-semibold text-cocoa">
-                  {STATUS_LABELS[order.status] ?? order.status}
-                </span>
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {(["awaiting_payment", "confirmed", "completed", "rejected"] as const).map((status) => (
-                  <Button
-                    key={status}
-                    size="sm"
-                    variant={status === "rejected" ? "outline" : "default"}
-                    className={status === "rejected" ? "" : "bg-berry text-berry-foreground hover:bg-berry/90"}
-                    disabled={order.status === status}
-                    onClick={() =>
-                      run(
-                        () => updateStatus({ data: { orderId: order.id, status } }),
-                        `Order marked ${(STATUS_LABELS[status] ?? status).toLowerCase()}`,
-                      )
-                    }
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {sortedOrders.map((order) => {
+                const badgeStyle =
+                  STATUS_BADGE_STYLES[order.status] ?? "bg-matcha text-cocoa";
+                return (
+                  <article
+                    key={order.id}
+                    className="flex flex-col justify-between rounded-3xl border border-border/70 bg-card p-5 shadow-soft hover:shadow-lift transition-all"
                   >
-                    {status === "awaiting_payment" ? "Approve" : (STATUS_LABELS[status] ?? status)}
-                  </Button>
-                ))}
-              </div>
-            </article>
-          ))}
+                    <div>
+                      {/* Card Header: Customer, Total, and Status */}
+                      <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-3">
+                        <div>
+                          <p className="font-display text-base font-bold text-cocoa truncate">
+                            {order.contact_name ?? "Customer"}
+                          </p>
+                          <p className="font-sans text-lg font-extrabold text-foreground tracking-tight mt-0.5">
+                            {formatCurrency(Number(order.total))}
+                          </p>
+                        </div>
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold shrink-0 ${badgeStyle}`}
+                        >
+                          {STATUS_LABELS[order.status] ?? order.status}
+                        </span>
+                      </div>
+
+                      {/* Fulfilment & Timing Details */}
+                      <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
+                        <div className="flex items-center justify-between font-medium text-foreground">
+                          <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] capitalize">
+                            {order.fulfilment_type}
+                          </span>
+                          <span className="font-mono text-[11px]">
+                            {order.slot_date} ({order.slot_start.slice(0, 5)}–{order.slot_end.slice(0, 5)})
+                          </span>
+                        </div>
+
+                        <p className="pt-0.5">📞 {order.contact_phone}</p>
+
+                        {order.delivery_address && (
+                          <p className="line-clamp-2 leading-tight">
+                            📍 {order.delivery_address}
+                          </p>
+                        )}
+
+                        {order.delivery_lat != null && order.delivery_lng != null && (
+                          <a
+                            className="inline-flex items-center gap-1 text-xs text-berry font-semibold underline hover:text-berry/80 pt-0.5"
+                            target="_blank"
+                            rel="noreferrer"
+                            href={`https://www.openstreetmap.org/?mlat=${order.delivery_lat}&mlon=${order.delivery_lng}#map=17/${order.delivery_lat}/${order.delivery_lng}`}
+                          >
+                            🗺️ View map pin
+                          </a>
+                        )}
+                      </div>
+
+                      {/* Ordered Items Pill Container */}
+                      <div className="mt-3.5 rounded-2xl bg-secondary/30 p-3 border border-border/40">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+                          Items ({order.order_items.reduce((s, i) => s + i.quantity, 0)})
+                        </p>
+                        <ul className="space-y-1 text-xs text-foreground/90 max-h-32 overflow-y-auto pr-1">
+                          {order.order_items.map((item, index) => (
+                            <li key={index} className="flex justify-between items-center text-[11px]">
+                              <span className="truncate pr-2">
+                                <span className="font-bold text-berry">{item.quantity}×</span> {item.product_name}
+                              </span>
+                              <span className="font-semibold shrink-0">
+                                {formatCurrency(Number(item.line_total))}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {order.notes && (
+                        <p className="mt-2 text-xs italic text-muted-foreground bg-muted/40 p-2 rounded-xl border border-border/40">
+                          “{order.notes}”
+                        </p>
+                      )}
+
+                      {order.payment_link_url && (
+                        <a
+                          className="mt-2 inline-block text-xs font-semibold text-berry underline"
+                          href={order.payment_link_url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          🔗 Payment link
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Status Action Buttons */}
+                    <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-2 gap-1.5">
+                      {(["awaiting_payment", "confirmed", "completed", "rejected"] as const).map((status) => (
+                        <Button
+                          key={status}
+                          size="sm"
+                          variant={status === "rejected" ? "outline" : "default"}
+                          className={`h-8 text-xs font-semibold rounded-xl ${
+                            status === "rejected"
+                              ? "text-destructive hover:bg-destructive/10"
+                              : order.status === status
+                              ? "bg-muted text-muted-foreground"
+                              : "bg-berry text-berry-foreground hover:bg-berry/90"
+                          }`}
+                          disabled={order.status === status}
+                          onClick={() =>
+                            run(
+                              () => updateStatus({ data: { orderId: order.id, status } }),
+                              `Order marked ${(STATUS_LABELS[status] ?? status).toLowerCase()}`,
+                            )
+                          }
+                        >
+                          {status === "awaiting_payment" ? "Approve" : (STATUS_LABELS[status] ?? status)}
+                        </Button>
+                      ))}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="inventory" className="mt-6 grid gap-8 lg:grid-cols-[380px_1fr]">
