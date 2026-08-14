@@ -76,12 +76,16 @@ export async function createSessionFromToken(userId: string, secret: string): Pr
 }
 
 export async function sendPasswordRecovery(email: string): Promise<void> {
-  const url = `${typeof window !== "undefined" ? window.location.origin : ""}/auth`;
-  try {
-    await appwriteAccount().createRecovery({ email, url });
-  } catch (error) {
-    console.info("Password recovery requested for:", email);
-  }
+  const url = `${typeof window !== "undefined" ? window.location.origin : ""}/reset-password`;
+  await appwriteAccount().createRecovery({ email, url });
+}
+
+export async function confirmPasswordRecovery(
+  userId: string,
+  secret: string,
+  password: string,
+): Promise<void> {
+  await appwriteAccount().updateRecovery({ userId, secret, password });
 }
 
 export async function signOut(): Promise<void> {

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { confirmEmailVerification } from "@/integrations/appwrite/client";
-import { refreshAuth } from "@/hooks/use-appwrite-auth";
+import { refreshAuth, useAuth } from "@/hooks/use-appwrite-auth";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/verify")({
@@ -22,42 +22,55 @@ function VerifyPage() {
   const search = Route.useSearch();
   const userId = search.userId;
   const secret = search.secret;
+  const { user } = useAuth();
 
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    userId && secret ? "loading" : "error"
+    userId && secret ? "loading" : user?.emailVerification ? "success" : "error"
   );
   const [errorMessage, setErrorMessage] = useState("");
+  const executedRef = useRef(false);
 
   useEffect(() => {
-    if (!userId || !secret) {
-      setStatus("error");
-      setErrorMessage("No verification credentials found in this link.");
+    // If user is already logged in and verified
+    if (user?.emailVerification) {
+      setStatus("success");
       return;
     }
 
-    let isMounted = true;
+    if (!userId || !secret) {
+      if (!user?.emailVerification) {
+        setStatus("error");
+        setErrorMessage("No verification credentials found in this link.");
+      }
+      return;
+    }
+
+    // Prevent double execution in React
+    if (executedRef.current) return;
+    executedRef.current = true;
 
     async function verify() {
       try {
         await confirmEmailVerification(userId!, secret!);
         await refreshAuth();
-        if (isMounted) {
-          setStatus("success");
-        }
+        setStatus("success");
       } catch (err) {
-        if (isMounted) {
-          setStatus("error");
-          setErrorMessage(err instanceof Error ? err.message : "Invalid or expired verification link.");
+        const freshUser = await refreshAuth();
+        if (freshUser?.emailVerification) {
+          setStatus("success");
+          return;
         }
+        setStatus("error");
+        setErrorMessage(
+          err instanceof Error
+            ? err.message
+            : "Invalid or expired verification link. The link may have already been used."
+        );
       }
     }
 
     void verify();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [userId, secret]);
+  }, [userId, secret, user]);
 
   return (
     <div className="mx-auto flex min-h-[60vh] w-full max-w-md items-center justify-center px-4 py-16">
@@ -95,9 +108,9 @@ function VerifyPage() {
               !
             </div>
             <div>
-              <h2 className="font-display text-2xl font-bold text-cocoa">Verification Failed</h2>
+              <h2 className="font-display text-2xl font-bold text-cocoa">Verification Note</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                {errorMessage || "The verification link may have expired or is invalid."}
+                {errorMessage || "The verification link may have expired or was already used."}
               </p>
             </div>
             <div className="pt-2 space-y-3">
