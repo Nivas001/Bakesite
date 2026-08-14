@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { User, Phone, MapPin, Pencil } from "lucide-react";
 
 const LocationPicker = lazy(() => import("@/components/location-picker"));
 
@@ -46,11 +47,6 @@ function CheckoutPage() {
   const [fulfilmentType, setFulfilmentType] = useState<"delivery" | "pickup">("delivery");
   const [slotDate, setSlotDate] = useState("");
   const [slotId, setSlotId] = useState(TIME_SLOTS[0]!.id);
-  const [contactName, setContactName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -59,15 +55,6 @@ function CheckoutPage() {
   useEffect(() => {
     if (!slotDate && dates.length > 0) setSlotDate(dates[0]!);
   }, [dates, slotDate]);
-
-  useEffect(() => {
-    if (!profile) return;
-    setContactName((v) => v || profile.full_name || "");
-    setContactPhone((v) => v || profile.phone || "");
-    setAddress((v) => v || profile.address || "");
-    setLatitude((v) => v ?? profile.latitude ?? null);
-    setLongitude((v) => v ?? profile.longitude ?? null);
-  }, [profile]);
 
   if (lines.length === 0) {
     return (
@@ -83,6 +70,12 @@ function CheckoutPage() {
   async function submit(event: React.FormEvent): Promise<void> {
     event.preventDefault();
     setBusy(true);
+    if (!profile) {
+      toast.error("Profile information is missing");
+      setBusy(false);
+      return;
+    }
+
     try {
       await submitOrder({
         data: {
@@ -90,11 +83,11 @@ function CheckoutPage() {
           slotDate,
           slotId,
           fulfilmentType,
-          contactName,
-          contactPhone,
-          address: fulfilmentType === "delivery" ? address : "",
-          latitude: fulfilmentType === "delivery" ? latitude : null,
-          longitude: fulfilmentType === "delivery" ? longitude : null,
+          contactName: profile.full_name,
+          contactPhone: profile.phone,
+          address: fulfilmentType === "delivery" ? profile.address : "",
+          latitude: fulfilmentType === "delivery" ? profile.latitude : null,
+          longitude: fulfilmentType === "delivery" ? profile.longitude : null,
           notes: notes || undefined,
         },
       });
@@ -168,39 +161,62 @@ function CheckoutPage() {
         </section>
 
         <section className="space-y-5 rounded-3xl border border-border bg-card p-6">
-          <h2 className="font-display text-lg font-semibold">Contact</h2>
-          <div>
-            <Label htmlFor="contactName">Full name</Label>
-            <Input id="contactName" required value={contactName} onChange={(e) => setContactName(e.target.value)} />
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold">Delivery Details</h2>
+            <Button asChild variant="ghost" size="sm" className="h-8 text-muted-foreground hover:text-foreground">
+              <Link to="/profile" search={{ returnTo: "/checkout" }}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Link>
+            </Button>
           </div>
-          <div>
-            <Label htmlFor="contactPhone">Phone</Label>
-            <Input id="contactPhone" required value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
-          </div>
-
-          {fulfilmentType === "delivery" && (
-            <>
-              <div>
-                <Label htmlFor="address">Delivery address</Label>
-                <Textarea id="address" rows={3} required value={address} onChange={(e) => setAddress(e.target.value)} />
+          
+          {(!profile?.full_name || !profile?.phone || (fulfilmentType === "delivery" && !profile?.address)) ? (
+            <div className="rounded-2xl border border-dashed border-border bg-muted/50 p-6 text-center">
+              <p className="mb-4 text-sm text-muted-foreground">Please complete your delivery details to continue.</p>
+              <Button asChild variant="outline">
+                <Link to="/profile" search={{ returnTo: "/checkout" }}>Complete Details</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4 rounded-2xl bg-muted/30 p-4">
+              <div className="flex items-start gap-3">
+                <User className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium">{profile.full_name}</p>
+                </div>
               </div>
-              <div>
-                <Label>Map pin</Label>
-                <p className="mb-2 text-xs text-muted-foreground">Tap the map to mark your door.</p>
-                <ClientOnly fallback={<div className="h-64 w-full rounded-2xl bg-muted" />}>
-                  <Suspense fallback={<div className="h-64 w-full rounded-2xl bg-muted" />}>
-                    <LocationPicker
-                      latitude={latitude}
-                      longitude={longitude}
-                      onChange={(lat, lng) => {
-                        setLatitude(lat);
-                        setLongitude(lng);
-                      }}
-                    />
-                  </Suspense>
-                </ClientOnly>
+              <div className="flex items-start gap-3">
+                <Phone className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="text-sm">{profile.phone}</p>
+                </div>
               </div>
-            </>
+              {fulfilmentType === "delivery" && (
+                <div className="flex items-start gap-3">
+                  <MapPin className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                  <div className="w-full">
+                    <p className="whitespace-pre-wrap text-sm">{profile.address}</p>
+                    {profile.latitude != null && profile.longitude != null && (
+                      <div className="mt-3 overflow-hidden rounded-xl border border-border">
+                        <ClientOnly fallback={<div className="h-32 w-full bg-muted" />}>
+                          <Suspense fallback={<div className="h-32 w-full bg-muted" />}>
+                            <div className="h-32">
+                              <LocationPicker
+                                latitude={profile.latitude}
+                                longitude={profile.longitude}
+                                onChange={() => {}}
+                                readonly
+                              />
+                            </div>
+                          </Suspense>
+                        </ClientOnly>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           <div>
@@ -209,12 +225,17 @@ function CheckoutPage() {
           </div>
         </section>
 
-        <Button type="submit" size="lg" disabled={busy || !slotDate} className="bg-berry text-berry-foreground hover:bg-berry/90">
+        <Button 
+          type="submit" 
+          size="lg" 
+          disabled={busy || !slotDate || !profile?.full_name || !profile?.phone || (fulfilmentType === "delivery" && !profile?.address)} 
+          className="bg-berry text-berry-foreground hover:bg-berry/90"
+        >
           {busy ? "Placing order…" : "Request this slot"}
         </Button>
       </form>
 
-      <aside className="h-fit rounded-3xl border border-border bg-card p-6 shadow-soft">
+      <aside className="sticky top-24 h-fit rounded-3xl border border-border bg-card p-6 shadow-soft">
         <h2 className="font-display text-xl font-semibold">Your order</h2>
         <ul className="mt-4 space-y-2 text-sm">
           {lines.map((line) => (
