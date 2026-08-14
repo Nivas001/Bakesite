@@ -11,18 +11,19 @@ import {
   upsertDoc,
   updateUserPhone,
   updateUserName,
+  getUserById,
 } from "@/integrations/appwrite/admin.server";
 import { finalPrice } from "./pricing";
 import type { ProductDoc } from "./catalog.server";
 import { TIME_SLOTS, toISODate } from "./slots";
-import { notifyAdminNewOrder } from "./notifications.server";
+import { notifyAdminNewOrder, notifyCustomerOrderPlaced } from "./notifications.server";
 import { placeOrderSchema, profileSchema, type PlaceOrderInput } from "./orders.schema";
 
 export { placeOrderSchema, profileSchema, type PlaceOrderInput };
 
 export type OrderDoc = {
   user_id: string;
-  status: "pending_approval" | "awaiting_payment" | "confirmed" | "completed" | "rejected";
+  status: "pending_approval" | "awaiting_payment" | "confirmed" | "rescheduled" | "completed" | "rejected";
   fulfilment_type: string;
   slot_date: string;
   slot_start: string;
@@ -231,8 +232,8 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     delivery_lng: input.fulfilmentType === "delivery" ? input.longitude : null,
     notes: orderNotes,
     payment_link_url: null,
-    payment_ref: null,
-    paid_at: null,
+    payment_ref: `PAY_${Date.now()}`,
+    paid_at: new Date().toISOString(),
   });
 
   try {
@@ -243,6 +244,22 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     await deleteDoc(COLLECTIONS.orders, order.$id);
     throw error;
   }
+
+  // Fetch customer account to send instant paid confirmation email via Resend
+  let customerEmail: string | undefined = undefined;
+  if (userId) {
+    const userAccount = await getUserById(userId).catch(() => null);
+    if (userAccount?.email) customerEmail = userAccount.email;
+  }
+
+  await notifyCustomerOrderPlaced({
+    orderId: order.$id,
+    name: input.contactName,
+    email: customerEmail,
+    phone: input.contactPhone,
+    slot: `${input.slotDate} (${slot.start.slice(0, 5)}–${slot.end.slice(0, 5)})`,
+    total: Number(order.total),
+  });
 
   await notifyAdminNewOrder({
     orderId: order.$id,

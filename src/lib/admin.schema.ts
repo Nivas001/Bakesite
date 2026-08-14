@@ -6,6 +6,7 @@ export const ORDER_STATUSES = [
   "pending_approval",
   "awaiting_payment",
   "confirmed",
+  "rescheduled",
   "completed",
   "rejected",
 ] as const;
@@ -13,6 +14,13 @@ export const ORDER_STATUSES = [
 export const orderStatusSchema = z.object({
   orderId: id,
   status: z.enum(ORDER_STATUSES),
+});
+
+export const rescheduleOrderSchema = z.object({
+  orderId: id,
+  newSlotDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  newSlotId: z.string().min(1),
+  reason: z.string().trim().max(300).optional(),
 });
 
 export const productSchema = z.object({

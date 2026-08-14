@@ -4,6 +4,7 @@ import {
   blackoutSchema,
   campaignSchema,
   orderStatusSchema,
+  rescheduleOrderSchema,
   productSchema,
 } from "./admin.schema";
 
@@ -43,6 +44,15 @@ export const setOrderStatus = createServerFn({ method: "POST" })
     const { assertAdmin, changeOrderStatus } = await import("./admin.server");
     await assertAdmin(context.userId);
     return changeOrderStatus(data);
+  });
+
+export const rescheduleOrderAdmin = createServerFn({ method: "POST" })
+  .middleware([requireAppwriteAuth])
+  .inputValidator((input: unknown) => rescheduleOrderSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { assertAdmin, rescheduleOrder } = await import("./admin.server");
+    await assertAdmin(context.userId);
+    return rescheduleOrder(data);
   });
 
 export const saveProduct = createServerFn({ method: "POST" })

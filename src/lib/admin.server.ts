@@ -10,20 +10,32 @@ import {
   listAppwriteUsers,
   getUserById,
 } from "@/integrations/appwrite/admin.server";
-import { notifyCustomerOrderUpdate, sendReviewRequest } from "./notifications.server";
+import {
+  notifyCustomerOrderUpdate,
+  notifyCustomerOrderRescheduled,
+  sendReviewRequest,
+} from "./notifications.server";
 import { createPaymentLink } from "./payments.server";
-import { toISODate } from "./slots";
+import { TIME_SLOTS, toISODate } from "./slots";
 import type { CategoryDoc, ProductDoc } from "./catalog.server";
 import { loadOrderItems, serializeOrder, type OrderDoc } from "./orders.server";
 import {
   ORDER_STATUSES,
   blackoutSchema,
   orderStatusSchema,
+  rescheduleOrderSchema,
   productSchema,
   type ProductInput,
 } from "./admin.schema";
 
-export { ORDER_STATUSES, blackoutSchema, orderStatusSchema, productSchema, type ProductInput };
+export {
+  ORDER_STATUSES,
+  blackoutSchema,
+  orderStatusSchema,
+  rescheduleOrderSchema,
+  productSchema,
+  type ProductInput,
+};
 export { assertAdmin } from "./roles.server";
 
 export async function fetchAdminOrders() {
@@ -95,6 +107,43 @@ export async function changeOrderStatus(input: z.infer<typeof orderStatusSchema>
     await sendReviewRequest({ orderId: data.$id, name: data.contact_name, email: customerEmail });
   }
   return { ok: true as const, paymentLink };
+}
+
+export async function rescheduleOrder(input: z.infer<typeof rescheduleOrderSchema>) {
+  const slot = TIME_SLOTS.find((s) => s.id === input.newSlotId);
+  if (!slot) throw new Error("Invalid time slot selected.");
+
+  const currentOrder = await getDoc<OrderDoc>(COLLECTIONS.orders, input.orderId);
+  if (!currentOrder) throw new Error("Order not found.");
+
+  const updatedNotes = input.reason?.trim()
+    ? `${currentOrder.notes ? `${currentOrder.notes} | ` : ""}Baker Note: ${input.reason.trim()}`
+    : currentOrder.notes;
+
+  const data = await updateDoc<OrderDoc>(COLLECTIONS.orders, input.orderId, {
+    slot_date: input.newSlotDate,
+    slot_start: slot.start,
+    slot_end: slot.end,
+    status: "rescheduled",
+    notes: updatedNotes,
+  });
+
+  let customerEmail: string | undefined = undefined;
+  if (data.user_id) {
+    const user = await getUserById(data.user_id).catch(() => null);
+    if (user?.email) customerEmail = user.email;
+  }
+
+  await notifyCustomerOrderRescheduled({
+    orderId: data.$id,
+    name: data.contact_name,
+    email: customerEmail,
+    phone: data.contact_phone,
+    newSlot: `${input.newSlotDate} (${slot.start.slice(0, 5)}–${slot.end.slice(0, 5)})`,
+    reason: input.reason,
+  });
+
+  return { ok: true as const };
 }
 
 export async function fetchStats() {

@@ -17,6 +17,7 @@ import {
   saveProduct,
   sendNewsletter,
   setOrderStatus,
+  rescheduleOrderAdmin,
 } from "@/lib/admin.functions";
 import {
   getAdminOfferCodes,
@@ -24,7 +25,15 @@ import {
   deleteAdminOfferCode,
 } from "@/lib/offers.functions";
 import { formatCurrency } from "@/lib/pricing";
-import { toISODate } from "@/lib/slots";
+import { TIME_SLOTS, toISODate } from "@/lib/slots";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -44,25 +53,28 @@ export const Route = createFileRoute("/admin")({
 });
 
 const STATUS_LABELS: Record<string, string> = {
-  pending_approval: "Pending approval",
+  pending_approval: "Paid · Kitchen Review",
   awaiting_payment: "Awaiting payment",
   confirmed: "Confirmed",
+  rescheduled: "Rescheduled",
   completed: "Completed",
-  rejected: "Rejected",
+  rejected: "Rejected / Refunded",
 };
 
 const STATUS_ORDER_PRIORITY: Record<string, number> = {
   pending_approval: 0,
-  awaiting_payment: 1,
+  rescheduled: 1,
   confirmed: 2,
-  completed: 3,
-  rejected: 4,
+  awaiting_payment: 3,
+  completed: 4,
+  rejected: 5,
 };
 
 const STATUS_BADGE_STYLES: Record<string, string> = {
   pending_approval: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
-  awaiting_payment: "bg-berry/15 text-berry dark:text-berry-foreground border-berry/30",
+  awaiting_payment: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30",
   confirmed: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
+  rescheduled: "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/30",
   completed: "bg-muted text-muted-foreground border-border",
   rejected: "bg-destructive/15 text-destructive border-destructive/30",
 };
@@ -272,6 +284,7 @@ function AdminDashboard() {
   const fetchOfferCodesFn = useServerFn(getAdminOfferCodes);
   const saveOfferCodeFn = useServerFn(saveAdminOfferCode);
   const removeOfferCodeFn = useServerFn(deleteAdminOfferCode);
+  const rescheduleFn = useServerFn(rescheduleOrderAdmin);
 
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
   const [offerForm, setOfferForm] = useState<OfferCodeForm>(EMPTY_OFFER_FORM);
@@ -279,6 +292,13 @@ function AdminDashboard() {
   const [blackoutReason, setBlackoutReason] = useState("");
   const [subject, setSubject] = useState("");
   const [bodyText, setBodyText] = useState("");
+
+  // Postpone / Reschedule Dialog state
+  const [reschedulingOrder, setReschedulingOrder] = useState<any>(null);
+  const [newSlotDate, setNewSlotDate] = useState("");
+  const [newSlotId, setNewSlotId] = useState(TIME_SLOTS[0]!.id);
+  const [rescheduleReason, setRescheduleReason] = useState("");
+  const [rescheduleBusy, setRescheduleBusy] = useState(false);
 
   const { data: offerCodes } = useQuery({
     queryKey: ["admin-offer-codes"],
@@ -458,18 +478,18 @@ function AdminDashboard() {
                 { id: "all", label: "All Orders", count: data.orders.length },
                 {
                   id: "pending_approval",
-                  label: "Pending",
+                  label: "Kitchen Queue",
                   count: data.orders.filter((o) => o.status === "pending_approval").length,
-                },
-                {
-                  id: "awaiting_payment",
-                  label: "Awaiting payment",
-                  count: data.orders.filter((o) => o.status === "awaiting_payment").length,
                 },
                 {
                   id: "confirmed",
                   label: "Confirmed",
                   count: data.orders.filter((o) => o.status === "confirmed").length,
+                },
+                {
+                  id: "rescheduled",
+                  label: "Rescheduled",
+                  count: data.orders.filter((o) => o.status === "rescheduled").length,
                 },
                 {
                   id: "completed",
@@ -675,10 +695,12 @@ function AdminDashboard() {
                               const myOrdersUrl = `${origin}/orders`;
                               
                               let message = `🎂 *Sweet Crumb Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;
-                              if (order.status === "awaiting_payment") {
-                                message += `Your bakery order is approved! Please view your bill and complete payment of *${formatCurrency(Number(order.total))}* on our website to confirm your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Pay on our website here:* ${myOrdersUrl}\n\nThank you!`;
+                              if (order.status === "pending_approval") {
+                                message += `We have received your payment of *${formatCurrency(Number(order.total))}*! Our head baker is reviewing the schedule for your requested slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Requested Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order:* ${myOrdersUrl}\n\nThank you!`;
                               } else if (order.status === "confirmed") {
                                 message += `Your bakery order is *confirmed*! Our bakers will prepare it fresh for your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order here:* ${myOrdersUrl}\n\nThank you for choosing Sweet Crumb!`;
+                              } else if (order.status === "rescheduled") {
+                                message += `Update on your order: The head baker has adjusted your scheduled baking slot to *${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})*.\n\n📦 *Items:*\n${itemsText}\n\n👉 *View details on our site:* ${myOrdersUrl}\n\nSweet Crumb Bakery`;
                               } else {
                                 message += `Here is your order summary for *${formatCurrency(Number(order.total))}*.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *View order:* ${myOrdersUrl}`;
                               }
@@ -710,50 +732,87 @@ function AdminDashboard() {
                     </div>
 
                     {/* Status Action Buttons */}
-                    <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-2 gap-1.5">
-                      {(["awaiting_payment", "confirmed", "completed", "rejected"] as const).map((status) => {
-                        let isBtnDisabled = order.status === status;
-                        let btnText: string = STATUS_LABELS[status] ?? status;
-                        let btnTitle: string | undefined = undefined;
-
-                        if (status === "awaiting_payment") {
-                          btnText = "Approve";
-                        } else if (status === "completed") {
-                          if (isFutureDelivery && !isAlreadyCompleted) {
-                            isBtnDisabled = true;
-                            btnTitle = `Can only complete on or after delivery day (${order.slot_date})`;
-                            btnText = `Due ${order.slot_date.slice(5)}`;
-                          } else {
-                            btnText = "Completed";
-                          }
+                    <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-2 gap-2">
+                      {/* Confirm button */}
+                      <Button
+                        size="sm"
+                        disabled={order.status === "confirmed"}
+                        className={`h-8 text-xs font-semibold rounded-xl ${
+                          order.status === "confirmed"
+                            ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
+                            : "bg-emerald-600 text-white hover:bg-emerald-700"
+                        }`}
+                        onClick={() =>
+                          run(
+                            () => updateStatus({ data: { orderId: order.id, status: "confirmed" } }),
+                            "Order confirmed & customer emailed!",
+                          )
                         }
+                      >
+                        {order.status === "confirmed" ? "✓ Confirmed" : "✅ Confirm"}
+                      </Button>
 
-                        return (
-                          <Button
-                            key={status}
-                            size="sm"
-                            title={btnTitle}
-                            variant={status === "rejected" ? "outline" : "default"}
-                            className={`h-8 text-xs font-semibold rounded-xl ${
-                              status === "rejected"
-                                ? "text-destructive hover:bg-destructive/10"
-                                : isBtnDisabled
-                                ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
-                                : "bg-berry text-berry-foreground hover:bg-berry/90"
-                            }`}
-                            disabled={isBtnDisabled}
-                            onClick={() =>
-                              run(
-                                () => updateStatus({ data: { orderId: order.id, status } }),
-                                `Order marked ${(STATUS_LABELS[status] ?? status).toLowerCase()}`,
-                              )
-                            }
-                          >
-                            {status === "completed" && isFutureDelivery && !isAlreadyCompleted && "🔒 "}
-                            {btnText}
-                          </Button>
-                        );
-                      })}
+                      {/* Postpone / Reschedule button */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 text-xs font-semibold rounded-xl border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
+                        onClick={() => {
+                          setReschedulingOrder(order);
+                          setNewSlotDate(order.slot_date);
+                          const matchingSlot = TIME_SLOTS.find((s) => s.start === order.slot_start);
+                          setNewSlotId(matchingSlot ? matchingSlot.id : TIME_SLOTS[0]!.id);
+                          setRescheduleReason("");
+                        }}
+                      >
+                        🕒 Reschedule
+                      </Button>
+
+                      {/* Complete button */}
+                      <Button
+                        size="sm"
+                        disabled={
+                          order.status === "completed" ||
+                          (isFutureDelivery && !isAlreadyCompleted)
+                        }
+                        title={
+                          isFutureDelivery && !isAlreadyCompleted
+                            ? `Can only complete on or after delivery day (${order.slot_date})`
+                            : undefined
+                        }
+                        className={`h-8 text-xs font-semibold rounded-xl ${
+                          order.status === "completed"
+                            ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
+                            : isFutureDelivery && !isAlreadyCompleted
+                            ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
+                            : "bg-berry text-berry-foreground hover:bg-berry/90"
+                        }`}
+                        onClick={() =>
+                          run(
+                            () => updateStatus({ data: { orderId: order.id, status: "completed" } }),
+                            "Order completed!",
+                          )
+                        }
+                      >
+                        {isFutureDelivery && !isAlreadyCompleted ? `🔒 Due ${order.slot_date.slice(5)}` : "Completed"}
+                      </Button>
+
+                      {/* Reject / Refund button */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 text-xs font-semibold rounded-xl text-destructive hover:bg-destructive/10 border-destructive/30"
+                        onClick={() => {
+                          if (confirm(`Are you sure you want to cancel & refund Order #${order.id.slice(0, 8)}?`)) {
+                            run(
+                              () => updateStatus({ data: { orderId: order.id, status: "rejected" } }),
+                              "Order cancelled and refund email sent.",
+                            );
+                          }
+                        }}
+                      >
+                        Cancel / Refund
+                      </Button>
                     </div>
                   </article>
                 );
@@ -1840,6 +1899,130 @@ function AdminDashboard() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Postpone / Reschedule Slot Dialog */}
+      <Dialog
+        open={!!reschedulingOrder}
+        onOpenChange={(open) => {
+          if (!open) {
+            setReschedulingOrder(null);
+            setRescheduleReason("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-[460px] rounded-3xl p-6">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl font-bold text-cocoa">
+              Postpone / Reschedule Baking Slot
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Adjust the delivery/pickup slot for Order #{reschedulingOrder?.id?.slice(0, 8)}. An automated email will be sent to {reschedulingOrder?.contact_name || "the customer"}.
+            </DialogDescription>
+          </DialogHeader>
+
+          {reschedulingOrder && (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!newSlotDate) {
+                  toast.error("Please pick a new date");
+                  return;
+                }
+                setRescheduleBusy(true);
+                try {
+                  await rescheduleFn({
+                    data: {
+                      orderId: reschedulingOrder.id,
+                      newSlotDate,
+                      newSlotId,
+                      reason: rescheduleReason.trim() || undefined,
+                    },
+                  });
+                  toast.success(`Order rescheduled to ${newSlotDate}! Customer notified via email.`);
+                  setReschedulingOrder(null);
+                  setRescheduleReason("");
+                  await refresh();
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : "Failed to reschedule order");
+                } finally {
+                  setRescheduleBusy(false);
+                }
+              }}
+              className="space-y-4 py-2"
+            >
+              <div className="space-y-1.5">
+                <Label htmlFor="reschedule-date" className="text-xs font-semibold text-foreground">
+                  New Baking & Delivery Date
+                </Label>
+                <Input
+                  id="reschedule-date"
+                  type="date"
+                  value={newSlotDate}
+                  min={toISODate(new Date())}
+                  onChange={(e) => setNewSlotDate(e.target.value)}
+                  required
+                  className="rounded-xl h-10 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="reschedule-slot" className="text-xs font-semibold text-foreground">
+                  New Time Window
+                </Label>
+                <select
+                  id="reschedule-slot"
+                  value={newSlotId}
+                  onChange={(e) => setNewSlotId(e.target.value)}
+                  className="w-full h-10 rounded-xl border border-input bg-background px-3 text-xs font-medium focus:ring-2 focus:ring-berry"
+                >
+                  {TIME_SLOTS.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.label} ({s.start.slice(0, 5)} - {s.end.slice(0, 5)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="reschedule-reason" className="text-xs font-semibold text-foreground">
+                  Reason / Note to Customer from Baker (optional)
+                </Label>
+                <Textarea
+                  id="reschedule-reason"
+                  placeholder="e.g. Morning oven batch at full capacity — moved to afternoon fresh bake."
+                  value={rescheduleReason}
+                  onChange={(e) => setRescheduleReason(e.target.value)}
+                  rows={3}
+                  className="rounded-xl text-xs resize-none"
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  This note will be included in the automated email sent to the customer.
+                </p>
+              </div>
+
+              <DialogFooter className="pt-2 flex items-center justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setReschedulingOrder(null)}
+                  className="rounded-xl text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={rescheduleBusy}
+                  size="sm"
+                  className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold text-xs"
+                >
+                  {rescheduleBusy ? "Updating…" : "Confirm & Send Email"}
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

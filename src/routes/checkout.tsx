@@ -201,7 +201,7 @@ function CheckoutPage() {
         },
       });
       clear();
-      toast.success("Order placed — we'll confirm your slot shortly.");
+      toast.success("Payment successful! Your order is now in the kitchen bake queue.");
       navigate({ to: "/orders" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not place the order");
@@ -215,9 +215,9 @@ function CheckoutPage() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12">
       <div className="mb-8">
-        <h1 className="font-display text-3xl font-bold text-cocoa">Choose your slot</h1>
+        <h1 className="font-display text-3xl font-bold text-cocoa">Choose your slot & checkout</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Orders need one day of notice. We confirm availability before asking for payment.
+          Orders need at least one day of notice. Instant payment secures your slot in our fresh bake queue.
         </p>
       </div>
 
@@ -784,13 +784,13 @@ function CheckoutPage() {
                 <ShieldCheck className="h-4 w-4 shrink-0 text-berry mt-0.5" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   <span className="font-semibold text-foreground">Bake-to-order notice:</span>{" "}
-                  Everything is baked fresh on slot morning. Pay only after your slot is confirmed.
+                  Everything is baked fresh on your delivery day. Payment is secured and entered directly into the head baker's schedule.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Relocated Request This Slot Button */}
+          {/* Pay & Place Order Button */}
           <div className="pt-2">
             <Button
               type="submit"
@@ -804,7 +804,7 @@ function CheckoutPage() {
               }
               className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 py-6 text-base font-semibold shadow-soft cursor-pointer transition-all hover:scale-[1.01]"
             >
-              {busy ? "Placing order…" : "Request this slot"}
+              {busy ? "Processing payment…" : `Pay & Place Order · ${formatCurrency(finalTotal)}`}
             </Button>
           </div>
         </aside>
