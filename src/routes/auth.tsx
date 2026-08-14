@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import {
   signInWithEmail,
   signInWithGoogle,
+  createSessionFromToken,
   signUpWithEmail,
   sendPasswordRecovery,
   sendEmailVerification,
@@ -16,9 +17,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+export type AuthSearch = {
+  redirect?: string | undefined;
+  userId?: string | undefined;
+  secret?: string | undefined;
+  error?: string | undefined;
+};
+
 export const Route = createFileRoute("/auth")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): AuthSearch => ({
     redirect: typeof search['redirect'] === "string" ? (search['redirect'] as string) : undefined,
+    userId: typeof search['userId'] === "string" ? (search['userId'] as string) : undefined,
+    secret: typeof search['secret'] === "string" ? (search['secret'] as string) : undefined,
+    error: typeof search['error'] === "string" ? (search['error'] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -45,6 +56,7 @@ function AuthPage() {
   const saveProfileFn = useServerFn(saveMyProfile);
 
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [authenticatingOAuth, setAuthenticatingOAuth] = useState(Boolean(search.userId && search.secret));
 
   // Email Sign-in State
   const [email, setEmail] = useState("");
@@ -61,11 +73,32 @@ function AuthPage() {
 
   const [busy, setBusy] = useState(false);
 
+  // Handle OAuth Token Callback (userId & secret from Google OAuth)
   useEffect(() => {
-    void refreshAuth().then((user) => {
-      if (user) navigate({ to: target, replace: true });
-    });
-  }, [navigate, target]);
+    if (search.userId && search.secret) {
+      setAuthenticatingOAuth(true);
+      createSessionFromToken(search.userId, search.secret)
+        .then(async () => {
+          await refreshAuth();
+          toast.success("Signed in with Google successfully!");
+          navigate({ to: target, replace: true });
+        })
+        .catch((err) => {
+          toast.error(err instanceof Error ? err.message : "Google sign-in failed.");
+          setAuthenticatingOAuth(false);
+        });
+    } else if (search.error) {
+      toast.error("Google sign-in was cancelled or failed.");
+    }
+  }, [search.userId, search.secret, search.error, navigate, target]);
+
+  useEffect(() => {
+    if (!search.userId && !search.secret) {
+      void refreshAuth().then((user) => {
+        if (user) navigate({ to: target, replace: true });
+      });
+    }
+  }, [navigate, target, search.userId, search.secret]);
 
   // 1. Email & Password Sign-in
   async function handleEmailSignIn(event: React.FormEvent): Promise<void> {
@@ -192,7 +225,25 @@ function AuthPage() {
 
   // 5. Google OAuth Sign-in
   async function handleGoogleSignIn(): Promise<void> {
-    signInWithGoogle(`${window.location.origin}${target}`, `${window.location.origin}/auth`);
+    const successUrl = `${window.location.origin}/auth?redirect=${encodeURIComponent(target)}`;
+    const failureUrl = `${window.location.origin}/auth?error=oauth_failed`;
+    signInWithGoogle(successUrl, failureUrl);
+  }
+
+  if (authenticatingOAuth) {
+    return (
+      <div className="mx-auto w-full max-w-md px-4 py-24 text-center">
+        <div className="rounded-3xl border border-border bg-card p-8 shadow-soft space-y-4">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-berry/10 text-berry animate-pulse">
+            <span className="text-2xl font-bold">🥐</span>
+          </div>
+          <h2 className="font-display text-2xl font-bold text-cocoa">Completing Google Sign-In</h2>
+          <p className="text-xs text-muted-foreground">
+            Setting up your secure bakery session, please wait…
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

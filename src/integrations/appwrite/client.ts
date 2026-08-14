@@ -63,11 +63,16 @@ export async function signUpWithEmail(
 }
 
 export function signInWithGoogle(success: string, failure: string): void {
-  appwriteAccount().createOAuth2Session({
+  appwriteAccount().createOAuth2Token({
     provider: OAuthProvider.Google,
     success,
     failure,
   });
+}
+
+/** Creates a local authenticated session from OAuth2 token query params (userId and secret) */
+export async function createSessionFromToken(userId: string, secret: string): Promise<void> {
+  await appwriteAccount().createSession({ userId, secret });
 }
 
 export async function sendPasswordRecovery(email: string): Promise<void> {
