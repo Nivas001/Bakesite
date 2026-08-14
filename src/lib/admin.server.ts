@@ -4,11 +4,13 @@ import {
   Q,
   createDoc,
   deleteDoc,
+  getDoc,
   listDocs,
   updateDoc,
 } from "@/integrations/appwrite/admin.server";
 import { notifyCustomerOrderUpdate, sendReviewRequest } from "./notifications.server";
 import { createPaymentLink } from "./payments.server";
+import { toISODate } from "./slots";
 import type { CategoryDoc, ProductDoc } from "./catalog.server";
 import { loadOrderItems, serializeOrder, type OrderDoc } from "./orders.server";
 import {
@@ -32,6 +34,18 @@ export async function fetchAdminOrders() {
 }
 
 export async function changeOrderStatus(input: z.infer<typeof orderStatusSchema>) {
+  if (input.status === "completed") {
+    const existing = await getDoc<OrderDoc>(COLLECTIONS.orders, input.orderId);
+    if (existing) {
+      const today = toISODate(new Date());
+      if (existing.slot_date > today) {
+        throw new Error(
+          `Order can only be marked completed on or after its scheduled delivery date (${existing.slot_date}).`,
+        );
+      }
+    }
+  }
+
   const data = await updateDoc<OrderDoc>(COLLECTIONS.orders, input.orderId, {
     status: input.status,
   });

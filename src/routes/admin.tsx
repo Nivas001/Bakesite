@@ -24,6 +24,7 @@ import {
   deleteAdminOfferCode,
 } from "@/lib/offers.functions";
 import { formatCurrency } from "@/lib/pricing";
+import { toISODate } from "@/lib/slots";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -170,13 +171,51 @@ function AdminDashboard() {
     );
   }
 
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
+  const [orderSortBy, setOrderSortBy] = useState<string>("priority");
+  const [orderSearchQuery, setOrderSearchQuery] = useState<string>("");
+
+  const todayISO = toISODate(new Date());
   const pending = data.orders.filter((o) => o.status === "pending_approval").length;
 
-  const sortedOrders = [...data.orders].sort((a, b) => {
-    const pA = STATUS_ORDER_PRIORITY[a.status] ?? 99;
-    const pB = STATUS_ORDER_PRIORITY[b.status] ?? 99;
-    if (pA !== pB) return pA - pB;
-    return new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime();
+  const filteredOrders = data.orders.filter((order) => {
+    if (orderStatusFilter !== "all" && order.status !== orderStatusFilter) {
+      return false;
+    }
+    if (orderSearchQuery.trim()) {
+      const q = orderSearchQuery.toLowerCase();
+      const matchName = (order.contact_name || "").toLowerCase().includes(q);
+      const matchPhone = (order.contact_phone || "").toLowerCase().includes(q);
+      const matchAddress = (order.delivery_address || "").toLowerCase().includes(q);
+      const matchId = (order.id || "").toLowerCase().includes(q);
+      return matchName || matchPhone || matchAddress || matchId;
+    }
+    return true;
+  });
+
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    if (orderSortBy === "priority") {
+      const pA = STATUS_ORDER_PRIORITY[a.status] ?? 99;
+      const pB = STATUS_ORDER_PRIORITY[b.status] ?? 99;
+      if (pA !== pB) return pA - pB;
+      return new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime();
+    }
+    if (orderSortBy === "date_asc") {
+      return a.slot_date.localeCompare(b.slot_date) || a.slot_start.localeCompare(b.slot_start);
+    }
+    if (orderSortBy === "date_desc") {
+      return b.slot_date.localeCompare(a.slot_date) || b.slot_start.localeCompare(a.slot_start);
+    }
+    if (orderSortBy === "amount_desc") {
+      return Number(b.total) - Number(a.total);
+    }
+    if (orderSortBy === "amount_asc") {
+      return Number(a.total) - Number(b.total);
+    }
+    if (orderSortBy === "newest") {
+      return new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime();
+    }
+    return 0;
   });
 
   return (
@@ -196,14 +235,139 @@ function AdminDashboard() {
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="orders" className="mt-6">
+        <TabsContent value="orders" className="mt-6 space-y-5">
+          {/* Filter & Sort Controls Bar */}
+          <div className="flex flex-col gap-3.5 rounded-3xl border border-border/70 bg-card p-4 shadow-soft">
+            {/* Status Filter Tabs with Counts */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {[
+                { id: "all", label: "All Orders", count: data.orders.length },
+                {
+                  id: "pending_approval",
+                  label: "Pending",
+                  count: data.orders.filter((o) => o.status === "pending_approval").length,
+                },
+                {
+                  id: "awaiting_payment",
+                  label: "Awaiting payment",
+                  count: data.orders.filter((o) => o.status === "awaiting_payment").length,
+                },
+                {
+                  id: "confirmed",
+                  label: "Confirmed",
+                  count: data.orders.filter((o) => o.status === "confirmed").length,
+                },
+                {
+                  id: "completed",
+                  label: "Completed",
+                  count: data.orders.filter((o) => o.status === "completed").length,
+                },
+                {
+                  id: "rejected",
+                  label: "Rejected",
+                  count: data.orders.filter((o) => o.status === "rejected").length,
+                },
+              ].map((pill) => {
+                const isActive = orderStatusFilter === pill.id;
+                return (
+                  <button
+                    key={pill.id}
+                    type="button"
+                    onClick={() => setOrderStatusFilter(pill.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                      isActive
+                        ? "bg-cocoa text-background shadow-sm"
+                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    }`}
+                  >
+                    <span>{pill.label}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                        isActive
+                          ? "bg-background/20 text-background"
+                          : "bg-background/80 text-foreground"
+                      }`}
+                    >
+                      {pill.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Search Bar & Sort Dropdown */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/50">
+              <div className="relative min-w-[240px] flex-1 max-w-sm">
+                <Input
+                  placeholder="Search customer, phone, address…"
+                  value={orderSearchQuery}
+                  onChange={(e) => setOrderSearchQuery(e.target.value)}
+                  className="h-9 text-xs pl-8 rounded-xl bg-background"
+                />
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
+                  🔍
+                </span>
+                {orderSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setOrderSearchQuery("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                  Sort:
+                </span>
+                <select
+                  value={orderSortBy}
+                  onChange={(e) => setOrderSortBy(e.target.value)}
+                  className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                >
+                  <option value="priority">Priority (Pending ➔ Confirmed ➔ Done)</option>
+                  <option value="date_asc">Delivery Date (Earliest First)</option>
+                  <option value="date_desc">Delivery Date (Latest First)</option>
+                  <option value="amount_desc">Order Amount (High to Low)</option>
+                  <option value="amount_asc">Order Amount (Low to High)</option>
+                  <option value="newest">Newest Orders First</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Orders Cards Grid */}
           {sortedOrders.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No orders yet.</p>
+            <div className="rounded-3xl border border-dashed border-border p-12 text-center">
+              <p className="text-sm font-medium text-muted-foreground">
+                {orderSearchQuery || orderStatusFilter !== "all"
+                  ? "No orders match your filter criteria."
+                  : "No orders yet."}
+              </p>
+              {(orderSearchQuery || orderStatusFilter !== "all") && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setOrderStatusFilter("all");
+                    setOrderSearchQuery("");
+                  }}
+                  className="mt-3 text-xs rounded-xl"
+                >
+                  Reset filters
+                </Button>
+              )}
+            </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {sortedOrders.map((order) => {
                 const badgeStyle =
                   STATUS_BADGE_STYLES[order.status] ?? "bg-matcha text-cocoa";
+                const isFutureDelivery = order.slot_date > todayISO;
+                const isAlreadyCompleted = order.status === "completed";
+
                 return (
                   <article
                     key={order.id}
@@ -297,29 +461,49 @@ function AdminDashboard() {
 
                     {/* Status Action Buttons */}
                     <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-2 gap-1.5">
-                      {(["awaiting_payment", "confirmed", "completed", "rejected"] as const).map((status) => (
-                        <Button
-                          key={status}
-                          size="sm"
-                          variant={status === "rejected" ? "outline" : "default"}
-                          className={`h-8 text-xs font-semibold rounded-xl ${
-                            status === "rejected"
-                              ? "text-destructive hover:bg-destructive/10"
-                              : order.status === status
-                              ? "bg-muted text-muted-foreground"
-                              : "bg-berry text-berry-foreground hover:bg-berry/90"
-                          }`}
-                          disabled={order.status === status}
-                          onClick={() =>
-                            run(
-                              () => updateStatus({ data: { orderId: order.id, status } }),
-                              `Order marked ${(STATUS_LABELS[status] ?? status).toLowerCase()}`,
-                            )
+                      {(["awaiting_payment", "confirmed", "completed", "rejected"] as const).map((status) => {
+                        let isBtnDisabled = order.status === status;
+                        let btnText: string = STATUS_LABELS[status] ?? status;
+                        let btnTitle: string | undefined = undefined;
+
+                        if (status === "awaiting_payment") {
+                          btnText = "Approve";
+                        } else if (status === "completed") {
+                          if (isFutureDelivery && !isAlreadyCompleted) {
+                            isBtnDisabled = true;
+                            btnTitle = `Can only complete on or after delivery day (${order.slot_date})`;
+                            btnText = `Due ${order.slot_date.slice(5)}`;
+                          } else {
+                            btnText = "Completed";
                           }
-                        >
-                          {status === "awaiting_payment" ? "Approve" : (STATUS_LABELS[status] ?? status)}
-                        </Button>
-                      ))}
+                        }
+
+                        return (
+                          <Button
+                            key={status}
+                            size="sm"
+                            title={btnTitle}
+                            variant={status === "rejected" ? "outline" : "default"}
+                            className={`h-8 text-xs font-semibold rounded-xl ${
+                              status === "rejected"
+                                ? "text-destructive hover:bg-destructive/10"
+                                : isBtnDisabled
+                                ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
+                                : "bg-berry text-berry-foreground hover:bg-berry/90"
+                            }`}
+                            disabled={isBtnDisabled}
+                            onClick={() =>
+                              run(
+                                () => updateStatus({ data: { orderId: order.id, status } }),
+                                `Order marked ${(STATUS_LABELS[status] ?? status).toLowerCase()}`,
+                              )
+                            }
+                          >
+                            {status === "completed" && isFutureDelivery && !isAlreadyCompleted && "🔒 "}
+                            {btnText}
+                          </Button>
+                        );
+                      })}
                     </div>
                   </article>
                 );
