@@ -113,6 +113,153 @@ const EMPTY_OFFER_FORM: OfferCodeForm = {
   description: "",
 };
 
+function ProductAdminRow({
+  product,
+  categoryName,
+  onEdit,
+  onDelete,
+}: {
+  product: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    price: number;
+    discount_type: "none" | "percent" | "flat";
+    discount_value: number;
+    image_url: string | null;
+    stock: number;
+    is_active: boolean;
+    category_id: string | null;
+  };
+  categoryName?: string | undefined;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const stock = Number(product.stock);
+  const price = Number(product.price);
+  const discountType = product.discount_type;
+  const discountVal = Number(product.discount_value);
+
+  let finalPrice = price;
+  if (discountType === "percent" && discountVal > 0) {
+    finalPrice = Math.max(0, price - (price * discountVal) / 100);
+  } else if (discountType === "flat" && discountVal > 0) {
+    finalPrice = Math.max(0, price - discountVal);
+  }
+
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border border-border/70 bg-card p-4 shadow-soft transition-all hover:border-berry/30 hover:shadow-lift">
+      {/* Product Image & Details */}
+      <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-secondary border border-border/50 shadow-2xs">
+          {product.image_url ? (
+            <img
+              src={product.image_url}
+              alt={product.name}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-xl text-muted-foreground/60">
+              🥖
+            </div>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h4 className="font-display text-base font-bold text-cocoa truncate">
+              {product.name}
+            </h4>
+
+            {/* Visibility Badge */}
+            {product.is_active ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                ● Visible
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted border border-border px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                Hidden
+              </span>
+            )}
+
+            {/* Stock Level Badge */}
+            {stock === 0 ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 border border-destructive/30 px-2 py-0.5 text-[10px] font-bold text-destructive">
+                ❌ Out of stock
+              </span>
+            ) : stock <= 5 ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                ⚠️ Low stock ({stock})
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-secondary/80 border border-border/50 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                Stock: {stock}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+            {/* Price & Discount */}
+            <div className="flex items-center gap-1.5 font-semibold text-cocoa">
+              {discountType !== "none" && discountVal > 0 ? (
+                <>
+                  <span className="text-berry">{formatCurrency(finalPrice)}</span>
+                  <span className="text-xs line-through text-muted-foreground font-normal">
+                    {formatCurrency(price)}
+                  </span>
+                  <span className="rounded bg-berry/15 px-1 py-0.5 text-[10px] font-bold text-berry">
+                    {discountType === "percent" ? `${discountVal}% off` : `₹${discountVal} off`}
+                  </span>
+                </>
+              ) : (
+                <span>{formatCurrency(price)}</span>
+              )}
+            </div>
+
+            {categoryName && (
+              <span className="rounded-md bg-secondary/70 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                📁 {categoryName}
+              </span>
+            )}
+
+            <span className="font-mono text-[11px] text-muted-foreground/70 truncate max-w-[150px]">
+              /{product.slug}
+            </span>
+          </div>
+
+          {product.description && (
+            <p className="mt-1 text-[11px] text-muted-foreground line-clamp-1">
+              {product.description}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2 border-t border-border/40 pt-2 sm:border-t-0 sm:pt-0 shrink-0">
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-xl h-8 px-3 text-xs font-semibold hover:border-berry/40"
+          onClick={onEdit}
+        >
+          Edit
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-xl h-8 px-3 text-xs font-semibold text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+          onClick={onDelete}
+        >
+          Delete
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function AdminDashboard() {
   const queryClient = useQueryClient();
   const loadData = useServerFn(getAdminData);
@@ -233,6 +380,52 @@ function AdminDashboard() {
     if (orderSortBy === "newest") {
       return new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime();
     }
+    return 0;
+  });
+
+  const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState<string>("all");
+  const [inventorySortBy, setInventorySortBy] = useState<string>("name_asc");
+  const [inventorySearchQuery, setInventorySearchQuery] = useState<string>("");
+  const [inventoryStockFilter, setInventoryStockFilter] = useState<string>("all");
+
+  const categoryMap = new Map<string, string>();
+  for (const c of data.categories) {
+    categoryMap.set(c.id, c.name);
+  }
+
+  const filteredProducts = data.products.filter((p) => {
+    if (inventoryCategoryFilter !== "all") {
+      if (inventoryCategoryFilter === "uncategorized") {
+        if (p.category_id) return false;
+      } else if (p.category_id !== inventoryCategoryFilter) {
+        return false;
+      }
+    }
+    if (inventoryStockFilter === "in_stock" && p.stock <= 0) return false;
+    if (inventoryStockFilter === "low" && (p.stock <= 0 || p.stock > 5)) return false;
+    if (inventoryStockFilter === "out" && p.stock > 0) return false;
+    if (inventoryStockFilter === "active" && !p.is_active) return false;
+    if (inventoryStockFilter === "hidden" && p.is_active) return false;
+
+    if (inventorySearchQuery.trim()) {
+      const q = inventorySearchQuery.toLowerCase();
+      const matchName = p.name.toLowerCase().includes(q);
+      const matchDesc = (p.description || "").toLowerCase().includes(q);
+      const matchSlug = p.slug.toLowerCase().includes(q);
+      const matchCat = (p.category_id ? categoryMap.get(p.category_id) || "" : "").toLowerCase().includes(q);
+      return matchName || matchDesc || matchSlug || matchCat;
+    }
+    return true;
+  });
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (inventorySortBy === "name_asc") return a.name.localeCompare(b.name);
+    if (inventorySortBy === "name_desc") return b.name.localeCompare(a.name);
+    if (inventorySortBy === "price_asc") return Number(a.price) - Number(b.price);
+    if (inventorySortBy === "price_desc") return Number(b.price) - Number(a.price);
+    if (inventorySortBy === "stock_asc") return Number(a.stock) - Number(b.stock);
+    if (inventorySortBy === "stock_desc") return Number(b.stock) - Number(a.stock);
+    if (inventorySortBy === "active_first") return (b.is_active ? 1 : 0) - (a.is_active ? 1 : 0);
     return 0;
   });
 
@@ -534,16 +727,27 @@ function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="inventory" className="mt-6 grid gap-8 lg:grid-cols-[380px_1fr]">
-          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-            <h2 className="font-display text-xl font-semibold">
-              {form.id ? "Edit product" : "New product"}
-            </h2>
+          {/* PRODUCT FORM */}
+          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft h-fit sticky top-24">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-xl font-semibold text-cocoa">
+                {form.id ? "Edit product" : "New product"}
+              </h2>
+              {form.id && (
+                <span className="rounded-full bg-berry/15 border border-berry/30 px-2 py-0.5 text-[10px] font-bold text-berry">
+                  Editing
+                </span>
+              )}
+            </div>
+
             <div className="mt-4 space-y-3">
               <div>
-                <Label htmlFor="p-name">Name</Label>
+                <Label htmlFor="p-name" className="text-xs font-semibold">Name <span className="text-berry">*</span></Label>
                 <Input
                   id="p-name"
                   value={form.name}
+                  placeholder="e.g. Sourdough Loaf"
+                  className="rounded-xl h-9 text-xs mt-1"
                   onChange={(e) => {
                     const name = e.target.value;
                     setForm((f) => ({
@@ -557,57 +761,80 @@ function AdminDashboard() {
                 />
               </div>
               <div>
-                <Label htmlFor="p-slug">Slug</Label>
-                <Input id="p-slug" value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+                <Label htmlFor="p-slug" className="text-xs font-semibold">URL Slug</Label>
+                <Input
+                  id="p-slug"
+                  value={form.slug}
+                  placeholder="sourdough-loaf"
+                  className="rounded-xl h-9 text-xs font-mono mt-1"
+                  onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+                />
               </div>
               <div>
-                <Label htmlFor="p-desc">Description</Label>
+                <Label htmlFor="p-desc" className="text-xs font-semibold">Description</Label>
                 <Textarea
                   id="p-desc"
                   value={form.description}
+                  rows={2}
+                  placeholder="Fresh artisan bread made daily…"
+                  className="rounded-xl text-xs mt-1"
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="p-price">Price (₹)</Label>
-                  <Input id="p-price" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} />
+                  <Label htmlFor="p-price" className="text-xs font-semibold">Price (₹) <span className="text-berry">*</span></Label>
+                  <Input
+                    id="p-price"
+                    type="number"
+                    value={form.price}
+                    className="rounded-xl h-9 text-xs mt-1"
+                    onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="p-stock">Stock</Label>
-                  <Input id="p-stock" value={form.stock} onChange={(e) => setForm((f) => ({ ...f, stock: e.target.value }))} />
+                  <Label htmlFor="p-stock" className="text-xs font-semibold">Stock Quantity</Label>
+                  <Input
+                    id="p-stock"
+                    type="number"
+                    value={form.stock}
+                    className="rounded-xl h-9 text-xs mt-1"
+                    onChange={(e) => setForm((f) => ({ ...f, stock: e.target.value }))}
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="p-dtype">Discount type</Label>
+                  <Label htmlFor="p-dtype" className="text-xs font-semibold">Discount Type</Label>
                   <select
                     id="p-dtype"
-                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                    className="h-9 w-full rounded-xl border border-input bg-background px-3 text-xs mt-1 cursor-pointer"
                     value={form.discount_type}
                     onChange={(e) =>
                       setForm((f) => ({ ...f, discount_type: e.target.value as ProductForm["discount_type"] }))
                     }
                   >
                     <option value="none">None</option>
-                    <option value="percent">Percent</option>
-                    <option value="flat">Flat</option>
+                    <option value="percent">Percent (%)</option>
+                    <option value="flat">Flat (₹)</option>
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="p-dval">Discount value</Label>
+                  <Label htmlFor="p-dval" className="text-xs font-semibold">Discount Value</Label>
                   <Input
                     id="p-dval"
+                    type="number"
                     value={form.discount_value}
+                    className="rounded-xl h-9 text-xs mt-1"
                     onChange={(e) => setForm((f) => ({ ...f, discount_value: e.target.value }))}
                   />
                 </div>
               </div>
               <div>
-                <Label htmlFor="p-cat">Category</Label>
+                <Label htmlFor="p-cat" className="text-xs font-semibold">Bakery Category</Label>
                 <select
                   id="p-cat"
-                  className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                  className="h-9 w-full rounded-xl border border-input bg-background px-3 text-xs mt-1 cursor-pointer"
                   value={form.category_id}
                   onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value }))}
                 >
@@ -620,20 +847,28 @@ function AdminDashboard() {
                 </select>
               </div>
               <div>
-                <Label htmlFor="p-img">Image URL</Label>
-                <Input id="p-img" value={form.image_url} onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))} />
+                <Label htmlFor="p-img" className="text-xs font-semibold">Image URL</Label>
+                <Input
+                  id="p-img"
+                  value={form.image_url}
+                  placeholder="https://images.unsplash.com/..."
+                  className="rounded-xl h-9 text-xs mt-1"
+                  onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
+                />
               </div>
-              <label className="flex items-center gap-2 text-sm">
+              <label className="flex items-center gap-2 text-xs font-medium cursor-pointer pt-1">
                 <input
                   type="checkbox"
                   checked={form.is_active}
                   onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
+                  className="rounded border-input text-berry"
                 />
-                Visible in the shop
+                Visible in the public shop
               </label>
-              <div className="flex gap-2 pt-2">
+
+              <div className="flex gap-2 pt-3">
                 <Button
-                  className="bg-berry text-berry-foreground hover:bg-berry/90"
+                  className="flex-1 rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 h-10 font-semibold text-xs"
                   onClick={() =>
                     run(async () => {
                       await persistProduct({
@@ -655,10 +890,14 @@ function AdminDashboard() {
                     }, "Product saved")
                   }
                 >
-                  Save product
+                  {form.id ? "Update Product" : "Create Product"}
                 </Button>
                 {form.id && (
-                  <Button variant="outline" onClick={() => setForm(EMPTY_FORM)}>
+                  <Button
+                    variant="outline"
+                    className="rounded-2xl h-10 text-xs"
+                    onClick={() => setForm(EMPTY_FORM)}
+                  >
                     Cancel
                   </Button>
                 )}
@@ -666,55 +905,308 @@ function AdminDashboard() {
             </div>
           </div>
 
-          <div className="space-y-3">
-            {data.products.map((product) => (
-              <div
-                key={product.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-card p-4"
-              >
-                <div>
-                  <p className="font-medium">
-                    {product.name}{" "}
-                    {!product.is_active && (
-                      <span className="text-xs text-muted-foreground">(hidden)</span>
-                    )}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatCurrency(Number(product.price))} · stock {product.stock}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      setForm({
-                        id: product.id,
-                        name: product.name,
-                        slug: product.slug,
-                        description: product.description ?? "",
-                        price: String(product.price),
-                        discount_type: product.discount_type,
-                        discount_value: String(product.discount_value),
-                        image_url: product.image_url ?? "",
-                        stock: String(product.stock),
-                        is_active: product.is_active,
-                        category_id: product.category_id ?? "",
-                      })
-                    }
+          {/* INVENTORY LIST WITH CATEGORY-WISE GROUPING & SORT CONTROLS */}
+          <div className="space-y-5">
+            {/* Category Filter Pills */}
+            <div className="flex flex-col gap-3.5 rounded-3xl border border-border/70 bg-card p-4 shadow-soft">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Browse by Category
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setInventoryCategoryFilter("all")}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                      inventoryCategoryFilter === "all"
+                        ? "bg-cocoa text-background shadow-xs"
+                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    }`}
                   >
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => run(() => removeProductFn({ data: product.id }), "Product deleted")}
-                  >
-                    Delete
-                  </Button>
+                    <span>All Categories</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                        inventoryCategoryFilter === "all"
+                          ? "bg-background/20 text-background"
+                          : "bg-background/80 text-foreground"
+                      }`}
+                    >
+                      {data.products.length}
+                    </span>
+                  </button>
+
+                  {data.categories.map((cat) => {
+                    const count = data.products.filter((p) => p.category_id === cat.id).length;
+                    const isActive = inventoryCategoryFilter === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setInventoryCategoryFilter(cat.id)}
+                        className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                          isActive
+                            ? "bg-cocoa text-background shadow-xs"
+                            : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        }`}
+                      >
+                        <span>{cat.name}</span>
+                        <span
+                          className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                            isActive
+                              ? "bg-background/20 text-background"
+                              : "bg-background/80 text-foreground"
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+
+                  {data.products.some((p) => !p.category_id) && (
+                    <button
+                      type="button"
+                      onClick={() => setInventoryCategoryFilter("uncategorized")}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                        inventoryCategoryFilter === "uncategorized"
+                          ? "bg-cocoa text-background shadow-xs"
+                          : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      }`}
+                    >
+                      <span>Uncategorised</span>
+                      <span
+                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                          inventoryCategoryFilter === "uncategorized"
+                            ? "bg-background/20 text-background"
+                            : "bg-background/80 text-foreground"
+                        }`}
+                      >
+                        {data.products.filter((p) => !p.category_id).length}
+                      </span>
+                    </button>
+                  )}
                 </div>
               </div>
-            ))}
+
+              {/* Search, Stock Filter & Sorting Controls */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/50">
+                <div className="relative min-w-[200px] flex-1 max-w-xs">
+                  <Input
+                    placeholder="Search product name, slug…"
+                    value={inventorySearchQuery}
+                    onChange={(e) => setInventorySearchQuery(e.target.value)}
+                    className="h-9 text-xs pl-8 rounded-xl bg-background"
+                  />
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
+                    🔍
+                  </span>
+                  {inventorySearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setInventorySearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={inventoryStockFilter}
+                    onChange={(e) => setInventoryStockFilter(e.target.value)}
+                    className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                  >
+                    <option value="all">All Stock Status</option>
+                    <option value="in_stock">In Stock (&gt;0)</option>
+                    <option value="low">⚠️ Low Stock (1–5)</option>
+                    <option value="out">❌ Out of Stock (0)</option>
+                    <option value="active">Visible in Shop</option>
+                    <option value="hidden">Hidden Only</option>
+                  </select>
+
+                  <select
+                    value={inventorySortBy}
+                    onChange={(e) => setInventorySortBy(e.target.value)}
+                    className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                  >
+                    <option value="name_asc">Name: A to Z</option>
+                    <option value="name_desc">Name: Z to A</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="stock_asc">Stock: Low First (Alerts)</option>
+                    <option value="stock_desc">Stock: High to Low</option>
+                    <option value="active_first">Visible Items First</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Products Display (Grouped by Category or Filtered) */}
+            {sortedProducts.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-border p-12 text-center">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {inventorySearchQuery || inventoryStockFilter !== "all" || inventoryCategoryFilter !== "all"
+                    ? "No bakery items match your filter criteria."
+                    : "No products in inventory yet."}
+                </p>
+                {(inventorySearchQuery || inventoryStockFilter !== "all" || inventoryCategoryFilter !== "all") && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 rounded-xl text-xs"
+                    onClick={() => {
+                      setInventorySearchQuery("");
+                      setInventoryStockFilter("all");
+                      setInventoryCategoryFilter("all");
+                    }}
+                  >
+                    Reset Filters
+                  </Button>
+                )}
+              </div>
+            ) : inventoryCategoryFilter !== "all" ? (
+              /* Single Category View */
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="font-display text-xl font-bold text-cocoa">
+                    {inventoryCategoryFilter === "uncategorized"
+                      ? "Uncategorised Items"
+                      : categoryMap.get(inventoryCategoryFilter) || "Category"}
+                  </h3>
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {sortedProducts.length} {sortedProducts.length === 1 ? "product" : "products"}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  {sortedProducts.map((product) => (
+                    <ProductAdminRow
+                      key={product.id}
+                      product={product}
+                      categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
+                      onEdit={() => {
+                        setForm({
+                          id: product.id,
+                          name: product.name,
+                          slug: product.slug,
+                          description: product.description ?? "",
+                          price: String(product.price),
+                          discount_type: product.discount_type,
+                          discount_value: String(product.discount_value),
+                          image_url: product.image_url ?? "",
+                          stock: String(product.stock),
+                          is_active: product.is_active,
+                          category_id: product.category_id ?? "",
+                        });
+                        window.scrollTo({ top: 180, behavior: "smooth" });
+                      }}
+                      onDelete={() =>
+                        run(() => removeProductFn({ data: product.id }), "Product deleted")
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* Grouped by Category View */
+              <div className="space-y-8">
+                {data.categories.map((cat) => {
+                  const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
+                  if (catProducts.length === 0) return null;
+                  const totalStock = catProducts.reduce((sum, p) => sum + Number(p.stock), 0);
+
+                  return (
+                    <div key={cat.id} className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-display text-lg font-bold text-cocoa">{cat.name}</h3>
+                          <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
+                            {catProducts.length} {catProducts.length === 1 ? "item" : "items"}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {totalStock} total in stock
+                        </span>
+                      </div>
+
+                      <div className="space-y-3">
+                        {catProducts.map((product) => (
+                          <ProductAdminRow
+                            key={product.id}
+                            product={product}
+                            categoryName={cat.name}
+                            onEdit={() => {
+                              setForm({
+                                id: product.id,
+                                name: product.name,
+                                slug: product.slug,
+                                description: product.description ?? "",
+                                price: String(product.price),
+                                discount_type: product.discount_type,
+                                discount_value: String(product.discount_value),
+                                image_url: product.image_url ?? "",
+                                stock: String(product.stock),
+                                is_active: product.is_active,
+                                category_id: product.category_id ?? "",
+                              });
+                              window.scrollTo({ top: 180, behavior: "smooth" });
+                            }}
+                            onDelete={() =>
+                              run(() => removeProductFn({ data: product.id }), "Product deleted")
+                            }
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Uncategorized products section */}
+                {sortedProducts.some((p) => !p.category_id) && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-display text-lg font-bold text-cocoa">Uncategorised</h3>
+                        <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
+                          {sortedProducts.filter((p) => !p.category_id).length} items
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      {sortedProducts
+                        .filter((p) => !p.category_id)
+                        .map((product) => (
+                          <ProductAdminRow
+                            key={product.id}
+                            product={product}
+                            onEdit={() => {
+                              setForm({
+                                id: product.id,
+                                name: product.name,
+                                slug: product.slug,
+                                description: product.description ?? "",
+                                price: String(product.price),
+                                discount_type: product.discount_type,
+                                discount_value: String(product.discount_value),
+                                image_url: product.image_url ?? "",
+                                stock: String(product.stock),
+                                is_active: product.is_active,
+                                category_id: product.category_id ?? "",
+                              });
+                              window.scrollTo({ top: 180, behavior: "smooth" });
+                            }}
+                            onDelete={() =>
+                              run(() => removeProductFn({ data: product.id }), "Product deleted")
+                            }
+                          />
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </TabsContent>
 
