@@ -6,6 +6,7 @@ import { ClientOnly } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { getMyProfile, saveMyProfile } from "@/lib/orders.functions";
 import { requestPhoneOtp, linkVerifiedPhone } from "@/lib/auth.functions";
+import { sendPhoneOtp } from "@/integrations/appwrite/client";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,17 +87,24 @@ function ProfilePage() {
     }
     setVerifyingPhone(true);
     try {
-      const res = await requestOtpFn({
-        data: {
-          phone: verifyPhoneInput,
-          name: form.full_name || undefined,
-        },
-      });
-      setOtpSent(true);
-      if (res.devCode) {
-        toast.success(`OTP sent to ${res.phone}! (Test Code: ${res.devCode})`);
-      } else {
-        toast.success(`6-digit OTP sent to ${res.phone}`);
+      try {
+        const appRes = await sendPhoneOtp(verifyPhoneInput);
+        setOtpSent(true);
+        toast.success(`6-digit OTP sent to ${appRes.phone}`);
+      } catch (appErr) {
+        console.warn("Appwrite phone verification OTP fallback:", appErr);
+        const res = await requestOtpFn({
+          data: {
+            phone: verifyPhoneInput,
+            name: form.full_name || undefined,
+          },
+        });
+        setOtpSent(true);
+        if (res.devCode) {
+          toast.success(`OTP sent to ${res.phone}! (Test Code: ${res.devCode})`);
+        } else {
+          toast.success(`6-digit OTP sent to ${res.phone}`);
+        }
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not send OTP code.");

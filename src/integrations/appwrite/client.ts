@@ -1,4 +1,4 @@
-import { Account, Client, OAuthProvider } from 'appwrite';
+import { Account, Client, ID, OAuthProvider } from 'appwrite';
 import { APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID } from './config';
 
 function createAppwriteClient() {
@@ -27,6 +27,8 @@ export type AppwriteUser = {
   email: string;
   name: string;
   emailVerification: boolean;
+  phone?: string;
+  phoneVerification?: boolean;
 };
 
 export async function getCurrentUser(): Promise<AppwriteUser | null> {
@@ -35,6 +37,31 @@ export async function getCurrentUser(): Promise<AppwriteUser | null> {
   } catch {
     return null;
   }
+}
+
+/** Sends an SMS OTP via Appwrite's createPhoneToken API */
+export async function sendPhoneOtp(phone: string): Promise<{ userId: string; phone: string }> {
+  const digits = phone.replace(/\D/g, "");
+  const cleanPhone = phone.startsWith("+")
+    ? phone.trim()
+    : digits.length === 10
+    ? `+91${digits}`
+    : `+91${digits.slice(-10)}`;
+
+  const token = await appwriteAccount().createPhoneToken({
+    userId: ID.unique(),
+    phone: cleanPhone,
+  });
+
+  return { userId: token.userId, phone: cleanPhone };
+}
+
+/** Verifies the 6-digit OTP secret and creates an active Appwrite session */
+export async function verifyPhoneSession(userId: string, secret: string): Promise<void> {
+  await appwriteAccount().createSession({
+    userId,
+    secret: secret.trim(),
+  });
 }
 
 export async function signInWithEmail(email: string, password: string): Promise<void> {
@@ -46,7 +73,7 @@ export async function signUpWithEmail(
   password: string,
   name: string,
 ): Promise<void> {
-  await appwriteAccount().create({ userId: 'unique()', email, password, name });
+  await appwriteAccount().create({ userId: ID.unique(), email, password, name });
   await signInWithEmail(email, password);
 }
 

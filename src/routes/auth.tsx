@@ -2,7 +2,14 @@ import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-r
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { signInWithEmail, signInWithGoogle, signUpWithEmail, sendPasswordRecovery } from "@/integrations/appwrite/client";
+import {
+  signInWithEmail,
+  signInWithGoogle,
+  signUpWithEmail,
+  sendPasswordRecovery,
+  sendPhoneOtp,
+  verifyPhoneSession,
+} from "@/integrations/appwrite/client";
 import { refreshAuth } from "@/hooks/use-appwrite-auth";
 import { requestPhoneOtp, verifyPhoneOtpEndpoint, requestPasswordRecovery as serverRecovery } from "@/lib/auth.functions";
 import { saveMyProfile } from "@/lib/orders.functions";
@@ -48,6 +55,7 @@ function AuthPage() {
   const [phone, setPhone] = useState("");
   const [phoneOtp, setPhoneOtp] = useState("");
   const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+  const [appwriteUserId, setAppwriteUserId] = useState<string | null>(null);
 
   // Email Sign-in State
   const [email, setEmail] = useState("");
@@ -62,6 +70,7 @@ function AuthPage() {
   const [signUpPhone, setSignUpPhone] = useState("");
   const [signUpOtp, setSignUpOtp] = useState("");
   const [signUpOtpSent, setSignUpOtpSent] = useState(false);
+  const [signUpAppwriteUserId, setSignUpAppwriteUserId] = useState<string | null>(null);
 
   const [busy, setBusy] = useState(false);
 
@@ -71,7 +80,7 @@ function AuthPage() {
     });
   }, [navigate, target]);
 
-  // 1. Phone OTP Request (Login)
+  // 1. Phone OTP Request (Login via Appwrite createPhoneToken)
   async function handleSendPhoneOtp(e: React.FormEvent) {
     e.preventDefault();
     if (!phone.trim() || phone.replace(/\D/g, "").length < 10) {
@@ -80,12 +89,23 @@ function AuthPage() {
     }
     setBusy(true);
     try {
-      const res = await requestOtpFn({ data: { phone } });
-      setPhoneOtpSent(true);
-      if (res.devCode) {
-        toast.success(`OTP sent to ${res.phone}! (Test Code: ${res.devCode})`);
-      } else {
-        toast.success(`6-digit OTP sent to ${res.phone}`);
+      // First attempt native Appwrite createPhoneToken
+      try {
+        const appwriteRes = await sendPhoneOtp(phone);
+        setAppwriteUserId(appwriteRes.userId);
+        setPhoneOtpSent(true);
+        toast.success(`6-digit OTP sent to ${appwriteRes.phone}`);
+      } catch (appwriteErr) {
+        console.warn("Appwrite Phone Token SMS gateway fallback:", appwriteErr);
+        // Fallback to server simulated OTP if SMS gateway is not configured
+        const res = await requestOtpFn({ data: { phone } });
+        setPhoneOtpSent(true);
+        setAppwriteUserId(null);
+        if (res.devCode) {
+          toast.success(`OTP sent to ${res.phone}! (Test Code: ${res.devCode})`);
+        } else {
+          toast.success(`6-digit OTP sent to ${res.phone}`);
+        }
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to send OTP.");
@@ -94,7 +114,7 @@ function AuthPage() {
     }
   }
 
-  // 2. Phone OTP Verification (Login)
+  // 2. Phone OTP Verification (Login via Appwrite createSession)
   async function handleVerifyPhoneOtp(e: React.FormEvent) {
     e.preventDefault();
     if (!phoneOtp.trim() || phoneOtp.length < 4) {
@@ -103,16 +123,39 @@ function AuthPage() {
     }
     setBusy(true);
     try {
+      if (appwriteUserId) {
+        // Appwrite native phone session creation
+        await verifyPhoneSession(appwriteUserId, phoneOtp);
+        const user = await refreshAuth();
+        if (user) {
+          try {
+            await saveProfileFn({
+              data: {
+                full_name: user.name || "Bakery Customer",
+                phone: phone.startsWith("+") ? phone : `+91${phone.replace(/\D/g, "").slice(-10)}`,
+                address: "",
+                latitude: null,
+                longitude: null,
+              },
+            });
+          } catch {
+            // Profile exists or already saved
+          }
+        }
+        toast.success("Signed in successfully via Appwrite!");
+        navigate({ to: target, replace: true });
+        return;
+      }
+
+      // Fallback verification
       const res = await verifyOtpFn({ data: { phone, code: phoneOtp } });
       if (res.ok) {
-        // Sign in / sync auth
         const autoEmail = `user.${res.phone.replace(/\D/g, "")}@sweetcrumb.in`;
         const autoPass = `Sweet#Crumb${res.phone.slice(-6)}!`;
 
         try {
           await signInWithEmail(autoEmail, autoPass);
         } catch {
-          // If first-time phone sign-in, create account silently
           try {
             await signUpWithEmail(autoEmail, autoPass, res.profile?.fullName || "Bakery Customer");
             await saveProfileFn({
@@ -125,7 +168,7 @@ function AuthPage() {
               },
             });
           } catch {
-            // Already exists or signed in
+            // Already created
           }
         }
         await refreshAuth();
@@ -197,18 +240,27 @@ function AuthPage() {
 
     setBusy(true);
     try {
-      const res = await requestOtpFn({
-        data: {
-          phone: signUpPhone,
-          name: signUpName,
-          email: signUpEmail,
-        },
-      });
-      setSignUpOtpSent(true);
-      if (res.devCode) {
-        toast.success(`Verification code sent to ${res.phone}! (Test Code: ${res.devCode})`);
-      } else {
-        toast.success(`6-digit verification code sent to ${res.phone}`);
+      try {
+        const appRes = await sendPhoneOtp(signUpPhone);
+        setSignUpAppwriteUserId(appRes.userId);
+        setSignUpOtpSent(true);
+        toast.success(`6-digit verification code sent to ${appRes.phone}`);
+      } catch (appErr) {
+        console.warn("Appwrite signup OTP fallback:", appErr);
+        const res = await requestOtpFn({
+          data: {
+            phone: signUpPhone,
+            name: signUpName,
+            email: signUpEmail,
+          },
+        });
+        setSignUpOtpSent(true);
+        setSignUpAppwriteUserId(null);
+        if (res.devCode) {
+          toast.success(`Verification code sent to ${res.phone}! (Test Code: ${res.devCode})`);
+        } else {
+          toast.success(`6-digit verification code sent to ${res.phone}`);
+        }
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not send verification code.");
@@ -226,23 +278,37 @@ function AuthPage() {
     }
     setBusy(true);
     try {
-      const verifyRes = await verifyOtpFn({ data: { phone: signUpPhone, code: signUpOtp } });
-      if (verifyRes.ok) {
-        // Create account
-        await signUpWithEmail(signUpEmail, signUpPassword, signUpName);
-        await saveProfileFn({
-          data: {
-            full_name: signUpName,
-            phone: verifyRes.phone,
-            address: "",
-            latitude: null,
-            longitude: null,
-          },
-        });
-        await refreshAuth();
-        toast.success("Account created and phone number verified!");
-        navigate({ to: target, replace: true });
+      if (signUpAppwriteUserId) {
+        await verifyPhoneSession(signUpAppwriteUserId, signUpOtp);
+      } else {
+        const verifyRes = await verifyOtpFn({ data: { phone: signUpPhone, code: signUpOtp } });
+        if (!verifyRes.ok) throw new Error("Invalid verification code");
       }
+
+      // Create / link account
+      try {
+        await signUpWithEmail(signUpEmail, signUpPassword, signUpName);
+      } catch {
+        await signInWithEmail(signUpEmail, signUpPassword);
+      }
+
+      const formattedPhone = signUpPhone.startsWith("+")
+        ? signUpPhone
+        : `+91${signUpPhone.replace(/\D/g, "").slice(-10)}`;
+
+      await saveProfileFn({
+        data: {
+          full_name: signUpName,
+          phone: formattedPhone,
+          address: "",
+          latitude: null,
+          longitude: null,
+        },
+      });
+
+      await refreshAuth();
+      toast.success("Account created and phone number verified!");
+      navigate({ to: target, replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create account.");
     } finally {
