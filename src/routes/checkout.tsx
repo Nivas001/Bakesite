@@ -71,10 +71,15 @@ function CheckoutPage() {
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const dates = selectableDates((blackout ?? []).map((b) => b.blackout_date));
+  const dates = selectableDates(
+    (blackout ?? []).map((b) => b.blackout_date),
+    5,
+  );
 
   useEffect(() => {
-    if (!slotDate && dates.length > 0) setSlotDate(dates[0]!);
+    if (dates.length > 0 && (!slotDate || !dates.includes(slotDate))) {
+      setSlotDate(dates[0]!);
+    }
   }, [dates, slotDate]);
 
   if (lines.length === 0) {
@@ -133,8 +138,8 @@ function CheckoutPage() {
         </p>
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
-        <form className="space-y-6" onSubmit={submit}>
+      <form onSubmit={submit} className="grid gap-10 lg:grid-cols-[1fr_360px]">
+        <div className="space-y-6">
           {/* Fulfilment Type */}
           <section className="rounded-3xl border border-border bg-card p-6 shadow-soft">
             <h2 className="font-display text-lg font-semibold">Delivery or pickup</h2>
@@ -166,7 +171,9 @@ function CheckoutPage() {
                   <Calendar className="h-5 w-5 text-berry" />
                   <h2 className="font-display text-lg font-semibold">Date</h2>
                 </div>
-                <p className="mb-3 text-xs text-muted-foreground">Select baking & dispatch day</p>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  Select next available baking & dispatch day
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {dates.map((date) => {
                     const isSelected = slotDate === date;
@@ -197,7 +204,9 @@ function CheckoutPage() {
                 <Clock className="h-5 w-5 text-berry" />
                 <h2 className="font-display text-lg font-semibold">Time window</h2>
               </div>
-              <p className="mb-3 text-xs text-muted-foreground">Choose your delivery arrival window</p>
+              <p className="mb-3 text-xs text-muted-foreground">
+                Choose your delivery arrival window
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {TIME_SLOTS.map((slot) => {
                   const meta = SLOT_METADATA[slot.id] ?? {
@@ -239,8 +248,10 @@ function CheckoutPage() {
                         )}
                       </div>
                       <div className="mt-2.5">
-                        <p className="font-display font-bold text-xs text-cocoa">{meta.period}</p>
-                        <p className="text-[11px] text-muted-foreground">
+                        <p className="font-sans font-bold text-xs text-foreground tracking-tight">
+                          {meta.period}
+                        </p>
+                        <p className="font-sans text-[11px] text-muted-foreground">
                           {slot.start} – {slot.end}
                         </p>
                       </div>
@@ -369,121 +380,128 @@ function CheckoutPage() {
               </div>
             </section>
           </div>
-
-          <Button
-            type="submit"
-            size="lg"
-            disabled={
-              busy ||
-              !slotDate ||
-              !profile?.full_name ||
-              !profile?.phone ||
-              (fulfilmentType === "delivery" && !profile?.address)
-            }
-            className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 py-6 text-base font-semibold shadow-soft"
-          >
-            {busy ? "Placing order…" : "Request this slot"}
-          </Button>
-        </form>
+        </div>
 
         {/* Elevated Your order Sidebar */}
-        <aside className="sticky top-24 h-fit space-y-5 rounded-3xl border border-border bg-card p-6 shadow-lift">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-border/80 pb-4">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-berry/10 text-berry">
-                <ShoppingBag className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="font-display text-lg font-bold text-cocoa leading-tight">
-                  Your order
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  {lines.reduce((s, l) => s + l.quantity, 0)}{" "}
-                  {lines.reduce((s, l) => s + l.quantity, 0) === 1 ? "item" : "items"}
-                </p>
-              </div>
-            </div>
-            <span className="rounded-full bg-secondary/80 px-2.5 py-1 text-xs font-semibold text-secondary-foreground capitalize">
-              {fulfilmentType}
-            </span>
-          </div>
-
-          {/* Selected Slot Confirmation Pill */}
-          {slotDate && (
-            <div className="flex items-center gap-2.5 rounded-2xl bg-berry/5 border border-berry/20 p-3 text-xs">
-              <Calendar className="h-4 w-4 shrink-0 text-berry" />
-              <div className="font-medium text-foreground">
-                <span className="font-semibold text-berry">{formatSlotDate(slotDate)}</span>
-                <span className="mx-1.5 text-muted-foreground">•</span>
-                <span>
-                  {selectedSlot?.label.split("·")[1]?.trim() ?? selectedSlot?.label ?? slotId}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Item List with Product Thumbnails */}
-          <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-            {lines.map((line) => (
-              <div key={line.productId} className="flex items-center gap-3">
-                {line.imageUrl ? (
-                  <img
-                    src={line.imageUrl}
-                    alt={line.name}
-                    className="h-12 w-12 shrink-0 rounded-xl object-cover border border-border/60 bg-muted"
-                  />
-                ) : (
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary/60 text-secondary-foreground text-xs font-bold">
-                    🥐
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-cocoa">{line.name}</p>
+        <aside className="sticky top-24 h-fit space-y-5 rounded-3xl border border-border bg-card p-6 shadow-lift flex flex-col justify-between">
+          <div className="space-y-5">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-border/80 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-berry/10 text-berry">
+                  <ShoppingBag className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg font-bold text-cocoa leading-tight">
+                    Your order
+                  </h2>
                   <p className="text-xs text-muted-foreground">
-                    {line.quantity} × {formatCurrency(line.unitPrice)}
+                    {lines.reduce((s, l) => s + l.quantity, 0)}{" "}
+                    {lines.reduce((s, l) => s + l.quantity, 0) === 1 ? "item" : "items"}
                   </p>
                 </div>
-                <p className="text-sm font-semibold text-cocoa">
-                  {formatCurrency(line.unitPrice * line.quantity)}
-                </p>
               </div>
-            ))}
-          </div>
-
-          {/* Price Breakdown */}
-          <dl className="space-y-2 border-t border-border/80 pt-4 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-muted-foreground">Subtotal</dt>
-              <dd className="font-medium">{formatCurrency(subtotal)}</dd>
+              <span className="rounded-full bg-secondary/80 px-2.5 py-1 text-xs font-semibold text-secondary-foreground capitalize">
+                {fulfilmentType}
+              </span>
             </div>
-            {discountTotal > 0 && (
-              <div className="flex items-center justify-between text-berry">
-                <dt className="flex items-center gap-1.5 font-medium">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Special Offers
-                </dt>
-                <dd className="font-semibold">−{formatCurrency(discountTotal)}</dd>
+
+            {/* Selected Slot Confirmation Pill (High-Contrast) */}
+            {slotDate && (
+              <div className="flex items-center gap-2.5 rounded-2xl bg-muted/70 border border-border p-3 text-xs shadow-2xs">
+                <Calendar className="h-4 w-4 shrink-0 text-berry" />
+                <div className="font-sans font-medium text-foreground">
+                  <span className="font-bold text-foreground">{formatSlotDate(slotDate)}</span>
+                  <span className="mx-1.5 text-muted-foreground font-normal">•</span>
+                  <span className="text-muted-foreground font-medium">
+                    {selectedSlot?.label.split("·")[1]?.trim() ?? selectedSlot?.label ?? slotId}
+                  </span>
+                </div>
               </div>
             )}
-            <div className="flex items-center justify-between border-t border-border/60 pt-3 text-base">
-              <dt className="font-display font-bold text-cocoa">Total Amount</dt>
-              <dd className="font-display text-xl font-bold text-berry">{formatCurrency(total)}</dd>
-            </div>
-          </dl>
 
-          {/* Freshness & Trust Guarantee */}
-          <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/50">
-            <div className="flex items-start gap-2.5">
-              <ShieldCheck className="h-4 w-4 shrink-0 text-berry mt-0.5" />
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <span className="font-semibold text-foreground">Bake-to-order notice:</span>{" "}
-                Everything is baked fresh on slot morning. Pay only after your slot is confirmed.
-              </p>
+            {/* Item List with Product Thumbnails */}
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+              {lines.map((line) => (
+                <div key={line.productId} className="flex items-center gap-3">
+                  {line.imageUrl ? (
+                    <img
+                      src={line.imageUrl}
+                      alt={line.name}
+                      className="h-12 w-12 shrink-0 rounded-xl object-cover border border-border/60 bg-muted"
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary/60 text-secondary-foreground text-xs font-bold">
+                      🥐
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-cocoa">{line.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {line.quantity} × {formatCurrency(line.unitPrice)}
+                    </p>
+                  </div>
+                  <p className="text-sm font-semibold text-cocoa">
+                    {formatCurrency(line.unitPrice * line.quantity)}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Price Breakdown (Inter Font & High Contrast) */}
+            <dl className="space-y-2 border-t border-border/80 pt-4 text-sm">
+              <div className="flex justify-between font-sans">
+                <dt className="text-muted-foreground">Subtotal</dt>
+                <dd className="font-semibold text-foreground">{formatCurrency(subtotal)}</dd>
+              </div>
+              {discountTotal > 0 && (
+                <div className="flex items-center justify-between font-sans text-berry">
+                  <dt className="flex items-center gap-1.5 font-medium">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Special Offers
+                  </dt>
+                  <dd className="font-bold">−{formatCurrency(discountTotal)}</dd>
+                </div>
+              )}
+              <div className="flex items-center justify-between border-t border-border/60 pt-3 text-base">
+                <dt className="font-sans font-bold text-foreground">Total Amount</dt>
+                <dd className="font-sans text-2xl font-extrabold text-foreground tracking-tight">
+                  {formatCurrency(total)}
+                </dd>
+              </div>
+            </dl>
+
+            {/* Freshness & Trust Guarantee */}
+            <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/50">
+              <div className="flex items-start gap-2.5">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-berry mt-0.5" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  <span className="font-semibold text-foreground">Bake-to-order notice:</span>{" "}
+                  Everything is baked fresh on slot morning. Pay only after your slot is confirmed.
+                </p>
+              </div>
             </div>
           </div>
+
+          {/* Relocated Request This Slot Button */}
+          <div className="pt-2">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={
+                busy ||
+                !slotDate ||
+                !profile?.full_name ||
+                !profile?.phone ||
+                (fulfilmentType === "delivery" && !profile?.address)
+              }
+              className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 py-6 text-base font-semibold shadow-soft cursor-pointer transition-all hover:scale-[1.01]"
+            >
+              {busy ? "Placing order…" : "Request this slot"}
+            </Button>
+          </div>
         </aside>
-      </div>
+      </form>
     </div>
   );
 }

@@ -19,14 +19,18 @@ export function toISODate(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
-/** Selectable dates: tomorrow through 14 days out, minus blackout dates. */
-export function selectableDates(blackout: string[], days = 14): string[] {
+/** Selectable dates: next `count` available open days (skipping blackout dates), starting tomorrow. */
+export function selectableDates(blackout: string[], count = 5): string[] {
   const out: string[] = [];
   const today = new Date();
-  for (let i = 1; i <= days; i += 1) {
-    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+  let dayOffset = 1;
+  while (out.length < count && dayOffset <= 30) {
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + dayOffset);
     const iso = toISODate(d);
-    if (!blackout.includes(iso)) out.push(iso);
+    if (!blackout.includes(iso)) {
+      out.push(iso);
+    }
+    dayOffset += 1;
   }
   return out;
 }
