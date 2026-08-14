@@ -15,6 +15,7 @@ import { CartProvider } from "../lib/cart";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { Toaster } from "../components/ui/sonner";
+import { WhatsAppFloatingButton } from "../components/whatsapp-button";
 
 /** Microsoft Clarity heatmaps/analytics — only injected once a project id is set. */
 function clarityScripts() {
@@ -159,6 +160,7 @@ function RootComponent() {
           </main>
           <SiteFooter />
         </div>
+        <WhatsAppFloatingButton />
         <Toaster richColors position="top-center" />
       </CartProvider>
     </QueryClientProvider>
