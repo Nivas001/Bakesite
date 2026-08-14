@@ -1,4 +1,4 @@
-import { sendEmail, sendSms } from "./notifications-impl.server";
+import { sendEmail, sendSms, sendWhatsAppMessage } from "./notifications-impl.server";
 
 function formatINR(value: number) {
   return `₹${Math.round(value)}`;
@@ -56,8 +56,9 @@ export async function notifyCustomerOrderUpdate(input: {
     rejected: `Order #${shortId} Update — Sweet Crumb Bakery`,
   };
 
-  // 1. Send SMS / automated message if phone exists
+  // 1. Send automated WhatsApp message & SMS in background
   if (input.phone) {
+    await sendWhatsAppMessage(input.phone, body);
     await sendSms(input.phone, body);
   }
 

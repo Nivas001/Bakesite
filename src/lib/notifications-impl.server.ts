@@ -34,7 +34,7 @@ export async function sendEmail(input: {
       </div>`
         : undefined);
 
-    const response = await fetch("https://api.resend.com/emails", {
+    let response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -49,6 +49,24 @@ export async function sendEmail(input: {
       }),
     });
 
+    if (!response.ok && senderEmail !== "Sweet Crumb Bakery <onboarding@resend.dev>") {
+      // Retry with verified sandbox sender if custom sender domain is pending
+      response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "Sweet Crumb Bakery <onboarding@resend.dev>",
+          to: [input.to],
+          subject: input.subject,
+          text: input.text,
+          html: formattedHtml,
+        }),
+      });
+    }
+
     if (!response.ok) {
       const errText = await response.text();
       console.error(`[resend] email send failed [${response.status}]: ${errText}`);
@@ -60,6 +78,104 @@ export async function sendEmail(input: {
   }
 }
 
+/**
+ * Automated WhatsApp message delivery via Meta WhatsApp Cloud API, Fast2SMS, or Twilio WhatsApp.
+ * Delivers directly to the customer's phone number in the background without opening WhatsApp.
+ */
+export async function sendWhatsAppMessage(toPhone: string | null, message: string): Promise<void> {
+  if (!toPhone) return;
+
+  const cleanDigits = toPhone.replace(/\D/g, "");
+  const phoneWithCountry = cleanDigits.length === 10 ? `91${cleanDigits}` : cleanDigits;
+
+  // 1. Meta WhatsApp Cloud API (Official WhatsApp API — Free 1,000 conversations/month)
+  const metaToken = process.env["META_WHATSAPP_TOKEN"];
+  const metaPhoneId = process.env["META_PHONE_NUMBER_ID"];
+  if (metaToken && metaPhoneId) {
+    try {
+      const res = await fetch(`https://graph.facebook.com/v20.0/${metaPhoneId}/messages`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${metaToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          recipient_type: "individual",
+          to: phoneWithCountry,
+          type: "text",
+          text: { preview_url: true, body: message },
+        }),
+      });
+      if (!res.ok) {
+        console.error(`[meta whatsapp] send failed [${res.status}]:`, await res.text());
+      } else {
+        console.info(`[meta whatsapp] automated message sent to ${phoneWithCountry}`);
+        return;
+      }
+    } catch (err) {
+      console.error("[meta whatsapp] network error:", err);
+    }
+  }
+
+  // 2. Fast2SMS / Indian Gateway (No Credit Card required — UPI top-up)
+  const fast2smsKey = process.env["FAST2SMS_API_KEY"];
+  if (fast2smsKey) {
+    try {
+      const res = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+        method: "POST",
+        headers: {
+          authorization: fast2smsKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          route: "v3",
+          sender_id: "TXTIND",
+          message: message,
+          language: "english",
+          numbers: cleanDigits.slice(-10),
+        }),
+      });
+      console.info("[fast2sms] automated notification dispatched", await res.text());
+      return;
+    } catch (err) {
+      console.error("[fast2sms] network error:", err);
+    }
+  }
+
+  // 3. Twilio WhatsApp
+  const twilioSid = process.env["TWILIO_ACCOUNT_SID"];
+  const twilioToken = process.env["TWILIO_AUTH_TOKEN"];
+  const twilioFrom = process.env["TWILIO_WHATSAPP_FROM"];
+  if (twilioSid && twilioToken && twilioFrom) {
+    try {
+      const auth = Buffer.from(`${twilioSid}:${twilioToken}`).toString("base64");
+      const res = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Basic ${auth}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            To: `whatsapp:+${phoneWithCountry}`,
+            From: twilioFrom.startsWith("whatsapp:") ? twilioFrom : `whatsapp:${twilioFrom}`,
+            Body: message,
+          }),
+        }
+      );
+      if (!res.ok) {
+        console.error(`[twilio whatsapp] send failed [${res.status}]: ${await res.text()}`);
+      } else {
+        console.info(`[twilio whatsapp] automated message sent to +${phoneWithCountry}`);
+      }
+    } catch (err) {
+      console.error("[twilio whatsapp] network error:", err);
+    }
+  }
+}
+
 /** Sends an SMS or automated message when provider credentials exist, otherwise logs. */
 export async function sendSms(to: string | null, body: string): Promise<void> {
   const twilioSid = process.env["TWILIO_ACCOUNT_SID"];
@@ -67,7 +183,7 @@ export async function sendSms(to: string | null, body: string): Promise<void> {
   const fromNumber = process.env["TWILIO_FROM_NUMBER"];
 
   if (!to || !twilioSid || !twilioToken || !fromNumber) {
-    console.info("[sms/whatsapp background skipped - no credentials]", { to, body });
+    console.info("[sms skipped - no twilio sms credentials]", { to, body });
     return;
   }
 
