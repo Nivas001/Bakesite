@@ -4,6 +4,11 @@ function formatINR(value: number) {
   return `₹${Math.round(value)}`;
 }
 
+function getAppUrl(): string {
+  const raw = process.env["APP_URL"] || "https://anibakes.app";
+  return raw.startsWith("http://") || raw.startsWith("https://") ? raw : `https://${raw}`;
+}
+
 export async function notifyAdminNewOrder(input: {
   orderId: string;
   customerName: string | null;
@@ -38,7 +43,7 @@ export async function notifyCustomerOrderPlaced(input: {
   total: number;
 }): Promise<void> {
   const shortId = input.orderId.slice(0, 8);
-  const appUrl = process.env["APP_URL"] || "https://anibakes.app";
+  const appUrl = getAppUrl();
   const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
   const ordersPageUrl = `${appUrl}/orders`;
 
@@ -67,7 +72,7 @@ export async function notifyCustomerOrderRescheduled(input: {
   reason?: string | null | undefined;
 }): Promise<void> {
   const shortId = input.orderId.slice(0, 8);
-  const appUrl = process.env["APP_URL"] || "https://anibakes.app";
+  const appUrl = getAppUrl();
   const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
   const ordersPageUrl = `${appUrl}/orders`;
 
@@ -99,7 +104,7 @@ export async function notifyCustomerOrderUpdate(input: {
   email?: string | null | undefined;
 }): Promise<void> {
   const shortId = input.orderId.slice(0, 8);
-  const appUrl = process.env["APP_URL"] || "https://anibakes.app";
+  const appUrl = getAppUrl();
   const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
   const ordersPageUrl = `${appUrl}/orders`;
 
