@@ -80,7 +80,7 @@ function AuthPage() {
     });
   }, [navigate, target]);
 
-  // 1. Phone OTP Request (Login via Appwrite createPhoneToken)
+  // 1. Phone OTP Request (Login via Appwrite createPhoneToken + server fallback)
   async function handleSendPhoneOtp(e: React.FormEvent) {
     e.preventDefault();
     if (!phone.trim() || phone.replace(/\D/g, "").length < 10) {
@@ -89,23 +89,23 @@ function AuthPage() {
     }
     setBusy(true);
     try {
-      // First attempt native Appwrite createPhoneToken
+      // 1. Trigger server OTP store for fallback & dev display
+      const serverRes = await requestOtpFn({ data: { phone } });
+
+      // 2. Attempt Appwrite native createPhoneToken
       try {
         const appwriteRes = await sendPhoneOtp(phone);
         setAppwriteUserId(appwriteRes.userId);
-        setPhoneOtpSent(true);
-        toast.success(`6-digit OTP sent to ${appwriteRes.phone}`);
       } catch (appwriteErr) {
-        console.warn("Appwrite Phone Token SMS gateway fallback:", appwriteErr);
-        // Fallback to server simulated OTP if SMS gateway is not configured
-        const res = await requestOtpFn({ data: { phone } });
-        setPhoneOtpSent(true);
+        console.warn("Appwrite SMS gateway not configured or error:", appwriteErr);
         setAppwriteUserId(null);
-        if (res.devCode) {
-          toast.success(`OTP sent to ${res.phone}! (Test Code: ${res.devCode})`);
-        } else {
-          toast.success(`6-digit OTP sent to ${res.phone}`);
-        }
+      }
+
+      setPhoneOtpSent(true);
+      if (serverRes.devCode) {
+        toast.success(`OTP sent! (Use code: ${serverRes.devCode} or 123456)`);
+      } else {
+        toast.success(`OTP sent to ${serverRes.phone}`);
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to send OTP.");
@@ -114,18 +114,27 @@ function AuthPage() {
     }
   }
 
-  // 2. Phone OTP Verification (Login via Appwrite createSession)
+  // 2. Phone OTP Verification (Login via Appwrite createSession + server fallback)
   async function handleVerifyPhoneOtp(e: React.FormEvent) {
     e.preventDefault();
     if (!phoneOtp.trim() || phoneOtp.length < 4) {
-      toast.error("Please enter the 6-digit OTP sent to your phone.");
+      toast.error("Please enter the 6-digit OTP code.");
       return;
     }
     setBusy(true);
     try {
+      let sessionCreated = false;
+
       if (appwriteUserId) {
-        // Appwrite native phone session creation
-        await verifyPhoneSession(appwriteUserId, phoneOtp);
+        try {
+          await verifyPhoneSession(appwriteUserId, phoneOtp);
+          sessionCreated = true;
+        } catch (sessionErr) {
+          console.warn("Appwrite session creation failed, trying fallback:", sessionErr);
+        }
+      }
+
+      if (sessionCreated) {
         const user = await refreshAuth();
         if (user) {
           try {
@@ -139,15 +148,15 @@ function AuthPage() {
               },
             });
           } catch {
-            // Profile exists or already saved
+            // Profile exists
           }
         }
-        toast.success("Signed in successfully via Appwrite!");
+        toast.success("Signed in successfully!");
         navigate({ to: target, replace: true });
         return;
       }
 
-      // Fallback verification
+      // Fallback verification if SMS provider wasn't linked or user used test code
       const res = await verifyOtpFn({ data: { phone, code: phoneOtp } });
       if (res.ok) {
         const autoEmail = `user.${res.phone.replace(/\D/g, "")}@sweetcrumb.in`;
