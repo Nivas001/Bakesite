@@ -46,7 +46,11 @@ export async function sendEmailVerification(url: string): Promise<void> {
 
 /** Confirms email verification using the userId and secret received from email link */
 export async function confirmEmailVerification(userId: string, secret: string): Promise<void> {
-  await appwriteAccount().updateVerification({ userId, secret });
+  try {
+    await appwriteAccount().updateEmailVerification({ userId, secret });
+  } catch {
+    await appwriteAccount().updateVerification({ userId, secret });
+  }
 }
 
 export async function signInWithEmail(email: string, password: string): Promise<void> {
