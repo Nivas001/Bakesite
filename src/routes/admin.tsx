@@ -661,15 +661,48 @@ function AdminDashboard() {
                         </p>
                       )}
 
-                      {order.payment_link_url && (
-                        <a
-                          className="mt-2 inline-block text-xs font-semibold text-berry underline"
-                          href={order.payment_link_url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          🔗 Payment link
-                        </a>
+                      {order.contact_phone && (
+                        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                          <a
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25 transition-all"
+                            href={(() => {
+                              const cleanDigits = (order.contact_phone || "").replace(/\D/g, "");
+                              const phoneWithCountry = cleanDigits.length === 10 ? `91${cleanDigits}` : cleanDigits;
+                              const shortId = order.id.slice(0, 8);
+                              const itemsText = order.order_items.map((i) => `• ${i.quantity}× ${i.product_name} (${formatCurrency(Number(i.line_total))})`).join("\n");
+                              
+                              let message = `🎂 *Sweet Crumb Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;
+                              if (order.status === "awaiting_payment") {
+                                message += `Your bakery order is approved! Please complete payment of *${formatCurrency(Number(order.total))}* to confirm your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n${order.payment_link_url ? `\n💳 *Pay Here:* ${order.payment_link_url}\n` : ""}\nThank you!`;
+                              } else if (order.status === "confirmed") {
+                                message += `Your bakery order is *confirmed*! Our bakers will prepare it fresh for your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\nThank you for choosing Sweet Crumb!`;
+                              } else {
+                                message += `Here is your order summary for *${formatCurrency(Number(order.total))}*.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})`;
+                              }
+
+                              return `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(message)}`;
+                            })()}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            💬 Send on WhatsApp
+                          </a>
+
+                          {order.payment_link_url && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="rounded-xl h-7 px-2 text-[11px] font-semibold"
+                              onClick={() => {
+                                navigator.clipboard.writeText(order.payment_link_url!);
+                                toast.success("Payment link copied to clipboard!");
+                              }}
+                            >
+                              📋 Copy Link
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </div>
 

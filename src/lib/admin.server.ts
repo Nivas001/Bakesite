@@ -8,6 +8,7 @@ import {
   listDocs,
   updateDoc,
   listAppwriteUsers,
+  getUserById,
 } from "@/integrations/appwrite/admin.server";
 import { notifyCustomerOrderUpdate, sendReviewRequest } from "./notifications.server";
 import { createPaymentLink } from "./payments.server";
@@ -69,6 +70,12 @@ export async function changeOrderStatus(input: z.infer<typeof orderStatusSchema>
   }
 
   if (input.status === "awaiting_payment" || input.status === "confirmed" || input.status === "rejected") {
+    let customerEmail: string | undefined = undefined;
+    if (data.user_id) {
+      const user = await getUserById(data.user_id).catch(() => null);
+      if (user?.email) customerEmail = user.email;
+    }
+
     await notifyCustomerOrderUpdate({
       orderId: data.$id,
       status: data.status,
@@ -76,10 +83,16 @@ export async function changeOrderStatus(input: z.infer<typeof orderStatusSchema>
       name: data.contact_name,
       total: Number(data.total),
       paymentLink,
+      email: customerEmail,
     });
   }
   if (input.status === "completed") {
-    await sendReviewRequest({ orderId: data.$id, name: data.contact_name });
+    let customerEmail: string | undefined = undefined;
+    if (data.user_id) {
+      const user = await getUserById(data.user_id).catch(() => null);
+      if (user?.email) customerEmail = user.email;
+    }
+    await sendReviewRequest({ orderId: data.$id, name: data.contact_name, email: customerEmail });
   }
   return { ok: true as const, paymentLink };
 }
