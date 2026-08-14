@@ -9,6 +9,8 @@ import {
   getDoc,
   listDocs,
   upsertDoc,
+  updateUserPhone,
+  updateUserName,
 } from "@/integrations/appwrite/admin.server";
 import { finalPrice } from "./pricing";
 import type { ProductDoc } from "./catalog.server";
@@ -110,6 +112,7 @@ export async function getProfile(userId: string) {
 }
 
 export async function saveProfile(userId: string, input: z.infer<typeof profileSchema>) {
+  // 1. Save to Database profiles collection
   await upsertDoc(COLLECTIONS.profiles, userId, {
     user_id: userId,
     full_name: input.full_name,
@@ -118,6 +121,15 @@ export async function saveProfile(userId: string, input: z.infer<typeof profileS
     latitude: input.latitude,
     longitude: input.longitude,
   });
+
+  // 2. Also sync to Appwrite Auth User record so it appears in Auth Users table
+  if (input.phone && input.phone.startsWith("+")) {
+    await updateUserPhone(userId, input.phone);
+  }
+  if (input.full_name) {
+    await updateUserName(userId, input.full_name);
+  }
+
   return { ok: true as const, phone: input.phone };
 }
 

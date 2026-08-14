@@ -153,3 +153,27 @@ export async function getUserById(userId: string): Promise<AppwriteAccount | nul
     return null;
   }
 }
+
+/** Updates user's phone number in Appwrite Auth */
+export async function updateUserPhone(userId: string, phone: string): Promise<void> {
+  try {
+    await request(`/users/${userId}/phone`, {
+      method: 'PATCH',
+      body: { phone },
+    });
+  } catch (err) {
+    console.warn(`Could not sync phone to Appwrite Auth for user ${userId}:`, err);
+  }
+}
+
+/** Updates user's name in Appwrite Auth */
+export async function updateUserName(userId: string, name: string): Promise<void> {
+  try {
+    await request(`/users/${userId}/name`, {
+      method: 'PATCH',
+      body: { name },
+    });
+  } catch (err) {
+    console.warn(`Could not sync name to Appwrite Auth for user ${userId}:`, err);
+  }
+}
