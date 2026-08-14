@@ -28,14 +28,25 @@ export function useAuth() {
   const [ready, setReady] = useState(loaded);
 
   useEffect(() => {
+    let mounted = true;
     const listener = () => {
-      setUser(cachedUser);
-      setReady(true);
+      if (mounted) {
+        setUser(cachedUser);
+        setReady(true);
+      }
     };
     listeners.add(listener);
-    if (!loaded) void refreshAuth();
-    else listener();
+
+    // Always fetch fresh session on mount to catch OAuth redirects
+    void refreshAuth().then((u) => {
+      if (mounted) {
+        setUser(u);
+        setReady(true);
+      }
+    });
+
     return () => {
+      mounted = false;
       listeners.delete(listener);
     };
   }, []);
