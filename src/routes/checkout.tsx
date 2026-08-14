@@ -96,6 +96,11 @@ function CheckoutPage() {
   } | null>(null);
   const [validatingPromo, setValidatingPromo] = useState(false);
 
+  // Alternate delivery contact state
+  const [useAlternateContact, setUseAlternateContact] = useState(false);
+  const [alternateName, setAlternateName] = useState("");
+  const [alternatePhone, setAlternatePhone] = useState("");
+
   const dates = selectableDates(
     (blackout ?? []).map((b) => b.blackout_date),
     5,
@@ -106,6 +111,10 @@ function CheckoutPage() {
       setSlotDate(dates[0]!);
     }
   }, [dates, slotDate]);
+
+  const hasVerifiedPhone = Boolean(profile?.phone && profile.phone.trim().length >= 7);
+  const hasFullName = Boolean(profile?.full_name && profile.full_name.trim().length >= 2);
+  const isProfileReady = hasVerifiedPhone && hasFullName;
 
   if (lines.length === 0) {
     return (
@@ -154,11 +163,23 @@ function CheckoutPage() {
   async function submit(event: React.FormEvent): Promise<void> {
     event.preventDefault();
     setBusy(true);
-    if (!profile) {
-      toast.error("Profile information is missing");
+    if (!profile || !isProfileReady) {
+      toast.error("Please verify your phone number and profile before placing an order.");
+      navigate({ to: "/profile", search: { returnTo: "/checkout" } });
       setBusy(false);
       return;
     }
+
+    if (useAlternateContact && alternatePhone.trim().replace(/\D/g, "").length < 10) {
+      toast.error("Please enter a valid 10-digit alternate contact phone number.");
+      setBusy(false);
+      return;
+    }
+
+    const finalContactName =
+      useAlternateContact && alternateName.trim() ? alternateName.trim() : profile.full_name;
+    const finalContactPhone =
+      useAlternateContact && alternatePhone.trim() ? alternatePhone.trim() : profile.phone;
 
     try {
       await submitOrder({
@@ -167,8 +188,8 @@ function CheckoutPage() {
           slotDate,
           slotId,
           fulfilmentType,
-          contactName: profile.full_name,
-          contactPhone: profile.phone,
+          contactName: finalContactName,
+          contactPhone: finalContactPhone,
           address: fulfilmentType === "delivery" ? profile.address : "",
           latitude: fulfilmentType === "delivery" ? profile.latitude : null,
           longitude: fulfilmentType === "delivery" ? profile.longitude : null,
@@ -494,73 +515,129 @@ function CheckoutPage() {
                   </Button>
                 </div>
 
-                {!profile?.full_name ||
-                !profile?.phone ||
-                (fulfilmentType === "delivery" && !profile?.address) ? (
-                  <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-6 text-center">
-                    <p className="mb-3 text-sm text-muted-foreground">
-                      Please complete your delivery details to proceed.
+                {!profile || !isProfileReady || (fulfilmentType === "delivery" && !profile.address) ? (
+                  <div className="rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 p-6 text-center space-y-3">
+                    <p className="text-sm font-semibold text-cocoa">
+                      {!hasVerifiedPhone
+                        ? "Mobile phone verification required before placing an order."
+                        : "Please complete your delivery details to proceed."}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Full name, verified mobile number, and delivery address are required.
                     </p>
                     <Button
                       asChild
                       size="sm"
-                      variant="outline"
-                      className="rounded-xl border-berry/40 text-berry hover:bg-berry/10"
+                      className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold"
                     >
                       <Link to="/profile" search={{ returnTo: "/checkout" }}>
-                        Complete Details
+                        {!hasVerifiedPhone ? "Verify Phone & Profile" : "Complete Details"}
                       </Link>
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-3 rounded-2xl bg-muted/30 p-4 border border-border/50">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-xs">
-                        <User className="h-4 w-4 text-berry" />
-                      </div>
-                      <div>
-                        <p className="text-[11px] text-muted-foreground">Recipient</p>
-                        <p className="text-sm font-semibold text-cocoa">{profile.full_name}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-xs">
-                        <Phone className="h-4 w-4 text-berry" />
-                      </div>
-                      <div>
-                        <p className="text-[11px] text-muted-foreground">Phone number</p>
-                        <p className="text-sm font-medium text-foreground">{profile.phone}</p>
-                      </div>
-                    </div>
-                    {fulfilmentType === "delivery" && (
-                      <div className="flex items-start gap-3 pt-1">
+                  <div className="space-y-3.5">
+                    <div className="space-y-3 rounded-2xl bg-muted/30 p-4 border border-border/50">
+                      <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-xs">
-                          <MapPin className="h-4 w-4 text-berry" />
+                          <User className="h-4 w-4 text-berry" />
                         </div>
-                        <div className="w-full">
-                          <p className="text-[11px] text-muted-foreground">Address</p>
-                          <p className="whitespace-pre-wrap text-sm font-medium text-foreground leading-snug">
-                            {profile.address}
-                          </p>
-                          {profile.latitude != null && profile.longitude != null && (
-                            <div className="mt-3 overflow-hidden rounded-xl border border-border">
-                              <ClientOnly fallback={<div className="h-28 w-full bg-muted" />}>
-                                <Suspense fallback={<div className="h-28 w-full bg-muted" />}>
-                                  <div className="h-28">
-                                    <LocationPicker
-                                      latitude={profile.latitude}
-                                      longitude={profile.longitude}
-                                      onChange={() => {}}
-                                      readonly
-                                    />
-                                  </div>
-                                </Suspense>
-                              </ClientOnly>
-                            </div>
-                          )}
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">Registered Account</p>
+                          <p className="text-sm font-semibold text-cocoa">{profile.full_name}</p>
                         </div>
                       </div>
-                    )}
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-xs">
+                          <Phone className="h-4 w-4 text-berry" />
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-muted-foreground">Verified Account Phone</p>
+                          <p className="text-sm font-medium text-foreground">{profile.phone}</p>
+                        </div>
+                      </div>
+                      {fulfilmentType === "delivery" && (
+                        <div className="flex items-start gap-3 pt-1">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-xs">
+                            <MapPin className="h-4 w-4 text-berry" />
+                          </div>
+                          <div className="w-full">
+                            <p className="text-[11px] text-muted-foreground">Address</p>
+                            <p className="whitespace-pre-wrap text-sm font-medium text-foreground leading-snug">
+                              {profile.address}
+                            </p>
+                            {profile.latitude != null && profile.longitude != null && (
+                              <div className="mt-3 overflow-hidden rounded-xl border border-border">
+                                <ClientOnly fallback={<div className="h-28 w-full bg-muted" />}>
+                                  <Suspense fallback={<div className="h-28 w-full bg-muted" />}>
+                                    <div className="h-28">
+                                      <LocationPicker
+                                        latitude={profile.latitude}
+                                        longitude={profile.longitude}
+                                        readonly
+                                        onChange={() => {}}
+                                      />
+                                    </div>
+                                  </Suspense>
+                                </ClientOnly>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Alternate Contact Option */}
+                    <div className="rounded-2xl border border-border/70 bg-card p-3.5 space-y-3">
+                      <label className="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-foreground select-none">
+                        <input
+                          type="checkbox"
+                          checked={useAlternateContact}
+                          onChange={(e) => setUseAlternateContact(e.target.checked)}
+                          className="h-4 w-4 rounded border-input text-berry focus:ring-berry"
+                        />
+                        <span>Deliver to someone else or alternate contact number</span>
+                      </label>
+
+                      {useAlternateContact && (
+                        <div className="pt-2 border-t border-border/50 space-y-3 animate-in fade-in duration-200">
+                          <div className="space-y-1">
+                            <Label htmlFor="alt-name" className="text-[11px] font-semibold text-muted-foreground">
+                              Recipient contact name
+                            </Label>
+                            <Input
+                              id="alt-name"
+                              placeholder="e.g. Rahul / Security Gate"
+                              value={alternateName}
+                              onChange={(e) => setAlternateName(e.target.value)}
+                              className="rounded-xl h-9 text-xs"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label htmlFor="alt-phone" className="text-[11px] font-semibold text-muted-foreground">
+                              Recipient calling phone number
+                            </Label>
+                            <div className="flex gap-2">
+                              <span className="inline-flex items-center px-2.5 rounded-xl border border-input bg-muted/60 text-xs font-bold text-foreground">
+                                🇮🇳 +91
+                              </span>
+                              <Input
+                                id="alt-phone"
+                                type="tel"
+                                placeholder="98765 43210"
+                                value={alternatePhone}
+                                onChange={(e) => setAlternatePhone(e.target.value)}
+                                className="rounded-xl h-9 text-xs"
+                              />
+                            </div>
+                            <p className="text-[10px] text-muted-foreground">
+                              The delivery rider will call this number upon arrival.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

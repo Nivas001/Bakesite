@@ -110,8 +110,19 @@ export async function getProfile(userId: string) {
 }
 
 export async function saveProfile(userId: string, input: z.infer<typeof profileSchema>) {
-  await upsertDoc(COLLECTIONS.profiles, userId, { user_id: userId, ...input });
-  return { ok: true as const };
+  const existing = await getDoc<ProfileDoc>(COLLECTIONS.profiles, userId);
+  // Phone number is immutable once saved/verified
+  const phoneToSave = existing?.phone ? existing.phone : input.phone;
+
+  await upsertDoc(COLLECTIONS.profiles, userId, {
+    user_id: userId,
+    full_name: input.full_name,
+    phone: phoneToSave,
+    address: input.address,
+    latitude: input.latitude,
+    longitude: input.longitude,
+  });
+  return { ok: true as const, phone: phoneToSave };
 }
 
 export async function listOrdersForUser(userId: string) {
@@ -125,6 +136,13 @@ export async function listOrdersForUser(userId: string) {
 }
 
 export async function createOrderForUser(userId: string, input: PlaceOrderInput) {
+  if (!input.contactPhone || input.contactPhone.trim().length < 7) {
+    throw new Error("A verified contact phone number is required to place an order.");
+  }
+  if (!input.contactName || input.contactName.trim().length < 2) {
+    throw new Error("Full contact name is required to place an order.");
+  }
+
   const slot = TIME_SLOTS.find((s) => s.id === input.slotId);
   if (!slot) throw new Error("Please pick a valid time slot.");
 

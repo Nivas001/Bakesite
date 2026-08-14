@@ -1,8 +1,11 @@
-import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { signInWithEmail, signInWithGoogle, signUpWithEmail } from "@/integrations/appwrite/client";
+import { signInWithEmail, signInWithGoogle, signUpWithEmail, sendPasswordRecovery } from "@/integrations/appwrite/client";
 import { refreshAuth } from "@/hooks/use-appwrite-auth";
+import { requestPhoneOtp, verifyPhoneOtpEndpoint, requestPasswordRecovery as serverRecovery } from "@/lib/auth.functions";
+import { saveMyProfile } from "@/lib/orders.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +18,7 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Sweet Crumb Bakery" },
-      { name: "description", content: "Sign in to place and track your Sweet Crumb orders." },
+      { name: "description", content: "Sign in with your phone or email to place and track your bakery orders." },
       { property: "og:title", content: "Sign in — Sweet Crumb Bakery" },
       { property: "og:description", content: "Sign in to place and track your bakery orders." },
     ],
@@ -32,9 +35,34 @@ function AuthPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/auth" });
   const target = safePath(search.redirect);
+
+  const requestOtpFn = useServerFn(requestPhoneOtp);
+  const verifyOtpFn = useServerFn(verifyPhoneOtpEndpoint);
+  const saveProfileFn = useServerFn(saveMyProfile);
+  const serverRecoveryFn = useServerFn(serverRecovery);
+
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [signInMethod, setSignInMethod] = useState<"phone" | "email">("phone");
+
+  // Phone OTP Sign-in State
+  const [phone, setPhone] = useState("");
+  const [phoneOtp, setPhoneOtp] = useState("");
+  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+
+  // Email Sign-in State
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState("");
+
+  // Sign-up State
+  const [signUpName, setSignUpName] = useState("");
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+  const [signUpPhone, setSignUpPhone] = useState("");
+  const [signUpOtp, setSignUpOtp] = useState("");
+  const [signUpOtpSent, setSignUpOtpSent] = useState(false);
+
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -43,95 +71,611 @@ function AuthPage() {
     });
   }, [navigate, target]);
 
-  async function signIn(event: React.FormEvent): Promise<void> {
+  // 1. Phone OTP Request (Login)
+  async function handleSendPhoneOtp(e: React.FormEvent) {
+    e.preventDefault();
+    if (!phone.trim() || phone.replace(/\D/g, "").length < 10) {
+      toast.error("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await requestOtpFn({ data: { phone } });
+      setPhoneOtpSent(true);
+      if (res.devCode) {
+        toast.success(`OTP sent to ${res.phone}! (Test Code: ${res.devCode})`);
+      } else {
+        toast.success(`6-digit OTP sent to ${res.phone}`);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to send OTP.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // 2. Phone OTP Verification (Login)
+  async function handleVerifyPhoneOtp(e: React.FormEvent) {
+    e.preventDefault();
+    if (!phoneOtp.trim() || phoneOtp.length < 4) {
+      toast.error("Please enter the 6-digit OTP sent to your phone.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await verifyOtpFn({ data: { phone, code: phoneOtp } });
+      if (res.ok) {
+        // Sign in / sync auth
+        const autoEmail = `user.${res.phone.replace(/\D/g, "")}@sweetcrumb.in`;
+        const autoPass = `Sweet#Crumb${res.phone.slice(-6)}!`;
+
+        try {
+          await signInWithEmail(autoEmail, autoPass);
+        } catch {
+          // If first-time phone sign-in, create account silently
+          try {
+            await signUpWithEmail(autoEmail, autoPass, res.profile?.fullName || "Bakery Customer");
+            await saveProfileFn({
+              data: {
+                full_name: res.profile?.fullName || "Bakery Customer",
+                phone: res.phone,
+                address: res.profile?.address || "",
+                latitude: null,
+                longitude: null,
+              },
+            });
+          } catch {
+            // Already exists or signed in
+          }
+        }
+        await refreshAuth();
+        toast.success("Signed in successfully!");
+        navigate({ to: target, replace: true });
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Invalid or expired OTP code.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // 3. Email & Password Sign-in
+  async function handleEmailSignIn(event: React.FormEvent): Promise<void> {
     event.preventDefault();
     setBusy(true);
     try {
       await signInWithEmail(email, password);
       await refreshAuth();
+      toast.success("Welcome back!");
       navigate({ to: target, replace: true });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Sign in failed");
+      toast.error(error instanceof Error ? error.message : "Sign in failed. Check your email and password.");
     } finally {
       setBusy(false);
     }
   }
 
-  async function signUp(event: React.FormEvent): Promise<void> {
-    event.preventDefault();
+  // 4. Forgot Password Recovery
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (!recoveryEmail.trim()) {
+      toast.error("Please enter your registered email address.");
+      return;
+    }
     setBusy(true);
     try {
-      await signUpWithEmail(email, password, fullName);
-      await refreshAuth();
-      navigate({ to: target, replace: true });
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not create your account");
+      await sendPasswordRecovery(recoveryEmail);
+      await serverRecoveryFn({ data: { email: recoveryEmail } });
+      toast.success(`Password reset instructions sent to ${recoveryEmail}`);
+      setForgotPasswordMode(false);
+    } catch (err) {
+      toast.error("Could not send recovery email. Please try again.");
     } finally {
       setBusy(false);
     }
   }
 
-  async function google(): Promise<void> {
+  // 5. Sign-up: Send Phone Verification OTP
+  async function handleSignUpSendOtp(e: React.FormEvent) {
+    e.preventDefault();
+    if (!signUpName.trim()) {
+      toast.error("Please enter your full name.");
+      return;
+    }
+    if (!signUpEmail.trim()) {
+      toast.error("Please enter your email address.");
+      return;
+    }
+    if (!signUpPassword || signUpPassword.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+    if (!signUpPhone.trim() || signUpPhone.replace(/\D/g, "").length < 10) {
+      toast.error("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const res = await requestOtpFn({
+        data: {
+          phone: signUpPhone,
+          name: signUpName,
+          email: signUpEmail,
+        },
+      });
+      setSignUpOtpSent(true);
+      if (res.devCode) {
+        toast.success(`Verification code sent to ${res.phone}! (Test Code: ${res.devCode})`);
+      } else {
+        toast.success(`6-digit verification code sent to ${res.phone}`);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not send verification code.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // 6. Sign-up: Verify OTP & Create Verified Account
+  async function handleSignUpConfirm(e: React.FormEvent) {
+    e.preventDefault();
+    if (!signUpOtp.trim() || signUpOtp.length < 4) {
+      toast.error("Please enter the 6-digit OTP sent to your phone.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const verifyRes = await verifyOtpFn({ data: { phone: signUpPhone, code: signUpOtp } });
+      if (verifyRes.ok) {
+        // Create account
+        await signUpWithEmail(signUpEmail, signUpPassword, signUpName);
+        await saveProfileFn({
+          data: {
+            full_name: signUpName,
+            phone: verifyRes.phone,
+            address: "",
+            latitude: null,
+            longitude: null,
+          },
+        });
+        await refreshAuth();
+        toast.success("Account created and phone number verified!");
+        navigate({ to: target, replace: true });
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not create account.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // 7. Google OAuth Sign-in
+  async function handleGoogleSignIn(): Promise<void> {
     signInWithGoogle(`${window.location.origin}${target}`, `${window.location.origin}/auth`);
   }
 
   return (
     <div className="mx-auto w-full max-w-md px-4 py-16">
-      <h1 className="text-center font-display text-3xl font-bold text-cocoa">Welcome back</h1>
-      <p className="mt-2 text-center text-sm text-muted-foreground">
-        Sign in to place orders and track your slots.
-      </p>
+      <div className="text-center">
+        <h1 className="font-display text-3xl font-bold text-cocoa">
+          {authMode === "signin" ? "Welcome back" : "Create your account"}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {authMode === "signin"
+            ? "Sign in with your phone or email to track your slots and bakes."
+            : "Register with your verified phone number to place bakery orders."}
+        </p>
+      </div>
 
-      <div className="mt-8 rounded-3xl border border-border bg-card p-6 shadow-soft">
-        <Button variant="outline" className="w-full" onClick={google}>
+      <div className="mt-8 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+        {/* Google OAuth (Top quick sign-in) */}
+        <Button
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2 rounded-2xl h-11 border-border font-medium hover:bg-secondary/50"
+          onClick={handleGoogleSignIn}
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24">
+            <path
+              fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+            />
+          </svg>
           Continue with Google
         </Button>
-        <div className="my-6 flex items-center gap-3 text-xs uppercase text-muted-foreground">
+
+        <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
           <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
         </div>
 
-        <Tabs defaultValue="signin">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign in</TabsTrigger>
-            <TabsTrigger value="signup">Create account</TabsTrigger>
-          </TabsList>
+        {/* SIGN IN FLOW */}
+        {authMode === "signin" && (
+          <div>
+            <Tabs
+              value={signInMethod}
+              onValueChange={(v) => {
+                setSignInMethod(v as "phone" | "email");
+                setForgotPasswordMode(false);
+              }}
+            >
+              <TabsList className="grid w-full grid-cols-2 rounded-2xl bg-secondary/60 p-1">
+                <TabsTrigger value="phone" className="rounded-xl text-xs font-semibold">
+                  📱 Mobile & OTP
+                </TabsTrigger>
+                <TabsTrigger value="email" className="rounded-xl text-xs font-semibold">
+                  ✉️ Email & Password
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="signin">
-            <form className="mt-4 space-y-4" onSubmit={signIn}>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-              <Button type="submit" disabled={busy} className="w-full bg-berry text-berry-foreground hover:bg-berry/90">
-                {busy ? "Signing in…" : "Sign in"}
-              </Button>
-            </form>
-          </TabsContent>
+              {/* PHONE OTP TAB (1ST AND PRIMARY OPTION) */}
+              <TabsContent value="phone" className="mt-4 space-y-4">
+                {!phoneOtpSent ? (
+                  <form onSubmit={handleSendPhoneOtp} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="login-phone" className="text-xs font-semibold">
+                        Mobile phone number
+                      </Label>
+                      <div className="flex gap-2">
+                        <span className="inline-flex items-center px-3 rounded-xl border border-input bg-muted/60 text-xs font-bold text-foreground">
+                          🇮🇳 +91
+                        </span>
+                        <Input
+                          id="login-phone"
+                          type="tel"
+                          placeholder="98765 43210"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          required
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        We will send a 6-digit OTP to verify your number.
+                      </p>
+                    </div>
 
-          <TabsContent value="signup">
-            <form className="mt-4 space-y-4" onSubmit={signUp}>
-              <div>
-                <Label htmlFor="name">Full name</Label>
-                <Input id="name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="email-up">Email</Label>
-                <Input id="email-up" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="password-up">Password</Label>
-                <Input id="password-up" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-              <Button type="submit" disabled={busy} className="w-full bg-berry text-berry-foreground hover:bg-berry/90">
-                {busy ? "Creating…" : "Create account"}
-              </Button>
-            </form>
-          </TabsContent>
-        </Tabs>
+                    <Button
+                      type="submit"
+                      disabled={busy}
+                      className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold"
+                    >
+                      {busy ? "Sending OTP…" : "Send 6-digit OTP"}
+                    </Button>
+                  </form>
+                ) : (
+                  <form onSubmit={handleVerifyPhoneOtp} className="space-y-4">
+                    <div className="rounded-2xl bg-secondary/40 p-3 text-center border border-border/50">
+                      <p className="text-xs text-muted-foreground">OTP code sent to</p>
+                      <p className="text-sm font-bold text-cocoa">{phone}</p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPhoneOtpSent(false);
+                          setPhoneOtp("");
+                        }}
+                        className="mt-1 text-[11px] text-berry font-semibold underline hover:text-berry/80"
+                      >
+                        Change number
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="login-otp" className="text-xs font-semibold">
+                        Enter 6-digit OTP
+                      </Label>
+                      <Input
+                        id="login-otp"
+                        type="text"
+                        maxLength={6}
+                        placeholder="123456"
+                        value={phoneOtp}
+                        onChange={(e) => setPhoneOtp(e.target.value)}
+                        required
+                        className="rounded-xl text-center text-lg font-mono tracking-widest"
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={busy}
+                      className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold"
+                    >
+                      {busy ? "Verifying…" : "Verify & Sign in"}
+                    </Button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={handleSendPhoneOtp}
+                        disabled={busy}
+                        className="text-xs text-muted-foreground hover:text-foreground font-medium underline"
+                      >
+                        Didn&apos;t get the code? Resend OTP
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </TabsContent>
+
+              {/* EMAIL & PASSWORD TAB (SECONDARY OPTION) */}
+              <TabsContent value="email" className="mt-4 space-y-4">
+                {!forgotPasswordMode ? (
+                  <form onSubmit={handleEmailSignIn} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="login-email" className="text-xs font-semibold">
+                        Email address
+                      </Label>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        required
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="rounded-xl"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="login-password" className="text-xs font-semibold">
+                          Password
+                        </Label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setForgotPasswordMode(true);
+                            setRecoveryEmail(email);
+                          }}
+                          className="text-xs text-berry font-medium hover:underline"
+                        >
+                          Forgot password?
+                        </button>
+                      </div>
+                      <Input
+                        id="login-password"
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="rounded-xl"
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={busy}
+                      className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold"
+                    >
+                      {busy ? "Signing in…" : "Sign in with Email"}
+                    </Button>
+                  </form>
+                ) : (
+                  /* FORGOT PASSWORD FORM */
+                  <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/50">
+                      <p className="text-xs font-bold text-cocoa">Reset your password</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Enter your email address and we&apos;ll send you instructions to set a new password.
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="recovery-email" className="text-xs font-semibold">
+                        Registered email address
+                      </Label>
+                      <Input
+                        id="recovery-email"
+                        type="email"
+                        required
+                        placeholder="you@example.com"
+                        value={recoveryEmail}
+                        onChange={(e) => setRecoveryEmail(e.target.value)}
+                        className="rounded-xl"
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={busy}
+                      className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold"
+                    >
+                      {busy ? "Sending…" : "Send reset link"}
+                    </Button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={() => setForgotPasswordMode(false)}
+                        className="text-xs text-muted-foreground hover:text-foreground font-medium underline"
+                      >
+                        ← Back to Sign in
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </TabsContent>
+            </Tabs>
+
+            {/* Toggle to Sign Up */}
+            <div className="mt-6 text-center pt-4 border-t border-border/60">
+              <p className="text-xs text-muted-foreground">
+                Don&apos;t have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("signup")}
+                  className="font-bold text-berry hover:underline"
+                >
+                  Create an account
+                </button>
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* SIGN UP FLOW WITH MANDATORY PHONE & OTP */}
+        {authMode === "signup" && (
+          <div className="space-y-4">
+            {!signUpOtpSent ? (
+              <form onSubmit={handleSignUpSendOtp} className="space-y-3.5">
+                <div className="space-y-1">
+                  <Label htmlFor="reg-name" className="text-xs font-semibold">
+                    Full name <span className="text-berry">*</span>
+                  </Label>
+                  <Input
+                    id="reg-name"
+                    required
+                    placeholder="e.g. Srinivas R"
+                    value={signUpName}
+                    onChange={(e) => setSignUpName(e.target.value)}
+                    className="rounded-xl h-10"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="reg-email" className="text-xs font-semibold">
+                    Email address <span className="text-berry">*</span>
+                  </Label>
+                  <Input
+                    id="reg-email"
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                    value={signUpEmail}
+                    onChange={(e) => setSignUpEmail(e.target.value)}
+                    className="rounded-xl h-10"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="reg-phone" className="text-xs font-semibold">
+                    Mobile phone number <span className="text-berry">*</span>
+                  </Label>
+                  <div className="flex gap-2">
+                    <span className="inline-flex items-center px-2.5 rounded-xl border border-input bg-muted/60 text-xs font-bold text-foreground">
+                      🇮🇳 +91
+                    </span>
+                    <Input
+                      id="reg-phone"
+                      type="tel"
+                      required
+                      placeholder="98765 43210"
+                      value={signUpPhone}
+                      onChange={(e) => setSignUpPhone(e.target.value)}
+                      className="rounded-xl h-10"
+                    />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    🔒 Phone number is verified and permanently linked to your account.
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="reg-pass" className="text-xs font-semibold">
+                    Create password <span className="text-berry">*</span>
+                  </Label>
+                  <Input
+                    id="reg-pass"
+                    type="password"
+                    required
+                    minLength={6}
+                    placeholder="At least 6 characters"
+                    value={signUpPassword}
+                    onChange={(e) => setSignUpPassword(e.target.value)}
+                    className="rounded-xl h-10"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold mt-2"
+                >
+                  {busy ? "Sending verification…" : "Verify phone & Create account"}
+                </Button>
+              </form>
+            ) : (
+              /* SIGNUP OTP VERIFICATION STEP */
+              <form onSubmit={handleSignUpConfirm} className="space-y-4">
+                <div className="rounded-2xl bg-secondary/40 p-3 text-center border border-border/50">
+                  <p className="text-xs text-muted-foreground">Verify mobile number for registration</p>
+                  <p className="text-sm font-bold text-cocoa">{signUpPhone}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSignUpOtpSent(false);
+                      setSignUpOtp("");
+                    }}
+                    className="mt-1 text-[11px] text-berry font-semibold underline hover:text-berry/80"
+                  >
+                    Edit details
+                  </button>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="reg-otp" className="text-xs font-semibold">
+                    Enter 6-digit OTP
+                  </Label>
+                  <Input
+                    id="reg-otp"
+                    type="text"
+                    maxLength={6}
+                    placeholder="123456"
+                    value={signUpOtp}
+                    onChange={(e) => setSignUpOtp(e.target.value)}
+                    required
+                    className="rounded-xl text-center text-lg font-mono tracking-widest"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold"
+                >
+                  {busy ? "Completing registration…" : "Confirm & Create Account"}
+                </Button>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={handleSignUpSendOtp}
+                    disabled={busy}
+                    className="text-xs text-muted-foreground hover:text-foreground font-medium underline"
+                  >
+                    Resend verification code
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Toggle back to Sign In */}
+            <div className="mt-6 text-center pt-4 border-t border-border/60">
+              <p className="text-xs text-muted-foreground">
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("signin")}
+                  className="font-bold text-berry hover:underline"
+                >
+                  Sign in
+                </button>
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

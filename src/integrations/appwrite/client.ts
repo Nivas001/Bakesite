@@ -58,6 +58,15 @@ export function signInWithGoogle(success: string, failure: string): void {
   });
 }
 
+export async function sendPasswordRecovery(email: string): Promise<void> {
+  const url = `${typeof window !== "undefined" ? window.location.origin : ""}/auth`;
+  try {
+    await appwriteAccount().createRecovery({ email, url });
+  } catch (error) {
+    console.info("Password recovery requested for:", email);
+  }
+}
+
 export async function signOut(): Promise<void> {
   try {
     await appwriteAccount().deleteSession({ sessionId: 'current' });
