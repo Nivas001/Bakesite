@@ -39,29 +39,14 @@ export async function getCurrentUser(): Promise<AppwriteUser | null> {
   }
 }
 
-/** Sends an SMS OTP via Appwrite's createPhoneToken API */
-export async function sendPhoneOtp(phone: string): Promise<{ userId: string; phone: string }> {
-  const digits = phone.replace(/\D/g, "");
-  const cleanPhone = phone.startsWith("+")
-    ? phone.trim()
-    : digits.length === 10
-    ? `+91${digits}`
-    : `+91${digits.slice(-10)}`;
-
-  const token = await appwriteAccount().createPhoneToken({
-    userId: ID.unique(),
-    phone: cleanPhone,
-  });
-
-  return { userId: token.userId, phone: cleanPhone };
+/** Sends an email verification link using Appwrite createVerification */
+export async function sendEmailVerification(url: string): Promise<void> {
+  await appwriteAccount().createVerification({ url });
 }
 
-/** Verifies the 6-digit OTP secret and creates an active Appwrite session */
-export async function verifyPhoneSession(userId: string, secret: string): Promise<void> {
-  await appwriteAccount().createSession({
-    userId,
-    secret: secret.trim(),
-  });
+/** Confirms email verification using the userId and secret received from email link */
+export async function confirmEmailVerification(userId: string, secret: string): Promise<void> {
+  await appwriteAccount().updateVerification({ userId, secret });
 }
 
 export async function signInWithEmail(email: string, password: string): Promise<void> {

@@ -112,9 +112,11 @@ function CheckoutPage() {
     }
   }, [dates, slotDate]);
 
-  const hasVerifiedPhone = Boolean(profile?.phone && profile.phone.trim().length >= 7);
+  const hasValidPhone = Boolean(
+    profile?.phone && profile.phone.replace(/\D/g, "").length >= 10,
+  );
   const hasFullName = Boolean(profile?.full_name && profile.full_name.trim().length >= 2);
-  const isProfileReady = hasVerifiedPhone && hasFullName;
+  const isProfileReady = hasValidPhone && hasFullName;
 
   if (lines.length === 0) {
     return (
@@ -164,7 +166,7 @@ function CheckoutPage() {
     event.preventDefault();
     setBusy(true);
     if (!profile || !isProfileReady) {
-      toast.error("Please verify your phone number and profile before placing an order.");
+      toast.error("Please add your contact phone number in your profile before placing an order.");
       navigate({ to: "/profile", search: { returnTo: "/checkout" } });
       setBusy(false);
       return;
@@ -518,12 +520,12 @@ function CheckoutPage() {
                 {!profile || !isProfileReady || (fulfilmentType === "delivery" && !profile.address) ? (
                   <div className="rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 p-6 text-center space-y-3">
                     <p className="text-sm font-semibold text-cocoa">
-                      {!hasVerifiedPhone
-                        ? "Mobile phone verification required before placing an order."
+                      {!hasValidPhone
+                        ? "Contact phone number required before placing an order."
                         : "Please complete your delivery details to proceed."}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Full name, verified mobile number, and delivery address are required.
+                      Full name, contact mobile number, and delivery address are required.
                     </p>
                     <Button
                       asChild
@@ -531,7 +533,7 @@ function CheckoutPage() {
                       className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold"
                     >
                       <Link to="/profile" search={{ returnTo: "/checkout" }}>
-                        {!hasVerifiedPhone ? "Verify Phone & Profile" : "Complete Details"}
+                        {!hasValidPhone ? "Add Phone in Profile" : "Complete Details"}
                       </Link>
                     </Button>
                   </div>
@@ -543,7 +545,7 @@ function CheckoutPage() {
                           <User className="h-4 w-4 text-berry" />
                         </div>
                         <div>
-                          <p className="text-[11px] text-muted-foreground">Registered Account</p>
+                          <p className="text-[11px] text-muted-foreground">Account Name</p>
                           <p className="text-sm font-semibold text-cocoa">{profile.full_name}</p>
                         </div>
                       </div>
@@ -552,7 +554,7 @@ function CheckoutPage() {
                           <Phone className="h-4 w-4 text-berry" />
                         </div>
                         <div>
-                          <p className="text-[11px] text-muted-foreground">Verified Account Phone</p>
+                          <p className="text-[11px] text-muted-foreground">Contact Phone</p>
                           <p className="text-sm font-medium text-foreground">{profile.phone}</p>
                         </div>
                       </div>

@@ -5,8 +5,6 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { getMyProfile, saveMyProfile } from "@/lib/orders.functions";
-import { requestPhoneOtp, linkVerifiedPhone } from "@/lib/auth.functions";
-import { sendPhoneOtp } from "@/integrations/appwrite/client";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,9 +23,9 @@ export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
       { title: "Your details — Sweet Crumb Bakery" },
-      { name: "description", content: "Save your delivery address and map pin for faster checkout." },
+      { name: "description", content: "Save your contact phone number, delivery address and map pin." },
       { property: "og:title", content: "Your details — Sweet Crumb Bakery" },
-      { property: "og:description", content: "Save your delivery address and map pin." },
+      { property: "og:description", content: "Save your contact phone number, delivery address and map pin." },
     ],
   }),
   component: () => (
@@ -40,8 +38,6 @@ export const Route = createFileRoute("/profile")({
 function ProfilePage() {
   const fetchProfile = useServerFn(getMyProfile);
   const save = useServerFn(saveMyProfile);
-  const requestOtpFn = useServerFn(requestPhoneOtp);
-  const linkPhoneFn = useServerFn(linkVerifiedPhone);
   const queryClient = useQueryClient();
   const search = useSearch({ from: "/profile" });
   const navigate = useNavigate();
@@ -55,11 +51,6 @@ function ProfilePage() {
     longitude: null as number | null,
   });
 
-  // Phone Onboarding / Verification State for Google / Unverified users
-  const [verifyPhoneInput, setVerifyPhoneInput] = useState("");
-  const [otpCodeInput, setOtpCodeInput] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [verifyingPhone, setVerifyingPhone] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -71,86 +62,36 @@ function ProfilePage() {
         latitude: data.latitude ?? null,
         longitude: data.longitude ?? null,
       });
-      if (data.phone) {
-        setVerifyPhoneInput(data.phone);
-      }
     }
   }, [data]);
 
-  const isPhoneVerified = Boolean(data?.phone && data.phone.trim().length >= 7);
-
-  async function handleSendVerifyOtp(e: React.FormEvent) {
-    e.preventDefault();
-    if (!verifyPhoneInput.trim() || verifyPhoneInput.replace(/\D/g, "").length < 10) {
-      toast.error("Please enter a valid 10-digit mobile phone number.");
-      return;
-    }
-    setVerifyingPhone(true);
-    try {
-      try {
-        const appRes = await sendPhoneOtp(verifyPhoneInput);
-        setOtpSent(true);
-        toast.success(`6-digit OTP sent to ${appRes.phone}`);
-      } catch (appErr) {
-        console.warn("Appwrite phone verification OTP fallback:", appErr);
-        const res = await requestOtpFn({
-          data: {
-            phone: verifyPhoneInput,
-            name: form.full_name || undefined,
-          },
-        });
-        setOtpSent(true);
-        if (res.devCode) {
-          toast.success(`OTP sent to ${res.phone}! (Test Code: ${res.devCode})`);
-        } else {
-          toast.success(`6-digit OTP sent to ${res.phone}`);
-        }
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not send OTP code.");
-    } finally {
-      setVerifyingPhone(false);
-    }
-  }
-
-  async function handleConfirmPhoneOtp(e: React.FormEvent) {
-    e.preventDefault();
-    if (!otpCodeInput.trim() || otpCodeInput.length < 4) {
-      toast.error("Please enter the 6-digit OTP code.");
-      return;
-    }
-    setVerifyingPhone(true);
-    try {
-      const res = await linkPhoneFn({
-        data: {
-          phone: verifyPhoneInput,
-          code: otpCodeInput,
-        },
-      });
-      if (res.ok) {
-        setForm((f) => ({ ...f, phone: res.phone }));
-        setOtpSent(false);
-        await queryClient.invalidateQueries({ queryKey: ["profile"] });
-        toast.success("Phone number verified and permanently linked to your account!");
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Invalid or expired OTP code.");
-    } finally {
-      setVerifyingPhone(false);
-    }
-  }
+  const hasValidPhone = Boolean(form.phone && form.phone.replace(/\D/g, "").length >= 10);
 
   async function submit(event: React.FormEvent): Promise<void> {
     event.preventDefault();
-    if (!isPhoneVerified) {
-      toast.error("Please verify your mobile phone number before saving your profile.");
+    if (!form.full_name.trim()) {
+      toast.error("Please enter your full name.");
+      return;
+    }
+    const cleanPhoneDigits = form.phone.replace(/\D/g, "");
+    if (cleanPhoneDigits.length < 10) {
+      toast.error("Please enter a valid 10-digit mobile phone number.");
       return;
     }
     setBusy(true);
     try {
-      await save({ data: form });
+      const formattedPhone = form.phone.startsWith("+")
+        ? form.phone.trim()
+        : `+91${cleanPhoneDigits.slice(-10)}`;
+
+      await save({
+        data: {
+          ...form,
+          phone: formattedPhone,
+        },
+      });
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Details saved");
+      toast.success("Profile details saved successfully!");
       if (search.returnTo) {
         navigate({ to: search.returnTo });
       }
@@ -171,9 +112,13 @@ function ProfilePage() {
               Required for checkout, delivery dispatch, and order status updates.
             </p>
           </div>
-          {isPhoneVerified && (
+          {hasValidPhone ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-xs font-semibold text-emerald-700">
-              ✓ Verified Account
+              ✓ Contact Phone Saved
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 px-3 py-1 text-xs font-semibold text-amber-700">
+              Phone Number Required
             </span>
           )}
         </div>
@@ -184,86 +129,20 @@ function ProfilePage() {
           </div>
         ) : (
           <div className="mt-8 space-y-6">
-            {/* PHONE VERIFICATION ONBOARDING (IF PHONE NOT LINKED YET) */}
-            {!isPhoneVerified && (
-              <div className="rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 p-5 space-y-4">
-                <div>
-                  <h2 className="text-sm font-bold text-cocoa">
-                    Verify your mobile phone number
-                  </h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    To place orders, your phone number must be verified via 6-digit OTP. Once linked, it cannot be changed.
-                  </p>
-                </div>
-
-                {!otpSent ? (
-                  <form onSubmit={handleSendVerifyOtp} className="space-y-3 pt-2">
-                    <div className="space-y-1">
-                      <Label htmlFor="verify-phone" className="text-xs font-semibold">
-                        Mobile Phone Number
-                      </Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="verify-phone"
-                          type="tel"
-                          required
-                          placeholder="10-digit mobile number"
-                          value={verifyPhoneInput}
-                          onChange={(e) => setVerifyPhoneInput(e.target.value)}
-                          className="rounded-xl bg-background"
-                        />
-                        <Button
-                          type="submit"
-                          disabled={verifyingPhone}
-                          className="bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl px-4 text-xs font-semibold shrink-0"
-                        >
-                          {verifyingPhone ? "Sending…" : "Send OTP"}
-                        </Button>
-                      </div>
-                    </div>
-                  </form>
-                ) : (
-                  <form onSubmit={handleConfirmPhoneOtp} className="space-y-3 pt-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span>Code sent to <strong className="font-mono">{verifyPhoneInput}</strong></span>
-                      <button
-                        type="button"
-                        onClick={() => setOtpSent(false)}
-                        className="text-berry underline font-semibold"
-                      >
-                        Change
-                      </button>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Input
-                        id="verify-otp"
-                        type="text"
-                        maxLength={6}
-                        required
-                        placeholder="6-digit OTP"
-                        value={otpCodeInput}
-                        onChange={(e) => setOtpCodeInput(e.target.value)}
-                        className="rounded-xl bg-background text-center font-mono tracking-widest"
-                      />
-                      <Button
-                        type="submit"
-                        disabled={verifyingPhone}
-                        className="bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl px-4 text-xs font-semibold shrink-0"
-                      >
-                        {verifyingPhone ? "Verifying…" : "Confirm OTP"}
-                      </Button>
-                    </div>
-                  </form>
-                )}
+            {!hasValidPhone && (
+              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+                <p className="text-xs font-semibold text-amber-900">
+                  Please provide your 10-digit mobile phone number below to enable placing bakery orders.
+                </p>
               </div>
             )}
 
-            {/* MAIN PROFILE FORM */}
             <form className="space-y-6" onSubmit={submit}>
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Full name</Label>
+                  <Label htmlFor="full_name">
+                    Full name <span className="text-berry">*</span>
+                  </Label>
                   <Input
                     id="full_name"
                     value={form.full_name}
@@ -275,33 +154,21 @@ function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="phone">Phone number</Label>
-                    {isPhoneVerified && (
-                      <span className="text-[11px] font-semibold text-emerald-700">
-                        Locked (Verified)
-                      </span>
-                    )}
-                  </div>
+                  <Label htmlFor="phone">
+                    Mobile phone number <span className="text-berry">*</span>
+                  </Label>
                   <Input
                     id="phone"
+                    type="tel"
                     value={form.phone}
-                    disabled={isPhoneVerified}
-                    readOnly={isPhoneVerified}
                     onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
                     placeholder="10-digit mobile number"
                     required
-                    className={`rounded-xl ${
-                      isPhoneVerified
-                        ? "bg-muted/70 cursor-not-allowed font-medium text-foreground"
-                        : ""
-                    }`}
+                    className="rounded-xl"
                   />
-                  {isPhoneVerified && (
-                    <p className="text-[11px] text-muted-foreground">
-                      Your registered phone number is locked for account safety. You can provide an alternate delivery contact at checkout if needed.
-                    </p>
-                  )}
+                  <p className="text-[11px] text-muted-foreground">
+                    Used by our delivery riders and bakers to contact you.
+                  </p>
                 </div>
               </div>
               
@@ -313,7 +180,6 @@ function ProfilePage() {
                   value={form.address}
                   onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
                   placeholder="Apartment/House No, Building, Street, Area, Landmark"
-                  required
                   className="rounded-2xl"
                 />
               </div>
@@ -342,7 +208,7 @@ function ProfilePage() {
               <div className="pt-4 flex items-center justify-between">
                 <Button
                   type="submit"
-                  disabled={busy || !isPhoneVerified}
+                  disabled={busy}
                   size="lg"
                   className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl sm:w-auto px-8"
                 >
