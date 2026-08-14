@@ -14,9 +14,10 @@ import { Textarea } from "@/components/ui/textarea";
 const LocationPicker = lazy(() => import("@/components/location-picker"));
 
 export const Route = createFileRoute("/profile")({
-  validateSearch: (search: Record<string, unknown>): { returnTo?: string } => {
+  validateSearch: (search: Record<string, unknown>): { returnTo?: string | undefined } => {
+    const returnTo = search["returnTo"];
     return {
-      returnTo: search.returnTo as string | undefined,
+      returnTo: typeof returnTo === "string" ? returnTo : undefined,
     };
   },
   head: () => ({
