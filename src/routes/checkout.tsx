@@ -102,14 +102,16 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 lg:grid-cols-[1fr_320px]">
-      <form className="space-y-8" onSubmit={submit}>
-        <div>
-          <h1 className="font-display text-3xl font-bold text-cocoa">Choose your slot</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Orders need one day of notice. We confirm availability before asking for payment.
-          </p>
-        </div>
+    <div className="mx-auto w-full max-w-6xl px-4 py-12">
+      <div className="mb-8">
+        <h1 className="font-display text-3xl font-bold text-cocoa">Choose your slot</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Orders need one day of notice. We confirm availability before asking for payment.
+        </p>
+      </div>
+
+      <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
+        <form className="space-y-8" onSubmit={submit}>
 
         <section className="rounded-3xl border border-border bg-card p-6">
           <h2 className="font-display text-lg font-semibold">Delivery or pickup</h2>
@@ -128,100 +130,115 @@ function CheckoutPage() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-border bg-card p-6">
-          <h2 className="font-display text-lg font-semibold">Date</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {dates.map((date) => (
-              <Button
-                key={date}
-                type="button"
-                size="sm"
-                variant={slotDate === date ? "default" : "outline"}
-                onClick={() => setSlotDate(date)}
-              >
-                {formatSlotDate(date)}
-              </Button>
-            ))}
+        <section className="grid gap-6 rounded-3xl border border-border bg-card p-6 md:grid-cols-2">
+          <div>
+            <h2 className="font-display text-lg font-semibold">Date</h2>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {dates.map((date) => (
+                <Button
+                  key={date}
+                  type="button"
+                  size="sm"
+                  variant={slotDate === date ? "default" : "outline"}
+                  onClick={() => setSlotDate(date)}
+                >
+                  {formatSlotDate(date)}
+                </Button>
+              ))}
+            </div>
           </div>
 
-          <h2 className="mt-8 font-display text-lg font-semibold">Time window</h2>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            {TIME_SLOTS.map((slot) => (
-              <Button
-                key={slot.id}
-                type="button"
-                variant={slotId === slot.id ? "default" : "outline"}
-                onClick={() => setSlotId(slot.id)}
-                className="justify-start"
-              >
-                {slot.label}
-              </Button>
-            ))}
+          <div>
+            <h2 className="font-display text-lg font-semibold">Time window</h2>
+            <div className="mt-4 flex flex-col gap-2">
+              {TIME_SLOTS.map((slot) => (
+                <Button
+                  key={slot.id}
+                  type="button"
+                  variant={slotId === slot.id ? "default" : "outline"}
+                  onClick={() => setSlotId(slot.id)}
+                  className="justify-start"
+                >
+                  {slot.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="space-y-5 rounded-3xl border border-border bg-card p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-semibold">Delivery Details</h2>
-            <Button asChild variant="ghost" size="sm" className="h-8 text-muted-foreground hover:text-foreground">
-              <Link to="/profile" search={{ returnTo: "/checkout" }}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit
-              </Link>
-            </Button>
-          </div>
-          
-          {(!profile?.full_name || !profile?.phone || (fulfilmentType === "delivery" && !profile?.address)) ? (
-            <div className="rounded-2xl border border-dashed border-border bg-muted/50 p-6 text-center">
-              <p className="mb-4 text-sm text-muted-foreground">Please complete your delivery details to continue.</p>
-              <Button asChild variant="outline">
-                <Link to="/profile" search={{ returnTo: "/checkout" }}>Complete Details</Link>
+        <section className="grid gap-6 rounded-3xl border border-border bg-card p-6 md:grid-cols-2">
+          <div>
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg font-semibold">Delivery Details</h2>
+              <Button asChild variant="ghost" size="sm" className="h-8 text-muted-foreground hover:text-foreground">
+                <Link to="/profile" search={{ returnTo: "/checkout" }}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </Link>
               </Button>
             </div>
-          ) : (
-            <div className="space-y-4 rounded-2xl bg-muted/30 p-4">
-              <div className="flex items-start gap-3">
-                <User className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">{profile.full_name}</p>
-                </div>
+            
+            {(!profile?.full_name || !profile?.phone || (fulfilmentType === "delivery" && !profile?.address)) ? (
+              <div className="mt-5 rounded-2xl border border-dashed border-border bg-muted/50 p-6 text-center">
+                <p className="mb-4 text-sm text-muted-foreground">Please complete your delivery details to continue.</p>
+                <Button asChild variant="outline">
+                  <Link to="/profile" search={{ returnTo: "/checkout" }}>Complete Details</Link>
+                </Button>
               </div>
-              <div className="flex items-start gap-3">
-                <Phone className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm">{profile.phone}</p>
-                </div>
-              </div>
-              {fulfilmentType === "delivery" && (
+            ) : (
+              <div className="mt-5 space-y-4 rounded-2xl bg-muted/30 p-4">
                 <div className="flex items-start gap-3">
-                  <MapPin className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                  <div className="w-full">
-                    <p className="whitespace-pre-wrap text-sm">{profile.address}</p>
-                    {profile.latitude != null && profile.longitude != null && (
-                      <div className="mt-3 overflow-hidden rounded-xl border border-border">
-                        <ClientOnly fallback={<div className="h-32 w-full bg-muted" />}>
-                          <Suspense fallback={<div className="h-32 w-full bg-muted" />}>
-                            <div className="h-32">
-                              <LocationPicker
-                                latitude={profile.latitude}
-                                longitude={profile.longitude}
-                                onChange={() => {}}
-                                readonly
-                              />
-                            </div>
-                          </Suspense>
-                        </ClientOnly>
-                      </div>
-                    )}
+                  <User className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">{profile.full_name}</p>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+                <div className="flex items-start gap-3">
+                  <Phone className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm">{profile.phone}</p>
+                  </div>
+                </div>
+                {fulfilmentType === "delivery" && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                    <div className="w-full">
+                      <p className="whitespace-pre-wrap text-sm">{profile.address}</p>
+                      {profile.latitude != null && profile.longitude != null && (
+                        <div className="mt-3 overflow-hidden rounded-xl border border-border">
+                          <ClientOnly fallback={<div className="h-32 w-full bg-muted" />}>
+                            <Suspense fallback={<div className="h-32 w-full bg-muted" />}>
+                              <div className="h-32">
+                                <LocationPicker
+                                  latitude={profile.latitude}
+                                  longitude={profile.longitude}
+                                  onChange={() => {}}
+                                  readonly
+                                />
+                              </div>
+                            </Suspense>
+                          </ClientOnly>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
-          <div>
-            <Label htmlFor="notes">Notes for the bakery</Label>
-            <Textarea id="notes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <div className="flex flex-col">
+            <h2 className="mb-5 font-display text-lg font-semibold">Additional Notes</h2>
+            <div className="flex-1">
+              <Label htmlFor="notes" className="sr-only">Notes for the bakery</Label>
+              <Textarea 
+                id="notes" 
+                placeholder="Optional notes for the bakery..."
+                className="h-full min-h-[120px] resize-none" 
+                value={notes} 
+                onChange={(e) => setNotes(e.target.value)} 
+              />
+            </div>
           </div>
         </section>
 
@@ -267,6 +284,7 @@ function CheckoutPage() {
           No payment now. Once the bakery approves your slot you&apos;ll receive a payment link.
         </p>
       </aside>
+      </div>
     </div>
   );
 }
