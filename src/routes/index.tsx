@@ -238,77 +238,7 @@ function Home() {
         </div>
       </section>
 
-      {/* 2. Interactive Category Counter Showcase */}
-      <section>
-        <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
-              The Counter
-            </span>
-            <h2 className="mt-1 font-display text-2xl font-bold text-cocoa sm:text-4xl">
-              Explore by bake category
-            </h2>
-          </div>
-          <Button asChild variant="ghost" className="text-berry hover:text-berry/80 text-sm font-semibold p-0">
-            <Link to="/shop">
-              Browse all items <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {data.categories.slice(0, 4).map((category) => {
-            const meta = CATEGORY_META[category.slug] ?? {
-              icon: Croissant,
-              desc: category.description ?? "Freshly crafted daily bakes",
-              color: "from-secondary/40 to-secondary/10 text-berry border-border",
-              badge: "Artisan",
-            };
-            const Icon = meta.icon;
-            const productCount = data.products.filter(
-              (p) => p.category_id === category.id,
-            ).length;
-
-            return (
-              <Link
-                key={category.id}
-                to="/shop"
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-berry/40 hover:shadow-lift cursor-pointer"
-              >
-                <div
-                  aria-hidden
-                  className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${meta.color} opacity-40 blur-2xl transition-opacity group-hover:opacity-70`}
-                />
-
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/80 text-berry shadow-xs transition-transform duration-300 group-hover:scale-110">
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <span className="rounded-full bg-secondary/60 px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
-                      {productCount > 0 ? `${productCount} bakes` : meta.badge}
-                    </span>
-                  </div>
-
-                  <h3 className="mt-5 font-display text-xl font-bold text-cocoa transition-colors group-hover:text-berry">
-                    {category.name}
-                  </h3>
-                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground line-clamp-2">
-                    {meta.desc}
-                  </p>
-                </div>
-
-                <div className="mt-6 flex items-center gap-1.5 border-t border-border/60 pt-4 text-xs font-bold uppercase tracking-wider text-berry">
-                  <span>Explore counter</span>
-                  <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 3. Fresh from the counter (Preserved & Elevated) */}
+      {/* 2. Daily Selection — Fresh from the counter (Moved First) */}
       <section className="section-shell section-shell-plain">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 sm:flex sm:justify-between mb-2">
           <div>
@@ -333,6 +263,107 @@ function Home() {
         <p className="mt-2 text-center text-xs uppercase tracking-widest text-muted-foreground sm:hidden">
           Swipe to browse
         </p>
+      </section>
+
+      {/* 3. Enhanced Interactive Category Counter Showcase */}
+      <section className="section-shell section-shell-tint rounded-[2.5rem] p-6 sm:p-10 border border-border/80 shadow-soft">
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-berry">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                The Bakery Counter
+              </span>
+              <span className="text-xs text-muted-foreground hidden sm:inline-block">
+                · Handcrafted every dawn from 4:00 AM
+              </span>
+            </div>
+            <h2 className="mt-1 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+              Explore by bake category
+            </h2>
+            <p className="mt-1.5 text-sm text-muted-foreground max-w-xl">
+              Choose from slow-fermented artisan sourdough, laminated French pastries, celebration cakes, and chunky cookies.
+            </p>
+          </div>
+          <Button asChild variant="outline" className="rounded-2xl border-border bg-card/90 text-berry hover:bg-secondary/60 text-xs font-semibold h-10 px-5 shadow-2xs">
+            <Link to="/shop">
+              Browse all items <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+            </Link>
+          </Button>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {data.categories.slice(0, 4).map((category) => {
+            const meta = CATEGORY_META[category.slug] ?? {
+              icon: Croissant,
+              desc: category.description ?? "Freshly crafted daily bakes",
+              color: "from-secondary/40 to-secondary/10 text-berry border-border",
+              badge: "Artisan",
+            };
+            const Icon = meta.icon;
+            const productCount = data.products.filter(
+              (p) => p.category_id === category.id,
+            ).length;
+
+            return (
+              <Link
+                key={category.id}
+                to="/shop"
+                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-2 hover:border-berry/50 hover:shadow-lift cursor-pointer"
+              >
+                <div
+                  aria-hidden
+                  className={`pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-gradient-to-br ${meta.color} opacity-40 blur-2xl transition-opacity duration-300 group-hover:opacity-80`}
+                />
+
+                <div className="relative">
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-secondary/90 text-berry shadow-xs transition-transform duration-300 group-hover:scale-110 group-hover:bg-berry group-hover:text-berry-foreground">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <span className="rounded-full bg-secondary/80 px-3 py-1 text-[11px] font-bold text-cocoa/80 border border-border/40 shadow-2xs">
+                      {productCount > 0 ? `${productCount} bakes` : meta.badge}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-5 font-display text-xl font-bold text-cocoa transition-colors group-hover:text-berry">
+                    {category.name}
+                  </h3>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground line-clamp-2">
+                    {meta.desc}
+                  </p>
+                </div>
+
+                <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs font-bold uppercase tracking-wider text-berry">
+                  <span>Explore {category.name}</span>
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary/60 transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-berry group-hover:text-berry-foreground">
+                    <ArrowRight className="h-3 w-3" />
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Counter Artisan Guarantee Footer Pill */}
+        <div className="mt-8 rounded-2xl border border-border/60 bg-card/60 backdrop-blur p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-berry/10 text-berry">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-cocoa">Small-batch morning oven slots</p>
+              <p className="text-[11px] text-muted-foreground">
+                We bake strictly to order. Choose your slot date and time window during checkout.
+              </p>
+            </div>
+          </div>
+          <Button asChild size="sm" variant="ghost" className="text-berry hover:text-berry/80 text-xs font-bold shrink-0">
+            <Link to="/shop">
+              See today&apos;s bakes <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+            </Link>
+          </Button>
+        </div>
       </section>
 
       {/* 5. The Sweet Crumb Artisan Difference (Bento Grid) */}
