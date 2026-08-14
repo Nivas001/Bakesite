@@ -154,6 +154,31 @@ export async function getUserById(userId: string): Promise<AppwriteAccount | nul
   }
 }
 
+export type AppwriteAuthUser = {
+  $id: string;
+  $createdAt: string;
+  name: string;
+  registration: string;
+  status: boolean;
+  email: string;
+  phone: string;
+  emailVerification: boolean;
+  accessedAt: string;
+};
+
+/** Fetches users from Appwrite Auth users table */
+export async function listAppwriteUsers(): Promise<AppwriteAuthUser[]> {
+  try {
+    const res = await request<{ total: number; users: AppwriteAuthUser[] }>(
+      '/users?queries[]=limit(100)&queries[]=orderDesc("$createdAt")',
+    );
+    return res.users || [];
+  } catch (err) {
+    console.warn("Failed to list Appwrite auth users:", err);
+    return [];
+  }
+}
+
 /** Updates user's phone number in Appwrite Auth */
 export async function updateUserPhone(userId: string, phone: string): Promise<void> {
   try {

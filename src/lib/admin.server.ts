@@ -7,6 +7,7 @@ import {
   getDoc,
   listDocs,
   updateDoc,
+  listAppwriteUsers,
 } from "@/integrations/appwrite/admin.server";
 import { notifyCustomerOrderUpdate, sendReviewRequest } from "./notifications.server";
 import { createPaymentLink } from "./payments.server";
@@ -194,4 +195,56 @@ export async function addBlackout(input: z.infer<typeof blackoutSchema>) {
 export async function removeBlackout(id: string) {
   await deleteDoc(COLLECTIONS.blackoutDates, id);
   return { ok: true as const };
+}
+
+export type AdminUserData = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  createdAt: string;
+  accessedAt: string;
+  emailVerification: boolean;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  totalOrders: number;
+};
+
+export async function fetchAdminUsers(): Promise<AdminUserData[]> {
+  const [authUsers, profileDocs, orderDocs] = await Promise.all([
+    listAppwriteUsers(),
+    listDocs<{ user_id: string; full_name?: string; phone?: string; address?: string; latitude?: number; longitude?: number }>(
+      COLLECTIONS.profiles,
+      [Q.limit(500)],
+    ).catch(() => []),
+    listDocs<{ user_id: string }>(COLLECTIONS.orders, [Q.limit(1000)]).catch(() => []),
+  ]);
+
+  const profileMap = new Map<string, (typeof profileDocs)[0]>();
+  for (const p of profileDocs) {
+    profileMap.set(p.user_id || p.$id, p);
+  }
+
+  const orderCountMap = new Map<string, number>();
+  for (const o of orderDocs) {
+    orderCountMap.set(o.user_id, (orderCountMap.get(o.user_id) ?? 0) + 1);
+  }
+
+  return authUsers.map((u) => {
+    const profile = profileMap.get(u.$id);
+    return {
+      id: u.$id,
+      name: u.name || profile?.full_name || "Unnamed Customer",
+      email: u.email || "No email",
+      phone: u.phone || profile?.phone || "",
+      createdAt: u.registration || u.$createdAt,
+      accessedAt: u.accessedAt || u.$createdAt,
+      emailVerification: Boolean(u.emailVerification),
+      address: profile?.address ?? null,
+      latitude: profile?.latitude ?? null,
+      longitude: profile?.longitude ?? null,
+      totalOrders: orderCountMap.get(u.$id) ?? 0,
+    };
+  });
 }

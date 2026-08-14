@@ -175,8 +175,26 @@ function AdminDashboard() {
   const [orderSortBy, setOrderSortBy] = useState<string>("priority");
   const [orderSearchQuery, setOrderSearchQuery] = useState<string>("");
 
+  const [userSearchQuery, setUserSearchQuery] = useState<string>("");
+  const [userVerifiedFilter, setUserVerifiedFilter] = useState<"all" | "verified" | "unverified">("all");
+
   const todayISO = toISODate(new Date());
   const pending = data.orders.filter((o) => o.status === "pending_approval").length;
+
+  const usersList = data.users ?? [];
+  const filteredUsers = usersList.filter((u) => {
+    if (userVerifiedFilter === "verified" && !u.emailVerification) return false;
+    if (userVerifiedFilter === "unverified" && u.emailVerification) return false;
+    if (userSearchQuery.trim()) {
+      const q = userSearchQuery.toLowerCase();
+      const matchName = (u.name || "").toLowerCase().includes(q);
+      const matchEmail = (u.email || "").toLowerCase().includes(q);
+      const matchPhone = (u.phone || "").toLowerCase().includes(q);
+      const matchAddress = (u.address || "").toLowerCase().includes(q);
+      return matchName || matchEmail || matchPhone || matchAddress;
+    }
+    return true;
+  });
 
   const filteredOrders = data.orders.filter((order) => {
     if (orderStatusFilter !== "all" && order.status !== orderStatusFilter) {
@@ -226,8 +244,11 @@ function AdminDashboard() {
       </p>
 
       <Tabs defaultValue="orders" className="mt-8">
-        <TabsList>
+        <TabsList className="flex flex-wrap h-auto gap-1">
           <TabsTrigger value="orders">Orders</TabsTrigger>
+          <TabsTrigger value="users">
+            Users ({usersList.length})
+          </TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
           <TabsTrigger value="offers">Offer codes</TabsTrigger>
           <TabsTrigger value="calendar">Closed dates</TabsTrigger>
@@ -1069,6 +1090,226 @@ function AdminDashboard() {
               );
             })}
           </div>
+        </TabsContent>
+
+        {/* USERS / CUSTOMER ACCOUNTS TAB */}
+        <TabsContent value="users" className="mt-6 space-y-6">
+          {/* Summary Stat Cards */}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Total Registered Accounts
+              </span>
+              <p className="mt-2 font-display text-3xl font-bold text-cocoa">{usersList.length}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Accounts created on Sweet Crumb</p>
+            </div>
+
+            <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                Verified Emails
+              </span>
+              <p className="mt-2 font-display text-3xl font-bold text-cocoa">
+                {usersList.filter((u) => u.emailVerification).length}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">Email addresses confirmed</p>
+            </div>
+
+            <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
+              <span className="text-xs font-bold uppercase tracking-wider text-berry">
+                Active Buyers
+              </span>
+              <p className="mt-2 font-display text-3xl font-bold text-cocoa">
+                {usersList.filter((u) => u.totalOrders > 0).length}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">Customers who placed orders</p>
+            </div>
+          </div>
+
+          {/* Search & Filter Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-3xl border border-border/70 bg-card p-4 shadow-soft">
+            <div className="relative flex-1 max-w-md">
+              <Input
+                placeholder="Search by customer name, email, phone…"
+                value={userSearchQuery}
+                onChange={(e) => setUserSearchQuery(e.target.value)}
+                className="h-10 text-xs pl-8 rounded-xl bg-background"
+              />
+              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
+                🔍
+              </span>
+              {userSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setUserSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {[
+                { id: "all", label: "All Users", count: usersList.length },
+                {
+                  id: "verified",
+                  label: "Verified",
+                  count: usersList.filter((u) => u.emailVerification).length,
+                },
+                {
+                  id: "unverified",
+                  label: "Pending",
+                  count: usersList.filter((u) => !u.emailVerification).length,
+                },
+              ].map((pill) => {
+                const isActive = userVerifiedFilter === pill.id;
+                return (
+                  <button
+                    key={pill.id}
+                    type="button"
+                    onClick={() => setUserVerifiedFilter(pill.id as "all" | "verified" | "unverified")}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                      isActive
+                        ? "bg-cocoa text-background shadow-xs"
+                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    }`}
+                  >
+                    <span>{pill.label}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                        isActive ? "bg-background/20 text-background" : "bg-background/80 text-foreground"
+                      }`}
+                    >
+                      {pill.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Users List Grid / Table */}
+          {filteredUsers.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-border p-12 text-center">
+              <p className="text-sm font-medium text-muted-foreground">
+                {userSearchQuery || userVerifiedFilter !== "all"
+                  ? "No user accounts match your filter criteria."
+                  : "No registered users found yet."}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredUsers.map((user) => {
+                const initials = (user.name || "CU")
+                  .split(" ")
+                  .map((n) => n[0])
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .join("")
+                  .toUpperCase();
+
+                const formattedCreated = user.createdAt
+                  ? new Date(user.createdAt).toLocaleString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "Unknown";
+
+                const formattedAccessed = user.accessedAt
+                  ? new Date(user.accessedAt).toLocaleString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : formattedCreated;
+
+                return (
+                  <div
+                    key={user.id}
+                    className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 rounded-3xl border border-border/70 bg-card p-5 shadow-soft transition-all hover:border-berry/30 hover:shadow-lift"
+                  >
+                    {/* User Info & Avatar */}
+                    <div className="flex items-start sm:items-center gap-3.5">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-berry/15 font-display text-sm font-bold text-berry shadow-2xs">
+                        {initials}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-display text-base font-bold text-cocoa truncate">
+                            {user.name}
+                          </h3>
+                          {user.emailVerification ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                              ✓ Verified
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                              Pending Verification
+                            </span>
+                          )}
+                          {user.totalOrders > 0 && (
+                            <span className="rounded-full bg-berry/10 border border-berry/20 px-2 py-0.5 text-[10px] font-bold text-berry">
+                              {user.totalOrders} order{user.totalOrders === 1 ? "" : "s"}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          <span className="font-mono">{user.email}</span>
+                          {user.phone ? (
+                            <span className="font-semibold text-cocoa/90">📞 {user.phone}</span>
+                          ) : (
+                            <span className="italic text-muted-foreground/60">No phone</span>
+                          )}
+                        </div>
+
+                        {user.address && (
+                          <p className="mt-1.5 text-[11px] text-muted-foreground line-clamp-1">
+                            📍 {user.address}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Registration & Last Login Times */}
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-6 border-t border-border/40 pt-3 lg:border-t-0 lg:pt-0 shrink-0 text-xs">
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Registered On
+                        </p>
+                        <p className="font-medium text-cocoa/90">{formattedCreated}</p>
+                      </div>
+
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Last Logged In
+                        </p>
+                        <p className="font-medium text-berry">{formattedAccessed}</p>
+                      </div>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-xl text-xs h-8"
+                        onClick={() => {
+                          navigator.clipboard.writeText(user.email);
+                          toast.success(`Copied ${user.email} to clipboard!`);
+                        }}
+                      >
+                        Copy Email
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

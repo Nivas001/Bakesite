@@ -10,19 +10,20 @@ import {
 export const getAdminData = createServerFn({ method: "GET" })
   .middleware([requireAppwriteAuth])
   .handler(async ({ context }) => {
-    const { assertAdmin, fetchAdminOrders, fetchAdminProducts, fetchBlackouts, fetchStats } =
+    const { assertAdmin, fetchAdminOrders, fetchAdminProducts, fetchBlackouts, fetchStats, fetchAdminUsers } =
       await import("./admin.server");
     const { fetchCampaigns, fetchSubscribers } = await import("./newsletter.server");
     await assertAdmin(context.userId);
-    const [orders, catalog, blackouts, stats, subscribers, campaigns] = await Promise.all([
+    const [orders, catalog, blackouts, stats, subscribers, campaigns, users] = await Promise.all([
       fetchAdminOrders(),
       fetchAdminProducts(),
       fetchBlackouts(),
       fetchStats(),
       fetchSubscribers(),
       fetchCampaigns(),
+      fetchAdminUsers(),
     ]);
-    return { orders, ...catalog, blackouts, stats, subscribers, campaigns };
+    return { orders, ...catalog, blackouts, stats, subscribers, campaigns, users };
   });
 
 export const sendNewsletter = createServerFn({ method: "POST" })
