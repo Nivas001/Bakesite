@@ -14,13 +14,13 @@ const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCat
 export const Route = createFileRoute("/offers")({
   head: () => ({
     meta: [
-      { title: "Bakery offers & coupons — Sweet Crumb Bakery" },
+      { title: "Bakery offers & coupons — Ani Bakes Bakery" },
       {
         name: "description",
-        content: "Discounted cakes, cookies, pastries and promo codes at Sweet Crumb, updated every week.",
+        content: "Discounted cakes, cookies, pastries and promo codes at Ani Bakes, updated every week.",
       },
-      { property: "og:title", content: "Bakery offers & coupons — Sweet Crumb Bakery" },
-      { property: "og:description", content: "This week's discounted bakes and promo codes at Sweet Crumb." },
+      { property: "og:title", content: "Bakery offers & coupons — Ani Bakes Bakery" },
+      { property: "og:description", content: "This week's discounted bakes and promo codes at Ani Bakes." },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogQuery),

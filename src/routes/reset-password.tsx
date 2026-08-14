@@ -13,7 +13,7 @@ export const Route = createFileRoute("/reset-password")({
   }),
   head: () => ({
     meta: [
-      { title: "Reset Password — Sweet Crumb Bakery" },
+      { title: "Reset Password — Ani Bakes Bakery" },
       { name: "description", content: "Set a new password for your bakery account." },
     ],
   }),

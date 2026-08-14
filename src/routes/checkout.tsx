@@ -55,9 +55,9 @@ function parseDateParts(iso: string) {
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
-      { title: "Checkout — Sweet Crumb Bakery" },
+      { title: "Checkout — Ani Bakes Bakery" },
       { name: "description", content: "Pick a next-day delivery or pickup slot for your bakes." },
-      { property: "og:title", content: "Checkout — Sweet Crumb Bakery" },
+      { property: "og:title", content: "Checkout — Ani Bakes Bakery" },
       { property: "og:description", content: "Pick a next-day delivery or pickup slot." },
     ],
   }),

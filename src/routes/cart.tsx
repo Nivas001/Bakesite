@@ -7,9 +7,9 @@ import { formatCurrency } from "@/lib/pricing";
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
-      { title: "Your cart — Sweet Crumb Bakery" },
-      { name: "description", content: "Review your Sweet Crumb bakes before choosing a slot." },
-      { property: "og:title", content: "Your cart — Sweet Crumb Bakery" },
+      { title: "Your cart — Ani Bakes Bakery" },
+      { name: "description", content: "Review your Ani Bakes bakes before choosing a slot." },
+      { property: "og:title", content: "Your cart — Ani Bakes Bakery" },
       { property: "og:description", content: "Review your bakes before choosing a slot." },
     ],
   }),

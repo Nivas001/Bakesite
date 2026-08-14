@@ -23,11 +23,11 @@ export const Route = createFileRoute("/product/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Not found — Sweet Crumb" }, { name: "robots", content: "noindex" }] };
+      return { meta: [{ title: "Not found — Ani Bakes" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.product.name} — Sweet Crumb Bakery`;
+    const title = `${loaderData.product.name} — Ani Bakes Bakery`;
     const description =
-      loaderData.product.description ?? "A small-batch bake from Sweet Crumb Bakery.";
+      loaderData.product.description ?? "A small-batch bake from Ani Bakes Bakery.";
     return {
       meta: [
         { title },

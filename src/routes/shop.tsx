@@ -10,12 +10,12 @@ const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCat
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Shop all bakes — Sweet Crumb Bakery" },
+      { title: "Shop all bakes — Ani Bakes Bakery" },
       {
         name: "description",
-        content: "Browse cakes, cookies and pastries from Sweet Crumb, baked fresh for your slot.",
+        content: "Browse cakes, cookies and pastries from Ani Bakes, baked fresh for your slot.",
       },
-      { property: "og:title", content: "Shop all bakes — Sweet Crumb Bakery" },
+      { property: "og:title", content: "Shop all bakes — Ani Bakes Bakery" },
       { property: "og:description", content: "Cakes, cookies and pastries baked fresh to order." },
     ],
   }),

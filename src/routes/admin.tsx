@@ -38,11 +38,11 @@ import {
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Bakery admin — Sweet Crumb" },
-      { name: "description", content: "Manage orders, inventory and closed dates for Sweet Crumb Bakery." },
+      { title: "Bakery admin — Ani Bakes" },
+      { name: "description", content: "Manage orders, inventory and closed dates for Ani Bakes Bakery." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Bakery admin — Sweet Crumb" },
-      { property: "og:description", content: "Order approvals and inventory for Sweet Crumb Bakery." },
+      { property: "og:title", content: "Bakery admin — Ani Bakes" },
+      { property: "og:description", content: "Order approvals and inventory for Ani Bakes Bakery." },
     ],
   }),
   component: () => (
@@ -694,13 +694,13 @@ function AdminDashboard() {
                               const origin = typeof window !== "undefined" ? window.location.origin : "https://bakesite.vercel.app";
                               const myOrdersUrl = `${origin}/orders`;
                               
-                              let message = `🎂 *Sweet Crumb Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;
+                              let message = `🎂 *Ani Bakes Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;
                               if (order.status === "pending_approval") {
                                 message += `We have received your payment of *${formatCurrency(Number(order.total))}*! Our head baker is reviewing the schedule for your requested slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Requested Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order:* ${myOrdersUrl}\n\nThank you!`;
                               } else if (order.status === "confirmed") {
-                                message += `Your bakery order is *confirmed*! Our bakers will prepare it fresh for your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order here:* ${myOrdersUrl}\n\nThank you for choosing Sweet Crumb!`;
+                                message += `Your bakery order is *confirmed*! Our bakers will prepare it fresh for your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order here:* ${myOrdersUrl}\n\nThank you for choosing Ani Bakes!`;
                               } else if (order.status === "rescheduled") {
-                                message += `Update on your order: The head baker has adjusted your scheduled baking slot to *${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})*.\n\n📦 *Items:*\n${itemsText}\n\n👉 *View details on our site:* ${myOrdersUrl}\n\nSweet Crumb Bakery`;
+                                message += `Update on your order: The head baker has adjusted your scheduled baking slot to *${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})*.\n\n📦 *Items:*\n${itemsText}\n\n👉 *View details on our site:* ${myOrdersUrl}\n\nAni Bakes Bakery`;
                               } else {
                                 message += `Here is your order summary for *${formatCurrency(Number(order.total))}*.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *View order:* ${myOrdersUrl}`;
                               }
@@ -1688,7 +1688,7 @@ function AdminDashboard() {
                 Total Registered Accounts
               </span>
               <p className="mt-2 font-display text-3xl font-bold text-cocoa">{usersList.length}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Accounts created on Sweet Crumb</p>
+              <p className="mt-1 text-xs text-muted-foreground">Accounts created on Ani Bakes</p>
             </div>
 
             <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">

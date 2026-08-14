@@ -21,9 +21,9 @@ import {
 export const Route = createFileRoute("/orders")({
   head: () => ({
     meta: [
-      { title: "Your orders — Sweet Crumb Bakery" },
-      { name: "description", content: "Track the live status of your Sweet Crumb bakery orders." },
-      { property: "og:title", content: "Your orders — Sweet Crumb Bakery" },
+      { title: "Your orders — Ani Bakes Bakery" },
+      { name: "description", content: "Track the live status of your Ani Bakes bakery orders." },
+      { property: "og:title", content: "Your orders — Ani Bakes Bakery" },
       { property: "og:description", content: "Track the live status of your bakery orders." },
     ],
   }),

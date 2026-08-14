@@ -37,13 +37,13 @@ const catalogQuery = queryOptions({
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sweet Crumb Bakery — Fresh small-batch cakes & cookies" },
+      { title: "Ani Bakes Bakery — Fresh small-batch cakes & cookies" },
       {
         name: "description",
         content:
-          "Order artisanal cakes, cookies and pastries from Sweet Crumb. Pick a next-day slot, we confirm, then you pay.",
+          "Order artisanal cakes, cookies and pastries from Ani Bakes. Pick a next-day slot, pay to secure, and enjoy fresh bakes.",
       },
-      { property: "og:title", content: "Sweet Crumb Bakery — Fresh small-batch cakes & cookies" },
+      { property: "og:title", content: "Ani Bakes Bakery — Fresh small-batch cakes & cookies" },
       {
         property: "og:description",
         content: "Artisanal bakes made the morning of your slot. Delivery or pickup.",
@@ -201,8 +201,8 @@ function Home() {
               <span className="italic text-berry">suits you.</span>
             </h1>
             <p className="max-w-md text-[0.95rem] leading-relaxed text-muted-foreground sm:text-base">
-              Everything at Sweet Crumb is made in small batches the morning of your delivery. Choose
-              your bakes, pick a next-day slot, and we&apos;ll confirm before you ever pay.
+              Everything at Ani Bakes is made in small batches the morning of your delivery. Choose
+              your bakes, pick a slot, and our head baker prepares your order fresh.
             </p>
             <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:flex-wrap">
               <Button
@@ -366,11 +366,11 @@ function Home() {
         </div>
       </section>
 
-      {/* 5. The Sweet Crumb Artisan Difference (Bento Grid) */}
+      {/* 5. The Ani Bakes Artisan Difference (Bento Grid) */}
       <section className="section-shell section-shell-tint">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
-            Why Sweet Crumb
+            Why Ani Bakes
           </span>
           <h2 className="mt-2 font-display text-2xl font-bold text-cocoa sm:text-4xl">
             The small-batch difference you can taste

@@ -92,13 +92,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Sweet Crumb Bakery" },
+      { title: "Ani Bakes Bakery" },
       {
         name: "description",
         content: "Small-batch cakes, cookies and pastries baked fresh for your chosen slot.",
       },
-      { name: "author", content: "Sweet Crumb Bakery" },
-      { property: "og:title", content: "Sweet Crumb Bakery" },
+      { name: "author", content: "Ani Bakes Bakery" },
+      { property: "og:title", content: "Ani Bakes Bakery" },
       {
         property: "og:description",
         content: "Small-batch cakes, cookies and pastries baked fresh for your chosen slot.",

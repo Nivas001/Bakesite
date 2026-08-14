@@ -23,9 +23,9 @@ export const Route = createFileRoute("/profile")({
   },
   head: () => ({
     meta: [
-      { title: "Your details — Sweet Crumb Bakery" },
+      { title: "Your details — Ani Bakes Bakery" },
       { name: "description", content: "Save your contact phone number, delivery address and map pin." },
-      { property: "og:title", content: "Your details — Sweet Crumb Bakery" },
+      { property: "og:title", content: "Your details — Ani Bakes Bakery" },
       { property: "og:description", content: "Save your contact phone number, delivery address and map pin." },
     ],
   }),
