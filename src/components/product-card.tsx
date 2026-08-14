@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import {
@@ -11,9 +12,12 @@ import {
 } from "@/lib/pricing";
 
 export function ProductCard({ product }: { product: CatalogProduct }) {
-  const { add } = useCart();
+  const { lines, add, setQuantity } = useCart();
   const price = finalPrice(product.price, product.discount_type, product.discount_value);
   const discounted = hasDiscount(product.discount_type, product.discount_value);
+
+  const cartLine = lines.find((l) => l.productId === product.id);
+  const quantityInCart = cartLine?.quantity ?? 0;
 
   return (
     <article className="glass-panel group flex flex-col rounded-[2.25rem] p-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-lift">
@@ -35,10 +39,18 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
             {discountLabel(product.discount_type, product.discount_value)}
           </span>
         )}
-        <span className="absolute bottom-4 right-4 rounded-full bg-card/85 px-3 py-1 text-sm font-bold text-cocoa shadow-soft backdrop-blur">
-          {formatCurrency(price)}
-        </span>
+        <div className="absolute bottom-3 right-3 flex flex-col items-end">
+          {discounted && (
+            <span className="text-[11px] font-semibold text-foreground/80 line-through drop-shadow-xs mb-0.5">
+              {formatCurrency(product.price)}
+            </span>
+          )}
+          <span className="rounded-full bg-card/90 px-3 py-1 text-sm font-bold text-cocoa shadow-soft backdrop-blur">
+            {formatCurrency(price)}
+          </span>
+        </div>
       </Link>
+
       <div className="flex flex-1 flex-col gap-3 px-2 pb-1 pt-5">
         <div>
           <p className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -51,30 +63,62 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
           </h3>
         </div>
         <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
-        <div className="mt-auto flex items-center justify-between gap-3 pt-3">
-          {discounted ? (
-            <span className="text-sm text-muted-foreground line-through">
-              {formatCurrency(product.price)}
-            </span>
+
+        {/* Bottom Action: Add or Quantity Stepper */}
+        <div className="mt-auto pt-3">
+          {quantityInCart === 0 ? (
+            <Button
+              className="w-full rounded-2xl bg-berry text-berry-foreground font-semibold shadow-soft transition-transform duration-200 hover:scale-[1.02] hover:bg-berry/90 active:scale-95 flex items-center justify-center gap-2 py-2.5"
+              onClick={() => {
+                add({
+                  productId: product.id,
+                  slug: product.slug,
+                  name: product.name,
+                  unitPrice: price,
+                  basePrice: product.price,
+                  imageUrl: product.image_url,
+                });
+                toast.success(`${product.name} added to cart`);
+              }}
+            >
+              <Plus className="size-4" />
+              <span>Add to cart</span>
+            </Button>
           ) : (
-            <span className="text-sm text-muted-foreground">Fresh today</span>
+            <div className="flex w-full items-center justify-between rounded-2xl bg-secondary/80 p-1 border border-border/70 shadow-2xs">
+              <button
+                type="button"
+                aria-label={`Decrease ${product.name} quantity`}
+                className="flex size-8 items-center justify-center rounded-xl bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer"
+                onClick={() => {
+                  setQuantity(product.id, quantityInCart - 1);
+                  if (quantityInCart - 1 === 0) {
+                    toast.info(`Removed ${product.name} from cart`);
+                  }
+                }}
+              >
+                <Minus className="size-3.5" />
+              </button>
+
+              <div className="flex items-center gap-1.5 px-2">
+                <ShoppingBag className="size-3.5 text-berry" />
+                <span className="text-xs font-bold text-foreground tabular-nums">
+                  {quantityInCart} in cart
+                </span>
+              </div>
+
+              <button
+                type="button"
+                aria-label={`Increase ${product.name} quantity`}
+                className="flex size-8 items-center justify-center rounded-xl bg-berry text-berry-foreground transition-all hover:bg-berry/90 active:scale-90 shadow-2xs cursor-pointer"
+                onClick={() => {
+                  setQuantity(product.id, Math.min(30, quantityInCart + 1));
+                }}
+              >
+                <Plus className="size-3.5" />
+              </button>
+            </div>
           )}
-          <Button
-            className="rounded-2xl bg-berry px-6 text-berry-foreground shadow-soft transition-transform duration-200 hover:scale-105 hover:bg-berry/90 active:scale-95"
-            onClick={() => {
-              add({
-                productId: product.id,
-                slug: product.slug,
-                name: product.name,
-                unitPrice: price,
-                basePrice: product.price,
-                imageUrl: product.image_url,
-              });
-              toast.success(`${product.name} added to cart`);
-            }}
-          >
-            Add
-          </Button>
         </div>
       </div>
     </article>

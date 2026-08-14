@@ -159,9 +159,16 @@ export function FeaturedProducts({ products }: { products: CatalogProduct[] }) {
                     {discountLabel(product.discount_type, product.discount_value)}
                   </span>
                 )}
-                <span className="absolute bottom-4 right-4 rounded-full bg-card/85 px-3 py-1 text-sm font-bold text-cocoa shadow-soft backdrop-blur">
-                  {formatCurrency(price)}
-                </span>
+                <div className="absolute bottom-3 right-3 flex flex-col items-end">
+                  {discounted && (
+                    <span className="text-[11px] font-semibold text-foreground/80 line-through drop-shadow-xs mb-0.5">
+                      {formatCurrency(product.price)}
+                    </span>
+                  )}
+                  <span className="rounded-full bg-card/90 px-3 py-1 text-sm font-bold text-cocoa shadow-soft backdrop-blur">
+                    {formatCurrency(price)}
+                  </span>
+                </div>
               </Link>
               <div className="flex flex-1 flex-col gap-2 px-2 pb-1 pt-4 sm:gap-3 sm:pt-5">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">
