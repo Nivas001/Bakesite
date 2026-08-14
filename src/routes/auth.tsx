@@ -312,10 +312,10 @@ function AuthPage() {
             >
               <TabsList className="grid w-full grid-cols-2 rounded-2xl bg-secondary/60 p-1">
                 <TabsTrigger value="phone" className="rounded-xl text-xs font-semibold">
-                  📱 Mobile & OTP
+                  Mobile & OTP
                 </TabsTrigger>
                 <TabsTrigger value="email" className="rounded-xl text-xs font-semibold">
-                  ✉️ Email & Password
+                  Email & Password
                 </TabsTrigger>
               </TabsList>
 
@@ -327,20 +327,15 @@ function AuthPage() {
                       <Label htmlFor="login-phone" className="text-xs font-semibold">
                         Mobile phone number
                       </Label>
-                      <div className="flex gap-2">
-                        <span className="inline-flex items-center px-3 rounded-xl border border-input bg-muted/60 text-xs font-bold text-foreground">
-                          🇮🇳 +91
-                        </span>
-                        <Input
-                          id="login-phone"
-                          type="tel"
-                          placeholder="98765 43210"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          required
-                          className="rounded-xl"
-                        />
-                      </div>
+                      <Input
+                        id="login-phone"
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                        className="rounded-xl"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         We will send a 6-digit OTP to verify your number.
                       </p>
@@ -501,7 +496,7 @@ function AuthPage() {
                         onClick={() => setForgotPasswordMode(false)}
                         className="text-xs text-muted-foreground hover:text-foreground font-medium underline"
                       >
-                        ← Back to Sign in
+                        Back to Sign in
                       </button>
                     </div>
                   </form>
@@ -537,7 +532,7 @@ function AuthPage() {
                   <Input
                     id="reg-name"
                     required
-                    placeholder="e.g. Srinivas R"
+                    placeholder="Full name"
                     value={signUpName}
                     onChange={(e) => setSignUpName(e.target.value)}
                     className="rounded-xl h-10"
@@ -563,22 +558,17 @@ function AuthPage() {
                   <Label htmlFor="reg-phone" className="text-xs font-semibold">
                     Mobile phone number <span className="text-berry">*</span>
                   </Label>
-                  <div className="flex gap-2">
-                    <span className="inline-flex items-center px-2.5 rounded-xl border border-input bg-muted/60 text-xs font-bold text-foreground">
-                      🇮🇳 +91
-                    </span>
-                    <Input
-                      id="reg-phone"
-                      type="tel"
-                      required
-                      placeholder="98765 43210"
-                      value={signUpPhone}
-                      onChange={(e) => setSignUpPhone(e.target.value)}
-                      className="rounded-xl h-10"
-                    />
-                  </div>
+                  <Input
+                    id="reg-phone"
+                    type="tel"
+                    required
+                    placeholder="10-digit mobile number"
+                    value={signUpPhone}
+                    onChange={(e) => setSignUpPhone(e.target.value)}
+                    className="rounded-xl h-10"
+                  />
                   <p className="text-[10px] text-muted-foreground">
-                    🔒 Phone number is verified and permanently linked to your account.
+                    Phone number is verified and permanently linked to your account.
                   </p>
                 </div>
 

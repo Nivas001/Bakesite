@@ -179,16 +179,13 @@ function ProfilePage() {
             {/* PHONE VERIFICATION ONBOARDING (IF PHONE NOT LINKED YET) */}
             {!isPhoneVerified && (
               <div className="rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 p-5 space-y-4">
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">📱</span>
-                  <div>
-                    <h2 className="text-sm font-bold text-cocoa">
-                      Verify your mobile phone number
-                    </h2>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      To place orders, your phone number must be verified via 6-digit OTP. Once linked, it cannot be changed.
-                    </p>
-                  </div>
+                <div>
+                  <h2 className="text-sm font-bold text-cocoa">
+                    Verify your mobile phone number
+                  </h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    To place orders, your phone number must be verified via 6-digit OTP. Once linked, it cannot be changed.
+                  </p>
                 </div>
 
                 {!otpSent ? (
@@ -198,14 +195,11 @@ function ProfilePage() {
                         Mobile Phone Number
                       </Label>
                       <div className="flex gap-2">
-                        <span className="inline-flex items-center px-3 rounded-xl border border-input bg-muted text-xs font-bold">
-                          🇮🇳 +91
-                        </span>
                         <Input
                           id="verify-phone"
                           type="tel"
                           required
-                          placeholder="98765 43210"
+                          placeholder="10-digit mobile number"
                           value={verifyPhoneInput}
                           onChange={(e) => setVerifyPhoneInput(e.target.value)}
                           className="rounded-xl bg-background"
@@ -277,7 +271,7 @@ function ProfilePage() {
                     <Label htmlFor="phone">Phone number</Label>
                     {isPhoneVerified && (
                       <span className="text-[11px] font-semibold text-emerald-700">
-                        🔒 Locked (Verified)
+                        Locked (Verified)
                       </span>
                     )}
                   </div>
@@ -287,7 +281,7 @@ function ProfilePage() {
                     disabled={isPhoneVerified}
                     readOnly={isPhoneVerified}
                     onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                    placeholder="e.g. +91 98765 43210"
+                    placeholder="10-digit mobile number"
                     required
                     className={`rounded-xl ${
                       isPhoneVerified
@@ -332,7 +326,7 @@ function ProfilePage() {
                 </ClientOnly>
                 {form.latitude != null && (
                   <p className="mt-2 text-xs text-muted-foreground">
-                    📍 Pinned at {form.latitude.toFixed(5)}, {form.longitude?.toFixed(5)}
+                    Pinned at {form.latitude.toFixed(5)}, {form.longitude?.toFixed(5)}
                   </p>
                 )}
               </div>

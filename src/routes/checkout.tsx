@@ -618,19 +618,14 @@ function CheckoutPage() {
                             <Label htmlFor="alt-phone" className="text-[11px] font-semibold text-muted-foreground">
                               Recipient calling phone number
                             </Label>
-                            <div className="flex gap-2">
-                              <span className="inline-flex items-center px-2.5 rounded-xl border border-input bg-muted/60 text-xs font-bold text-foreground">
-                                🇮🇳 +91
-                              </span>
-                              <Input
-                                id="alt-phone"
-                                type="tel"
-                                placeholder="98765 43210"
-                                value={alternatePhone}
-                                onChange={(e) => setAlternatePhone(e.target.value)}
-                                className="rounded-xl h-9 text-xs"
-                              />
-                            </div>
+                            <Input
+                              id="alt-phone"
+                              type="tel"
+                              placeholder="10-digit mobile number"
+                              value={alternatePhone}
+                              onChange={(e) => setAlternatePhone(e.target.value)}
+                              className="rounded-xl h-9 text-xs"
+                            />
                             <p className="text-[10px] text-muted-foreground">
                               The delivery rider will call this number upon arrival.
                             </p>
