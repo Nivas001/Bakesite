@@ -6,11 +6,13 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getBlackoutDates } from "@/lib/catalog.functions";
 import { getMyProfile, placeOrder } from "@/lib/orders.functions";
+import { checkOfferCode } from "@/lib/offers.functions";
 import { RequireAuth } from "@/components/require-auth";
 import { useCart } from "@/lib/cart";
 import { formatCurrency } from "@/lib/pricing";
 import { TIME_SLOTS, formatSlotDate, selectableDates } from "@/lib/slots";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -28,6 +30,7 @@ import {
   Sparkles,
   ShieldCheck,
   Check,
+  Tag,
 } from "lucide-react";
 
 const LocationPicker = lazy(() => import("@/components/location-picker"));
@@ -71,6 +74,7 @@ function CheckoutPage() {
   const fetchProfile = useServerFn(getMyProfile);
   const fetchBlackout = useServerFn(getBlackoutDates);
   const submitOrder = useServerFn(placeOrder);
+  const validatePromoFn = useServerFn(checkOfferCode);
 
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: blackout } = useQuery({ queryKey: ["blackout"], queryFn: () => fetchBlackout() });
@@ -80,6 +84,17 @@ function CheckoutPage() {
   const [slotId, setSlotId] = useState(TIME_SLOTS[0]!.id);
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Promo code state
+  const [promoCodeInput, setPromoCodeInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{
+    code: string;
+    discountAmount: number;
+    discountType: "percent" | "flat";
+    discountValue: number;
+    description?: string | null;
+  } | null>(null);
+  const [validatingPromo, setValidatingPromo] = useState(false);
 
   const dates = selectableDates(
     (blackout ?? []).map((b) => b.blackout_date),
@@ -103,6 +118,39 @@ function CheckoutPage() {
     );
   }
 
+  async function handleApplyPromo() {
+    if (!promoCodeInput.trim()) {
+      toast.error("Please enter an offer code.");
+      return;
+    }
+    setValidatingPromo(true);
+    try {
+      const res = await validatePromoFn({
+        data: {
+          code: promoCodeInput.trim().toUpperCase(),
+          subtotal: total,
+        },
+      });
+      setAppliedPromo(res);
+      toast.success(
+        `Offer code "${res.code}" applied! Saved ${formatCurrency(res.discountAmount)}`,
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Invalid offer code");
+    } finally {
+      setValidatingPromo(false);
+    }
+  }
+
+  function handleRemovePromo() {
+    setAppliedPromo(null);
+    setPromoCodeInput("");
+    toast.info("Offer code removed");
+  }
+
+  const promoDiscount = appliedPromo ? Math.min(total, appliedPromo.discountAmount) : 0;
+  const finalTotal = Math.max(0, total - promoDiscount);
+
   async function submit(event: React.FormEvent): Promise<void> {
     event.preventDefault();
     setBusy(true);
@@ -125,6 +173,8 @@ function CheckoutPage() {
           latitude: fulfilmentType === "delivery" ? profile.latitude : null,
           longitude: fulfilmentType === "delivery" ? profile.longitude : null,
           notes: notes || undefined,
+          promoCode: appliedPromo?.code,
+          promoDiscount,
         },
       });
       clear();
@@ -150,27 +200,94 @@ function CheckoutPage() {
 
       <form onSubmit={submit} className="grid gap-10 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          {/* Fulfilment Type */}
-          <section className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-            <h2 className="font-display text-lg font-semibold">Delivery or pickup</h2>
-            <div className="mt-4 flex gap-2">
-              {(["delivery", "pickup"] as const).map((option) => (
-                <Button
-                  key={option}
-                  type="button"
-                  variant={fulfilmentType === option ? "default" : "outline"}
-                  onClick={() => setFulfilmentType(option)}
-                  className={`capitalize rounded-xl ${
-                    fulfilmentType === option
-                      ? "bg-berry text-berry-foreground font-semibold"
-                      : "hover:border-berry/40"
-                  }`}
-                >
-                  {option}
-                </Button>
-              ))}
-            </div>
-          </section>
+          {/* 50/50 Top Row: Delivery or Pickup & Offer Code Card */}
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Delivery or pickup (50%) */}
+            <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
+              <div>
+                <h2 className="font-display text-lg font-semibold">Delivery or pickup</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Select how you want to receive your bakes
+                </p>
+              </div>
+              <div className="mt-4 flex gap-2">
+                {(["delivery", "pickup"] as const).map((option) => (
+                  <Button
+                    key={option}
+                    type="button"
+                    variant={fulfilmentType === option ? "default" : "outline"}
+                    onClick={() => setFulfilmentType(option)}
+                    className={`flex-1 capitalize rounded-xl ${
+                      fulfilmentType === option
+                        ? "bg-berry text-berry-foreground font-semibold"
+                        : "hover:border-berry/40"
+                    }`}
+                  >
+                    {option}
+                  </Button>
+                ))}
+              </div>
+            </section>
+
+            {/* Offer / Promo Code Card (50%) */}
+            <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Tag className="h-5 w-5 text-berry" />
+                  <h2 className="font-display text-lg font-semibold">Have an offer code?</h2>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Apply bakery promo code for extra savings
+                </p>
+              </div>
+
+              <div className="mt-4">
+                {appliedPromo ? (
+                  <div className="flex items-center justify-between rounded-2xl bg-matcha/40 border border-matcha p-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-berry text-berry-foreground">
+                        <Check className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="font-mono font-bold text-xs text-cocoa">{appliedPromo.code}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {appliedPromo.discountType === "percent"
+                            ? `${appliedPromo.discountValue}% discount applied`
+                            : `₹${appliedPromo.discountValue} flat discount applied`}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemovePromo}
+                      className="h-8 text-xs text-destructive hover:bg-destructive/10 rounded-xl"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="e.g. WELCOME10"
+                      value={promoCodeInput}
+                      onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                      className="uppercase font-mono text-sm tracking-wider rounded-xl bg-background/50 focus:bg-background"
+                    />
+                    <Button
+                      type="button"
+                      disabled={validatingPromo || !promoCodeInput.trim()}
+                      onClick={handleApplyPromo}
+                      className="bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl px-5 font-semibold text-xs shrink-0"
+                    >
+                      {validatingPromo ? "Checking…" : "Apply"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
 
           {/* Separate Date and Time Window Cards */}
           <div className="grid gap-6 md:grid-cols-2">
@@ -214,7 +331,9 @@ function CheckoutPage() {
                               <span className="text-[10px] uppercase font-bold tracking-wider leading-none">
                                 {weekdayShort}
                               </span>
-                              <span className="text-base font-extrabold leading-none mt-0.5">{day}</span>
+                              <span className="text-base font-extrabold leading-none mt-0.5">
+                                {day}
+                              </span>
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
@@ -222,7 +341,9 @@ function CheckoutPage() {
                                   {weekdayLong}, {day} {monthShort}
                                 </p>
                               </div>
-                              <p className="text-[11px] text-muted-foreground">Next Available Dispatch</p>
+                              <p className="text-[11px] text-muted-foreground">
+                                Next Available Dispatch
+                              </p>
                             </div>
                           </div>
 
@@ -536,6 +657,21 @@ function CheckoutPage() {
               ))}
             </div>
 
+            {/* Edit Items / Add More Bakes Action Button */}
+            <div className="pt-1">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="w-full rounded-xl border-dashed border-border hover:border-berry/40 hover:bg-secondary/40 text-xs font-semibold text-muted-foreground hover:text-foreground py-4"
+              >
+                <Link to="/cart">
+                  <Pencil className="mr-1.5 h-3.5 w-3.5 text-berry" />
+                  Edit items or add more bakes
+                </Link>
+              </Button>
+            </div>
+
             {/* Price Breakdown (Inter Font & High Contrast) */}
             <dl className="space-y-2 border-t border-border/80 pt-4 text-sm">
               <div className="flex justify-between font-sans">
@@ -551,10 +687,19 @@ function CheckoutPage() {
                   <dd className="font-bold">−{formatCurrency(discountTotal)}</dd>
                 </div>
               )}
+              {appliedPromo && promoDiscount > 0 && (
+                <div className="flex items-center justify-between font-sans text-emerald-600 dark:text-emerald-400">
+                  <dt className="flex items-center gap-1.5 font-medium">
+                    <Tag className="h-3.5 w-3.5" />
+                    Promo ({appliedPromo.code})
+                  </dt>
+                  <dd className="font-bold">−{formatCurrency(promoDiscount)}</dd>
+                </div>
+              )}
               <div className="flex items-center justify-between border-t border-border/60 pt-3 text-base">
                 <dt className="font-sans font-bold text-foreground">Total Amount</dt>
                 <dd className="font-sans text-2xl font-extrabold text-foreground tracking-tight">
-                  {formatCurrency(total)}
+                  {formatCurrency(finalTotal)}
                 </dd>
               </div>
             </dl>

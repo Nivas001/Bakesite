@@ -167,6 +167,27 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     };
   });
 
+  let promoDiscount = 0;
+  if (input.promoCode) {
+    try {
+      const { validatePromoCode } = await import("./offers.server");
+      const promoResult = await validatePromoCode({
+        code: input.promoCode,
+        subtotal: total,
+      });
+      promoDiscount = promoResult.discountAmount;
+    } catch {
+      // Continue if promo validation fails on edge cases
+    }
+  }
+
+  const finalOrderTotal = Math.max(0, total - promoDiscount);
+  const totalDiscount = (subtotal - total) + promoDiscount;
+
+  const orderNotes = input.promoCode
+    ? `${input.notes ? `${input.notes} | ` : ""}Promo: ${input.promoCode} (-₹${promoDiscount})`
+    : input.notes ?? null;
+
   const order = await createDoc<OrderDoc>(COLLECTIONS.orders, {
     user_id: userId,
     status: "pending_approval",
@@ -175,14 +196,14 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     slot_start: slot.start,
     slot_end: slot.end,
     subtotal: Math.round(subtotal * 100) / 100,
-    discount_total: Math.round((subtotal - total) * 100) / 100,
-    total: Math.round(total * 100) / 100,
+    discount_total: Math.round(totalDiscount * 100) / 100,
+    total: Math.round(finalOrderTotal * 100) / 100,
     contact_name: input.contactName,
     contact_phone: input.contactPhone,
     delivery_address: input.fulfilmentType === "delivery" ? input.address : null,
     delivery_lat: input.fulfilmentType === "delivery" ? input.latitude : null,
     delivery_lng: input.fulfilmentType === "delivery" ? input.longitude : null,
-    notes: input.notes ?? null,
+    notes: orderNotes,
     payment_link_url: null,
     payment_ref: null,
     paid_at: null,

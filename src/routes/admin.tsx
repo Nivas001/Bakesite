@@ -18,6 +18,11 @@ import {
   sendNewsletter,
   setOrderStatus,
 } from "@/lib/admin.functions";
+import {
+  getAdminOfferCodes,
+  saveAdminOfferCode,
+  deleteAdminOfferCode,
+} from "@/lib/offers.functions";
 import { formatCurrency } from "@/lib/pricing";
 
 export const Route = createFileRoute("/admin")({
@@ -72,6 +77,25 @@ const EMPTY_FORM: ProductForm = {
   category_id: "",
 };
 
+type OfferCodeForm = {
+  id?: string | undefined;
+  code: string;
+  discount_type: "percent" | "flat";
+  discount_value: string;
+  min_order_amount: string;
+  expires_at: string;
+  description: string;
+};
+
+const EMPTY_OFFER_FORM: OfferCodeForm = {
+  code: "",
+  discount_type: "percent",
+  discount_value: "10",
+  min_order_amount: "0",
+  expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
+  description: "",
+};
+
 function AdminDashboard() {
   const queryClient = useQueryClient();
   const loadData = useServerFn(getAdminData);
@@ -81,12 +105,21 @@ function AdminDashboard() {
   const addBlackoutFn = useServerFn(createBlackout);
   const removeBlackoutFn = useServerFn(deleteBlackout);
   const sendNewsletterFn = useServerFn(sendNewsletter);
+  const fetchOfferCodesFn = useServerFn(getAdminOfferCodes);
+  const saveOfferCodeFn = useServerFn(saveAdminOfferCode);
+  const removeOfferCodeFn = useServerFn(deleteAdminOfferCode);
 
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
+  const [offerForm, setOfferForm] = useState<OfferCodeForm>(EMPTY_OFFER_FORM);
   const [blackoutDate, setBlackoutDate] = useState("");
   const [blackoutReason, setBlackoutReason] = useState("");
   const [subject, setSubject] = useState("");
   const [bodyText, setBodyText] = useState("");
+
+  const { data: offerCodes } = useQuery({
+    queryKey: ["admin-offer-codes"],
+    queryFn: () => fetchOfferCodesFn(),
+  });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["admin-data"],
@@ -134,6 +167,7 @@ function AdminDashboard() {
         <TabsList>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          <TabsTrigger value="offers">Offer codes</TabsTrigger>
           <TabsTrigger value="calendar">Closed dates</TabsTrigger>
           <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -559,6 +593,218 @@ function AdminDashboard() {
             Heatmaps and session recordings run through Microsoft Clarity. Add your Clarity project id
             as <code>VITE_CLARITY_PROJECT_ID</code> and the tracking tag loads on every page.
           </p>
+        </TabsContent>
+
+        <TabsContent value="offers" className="mt-6 grid gap-8 lg:grid-cols-[380px_1fr]">
+          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
+            <h2 className="font-display text-xl font-semibold">
+              {offerForm.id ? "Edit offer code" : "New offer code"}
+            </h2>
+            <div className="mt-4 space-y-3">
+              <div>
+                <Label htmlFor="o-code">Code (e.g. FESTIVE20)</Label>
+                <Input
+                  id="o-code"
+                  placeholder="SWEET20"
+                  value={offerForm.code}
+                  onChange={(e) =>
+                    setOfferForm((f) => ({ ...f, code: e.target.value.toUpperCase().trim() }))
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="o-type">Discount type</Label>
+                  <select
+                    id="o-type"
+                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                    value={offerForm.discount_type}
+                    onChange={(e) =>
+                      setOfferForm((f) => ({
+                        ...f,
+                        discount_type: e.target.value as "percent" | "flat",
+                      }))
+                    }
+                  >
+                    <option value="percent">Percent (%)</option>
+                    <option value="flat">Flat (₹)</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="o-val">Discount value</Label>
+                  <Input
+                    id="o-val"
+                    type="number"
+                    value={offerForm.discount_value}
+                    onChange={(e) =>
+                      setOfferForm((f) => ({ ...f, discount_value: e.target.value }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="o-min">Min order amount (₹)</Label>
+                <Input
+                  id="o-min"
+                  type="number"
+                  placeholder="0"
+                  value={offerForm.min_order_amount}
+                  onChange={(e) =>
+                    setOfferForm((f) => ({ ...f, min_order_amount: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="o-expiry">Valid until (Expiry Date & Time)</Label>
+                <Input
+                  id="o-expiry"
+                  type="datetime-local"
+                  value={offerForm.expires_at}
+                  onChange={(e) =>
+                    setOfferForm((f) => ({ ...f, expires_at: e.target.value }))
+                  }
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  The code automatically expires past this timestamp.
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="o-desc">Description (optional)</Label>
+                <Input
+                  id="o-desc"
+                  placeholder="e.g. 20% off for festival season"
+                  value={offerForm.description}
+                  onChange={(e) =>
+                    setOfferForm((f) => ({ ...f, description: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  className="bg-berry text-berry-foreground hover:bg-berry/90"
+                  onClick={() =>
+                    run(async () => {
+                      if (!offerForm.code || !offerForm.discount_value || !offerForm.expires_at) {
+                        toast.error("Please fill in code, discount value, and expiry date.");
+                        return;
+                      }
+                      await saveOfferCodeFn({
+                        data: {
+                          ...(offerForm.id ? { id: offerForm.id } : {}),
+                          code: offerForm.code,
+                          discount_type: offerForm.discount_type,
+                          discount_value: Number(offerForm.discount_value),
+                          min_order_amount: Number(offerForm.min_order_amount || 0),
+                          expires_at: new Date(offerForm.expires_at).toISOString(),
+                          description: offerForm.description || undefined,
+                          is_active: true,
+                        },
+                      });
+                      setOfferForm(EMPTY_OFFER_FORM);
+                      queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
+                    }, "Offer code saved")
+                  }
+                >
+                  Save offer code
+                </Button>
+                {offerForm.id && (
+                  <Button variant="outline" onClick={() => setOfferForm(EMPTY_OFFER_FORM)}>
+                    Cancel
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {(!offerCodes || offerCodes.length === 0) && (
+              <p className="text-sm text-muted-foreground">No offer codes created yet.</p>
+            )}
+            {offerCodes?.map((offer) => {
+              const isExpired = new Date(offer.expires_at).getTime() <= Date.now();
+              return (
+                <div
+                  key={offer.id ?? offer.code}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-card p-4 shadow-2xs"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-base text-berry bg-berry/10 px-2 py-0.5 rounded-lg border border-berry/20">
+                        {offer.code}
+                      </span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                          isExpired
+                            ? "bg-destructive/15 text-destructive"
+                            : "bg-matcha text-cocoa"
+                        }`}
+                      >
+                        {isExpired ? "Expired" : "Active"}
+                      </span>
+                    </div>
+
+                    <p className="mt-1.5 text-sm font-medium text-foreground">
+                      {offer.discount_type === "percent"
+                        ? `${offer.discount_value}% off`
+                        : `₹${offer.discount_value} flat off`}
+                      {offer.min_order_amount > 0 ? ` on orders above ₹${offer.min_order_amount}` : ""}
+                    </p>
+
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Expires: {new Date(offer.expires_at).toLocaleString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                      {offer.description ? ` · ${offer.description}` : ""}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        setOfferForm({
+                          id: offer.id,
+                          code: offer.code,
+                          discount_type: offer.discount_type,
+                          discount_value: String(offer.discount_value),
+                          min_order_amount: String(offer.min_order_amount),
+                          expires_at: new Date(offer.expires_at).toISOString().slice(0, 16),
+                          description: offer.description ?? "",
+                        })
+                      }
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-destructive hover:bg-destructive/10"
+                      onClick={() =>
+                        run(async () => {
+                          if (offer.id) {
+                            await removeOfferCodeFn({ data: offer.id });
+                            queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
+                          }
+                        }, "Offer code deleted")
+                      }
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

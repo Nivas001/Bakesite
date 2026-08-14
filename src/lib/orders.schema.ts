@@ -34,6 +34,8 @@ export const placeOrderSchema = z.object({
   latitude: z.number().min(-90).max(90).nullable(),
   longitude: z.number().min(-180).max(180).nullable(),
   notes: z.string().trim().max(500).optional(),
+  promoCode: z.string().trim().max(30).optional(),
+  promoDiscount: z.number().min(0).optional(),
 });
 
 export type PlaceOrderInput = z.infer<typeof placeOrderSchema>;

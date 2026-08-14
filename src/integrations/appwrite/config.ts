@@ -15,4 +15,5 @@ export const COLLECTIONS = {
   blackoutDates: 'blackout_dates',
   newsletterSubscribers: 'newsletter_subscribers',
   newsletterCampaigns: 'newsletter_campaigns',
+  offerCodes: 'offer_codes',
 } as const;
