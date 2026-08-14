@@ -11,6 +11,7 @@ import {
 } from "@/integrations/appwrite/client";
 import { refreshAuth } from "@/hooks/use-appwrite-auth";
 import { requestPasswordRecovery as serverRecovery } from "@/lib/auth.functions";
+import { saveMyProfile } from "@/lib/orders.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,6 +42,7 @@ function AuthPage() {
   const target = safePath(search.redirect);
 
   const serverRecoveryFn = useServerFn(serverRecovery);
+  const saveProfileFn = useServerFn(saveMyProfile);
 
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
 
@@ -52,6 +54,7 @@ function AuthPage() {
 
   // Sign-up State
   const [signUpName, setSignUpName] = useState("");
+  const [signUpPhone, setSignUpPhone] = useState("");
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
   const [verificationSentEmail, setVerificationSentEmail] = useState<string | null>(null);
@@ -108,11 +111,16 @@ function AuthPage() {
     }
   }
 
-  // 3. Sign-up with Email & Send Verification
+  // 3. Sign-up with Email, Name & Phone, then Send Verification Link
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
     if (!signUpName.trim()) {
       toast.error("Please enter your full name.");
+      return;
+    }
+    const cleanPhone = signUpPhone.replace(/\D/g, "");
+    if (cleanPhone.length < 10) {
+      toast.error("Please enter a valid 10-digit mobile phone number.");
       return;
     }
     if (!signUpEmail.trim()) {
@@ -126,10 +134,29 @@ function AuthPage() {
 
     setBusy(true);
     try {
-      // Create user account in Appwrite and auto-login
+      // 1. Create user account in Appwrite and sign in
       await signUpWithEmail(signUpEmail.trim(), signUpPassword, signUpName.trim());
 
-      // Send email verification link
+      const formattedPhone = signUpPhone.startsWith("+")
+        ? signUpPhone.trim()
+        : `+91${cleanPhone.slice(-10)}`;
+
+      // 2. Save profile with collected name and phone
+      try {
+        await saveProfileFn({
+          data: {
+            full_name: signUpName.trim(),
+            phone: formattedPhone,
+            address: "",
+            latitude: null,
+            longitude: null,
+          },
+        });
+      } catch (profErr) {
+        console.warn("Could not save initial profile:", profErr);
+      }
+
+      // 3. Send email verification link
       const verifyUrl = `${window.location.origin}/verify`;
       try {
         await sendEmailVerification(verifyUrl);
@@ -137,7 +164,6 @@ function AuthPage() {
         toast.success("Account created! Verification link sent to your email.");
       } catch (verifyErr) {
         console.warn("Email verification send note:", verifyErr);
-        // If verification fails or email sender pending, still grant access
         await refreshAuth();
         toast.success("Account created successfully!");
         navigate({ to: target, replace: true });
@@ -377,18 +403,35 @@ function AuthPage() {
               /* SIGN UP VIEW */
               <div className="space-y-4">
                 <form onSubmit={handleSignUp} className="space-y-3.5">
-                  <div className="space-y-1">
-                    <Label htmlFor="reg-name" className="text-xs font-semibold">
-                      Full name <span className="text-berry">*</span>
-                    </Label>
-                    <Input
-                      id="reg-name"
-                      required
-                      placeholder="Your full name"
-                      value={signUpName}
-                      onChange={(e) => setSignUpName(e.target.value)}
-                      className="rounded-xl h-10"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="reg-name" className="text-xs font-semibold">
+                        Full name <span className="text-berry">*</span>
+                      </Label>
+                      <Input
+                        id="reg-name"
+                        required
+                        placeholder="Your full name"
+                        value={signUpName}
+                        onChange={(e) => setSignUpName(e.target.value)}
+                        className="rounded-xl h-10"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="reg-phone" className="text-xs font-semibold">
+                        Mobile number <span className="text-berry">*</span>
+                      </Label>
+                      <Input
+                        id="reg-phone"
+                        type="tel"
+                        required
+                        placeholder="10-digit mobile"
+                        value={signUpPhone}
+                        onChange={(e) => setSignUpPhone(e.target.value)}
+                        className="rounded-xl h-10"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-1">

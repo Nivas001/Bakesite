@@ -110,19 +110,15 @@ export async function getProfile(userId: string) {
 }
 
 export async function saveProfile(userId: string, input: z.infer<typeof profileSchema>) {
-  const existing = await getDoc<ProfileDoc>(COLLECTIONS.profiles, userId);
-  // Phone number is immutable once saved/verified
-  const phoneToSave = existing?.phone ? existing.phone : input.phone;
-
   await upsertDoc(COLLECTIONS.profiles, userId, {
     user_id: userId,
     full_name: input.full_name,
-    phone: phoneToSave,
+    phone: input.phone,
     address: input.address,
     latitude: input.latitude,
     longitude: input.longitude,
   });
-  return { ok: true as const, phone: phoneToSave };
+  return { ok: true as const, phone: input.phone };
 }
 
 export async function listOrdersForUser(userId: string) {

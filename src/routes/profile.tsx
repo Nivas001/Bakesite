@@ -5,6 +5,7 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { getMyProfile, saveMyProfile } from "@/lib/orders.functions";
+import { useAuth } from "@/hooks/use-appwrite-auth";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/profile")({
 });
 
 function ProfilePage() {
+  const { user } = useAuth();
   const fetchProfile = useServerFn(getMyProfile);
   const save = useServerFn(saveMyProfile);
   const queryClient = useQueryClient();
@@ -138,6 +140,7 @@ function ProfilePage() {
             )}
 
             <form className="space-y-6" onSubmit={submit}>
+              {/* Full Name and Phone Number (Editable) */}
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="full_name">
@@ -154,9 +157,12 @@ function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">
-                    Mobile phone number <span className="text-berry">*</span>
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="phone">
+                      Mobile phone number <span className="text-berry">*</span>
+                    </Label>
+                    <span className="text-[10px] text-muted-foreground">Editable</span>
+                  </div>
                   <Input
                     id="phone"
                     type="tel"
@@ -171,7 +177,29 @@ function ProfilePage() {
                   </p>
                 </div>
               </div>
+
+              {/* Email Address (Non-Editable / Read-Only) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="profile-email">Email address</Label>
+                  <span className="text-[10px] font-semibold text-muted-foreground">
+                    Non-editable (Account ID)
+                  </span>
+                </div>
+                <Input
+                  id="profile-email"
+                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  readOnly
+                  className="rounded-xl bg-muted/60 text-muted-foreground cursor-not-allowed font-medium"
+                />
+                <p className="text-[11px] text-muted-foreground">
+                  Your registered email address cannot be changed directly.
+                </p>
+              </div>
               
+              {/* Default Delivery Address (Editable) */}
               <div className="space-y-2">
                 <Label htmlFor="address">Default delivery address</Label>
                 <Textarea
@@ -184,6 +212,7 @@ function ProfilePage() {
                 />
               </div>
               
+              {/* Delivery Map Pin (Editable) */}
               <div className="space-y-2">
                 <Label>Delivery map pin</Label>
                 <p className="mb-2 text-xs text-muted-foreground">
