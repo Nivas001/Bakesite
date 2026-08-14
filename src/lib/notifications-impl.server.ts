@@ -9,7 +9,8 @@ export async function sendEmail(input: {
   html?: string;
 }): Promise<void> {
   const apiKey = process.env["RESEND_API_KEY"];
-  const senderEmail = process.env["SENDER_EMAIL"] || "Sweet Crumb Bakery <onboarding@resend.dev>";
+  const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
+  const senderEmail = process.env["SENDER_EMAIL"] || `${bakeryName} <orders@anibakes.app>`;
 
   if (!input.to || !apiKey) {
     console.info("[resend email skipped - configure RESEND_API_KEY in .env]", input);
@@ -23,13 +24,13 @@ export async function sendEmail(input: {
         ? `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #f0e6e1; border-radius: 20px; background-color: #fffdfa;">
         <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="color: #43281c; margin: 0; font-size: 24px;">Sweet Crumb Bakery</h2>
+          <h2 style="color: #43281c; margin: 0; font-size: 24px;">${bakeryName}</h2>
           <p style="color: #8c7870; font-size: 13px; margin-top: 4px;">Fresh Artisan Bakes Daily</p>
         </div>
         <div style="color: #2b1e16; font-size: 15px; line-height: 1.6; white-space: pre-wrap;">${input.text}</div>
         <hr style="border: none; border-top: 1px solid #f0e6e1; margin: 24px 0 16px;" />
         <p style="color: #9c8982; font-size: 11px; text-align: center; margin: 0;">
-          Sweet Crumb Bakery · Thank you for your order!
+          ${bakeryName} · Thank you for your order!
         </p>
       </div>`
         : undefined);
@@ -49,8 +50,8 @@ export async function sendEmail(input: {
       }),
     });
 
-    if (!response.ok && senderEmail !== "Sweet Crumb Bakery <onboarding@resend.dev>") {
-      // Retry with verified sandbox sender if custom sender domain is pending
+    if (!response.ok && !senderEmail.includes("onboarding@resend.dev")) {
+      // Retry with sandbox sender if custom domain has temporary propagation delay
       response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -58,7 +59,7 @@ export async function sendEmail(input: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Sweet Crumb Bakery <onboarding@resend.dev>",
+          from: `${bakeryName} <onboarding@resend.dev>`,
           to: [input.to],
           subject: input.subject,
           text: input.text,
