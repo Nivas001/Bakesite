@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   ArrowRight,
   Clock,
@@ -11,14 +12,16 @@ import {
   Star,
   Truck,
   HelpCircle,
+  ShieldCheck,
+  Heart,
+  CheckCircle2,
+  ChevronDown,
 } from "lucide-react";
 import heroImage from "@/assets/hero-bakery.jpg";
 import aboutImage from "@/assets/about-baker.jpg";
 import { getCatalog } from "@/lib/catalog.functions";
 import { FeaturedProducts } from "@/components/featured-products";
-import { BentoCard } from "@/components/bento-card";
 import { Button } from "@/components/ui/button";
-import { finalPrice, hasDiscount } from "@/lib/pricing";
 import {
   Accordion,
   AccordionContent,
@@ -51,17 +54,79 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const CATEGORY_META: Record<
+  string,
+  { icon: typeof Croissant; desc: string; color: string; badge: string }
+> = {
+  breads: {
+    icon: Croissant,
+    desc: "Slow-fermented artisan sourdough & soft morning loaves",
+    color: "from-amber-500/10 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    badge: "Slow Ferment",
+  },
+  cakes: {
+    icon: Sparkles,
+    desc: "Celebration layer cakes & tea-time artisan sponge slices",
+    color: "from-rose-500/10 to-rose-500/5 text-rose-600 dark:text-rose-400 border-rose-500/20",
+    badge: "Celebration",
+  },
+  pastries: {
+    icon: Leaf,
+    desc: "Laminated French butter croissants, danishes & cruffins",
+    color: "from-emerald-500/10 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    badge: "Pure Butter",
+  },
+  cookies: {
+    icon: Star,
+    desc: "Crispy-edged, chewy-centred chunky artisan cookies",
+    color: "from-orange-500/10 to-orange-500/5 text-orange-600 dark:text-orange-400 border-orange-500/20",
+    badge: "Small Batch",
+  },
+};
+
+const FAQ_ITEMS = [
+  {
+    category: "Freshness & Ingredients",
+    question: "How fresh are the bakes when they reach my door?",
+    answer:
+      "Every single item is mixed, proofed, and baked the same morning as your slot (starting at 4:00 AM). Nothing is prepared the day before, and we never keep unsold stock on shelves overnight.",
+  },
+  {
+    category: "Slots & Ordering",
+    question: "How do next-day delivery and pickup slots work?",
+    answer:
+      "We offer next-day slots across Morning (7:30–10:30 AM), Midday (11:00 AM–2:00 PM), Afternoon (2:30–5:30 PM), and Evening (6:00–8:00 PM). Because everything is baked strictly to order, we require one day of notice.",
+  },
+  {
+    category: "Payment & Guarantee",
+    question: "Why do I only pay after my order is approved?",
+    answer:
+      "We verify our morning oven capacity and ingredient inventory first so you never pay for something we cannot bake fresh. Once approved by our team, you receive a secure payment link.",
+  },
+  {
+    category: "Delivery & Pickup",
+    question: "Where do you deliver and how does the map pin work?",
+    answer:
+      "We deliver across central and suburban neighbourhoods. Dropping an exact map pin during checkout allows our delivery rider to reach your specific gate or apartment entrance on the very first try without calls.",
+  },
+  {
+    category: "Delivery & Pickup",
+    question: "Can I pick up my bakes directly from the bakery counter?",
+    answer:
+      "Yes! Select 'Pickup' at checkout and choose your arrival slot. Your order will be freshly boxed and waiting for you at our counter (open Tue–Sun, 7:30 AM to 8:00 PM).",
+  },
+  {
+    category: "Slots & Ordering",
+    question: "What if I need to reschedule or cancel my slot?",
+    answer:
+      "Reach out before our 4:00 AM baking cycle begins and we will gladly reschedule or cancel your order. Since each batch is baked strictly for you, same-day cancellations cannot be accommodated.",
+  },
+];
+
 function Home() {
   const { data } = useSuspenseQuery(catalogQuery);
   const featured = data.products.slice(0, 6);
-  const offers = data.products.filter((p) => hasDiscount(p.discount_type, p.discount_value));
-
-  const stats = [
-    { icon: Croissant, value: "Small batch", label: "Baked the morning of your slot" },
-    { icon: Leaf, value: "No preservatives", label: "Butter, flour, fruit — nothing odd" },
-    { icon: Truck, value: "Next-day slots", label: "Delivery or counter pickup" },
-    { icon: Star, value: "4.9 / 5", label: "From 300+ neighbourhood orders" },
-  ];
+  const [selectedFaqCategory, setSelectedFaqCategory] = useState<string>("All");
 
   const testimonials = [
     {
@@ -69,18 +134,24 @@ function Home() {
         "The pistachio loaf arrived still faintly warm. It genuinely tasted like someone baked it for us that morning — because they did.",
       name: "Ananya R.",
       detail: "Indiranagar",
+      bakes: "Pistachio Loaf & Croissants",
+      rating: 5,
     },
     {
       quote:
-        "Picking a slot and getting a confirmation before paying made ordering a birthday cake completely stress-free.",
+        "Picking a slot and getting a confirmation before paying made ordering our anniversary cake completely stress-free.",
       name: "Karthik M.",
       detail: "Koramangala",
+      bakes: "Belgian Chocolate Cake",
+      rating: 5,
     },
     {
       quote:
-        "The map pin saved us. Our building is impossible to find and the rider walked straight to the door.",
+        "The map pin saved us. Our building entrance is tricky to find and the rider walked straight to our door on the first try.",
       name: "Fatima S.",
       detail: "Frazer Town",
+      bakes: "Sourdough & Cookie Box",
+      rating: 5,
     },
   ];
 
@@ -88,59 +159,33 @@ function Home() {
     {
       icon: Clock,
       step: "01",
-      title: "Next-day slots",
-      body: "Reserve a morning, midday, afternoon or evening window. We bake strictly to order, so nothing sits on a shelf.",
-    },
-    {
-      icon: MapPin,
-      step: "02",
-      title: "Pin your door",
-      body: "Drop a map marker with your exact entrance so our rider finds you on the very first try.",
+      title: "Pick Your Bakes & Slot",
+      body: "Choose your treats and select a next-day morning, midday, afternoon, or evening window. We bake strictly to order.",
     },
     {
       icon: Sparkles,
+      step: "02",
+      title: "We Confirm & Bake at Dawn",
+      body: "Our bakers lock in your order at 4:00 AM. You receive a confirmation and pay only when the bake is secured.",
+    },
+    {
+      icon: Truck,
       step: "03",
-      title: "Approve then pay",
-      body: "We confirm your slot before any money moves. You only pay once the bake is locked in.",
+      title: "Doorstep Delivery or Pickup",
+      body: "Dispatched warm with precise GPS map guidance right to your door, or packaged ready at our neighbourhood counter.",
     },
   ];
 
-  const faqs = [
-    {
-      question: "How fresh is everything when it reaches me?",
-      answer:
-        "Every item is baked the same morning as your slot. Nothing is made the night before, and anything unsold is donated rather than stored.",
-    },
-    {
-      question: "Can I choose a delivery time?",
-      answer:
-        "Yes. We offer next-day slots across morning, midday, afternoon and evening windows. Pick what works for you at checkout.",
-    },
-    {
-      question: "Why do I only pay after approval?",
-      answer:
-        "We confirm your slot and inventory first so you never pay for something we cannot bake fresh. Once approved, you receive a secure payment link.",
-    },
-    {
-      question: "Do you deliver across Bangalore?",
-      answer:
-        "We currently serve central Bangalore neighbourhoods. Drop a map pin during checkout so our rider can reach your exact entrance.",
-    },
-    {
-      question: "Can I pick up from the bakery counter?",
-      answer:
-        "Absolutely. Select counter pickup at checkout and choose a time that suits you. The counter is open Tue – Sun, 7:30am to 8pm.",
-    },
-    {
-      question: "What if I need to cancel or change my slot?",
-      answer:
-        "Reach out before your slot window begins and we will move or cancel it. Since each bake is made to order, last-minute changes may not always be possible.",
-    },
-  ];
+  const faqCategories = ["All", "Freshness & Ingredients", "Slots & Ordering", "Delivery & Pickup", "Payment & Guarantee"];
+
+  const filteredFaqs =
+    selectedFaqCategory === "All"
+      ? FAQ_ITEMS
+      : FAQ_ITEMS.filter((f) => f.category === selectedFaqCategory);
 
   return (
-    <div className="mx-auto w-full max-w-6xl overflow-x-clip px-4 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-16">
-      {/* Hero */}
+    <div className="mx-auto w-full max-w-6xl overflow-x-clip px-4 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-16 space-y-16 sm:space-y-24">
+      {/* 1. Hero (Preserved) */}
       <section className="relative">
         <div
           aria-hidden
@@ -193,177 +238,88 @@ function Home() {
         </div>
       </section>
 
-      {/* About — bento */}
-      <section id="about" className="section-shell section-shell-tint mt-16 scroll-mt-24 sm:mt-20">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 sm:flex sm:justify-between">
+      {/* 2. Interactive Category Counter Showcase */}
+      <section>
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-berry">
-              Our story
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+              The Counter
             </span>
-            <h2 className="mt-2 font-display text-[1.65rem] font-bold leading-tight text-cocoa sm:text-4xl">
-              A tiny bakery with stubborn habits
+            <h2 className="mt-1 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+              Explore by bake category
             </h2>
           </div>
-          <Link
-            to="/shop"
-            className="story-link w-fit shrink-0 text-xs font-semibold uppercase tracking-widest text-berry sm:text-sm"
-          >
-            All bakes
-          </Link>
+          <Button asChild variant="ghost" className="text-berry hover:text-berry/80 text-sm font-semibold p-0">
+            <Link to="/shop">
+              Browse all items <ArrowRight className="ml-1.5 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
 
-        <div className="mt-6 grid auto-rows-auto gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-5 md:auto-rows-[minmax(0,1fr)] md:grid-cols-3 lg:grid-cols-4">
-          {/* Story tile */}
-          <BentoCard
-            className="md:col-span-2 md:row-span-2"
-            expandedContent={
-              <p className="text-sm leading-relaxed text-cocoa/80">
-                Every flour sack is unbleached. Every fruit is seasonal. We ferment our doughs
-                slowly and bake in small batches so nothing waits on a shelf.
-              </p>
-            }
-          >
-            <article className="glass-panel relative flex h-full flex-col overflow-hidden rounded-[1.5rem] p-6 sm:rounded-[2rem] sm:p-8">
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-berry/20 blur-3xl"
-              />
-              <div className="relative flex h-full flex-col">
-                <h3 className="font-display text-xl font-bold leading-tight text-cocoa sm:text-3xl">
-                  We start at 4am so your morning starts better.
-                </h3>
-                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                  Sweet Crumb began in a home kitchen with one oven, a hand-me-down mixer and a
-                  neighbourhood that kept asking for one more loaf. We still bake in small batches,
-                  still use real butter and slow ferments, and still refuse to keep anything on a
-                  shelf overnight.
-                </p>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  Every order is baked the morning of your slot — which is why we confirm your
-                  timing before we ever take a rupee.
-                </p>
-                <div className="mt-auto flex flex-wrap gap-3 pt-6 sm:pt-8">
-                  <Button
-                    asChild
-                    className="w-full rounded-2xl bg-berry px-6 text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.03] hover:bg-berry/90 active:scale-95 sm:w-auto"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Link to="/shop">
-                      Taste the difference <ArrowRight className="ml-2 size-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </article>
-          </BentoCard>
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {data.categories.slice(0, 4).map((category) => {
+            const meta = CATEGORY_META[category.slug] ?? {
+              icon: Croissant,
+              desc: category.description ?? "Freshly crafted daily bakes",
+              color: "from-secondary/40 to-secondary/10 text-berry border-border",
+              badge: "Artisan",
+            };
+            const Icon = meta.icon;
+            const productCount = data.products.filter(
+              (p) => p.category_id === category.id,
+            ).length;
 
-          {/* Image tile */}
-          <BentoCard
-            className="md:row-span-2"
-            expandedContent={
-              <p className="text-sm leading-relaxed text-cocoa/80">
-                Hand-shaped, never rushed. Our bakers shape every loaf and pastry by hand the
-                same morning it reaches you.
-              </p>
-            }
-          >
-            <div className="glass-panel group relative flex h-full min-h-52 flex-col overflow-hidden rounded-[1.5rem] p-0 sm:min-h-56 sm:rounded-[2rem]">
-              <img
-                src={aboutImage}
-                alt="Baker shaping dough on a floured marble counter"
-                loading="lazy"
-                width={1024}
-                height={1024}
-                className="h-full w-full flex-1 object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-cocoa/60 to-transparent"
-              />
-              <p className="absolute bottom-5 left-5 right-5 font-display text-lg font-bold text-background">
-                Hand-shaped, never rushed.
-              </p>
-            </div>
-          </BentoCard>
-
-          {/* Stat tiles */}
-          {stats.slice(0, 2).map((s) => (
-            <BentoCard
-              key={s.value}
-              expandedContent={
-                <p className="text-sm leading-relaxed text-cocoa/80">
-                  {s.value === "Small batch"
-                    ? "We bake only what is ordered for each slot. No bulk production, no overnight holding."
-                    : "Butter, flour, fruit, sugar, eggs — and time. That's the full ingredient list."}
-                </p>
-              }
-            >
-              <div className="glass-soft flex h-full flex-col justify-between rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-6">
-                <s.icon className="size-5 text-berry" />
-                <div className="mt-5 sm:mt-6">
-                  <p className="font-display text-lg font-bold text-cocoa">{s.value}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{s.label}</p>
-                </div>
-              </div>
-            </BentoCard>
-          ))}
-
-          {/* Category tiles */}
-          {data.categories.slice(0, 4).map((category) => (
-            <BentoCard key={category.id} expandable={false}>
+            return (
               <Link
+                key={category.id}
                 to="/shop"
-                className="glass-panel relative flex h-full flex-col overflow-hidden rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-6"
+                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-berry/40 hover:shadow-lift cursor-pointer"
               >
-                <span
+                <div
                   aria-hidden
-                  className="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full bg-accent/50 blur-2xl"
+                  className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${meta.color} opacity-40 blur-2xl transition-opacity group-hover:opacity-70`}
                 />
-                <h3 className="relative font-display text-xl font-bold text-cocoa">
-                  {category.name}
-                </h3>
-                <p className="relative mt-2 line-clamp-2 text-sm text-muted-foreground">
-                  {category.description ?? "Freshly baked, boxed for your slot."}
-                </p>
-                <span className="relative mt-auto inline-flex items-center gap-1 pt-5 text-xs font-semibold uppercase tracking-widest text-berry">
-                  Explore
-                  <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </Link>
-            </BentoCard>
-          ))}
 
-          {/* Hours tile */}
-          <BentoCard
-            expandedContent={
-              <div className="space-y-1 text-sm text-cocoa/80">
-                <p>Tue – Sun: 7:30am – 8:00pm</p>
-                <p>Monday: Closed for prep & pastry trials</p>
-              </div>
-            }
-          >
-            <div className="glass-soft flex h-full flex-col justify-between rounded-[1.5rem] p-5 sm:rounded-[2rem] sm:p-6">
-              <Clock className="size-5 text-berry" />
-              <div className="mt-5 sm:mt-6">
-                <p className="font-display text-lg font-bold text-cocoa">Counter hours</p>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                  Tue – Sun, 7:30am to 8pm. Closed Mondays for prep and pastry trials.
-                </p>
-              </div>
-            </div>
-          </BentoCard>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/80 text-berry shadow-xs transition-transform duration-300 group-hover:scale-110">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <span className="rounded-full bg-secondary/60 px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                      {productCount > 0 ? `${productCount} bakes` : meta.badge}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-5 font-display text-xl font-bold text-cocoa transition-colors group-hover:text-berry">
+                    {category.name}
+                  </h3>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground line-clamp-2">
+                    {meta.desc}
+                  </p>
+                </div>
+
+                <div className="mt-6 flex items-center gap-1.5 border-t border-border/60 pt-4 text-xs font-bold uppercase tracking-wider text-berry">
+                  <span>Explore counter</span>
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
-      {/* Featured products */}
-      <section className="section-shell section-shell-plain mt-10 sm:mt-12">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 sm:flex sm:justify-between">
+      {/* 3. Fresh from the counter (Preserved & Elevated) */}
+      <section className="section-shell section-shell-plain">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 sm:flex sm:justify-between mb-2">
           <div>
-            <h2 className="font-display text-[1.65rem] font-bold leading-tight text-cocoa sm:text-4xl">
+            <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+              Daily Selection
+            </span>
+            <h2 className="mt-1 font-display text-[1.65rem] font-bold leading-tight text-cocoa sm:text-4xl">
               Fresh from the counter
             </h2>
-            <p className="mt-2 text-sm italic text-muted-foreground sm:text-base">
-              Baked at dawn, boxed for your slot.
+            <p className="mt-1.5 text-sm italic text-muted-foreground sm:text-base">
+              Baked at dawn, boxed for your chosen slot.
             </p>
           </div>
           <Link
@@ -379,59 +335,132 @@ function Home() {
         </p>
       </section>
 
-      {/* Offers */}
-      {offers.length > 0 && (
-        <section className="mt-16 sm:mt-24">
-          <div className="glass-panel relative overflow-hidden rounded-[1.75rem] px-6 py-10 sm:rounded-[2.5rem] sm:px-14 sm:py-12">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-berry/30 blur-3xl"
-            />
-            <div className="relative">
-              <h2 className="font-display text-[1.65rem] font-bold leading-tight text-cocoa sm:text-4xl">
-                On offer right now
-              </h2>
-              <p className="mt-3 max-w-lg text-sm text-muted-foreground">
-                {offers.length} bake{offers.length > 1 ? "s" : ""} at a friendlier price, starting at ₹
-                {Math.min(
-                  ...offers.map((o) => finalPrice(o.price, o.discount_type, o.discount_value)),
-                ).toFixed(0)}
-                .
-              </p>
-              <Button
-                asChild
-                className="mt-6 w-full rounded-2xl bg-berry px-7 text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.03] hover:bg-berry/90 active:scale-95 sm:mt-7 sm:w-auto"
-              >
-                <Link to="/offers">Shop offers</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* How it works — moved below the counter */}
-      <section className="section-shell section-shell-tint mt-10 sm:mt-12">
-        <div className="text-center">
-          <h2 className="font-display text-[1.65rem] font-bold text-cocoa sm:text-4xl">How it works</h2>
-          <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-            Three calm steps between craving and doorstep.
+      {/* 5. The Sweet Crumb Artisan Difference (Bento Grid) */}
+      <section className="section-shell section-shell-tint">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+            Why Sweet Crumb
+          </span>
+          <h2 className="mt-2 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+            The small-batch difference you can taste
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We bake strictly to order every morning. No commercial shortcuts, no warehouse storage.
           </p>
         </div>
-        <div className="mt-8 grid gap-4 sm:mt-10 sm:gap-6 md:grid-cols-3">
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Card 1: 4 AM Dawn Baking (Wide on LG) */}
+          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-7 shadow-soft transition-all duration-300 hover:shadow-lift lg:col-span-2">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-berry/15 blur-3xl"
+            />
+            <div className="relative">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-berry text-berry-foreground shadow-xs">
+                <Clock className="h-6 w-6" />
+              </div>
+              <h3 className="mt-5 font-display text-2xl font-bold text-cocoa sm:text-3xl">
+                We start at 4:00 AM so your morning starts warm.
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground max-w-xl">
+                Every loaf, croissant, and tea cake is shaped and baked the exact morning of your slot.
+                We never store bakes overnight on a shelf, which is why everything arrives with crisp crusts
+                and soft, fragrant crumbs.
+              </p>
+            </div>
+            <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-cocoa">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <span>Baked exclusively to order · Zero day-old stock</span>
+            </div>
+          </div>
+
+          {/* Card 2: Pure Ingredients */}
+          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-7 shadow-soft transition-all duration-300 hover:shadow-lift">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-berry shadow-xs">
+                <Leaf className="h-6 w-6" />
+              </div>
+              <h3 className="mt-5 font-display text-xl font-bold text-cocoa">
+                100% Honest Ingredients
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Unbleached heritage flour, pure dairy butter, fresh seasonal fruits, and wild sourdough starters.
+                Zero artificial preservatives or emulsifiers.
+              </p>
+            </div>
+            <div className="mt-6 border-t border-border/60 pt-4 text-xs font-semibold text-muted-foreground">
+              Pure butter · No strange chemicals
+            </div>
+          </div>
+
+          {/* Card 3: Photo Accent */}
+          <div className="group relative overflow-hidden rounded-[2rem] min-h-[220px] shadow-soft">
+            <img
+              src={aboutImage}
+              alt="Baker dusting flour on artisan sourdough loaves"
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-cocoa/80 via-cocoa/30 to-transparent" />
+            <div className="absolute bottom-5 left-5 right-5 text-white">
+              <p className="font-display text-lg font-bold">Hand-shaped with care</p>
+              <p className="text-xs text-white/80">Every single piece made with artisan passion</p>
+            </div>
+          </div>
+
+          {/* Card 4: Pinpoint GPS Delivery */}
+          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-7 shadow-soft transition-all duration-300 hover:shadow-lift lg:col-span-2">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-berry shadow-xs">
+                <MapPin className="h-6 w-6" />
+              </div>
+              <h3 className="mt-5 font-display text-xl font-bold text-cocoa sm:text-2xl">
+                Pin Your Doorstep on the Map
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Tricky building entrance or gated society? Our live interactive map pin lets you drop
+                the exact marker for our delivery rider to find you on the very first try without confusion.
+              </p>
+            </div>
+            <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-cocoa">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <span>Direct delivery rider navigation</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. 3-Step Morning Slot Ritual (How it works) */}
+      <section className="section-shell section-shell-plain">
+        <div className="text-center max-w-xl mx-auto mb-12">
+          <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+            Simple Process
+          </span>
+          <h2 className="mt-2 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+            How the morning ritual works
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Three calm steps between your craving and your warm breakfast table.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-3">
           {steps.map((item, index) => (
             <article
               key={item.title}
-              className={`group relative overflow-hidden rounded-[1.5rem] p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-lift sm:rounded-[2rem] sm:p-8 ${
-                index === 1 ? "glass-panel md:scale-[1.04]" : "glass-soft"
+              className={`group relative overflow-hidden rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift border ${
+                index === 1
+                  ? "border-berry/40 bg-card shadow-soft"
+                  : "border-border bg-card/60"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-card font-display text-lg font-bold text-berry shadow-soft">
+              <div className="flex items-center justify-between">
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-berry/10 font-display text-lg font-extrabold text-berry">
                   {item.step}
                 </span>
-                <item.icon className="size-5 text-berry opacity-70 transition-transform duration-300 group-hover:scale-110" />
+                <item.icon className="h-5 w-5 text-berry/70 transition-transform duration-300 group-hover:scale-110" />
               </div>
-              <h3 className="mt-5 font-display text-xl font-bold leading-tight text-cocoa sm:mt-6 sm:text-2xl">
+              <h3 className="mt-6 font-display text-xl font-bold text-cocoa">
                 {item.title}
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
@@ -440,95 +469,157 @@ function Home() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="section-shell section-shell-plain mt-10 sm:mt-12">
-        <div className="text-center">
-          <h2 className="font-display text-[1.65rem] font-bold text-cocoa sm:text-4xl">
+      {/* 7. Customer Love & Verified Neighbourhood Reviews */}
+      <section className="section-shell section-shell-tint">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+            Neighbourhood Love
+          </span>
+          <h2 className="mt-2 font-display text-2xl font-bold text-cocoa sm:text-4xl">
             Loved down the street
           </h2>
-          <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-            A few notes from people who order on repeat.
+          <p className="mt-2 text-sm text-muted-foreground">
+            Over 300+ orders baked and delivered across Bangalore neighbourhoods.
           </p>
         </div>
-        <div className="mt-8 grid gap-4 sm:mt-10 sm:gap-6 md:grid-cols-3">
+
+        <div className="grid gap-5 md:grid-cols-3">
           {testimonials.map((t) => (
             <figure
               key={t.name}
-              className="glass-panel flex flex-col rounded-[1.5rem] p-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-lift sm:rounded-[2rem] sm:p-7"
+              className="glass-panel flex flex-col justify-between rounded-3xl p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
             >
-              <Quote className="size-6 text-berry opacity-60" />
-              <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-cocoa/90">
-                {t.quote}
-              </blockquote>
-              <figcaption className="mt-6 border-t border-border/60 pt-4">
-                <p className="font-display text-base font-bold text-cocoa">{t.name}</p>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground">
-                  {t.detail}
-                </p>
+              <div>
+                <div className="flex items-center gap-1 mb-4">
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <Quote className="h-6 w-6 text-berry/40 mb-2" />
+                <blockquote className="text-sm leading-relaxed text-cocoa/90">
+                  “{t.quote}”
+                </blockquote>
+              </div>
+
+              <figcaption className="mt-6 border-t border-border/60 pt-4 flex items-center justify-between">
+                <div>
+                  <p className="font-display text-base font-bold text-cocoa">{t.name}</p>
+                  <p className="text-xs text-muted-foreground">{t.detail}</p>
+                </div>
+                <span className="rounded-full bg-secondary/80 px-2.5 py-1 text-[10px] font-semibold text-secondary-foreground">
+                  Verified Order
+                </span>
               </figcaption>
             </figure>
           ))}
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="section-shell section-shell-tint mt-10 sm:mt-12">
-        <div className="text-center">
+      {/* 8. Revamped FAQ Section (Fixed Single-Column Layout & Filter Tabs) */}
+      <section className="section-shell section-shell-plain">
+        <div className="text-center max-w-xl mx-auto mb-8">
           <span className="inline-flex items-center gap-2 rounded-full bg-secondary/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary-foreground backdrop-blur">
-            <HelpCircle className="size-3.5" /> Questions
+            <HelpCircle className="size-3.5 text-berry" /> Clear Answers
           </span>
-          <h2 className="mt-4 font-display text-[1.65rem] font-bold text-cocoa sm:text-4xl">
-            Everything you need to know
+          <h2 className="mt-3 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+            Frequently asked questions
           </h2>
-          <p className="mx-auto mt-2 max-w-md text-muted-foreground">
-            Freshness, slots, pickup and delivery — answered.
+          <p className="mt-2 text-sm text-muted-foreground">
+            Everything you need to know about freshness, morning slots, payment, and delivery.
           </p>
         </div>
-        <Accordion
-          type="single"
-          collapsible
-          className="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-2"
-        >
-          {faqs.map((faq, i) => (
-            <AccordionItem
-              key={i}
-              value={`item-${i}`}
-              className="glass-panel overflow-hidden rounded-[1.5rem] border-0 px-5 py-1 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:rounded-[2rem] sm:px-7"
+
+        {/* Category Pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+          {faqCategories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedFaqCategory(cat)}
+              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                selectedFaqCategory === cat
+                  ? "bg-berry text-berry-foreground shadow-xs"
+                  : "bg-secondary/60 text-secondary-foreground hover:bg-secondary"
+              }`}
             >
-              <AccordionTrigger className="py-5 text-left font-display text-base font-semibold text-cocoa hover:no-underline sm:py-6 sm:text-lg">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground sm:pb-6">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
+              {cat}
+            </button>
           ))}
-        </Accordion>
+        </div>
+
+        {/* Unified Single-Column Accordion (Zero jumping height flaws) */}
+        <div className="mx-auto max-w-3xl">
+          <Accordion type="single" collapsible className="space-y-3">
+            {filteredFaqs.map((faq, i) => (
+              <AccordionItem
+                key={`${selectedFaqCategory}-${i}`}
+                value={`faq-${i}`}
+                className="overflow-hidden rounded-2xl border border-border bg-card px-6 shadow-2xs transition-all hover:border-berry/30"
+              >
+                <AccordionTrigger className="py-5 text-left font-display text-base font-semibold text-cocoa hover:no-underline sm:text-lg">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
+          {/* Need Help Helper Chip */}
+          <div className="mt-8 rounded-2xl bg-secondary/40 p-4 text-center border border-border/50">
+            <p className="text-xs text-muted-foreground">
+              Have a special dietary requirement or celebration order?{" "}
+              <Link to="/shop" className="font-semibold text-berry hover:underline">
+                Explore custom options in the bakery
+              </Link>
+            </p>
+          </div>
+        </div>
       </section>
 
-      {/* Closing CTA */}
-      <section className="mb-2 mt-10 sm:mb-4 sm:mt-12">
-        <div className="glass-panel relative overflow-hidden rounded-[1.75rem] px-6 py-12 text-center sm:rounded-[2.5rem] sm:px-14 sm:py-14">
+      {/* 9. Warm Morning Closing CTA */}
+      <section className="mb-4">
+        <div className="glass-panel relative overflow-hidden rounded-[2.5rem] px-6 py-14 text-center sm:px-14 sm:py-16 shadow-lift">
           <div
             aria-hidden
-            className="pointer-events-none absolute -bottom-16 -left-16 size-64 rounded-full bg-secondary/60 blur-3xl"
+            className="pointer-events-none absolute -bottom-20 -left-20 size-80 rounded-full bg-berry/20 blur-3xl"
           />
-          <div className="relative mx-auto max-w-xl">
-            <h2 className="font-display text-[1.65rem] font-bold leading-tight text-cocoa sm:text-4xl">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-20 -right-20 size-80 rounded-full bg-secondary/60 blur-3xl"
+          />
+
+          <div className="relative mx-auto max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full bg-secondary/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-secondary-foreground mb-4">
+              <Sparkles className="size-3.5 text-berry" /> Tomorrow Morning&apos;s Bakes
+            </span>
+            <h2 className="font-display text-3xl font-bold leading-tight text-cocoa sm:text-5xl">
               Tomorrow morning could smell a lot better.
             </h2>
-            <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-              Reserve a next-day slot now — we only take payment once the bakery confirms it.
+            <p className="mt-4 text-sm text-muted-foreground sm:text-base leading-relaxed">
+              Reserve your next-day slot now. We mix and bake fresh at dawn, and you only pay once
+              your delivery slot is confirmed.
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="mt-7 w-full rounded-2xl bg-berry px-8 text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.03] hover:bg-berry/90 active:scale-95 sm:mt-8 sm:w-auto"
-            >
-              <Link to="/shop">
-                Start your box <ArrowRight className="ml-2 size-4" />
-              </Link>
-            </Button>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button
+                asChild
+                size="lg"
+                className="w-full sm:w-auto rounded-2xl bg-berry px-8 py-6 text-base font-semibold text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.03] hover:bg-berry/90 active:scale-95"
+              >
+                <Link to="/shop">
+                  Start your bake box <ArrowRight className="ml-2 size-4" />
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto rounded-2xl px-8 py-6 text-base font-semibold border-border bg-card/60 backdrop-blur hover:bg-secondary/60"
+              >
+                <Link to="/offers">View this week&apos;s offers</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
