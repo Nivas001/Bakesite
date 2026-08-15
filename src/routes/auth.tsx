@@ -16,6 +16,7 @@ import { saveMyProfile } from "@/lib/orders.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 
 export type AuthSearch = {
   redirect?: string | undefined;
@@ -63,6 +64,7 @@ function AuthPage() {
   // Email Sign-in State
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
   const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState("");
 
@@ -71,6 +73,7 @@ function AuthPage() {
   const [signUpPhone, setSignUpPhone] = useState("");
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
+  const [showSignUpPassword, setShowSignUpPassword] = useState(false);
   const [verificationSentEmail, setVerificationSentEmail] = useState<string | null>(null);
 
   const [busy, setBusy] = useState(false);
@@ -386,15 +389,29 @@ function AuthPage() {
                             Forgot password?
                           </button>
                         </div>
-                        <Input
-                          id="login-password"
-                          type="password"
-                          required
-                          placeholder="Your password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm"
-                        />
+                        <div className="relative">
+                          <Input
+                            id="login-password"
+                            type={showSignInPassword ? "text" : "password"}
+                            required
+                            placeholder="Your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm pr-9"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowSignInPassword(!showSignInPassword)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/75 hover:text-foreground transition-colors p-1 cursor-pointer"
+                            aria-label={showSignInPassword ? "Hide password" : "Show password"}
+                          >
+                            {showSignInPassword ? (
+                              <EyeOff className="size-4" />
+                            ) : (
+                              <Eye className="size-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
 
                       <Button
@@ -520,16 +537,30 @@ function AuthPage() {
                       <Label htmlFor="reg-pass" className="text-[11px] sm:text-xs font-semibold">
                         Create password <span className="text-berry">*</span>
                       </Label>
-                      <Input
-                        id="reg-pass"
-                        type="password"
-                        required
-                        minLength={6}
-                        placeholder="At least 6 characters"
-                        value={signUpPassword}
-                        onChange={(e) => setSignUpPassword(e.target.value)}
-                        className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm px-2.5"
-                      />
+                      <div className="relative">
+                        <Input
+                          id="reg-pass"
+                          type={showSignUpPassword ? "text" : "password"}
+                          required
+                          minLength={6}
+                          placeholder="At least 6 characters"
+                          value={signUpPassword}
+                          onChange={(e) => setSignUpPassword(e.target.value)}
+                          className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm pl-2.5 pr-9"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/75 hover:text-foreground transition-colors p-1 cursor-pointer"
+                          aria-label={showSignUpPassword ? "Hide password" : "Show password"}
+                        >
+                          {showSignUpPassword ? (
+                            <EyeOff className="size-4" />
+                          ) : (
+                            <Eye className="size-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <Button

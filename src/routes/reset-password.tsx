@@ -5,6 +5,7 @@ import { confirmPasswordRecovery } from "@/integrations/appwrite/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/reset-password")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -28,6 +29,8 @@ function ResetPasswordPage() {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -119,32 +122,52 @@ function ResetPasswordPage() {
             <Label htmlFor="new-pass" className="text-xs font-semibold">
               New Password <span className="text-berry">*</span>
             </Label>
-            <Input
-              id="new-pass"
-              type="password"
-              required
-              minLength={8}
-              placeholder="At least 8 characters"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className="rounded-xl h-10"
-            />
+            <div className="relative">
+              <Input
+                id="new-pass"
+                type={showNewPassword ? "text" : "password"}
+                required
+                minLength={8}
+                placeholder="At least 8 characters"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="rounded-xl h-10 pr-9"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/75 hover:text-foreground transition-colors p-1 cursor-pointer"
+                aria-label={showNewPassword ? "Hide password" : "Show password"}
+              >
+                {showNewPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="space-y-1.5">
             <Label htmlFor="confirm-pass" className="text-xs font-semibold">
               Confirm New Password <span className="text-berry">*</span>
             </Label>
-            <Input
-              id="confirm-pass"
-              type="password"
-              required
-              minLength={8}
-              placeholder="Re-type new password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="rounded-xl h-10"
-            />
+            <div className="relative">
+              <Input
+                id="confirm-pass"
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                minLength={8}
+                placeholder="Re-type new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="rounded-xl h-10 pr-9"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/75 hover:text-foreground transition-colors p-1 cursor-pointer"
+                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+              >
+                {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
           </div>
 
           <Button
