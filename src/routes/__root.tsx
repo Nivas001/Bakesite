@@ -159,7 +159,7 @@ function RootComponent() {
           </main>
           <SiteFooter />
         </div>
-        <Toaster richColors position="top-center" />
+        <Toaster position="bottom-center" />
       </CartProvider>
     </QueryClientProvider>
   );
