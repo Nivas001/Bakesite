@@ -60,25 +60,25 @@ const CATEGORY_META: Record<
 > = {
   breads: {
     icon: Croissant,
-    desc: "Slow-fermented artisan sourdough & soft morning loaves",
+    desc: "Slow-fermented artisan sourdough & morning loaves",
     color: "from-amber-500/10 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/20",
     badge: "Slow Ferment",
   },
   cakes: {
     icon: Sparkles,
-    desc: "Celebration layer cakes & tea-time artisan sponge slices",
+    desc: "Celebration layer cakes & tea-time sponge slices",
     color: "from-rose-500/10 to-rose-500/5 text-rose-600 dark:text-rose-400 border-rose-500/20",
     badge: "Celebration",
   },
   pastries: {
     icon: Leaf,
-    desc: "Laminated French butter croissants, danishes & cruffins",
+    desc: "French butter croissants, danishes & cruffins",
     color: "from-emerald-500/10 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
     badge: "Pure Butter",
   },
   cookies: {
     icon: Star,
-    desc: "Crispy-edged, chewy-centred chunky artisan cookies",
+    desc: "Crispy-edged, chewy-centred chunky cookies",
     color: "from-orange-500/10 to-orange-500/5 text-orange-600 dark:text-orange-400 border-orange-500/20",
     badge: "Small Batch",
   },
@@ -95,7 +95,7 @@ const FAQ_ITEMS = [
     category: "Slots & Ordering",
     question: "How do next-day delivery and pickup slots work?",
     answer:
-      "We offer next-day slots across Morning (7:30–10:30 AM), Midday (11:00 AM–2:00 PM), Afternoon (2:30–5:30 PM), and Evening (6:00–8:00 PM). Because everything is baked strictly to order, we require one day of notice.",
+      "We offer next-day slots across Morning (8:00–11:00 AM), Midday (11:00 AM–2:00 PM), Afternoon (2:00–5:00 PM), and Evening (5:00–8:00 PM). Small-batch baking requires at least 24 hours advance notice.",
   },
   {
     category: "Payment & Guarantee",
@@ -113,7 +113,7 @@ const FAQ_ITEMS = [
     category: "Delivery & Pickup",
     question: "Can I pick up my bakes directly from the bakery counter?",
     answer:
-      "Yes! Select 'Pickup' at checkout and choose your arrival slot. Your order will be freshly boxed and waiting for you at our counter (open Tue–Sun, 7:30 AM to 8:00 PM).",
+      "Yes! Select 'Pickup' at checkout and choose your arrival slot. Your order will be freshly boxed and waiting for you at our counter (open Tue–Sun, 8:00 AM to 8:00 PM).",
   },
   {
     category: "Slots & Ordering",
@@ -148,31 +148,31 @@ function Home() {
     {
       quote:
         "The map pin saved us. Our building entrance is tricky to find and the rider walked straight to our door on the first try.",
-      name: "Fatima S.",
-      detail: "Frazer Town",
-      bakes: "Sourdough & Cookie Box",
+      name: "Meera & Siddharth",
+      detail: "Whitefield",
+      bakes: "Sourdough & Cinnamon Buns",
       rating: 5,
     },
   ];
 
   const steps = [
     {
-      icon: Clock,
       step: "01",
-      title: "Pick Your Bakes & Slot",
-      body: "Choose your treats and select a next-day morning, midday, afternoon, or evening window. We bake strictly to order.",
+      title: "Choose your bakes",
+      body: "Browse artisan sourdough, layered celebration cakes, and French croissants. Everything is baked exclusively for your slot.",
+      icon: Croissant,
     },
     {
-      icon: Sparkles,
       step: "02",
-      title: "We Confirm & Bake at Dawn",
-      body: "Our bakers lock in your order at 4:00 AM. You receive a confirmation and pay only when the bake is secured.",
+      title: "Pick your arrival slot",
+      body: "Choose your morning, midday or evening window. Drop your exact building pin on the live map for smooth doorstep arrival.",
+      icon: Clock,
     },
     {
-      icon: Truck,
       step: "03",
-      title: "Doorstep Delivery or Pickup",
-      body: "Dispatched warm with precise GPS map guidance right to your door, or packaged ready at our neighbourhood counter.",
+      title: "Baked fresh at dawn",
+      body: "Our head baker fires up the ovens at 4:00 AM. Your bakes arrive warm and fragrant right at your scheduled hour.",
+      icon: Truck,
     },
   ];
 
@@ -184,47 +184,48 @@ function Home() {
       : FAQ_ITEMS.filter((f) => f.category === selectedFaqCategory);
 
   return (
-    <div className="mx-auto w-full max-w-6xl overflow-x-clip px-4 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-16 space-y-16 sm:space-y-24">
-      {/* 1. Hero (Preserved) */}
+    <div className="mx-auto w-full max-w-6xl overflow-x-clip px-4 py-6 sm:px-8 sm:py-10 lg:px-10 lg:py-14 space-y-12 sm:space-y-20">
+      
+      {/* 1. Hero Section: Fluid, compact padding and balanced heights */}
       <section className="relative">
         <div
           aria-hidden
-          className="pointer-events-none absolute -inset-3 rounded-[3rem] bg-gradient-to-tr from-secondary via-accent to-berry/40 opacity-30 blur-3xl sm:-inset-6 sm:rounded-[3.5rem]"
+          className="pointer-events-none absolute -inset-3 rounded-[2.5rem] bg-gradient-to-tr from-secondary via-accent to-berry/30 opacity-25 blur-3xl sm:-inset-6 sm:rounded-[3.5rem]"
         />
-        <div className="glass-panel relative grid overflow-hidden rounded-[1.75rem] shadow-lift sm:rounded-[2.5rem] md:grid-cols-2">
-          <div className="flex flex-col justify-center gap-5 p-6 sm:gap-6 sm:p-12 lg:p-14">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-secondary/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary-foreground backdrop-blur">
-              <Sparkles className="size-3.5" /> Baked to order
+        <div className="glass-panel relative grid overflow-hidden rounded-2xl shadow-lift sm:rounded-[2.25rem] md:grid-cols-2">
+          <div className="flex flex-col justify-center gap-3.5 p-5 sm:gap-6 sm:p-10 lg:p-12">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-secondary/90 px-3 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] text-secondary-foreground backdrop-blur">
+              <Sparkles className="size-3 text-berry" /> Baked to order
             </span>
-            <h1 className="font-display text-[2rem] font-bold leading-[1.1] text-cocoa sm:text-5xl lg:text-6xl">
+            <h1 className="font-display text-2xl font-bold leading-tight text-cocoa sm:text-4xl lg:text-5xl">
               Slow bakes, warm mornings, and a slot that{" "}
               <span className="italic text-berry">suits you.</span>
             </h1>
-            <p className="max-w-md text-[0.95rem] leading-relaxed text-muted-foreground sm:text-base">
+            <p className="max-w-md text-xs sm:text-sm leading-relaxed text-muted-foreground">
               Everything at Ani Bakes is made in small batches the morning of your delivery. Choose
               your bakes, pick a slot, and our head baker prepares your order fresh.
             </p>
-            <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:flex-wrap">
+            <div className="flex flex-col xs:flex-row gap-2.5 pt-1 sm:gap-3">
               <Button
                 asChild
-                size="lg"
-                className="w-full rounded-2xl bg-berry px-7 text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.03] hover:bg-berry/90 active:scale-95 sm:w-auto"
+                size="default"
+                className="w-full xs:w-auto rounded-xl sm:rounded-2xl bg-berry px-5 sm:px-7 text-xs sm:text-sm font-semibold text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.02] hover:bg-berry/90 active:scale-95"
               >
                 <Link to="/shop">
-                  Browse the bakery <ArrowRight className="ml-2 size-4" />
+                  Browse bakery <ArrowRight className="ml-1.5 size-3.5" />
                 </Link>
               </Button>
               <Button
                 asChild
-                size="lg"
+                size="default"
                 variant="outline"
-                className="w-full rounded-2xl border-white/60 bg-card/40 px-7 backdrop-blur transition-transform duration-200 hover:scale-[1.03] active:scale-95 sm:w-auto"
+                className="w-full xs:w-auto rounded-xl sm:rounded-2xl border-border bg-card/60 px-5 sm:px-7 text-xs sm:text-sm font-semibold backdrop-blur transition-transform duration-200 hover:scale-[1.02] active:scale-95"
               >
-                <Link to="/offers">See this week&apos;s offers</Link>
+                <Link to="/offers">See offers</Link>
               </Button>
             </div>
           </div>
-          <div className="relative min-h-56 sm:min-h-64 md:min-h-[520px]">
+          <div className="relative h-44 sm:h-64 md:h-full min-h-[180px] md:min-h-[420px]">
             <img
               src={heroImage}
               alt="Freshly baked breads and pastries on a wooden bakery counter"
@@ -232,67 +233,62 @@ function Home() {
             />
             <div
               aria-hidden
-              className="absolute inset-0 bg-gradient-to-l from-transparent to-background/25"
+              className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent to-background/20"
             />
           </div>
         </div>
       </section>
 
-      {/* 2. Daily Selection — Fresh from the counter (Moved First) */}
+      {/* 2. Daily Selection — Fresh from the counter */}
       <section className="section-shell section-shell-plain">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 sm:flex sm:justify-between mb-2">
+        <div className="flex items-end justify-between gap-3 mb-2">
           <div>
-            <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry">
               Daily Selection
             </span>
-            <h2 className="mt-1 font-display text-[1.65rem] font-bold leading-tight text-cocoa sm:text-4xl">
+            <h2 className="mt-0.5 font-display text-xl sm:text-3xl font-bold leading-tight text-cocoa">
               Fresh from the counter
             </h2>
-            <p className="mt-1.5 text-sm italic text-muted-foreground sm:text-base">
+            <p className="text-xs sm:text-sm italic text-muted-foreground">
               Baked at dawn, boxed for your chosen slot.
             </p>
           </div>
           <Link
             to="/shop"
-            className="story-link w-fit shrink-0 text-xs font-semibold uppercase tracking-widest text-berry sm:mr-28 sm:text-sm"
+            className="story-link shrink-0 text-xs font-semibold uppercase tracking-wider text-berry hover:underline"
           >
-            View all
+            View all →
           </Link>
         </div>
         <FeaturedProducts products={featured} />
-        <p className="mt-2 text-center text-xs uppercase tracking-widest text-muted-foreground sm:hidden">
-          Swipe to browse
-        </p>
       </section>
 
-      {/* 3. Enhanced Interactive Category Counter Showcase */}
-      <section className="section-shell section-shell-tint rounded-[2.5rem] p-6 sm:p-10 border border-border/80 shadow-soft">
-        <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+      {/* 3. Category Counter Showcase: 2x2 grid on mobile, 4 columns on desktop */}
+      <section className="section-shell section-shell-tint rounded-2xl sm:rounded-[2.25rem] p-4 sm:p-8 border border-border/80 shadow-soft">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-berry">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="inline-flex items-center gap-1 rounded-full bg-berry/10 border border-berry/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-berry">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 The Bakery Counter
               </span>
-              <span className="text-xs text-muted-foreground hidden sm:inline-block">
+              <span className="text-[11px] text-muted-foreground hidden sm:inline-block">
                 · Handcrafted every dawn from 4:00 AM
               </span>
             </div>
-            <h2 className="mt-1 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+            <h2 className="font-display text-lg sm:text-3xl font-bold text-cocoa">
               Explore by bake category
             </h2>
-            <p className="mt-1.5 text-sm text-muted-foreground max-w-xl">
-              Choose from slow-fermented artisan sourdough, laminated French pastries, celebration cakes, and chunky cookies.
-            </p>
           </div>
-          <Button asChild variant="outline" className="rounded-2xl border-border bg-card/90 text-berry hover:bg-secondary/60 text-xs font-semibold h-10 px-5 shadow-2xs">
+          <Button asChild variant="outline" size="sm" className="w-fit rounded-xl border-border bg-card/90 text-berry hover:bg-secondary/60 text-xs font-semibold h-8 px-3.5 shadow-2xs">
             <Link to="/shop">
-              Browse all items <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+              Browse all <ArrowRight className="ml-1 h-3 w-3" />
             </Link>
           </Button>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 2x2 Grid on Mobile, 4 Cols on Desktop */}
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-5">
           {data.categories.slice(0, 4).map((category) => {
             const meta = CATEGORY_META[category.slug] ?? {
               icon: Croissant,
@@ -309,235 +305,211 @@ function Home() {
               <Link
                 key={category.id}
                 to="/shop"
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-2 hover:border-berry/50 hover:shadow-lift cursor-pointer"
+                className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card p-3 sm:p-5 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-berry/50 hover:shadow-lift cursor-pointer"
               >
                 <div
                   aria-hidden
-                  className={`pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-gradient-to-br ${meta.color} opacity-40 blur-2xl transition-opacity duration-300 group-hover:opacity-80`}
+                  className={`pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-gradient-to-br ${meta.color} opacity-35 blur-xl transition-opacity duration-300 group-hover:opacity-75`}
                 />
 
                 <div className="relative">
                   <div className="flex items-center justify-between">
-                    <div className="flex h-13 w-13 items-center justify-center rounded-2xl bg-secondary/90 text-berry shadow-xs transition-transform duration-300 group-hover:scale-110 group-hover:bg-berry group-hover:text-berry-foreground">
-                      <Icon className="h-6 w-6" />
+                    <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-secondary/90 text-berry shadow-2xs transition-transform duration-300 group-hover:scale-105 group-hover:bg-berry group-hover:text-berry-foreground">
+                      <Icon className="size-4 sm:size-5" />
                     </div>
-                    <span className="rounded-full bg-secondary/80 px-3 py-1 text-[11px] font-bold text-cocoa/80 border border-border/40 shadow-2xs">
+                    <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[9px] sm:text-[11px] font-bold text-cocoa/80 border border-border/40">
                       {productCount > 0 ? `${productCount} bakes` : meta.badge}
                     </span>
                   </div>
 
-                  <h3 className="mt-5 font-display text-xl font-bold text-cocoa transition-colors group-hover:text-berry">
+                  <h3 className="mt-3 sm:mt-4 font-display text-sm sm:text-lg font-bold text-cocoa transition-colors group-hover:text-berry leading-tight">
                     {category.name}
                   </h3>
-                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground line-clamp-2">
+                  <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground line-clamp-2 hidden xs:block">
                     {meta.desc}
                   </p>
                 </div>
 
-                <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs font-bold uppercase tracking-wider text-berry">
-                  <span>Explore {category.name}</span>
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary/60 transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-berry group-hover:text-berry-foreground">
-                    <ArrowRight className="h-3 w-3" />
-                  </div>
+                <div className="mt-3 sm:mt-5 flex items-center justify-between border-t border-border/60 pt-2.5 sm:pt-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry">
+                  <span>Explore</span>
+                  <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                 </div>
               </Link>
             );
           })}
         </div>
-
-        {/* Counter Artisan Guarantee Footer Pill */}
-        <div className="mt-8 rounded-2xl border border-border/60 bg-card/60 backdrop-blur p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-berry/10 text-berry">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-cocoa">Small-batch morning oven slots</p>
-              <p className="text-[11px] text-muted-foreground">
-                We bake strictly to order. Choose your slot date and time window during checkout.
-              </p>
-            </div>
-          </div>
-          <Button asChild size="sm" variant="ghost" className="text-berry hover:text-berry/80 text-xs font-bold shrink-0">
-            <Link to="/shop">
-              See today&apos;s bakes <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-            </Link>
-          </Button>
-        </div>
       </section>
 
-      {/* 5. The Ani Bakes Artisan Difference (Bento Grid) */}
+      {/* 4. The Ani Bakes Artisan Difference (Streamlined Bento Grid) */}
       <section className="section-shell section-shell-tint">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+        <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry">
             Why Ani Bakes
           </span>
-          <h2 className="mt-2 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+          <h2 className="mt-1 font-display text-xl sm:text-3xl font-bold text-cocoa">
             The small-batch difference you can taste
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            We bake strictly to order every morning. No commercial shortcuts, no warehouse storage.
+          <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+            Baked strictly to order every dawn. No warehouse stock.
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {/* Card 1: 4 AM Dawn Baking (Wide on LG) */}
-          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-7 shadow-soft transition-all duration-300 hover:shadow-lift lg:col-span-2">
+          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-[2rem] p-4.5 sm:p-7 shadow-soft transition-all duration-300 hover:shadow-lift lg:col-span-2">
             <span
               aria-hidden
-              className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-berry/15 blur-3xl"
+              className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-berry/15 blur-2xl"
             />
             <div className="relative">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-berry text-berry-foreground shadow-xs">
-                <Clock className="h-6 w-6" />
+              <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-berry text-berry-foreground shadow-2xs">
+                <Clock className="size-4 sm:size-5" />
               </div>
-              <h3 className="mt-5 font-display text-2xl font-bold text-cocoa sm:text-3xl">
+              <h3 className="mt-3 sm:mt-4 font-display text-base sm:text-2xl font-bold text-cocoa leading-tight">
                 We start at 4:00 AM so your morning starts warm.
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground max-w-xl">
+              <p className="mt-1.5 sm:mt-2.5 text-xs sm:text-sm leading-relaxed text-muted-foreground max-w-xl">
                 Every loaf, croissant, and tea cake is shaped and baked the exact morning of your slot.
-                We never store bakes overnight on a shelf, which is why everything arrives with crisp crusts
-                and soft, fragrant crumbs.
+                We never store bakes overnight on a shelf, ensuring crisp crusts and fragrant crumbs.
               </p>
             </div>
-            <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-cocoa">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <div className="mt-4 flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-cocoa">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
               <span>Baked exclusively to order · Zero day-old stock</span>
             </div>
           </div>
 
           {/* Card 2: Pure Ingredients */}
-          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-7 shadow-soft transition-all duration-300 hover:shadow-lift">
+          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-[2rem] p-4.5 sm:p-7 shadow-soft transition-all duration-300 hover:shadow-lift">
             <div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-berry shadow-xs">
-                <Leaf className="h-6 w-6" />
+              <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-secondary text-berry shadow-2xs">
+                <Leaf className="size-4 sm:size-5" />
               </div>
-              <h3 className="mt-5 font-display text-xl font-bold text-cocoa">
+              <h3 className="mt-3 sm:mt-4 font-display text-base sm:text-xl font-bold text-cocoa">
                 100% Honest Ingredients
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-muted-foreground">
                 Unbleached heritage flour, pure dairy butter, fresh seasonal fruits, and wild sourdough starters.
-                Zero artificial preservatives or emulsifiers.
               </p>
             </div>
-            <div className="mt-6 border-t border-border/60 pt-4 text-xs font-semibold text-muted-foreground">
-              Pure butter · No strange chemicals
+            <div className="mt-4 border-t border-border/60 pt-3 text-[11px] sm:text-xs font-semibold text-muted-foreground">
+              Pure butter · Zero artificial preservatives
             </div>
           </div>
 
-          {/* Card 3: Photo Accent */}
-          <div className="group relative overflow-hidden rounded-[2rem] min-h-[220px] shadow-soft">
+          {/* Card 3: Photo Accent (Hidden on small mobile to eliminate vertical drag) */}
+          <div className="hidden sm:block group relative overflow-hidden rounded-2xl sm:rounded-[2rem] min-h-[200px] shadow-soft">
             <img
               src={aboutImage}
               alt="Baker dusting flour on artisan sourdough loaves"
               className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-cocoa/80 via-cocoa/30 to-transparent" />
-            <div className="absolute bottom-5 left-5 right-5 text-white">
-              <p className="font-display text-lg font-bold">Hand-shaped with care</p>
-              <p className="text-xs text-white/80">Every single piece made with artisan passion</p>
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <p className="font-display text-base font-bold">Hand-shaped with care</p>
+              <p className="text-[11px] text-white/80">Every piece made with artisan passion</p>
             </div>
           </div>
 
           {/* Card 4: Pinpoint GPS Delivery */}
-          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-7 shadow-soft transition-all duration-300 hover:shadow-lift lg:col-span-2">
+          <div className="glass-panel relative flex flex-col justify-between overflow-hidden rounded-2xl sm:rounded-[2rem] p-4.5 sm:p-7 shadow-soft transition-all duration-300 hover:shadow-lift lg:col-span-2">
             <div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-berry shadow-xs">
-                <MapPin className="h-6 w-6" />
+              <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-secondary text-berry shadow-2xs">
+                <MapPin className="size-4 sm:size-5" />
               </div>
-              <h3 className="mt-5 font-display text-xl font-bold text-cocoa sm:text-2xl">
+              <h3 className="mt-3 sm:mt-4 font-display text-base sm:text-xl font-bold text-cocoa">
                 Pin Your Doorstep on the Map
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Tricky building entrance or gated society? Our live interactive map pin lets you drop
-                the exact marker for our delivery rider to find you on the very first try without confusion.
+              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                Drop your exact building entrance marker on our live checkout map for effortless first-try delivery.
               </p>
             </div>
-            <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-cocoa">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <div className="mt-4 flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-cocoa">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
               <span>Direct delivery rider navigation</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. 3-Step Morning Slot Ritual (How it works) */}
+      {/* 5. 3-Step Morning Slot Ritual (Compact Grid) */}
       <section className="section-shell section-shell-plain">
-        <div className="text-center max-w-xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+        <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry">
             Simple Process
           </span>
-          <h2 className="mt-2 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+          <h2 className="mt-1 font-display text-xl sm:text-3xl font-bold text-cocoa">
             How the morning ritual works
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Three calm steps between your craving and your warm breakfast table.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-3 sm:gap-5 sm:grid-cols-3">
           {steps.map((item, index) => (
             <article
               key={item.title}
-              className={`group relative overflow-hidden rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift border ${
+              className={`group relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift border ${
                 index === 1
                   ? "border-berry/40 bg-card shadow-soft"
                   : "border-border bg-card/60"
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-berry/10 font-display text-lg font-extrabold text-berry">
+                <span className="flex size-8 sm:size-10 items-center justify-center rounded-xl bg-berry/10 font-display text-sm sm:text-base font-extrabold text-berry">
                   {item.step}
                 </span>
-                <item.icon className="h-5 w-5 text-berry/70 transition-transform duration-300 group-hover:scale-110" />
+                <item.icon className="size-4 sm:size-5 text-berry/70 transition-transform duration-300 group-hover:scale-110" />
               </div>
-              <h3 className="mt-6 font-display text-xl font-bold text-cocoa">
+              <h3 className="mt-3 sm:mt-4 font-display text-sm sm:text-lg font-bold text-cocoa">
                 {item.title}
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.body}</p>
+              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-muted-foreground">{item.body}</p>
             </article>
           ))}
         </div>
       </section>
 
-      {/* 7. Customer Love & Verified Neighbourhood Reviews */}
+      {/* 6. Customer Love & Verified Neighbourhood Reviews (Swipeable Track on Mobile) */}
       <section className="section-shell section-shell-tint">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <span className="text-xs font-bold uppercase tracking-[0.22em] text-berry">
+        <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
+          <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry">
             Neighbourhood Love
           </span>
-          <h2 className="mt-2 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+          <h2 className="mt-1 font-display text-xl sm:text-3xl font-bold text-cocoa">
             Loved down the street
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Over 300+ orders baked and delivered across Bangalore neighbourhoods.
           </p>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        {/* Horizontal scroll track on mobile, 3 cols on tablet/desktop */}
+        <div className="flex gap-3 overflow-x-auto no-scrollbar snap-x pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 sm:gap-5">
           {testimonials.map((t) => (
             <figure
               key={t.name}
-              className="glass-panel flex flex-col justify-between rounded-3xl p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+              className="glass-panel flex w-[82%] xs:w-[75%] shrink-0 snap-start sm:w-auto flex-col justify-between rounded-2xl sm:rounded-3xl p-4.5 sm:p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
             >
               <div>
-                <div className="flex items-center gap-1 mb-4">
+                <div className="flex items-center gap-0.5 mb-2.5">
                   {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    <Star key={i} className="size-3.5 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <Quote className="h-6 w-6 text-berry/40 mb-2" />
-                <blockquote className="text-sm leading-relaxed text-cocoa/90">
+                <Quote className="size-4 text-berry/40 mb-1" />
+                <blockquote className="text-xs sm:text-sm leading-relaxed text-cocoa/90">
                   “{t.quote}”
                 </blockquote>
               </div>
 
-              <figcaption className="mt-6 border-t border-border/60 pt-4 flex items-center justify-between">
+              <figcaption className="mt-4 border-t border-border/60 pt-3 flex items-center justify-between">
                 <div>
-                  <p className="font-display text-base font-bold text-cocoa">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.detail}</p>
+                  <p className="font-display text-xs sm:text-sm font-bold text-cocoa">{t.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{t.detail}</p>
                 </div>
-                <span className="rounded-full bg-secondary/80 px-2.5 py-1 text-[10px] font-semibold text-secondary-foreground">
+                <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[9px] font-semibold text-secondary-foreground">
                   Verified Order
                 </span>
               </figcaption>
@@ -546,28 +518,28 @@ function Home() {
         </div>
       </section>
 
-      {/* 8. Revamped FAQ Section (Fixed Single-Column Layout & Filter Tabs) */}
+      {/* 7. Frequently Asked Questions with Swipeable Filter Pills */}
       <section className="section-shell section-shell-plain">
-        <div className="text-center max-w-xl mx-auto mb-8">
-          <span className="inline-flex items-center gap-2 rounded-full bg-secondary/80 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-secondary-foreground backdrop-blur">
-            <HelpCircle className="size-3.5 text-berry" /> Clear Answers
+        <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/80 px-3 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] text-secondary-foreground backdrop-blur">
+            <HelpCircle className="size-3 text-berry" /> Clear Answers
           </span>
-          <h2 className="mt-3 font-display text-2xl font-bold text-cocoa sm:text-4xl">
+          <h2 className="mt-2 font-display text-xl sm:text-3xl font-bold text-cocoa">
             Frequently asked questions
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Everything you need to know about freshness, morning slots, payment, and delivery.
+          <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+            Everything you need to know about freshness, morning slots, and delivery.
           </p>
         </div>
 
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+        {/* Swipeable Filter Pills on Mobile */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap sm:justify-center">
           {faqCategories.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setSelectedFaqCategory(cat)}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+              className={`rounded-full px-3.5 py-1 text-xs font-semibold transition-all shrink-0 cursor-pointer ${
                 selectedFaqCategory === cat
                   ? "bg-berry text-berry-foreground shadow-xs"
                   : "bg-secondary/60 text-secondary-foreground hover:bg-secondary"
@@ -578,82 +550,72 @@ function Home() {
           ))}
         </div>
 
-        {/* Unified Single-Column Accordion (Zero jumping height flaws) */}
+        {/* Single-Column Accordion */}
         <div className="mx-auto max-w-3xl">
-          <Accordion type="single" collapsible className="space-y-3">
+          <Accordion type="single" collapsible className="space-y-2.5">
             {filteredFaqs.map((faq, i) => (
               <AccordionItem
                 key={`${selectedFaqCategory}-${i}`}
                 value={`faq-${i}`}
-                className="overflow-hidden rounded-2xl border border-border bg-card px-6 shadow-2xs transition-all hover:border-berry/30"
+                className="overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-card px-4 py-1 sm:px-6 shadow-2xs transition-all hover:border-berry/30"
               >
-                <AccordionTrigger className="py-5 text-left font-display text-base font-semibold text-cocoa hover:no-underline sm:text-lg">
+                <AccordionTrigger className="py-3.5 text-left font-display text-sm font-semibold text-cocoa hover:no-underline sm:text-base">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground">
+                <AccordionContent className="pb-3.5 text-xs sm:text-sm leading-relaxed text-muted-foreground">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-
-          {/* Need Help Helper Chip */}
-          <div className="mt-8 rounded-2xl bg-secondary/40 p-4 text-center border border-border/50">
-            <p className="text-xs text-muted-foreground">
-              Have a special dietary requirement or celebration order?{" "}
-              <Link to="/shop" className="font-semibold text-berry hover:underline">
-                Explore custom options in the bakery
-              </Link>
-            </p>
-          </div>
         </div>
       </section>
 
-      {/* 9. Warm Morning Closing CTA */}
-      <section className="mb-4">
-        <div className="glass-panel relative overflow-hidden rounded-[2.5rem] px-6 py-14 text-center sm:px-14 sm:py-16 shadow-lift">
+      {/* 8. Closing Call-To-Action Banner */}
+      <section className="mb-2">
+        <div className="glass-panel relative overflow-hidden rounded-2xl sm:rounded-[2.25rem] px-5 py-10 text-center sm:px-12 sm:py-14 shadow-lift">
           <div
             aria-hidden
-            className="pointer-events-none absolute -bottom-20 -left-20 size-80 rounded-full bg-berry/20 blur-3xl"
+            className="pointer-events-none absolute -bottom-16 -left-16 size-60 rounded-full bg-berry/15 blur-2xl"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-20 -right-20 size-80 rounded-full bg-secondary/60 blur-3xl"
+            className="pointer-events-none absolute -top-16 -right-16 size-60 rounded-full bg-secondary/50 blur-2xl"
           />
 
-          <div className="relative mx-auto max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-secondary/80 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-secondary-foreground mb-4">
-              <Sparkles className="size-3.5 text-berry" /> Tomorrow Morning&apos;s Bakes
+          <div className="relative mx-auto max-w-xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/80 px-3 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.16em] text-secondary-foreground mb-3">
+              <Sparkles className="size-3 text-berry" /> Fresh Mornings
             </span>
-            <h2 className="font-display text-3xl font-bold leading-tight text-cocoa sm:text-5xl">
+            <h2 className="font-display text-xl sm:text-4xl font-bold leading-tight text-cocoa">
               Tomorrow morning could smell a lot better.
             </h2>
-            <p className="mt-4 text-sm text-muted-foreground sm:text-base leading-relaxed">
-              Reserve your next-day slot now. We mix and bake fresh at dawn, and you only pay once
-              your delivery slot is confirmed.
+            <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Reserve your next-day slot now. We mix and bake fresh at dawn for your chosen arrival window.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="mt-6 flex flex-col xs:flex-row items-center justify-center gap-2.5 sm:gap-3">
               <Button
                 asChild
-                size="lg"
-                className="w-full sm:w-auto rounded-2xl bg-berry px-8 py-6 text-base font-semibold text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.03] hover:bg-berry/90 active:scale-95"
+                size="default"
+                className="w-full xs:w-auto rounded-xl sm:rounded-2xl bg-berry px-6 py-5 text-xs sm:text-sm font-semibold text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.02] hover:bg-berry/90 active:scale-95 cursor-pointer"
               >
                 <Link to="/shop">
-                  Start your bake box <ArrowRight className="ml-2 size-4" />
+                  Start your bake box <ArrowRight className="ml-1.5 size-3.5" />
                 </Link>
               </Button>
               <Button
                 asChild
-                size="lg"
+                size="default"
                 variant="outline"
-                className="w-full sm:w-auto rounded-2xl px-8 py-6 text-base font-semibold border-border bg-card/60 backdrop-blur hover:bg-secondary/60"
+                className="w-full xs:w-auto rounded-xl sm:rounded-2xl px-6 py-5 text-xs sm:text-sm font-semibold border-border bg-card/60 backdrop-blur hover:bg-secondary/60 cursor-pointer"
               >
-                <Link to="/offers">View this week&apos;s offers</Link>
+                <Link to="/offers">View offers</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
+
     </div>
   );
 }
