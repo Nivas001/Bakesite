@@ -37,7 +37,17 @@ import {
 } from "@/components/ui/dialog";
 import { DevPanel } from "@/components/dev-panel";
 import { AdminNewsletter } from "@/components/admin-newsletter";
-import { AlertTriangle, CheckCircle2, XCircle, Camera, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  Camera,
+  Trash2,
+  Eye,
+  EyeOff,
+  Lock,
+  Unlock,
+} from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -118,6 +128,8 @@ type OfferCodeForm = {
   min_order_amount: string;
   expires_at: string;
   description: string;
+  is_active: boolean;
+  is_visible: boolean;
 };
 
 const EMPTY_OFFER_FORM: OfferCodeForm = {
@@ -127,6 +139,8 @@ const EMPTY_OFFER_FORM: OfferCodeForm = {
   min_order_amount: "0",
   expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
   description: "",
+  is_active: true,
+  is_visible: true,
 };
 
 function ProductAdminRow({
@@ -1565,17 +1579,26 @@ function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="offers" className="mt-6 grid gap-8 lg:grid-cols-[380px_1fr]">
-          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-            <h2 className="font-display text-xl font-semibold">
-              {offerForm.id ? "Edit offer code" : "New offer code"}
-            </h2>
+          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft h-fit">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-xl font-bold text-cocoa">
+                {offerForm.id ? "Edit offer code" : "New offer code"}
+              </h2>
+              {offerForm.id && (
+                <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[10px] font-bold text-berry">
+                  Editing #{offerForm.code}
+                </span>
+              )}
+            </div>
+
             <div className="mt-4 space-y-3">
               <div>
-                <Label htmlFor="o-code">Code (e.g. FESTIVE20)</Label>
+                <Label htmlFor="o-code" className="text-xs font-semibold">Code (e.g. FESTIVE20)</Label>
                 <Input
                   id="o-code"
                   placeholder="SWEET20"
                   value={offerForm.code}
+                  className="rounded-xl h-9 text-xs font-mono font-bold uppercase mt-1"
                   onChange={(e) =>
                     setOfferForm((f) => ({ ...f, code: e.target.value.toUpperCase().trim() }))
                   }
@@ -1584,10 +1607,10 @@ function AdminDashboard() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="o-type">Discount type</Label>
+                  <Label htmlFor="o-type" className="text-xs font-semibold">Discount type</Label>
                   <select
                     id="o-type"
-                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                    className="h-9 w-full rounded-xl border border-input bg-background px-3 text-xs mt-1 cursor-pointer"
                     value={offerForm.discount_type}
                     onChange={(e) =>
                       setOfferForm((f) => ({
@@ -1601,11 +1624,12 @@ function AdminDashboard() {
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="o-val">Discount value</Label>
+                  <Label htmlFor="o-val" className="text-xs font-semibold">Discount value</Label>
                   <Input
                     id="o-val"
                     type="number"
                     value={offerForm.discount_value}
+                    className="rounded-xl h-9 text-xs mt-1"
                     onChange={(e) =>
                       setOfferForm((f) => ({ ...f, discount_value: e.target.value }))
                     }
@@ -1614,12 +1638,13 @@ function AdminDashboard() {
               </div>
 
               <div>
-                <Label htmlFor="o-min">Min order amount (₹)</Label>
+                <Label htmlFor="o-min" className="text-xs font-semibold">Min order amount (₹)</Label>
                 <Input
                   id="o-min"
                   type="number"
                   placeholder="0"
                   value={offerForm.min_order_amount}
+                  className="rounded-xl h-9 text-xs mt-1"
                   onChange={(e) =>
                     setOfferForm((f) => ({ ...f, min_order_amount: e.target.value }))
                   }
@@ -1627,35 +1652,88 @@ function AdminDashboard() {
               </div>
 
               <div>
-                <Label htmlFor="o-expiry">Valid until (Expiry Date & Time)</Label>
+                <Label htmlFor="o-expiry" className="text-xs font-semibold">Valid until (Expiry Date &amp; Time)</Label>
                 <Input
                   id="o-expiry"
                   type="datetime-local"
                   value={offerForm.expires_at}
+                  className="rounded-xl h-9 text-xs mt-1"
                   onChange={(e) =>
                     setOfferForm((f) => ({ ...f, expires_at: e.target.value }))
                   }
                 />
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-[10px] text-muted-foreground">
                   The code automatically expires past this timestamp.
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="o-desc">Description (optional)</Label>
+                <Label htmlFor="o-desc" className="text-xs font-semibold">Description (optional)</Label>
                 <Input
                   id="o-desc"
                   placeholder="e.g. 20% off for festival season"
                   value={offerForm.description}
+                  className="rounded-xl h-9 text-xs mt-1"
                   onChange={(e) =>
                     setOfferForm((f) => ({ ...f, description: e.target.value }))
                   }
                 />
               </div>
 
+              {/* Visibility & Activation Toggles */}
+              <div className="space-y-2 pt-2 border-t border-border/50">
+                <label className="flex items-start gap-2.5 text-xs font-medium cursor-pointer p-2.5 rounded-xl border border-border/60 bg-secondary/20 hover:bg-secondary/40 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={offerForm.is_visible}
+                    onChange={(e) => setOfferForm((f) => ({ ...f, is_visible: e.target.checked }))}
+                    className="mt-0.5 rounded border-input text-berry cursor-pointer"
+                  />
+                  <div>
+                    <span className="font-semibold text-foreground flex items-center gap-1.5">
+                      {offerForm.is_visible ? (
+                        <>
+                          <Eye className="size-3.5 text-emerald-600" />
+                          <span>Visible on /offers page (Public)</span>
+                        </>
+                      ) : (
+                        <>
+                          <EyeOff className="size-3.5 text-purple-600" />
+                          <span>Secret / Hidden from /offers</span>
+                        </>
+                      )}
+                    </span>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                      {offerForm.is_visible
+                        ? "Public: All visitors can see and copy this code on the offers page."
+                        : "Secret: Hidden from /offers. Share privately via newsletter or VIP messages."}
+                    </p>
+                  </div>
+                </label>
+
+                <label className="flex items-start gap-2.5 text-xs font-medium cursor-pointer p-2.5 rounded-xl border border-border/60 bg-secondary/20 hover:bg-secondary/40 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={offerForm.is_active}
+                    onChange={(e) => setOfferForm((f) => ({ ...f, is_active: e.target.checked }))}
+                    className="mt-0.5 rounded border-input text-berry cursor-pointer"
+                  />
+                  <div>
+                    <span className="font-semibold text-foreground flex items-center gap-1.5">
+                      {offerForm.is_active ? "🟢 Active & Redeemable" : "⚪ Deactivated / Paused"}
+                    </span>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                      {offerForm.is_active
+                        ? "Active: Customers can apply this code during checkout."
+                        : "Deactivated: Code cannot be applied until reactivated."}
+                    </p>
+                  </div>
+                </label>
+              </div>
+
               <div className="flex gap-2 pt-2">
                 <Button
-                  className="bg-berry text-berry-foreground hover:bg-berry/90"
+                  className="flex-1 bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl h-9 text-xs font-semibold cursor-pointer"
                   onClick={() =>
                     run(async () => {
                       if (!offerForm.code || !offerForm.discount_value || !offerForm.expires_at) {
@@ -1671,7 +1749,8 @@ function AdminDashboard() {
                           min_order_amount: Number(offerForm.min_order_amount || 0),
                           expires_at: new Date(offerForm.expires_at).toISOString(),
                           description: offerForm.description || undefined,
-                          is_active: true,
+                          is_active: offerForm.is_active,
+                          is_visible: offerForm.is_visible,
                         },
                       });
                       setOfferForm(EMPTY_OFFER_FORM);
@@ -1679,10 +1758,14 @@ function AdminDashboard() {
                     }, "Offer code saved")
                   }
                 >
-                  Save offer code
+                  {offerForm.id ? "Update offer code" : "Create offer code"}
                 </Button>
                 {offerForm.id && (
-                  <Button variant="outline" onClick={() => setOfferForm(EMPTY_OFFER_FORM)}>
+                  <Button
+                    variant="outline"
+                    className="rounded-xl h-9 text-xs cursor-pointer"
+                    onClick={() => setOfferForm(EMPTY_OFFER_FORM)}
+                  >
                     Cancel
                   </Button>
                 )}
@@ -1690,41 +1773,86 @@ function AdminDashboard() {
             </div>
           </div>
 
+          {/* Offer Codes List */}
           <div className="space-y-3">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="font-display text-lg font-bold text-cocoa">All Promo Codes</h3>
+              <span className="text-xs font-semibold text-muted-foreground">
+                {offerCodes?.length || 0} total
+              </span>
+            </div>
+
             {(!offerCodes || offerCodes.length === 0) && (
-              <p className="text-sm text-muted-foreground">No offer codes created yet.</p>
+              <div className="rounded-3xl border border-dashed border-border/80 p-8 text-center bg-card/40">
+                <p className="text-xs text-muted-foreground">No offer codes created yet.</p>
+              </div>
             )}
+
             {offerCodes?.map((offer) => {
               const isExpired = new Date(offer.expires_at).getTime() <= Date.now();
+              const isSecret = offer.is_visible === false;
+              const isActive = offer.is_active && !isExpired;
+
               return (
                 <div
                   key={offer.id ?? offer.code}
-                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-card p-4 shadow-2xs"
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border p-4 shadow-soft transition-all ${
+                    !offer.is_active
+                      ? "border-border/40 bg-card/40 opacity-70"
+                      : isSecret
+                      ? "border-purple-500/30 bg-purple-500/5 hover:border-purple-500/50"
+                      : "border-border/70 bg-card hover:border-berry/30"
+                  }`}
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-base text-berry bg-berry/10 px-2 py-0.5 rounded-lg border border-berry/20">
+                  <div className="space-y-1.5 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono font-bold text-sm sm:text-base text-berry bg-berry/10 px-2.5 py-0.5 rounded-xl border border-berry/20">
                         {offer.code}
                       </span>
+
+                      {/* Active / Inactive / Expired Badge */}
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold border ${
                           isExpired
-                            ? "bg-destructive/15 text-destructive"
-                            : "bg-matcha text-cocoa"
+                            ? "bg-destructive/15 text-destructive border-destructive/30"
+                            : offer.is_active
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
+                            : "bg-muted text-muted-foreground border-border"
                         }`}
                       >
-                        {isExpired ? "Expired" : "Active"}
+                        {isExpired ? "🔴 Expired" : offer.is_active ? "🟢 Active" : "⚪ Deactivated"}
+                      </span>
+
+                      {/* Visibility Badge */}
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold border flex items-center gap-1 ${
+                          isSecret
+                            ? "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30"
+                            : "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30"
+                        }`}
+                      >
+                        {isSecret ? (
+                          <>
+                            <Lock className="size-2.5" />
+                            <span>Secret (Hidden from /offers)</span>
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="size-2.5" />
+                            <span>Public (/offers)</span>
+                          </>
+                        )}
                       </span>
                     </div>
 
-                    <p className="mt-1.5 text-sm font-medium text-foreground">
+                    <p className="text-xs sm:text-sm font-semibold text-foreground">
                       {offer.discount_type === "percent"
                         ? `${offer.discount_value}% off`
                         : `₹${offer.discount_value} flat off`}
-                      {offer.min_order_amount > 0 ? ` on orders above ₹${offer.min_order_amount}` : ""}
+                      {offer.min_order_amount > 0 ? ` · Min order ₹${offer.min_order_amount}` : ""}
                     </p>
 
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-[11px] text-muted-foreground">
                       Expires: {new Date(offer.expires_at).toLocaleString("en-IN", {
                         day: "numeric",
                         month: "short",
@@ -1736,10 +1864,82 @@ function AdminDashboard() {
                     </p>
                   </div>
 
-                  <div className="flex gap-2">
+                  {/* Actions Bar */}
+                  <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2 sm:border-t-0 sm:pt-0 shrink-0">
+                    {/* Toggle Visibility Button */}
                     <Button
                       size="sm"
                       variant="outline"
+                      title={offer.is_visible !== false ? "Hide from /offers page" : "Show on /offers page"}
+                      className={`h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer ${
+                        offer.is_visible !== false
+                          ? "border-purple-500/30 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
+                          : "border-blue-500/30 text-blue-700 dark:text-blue-300 hover:bg-blue-500/10"
+                      }`}
+                      onClick={() =>
+                        run(async () => {
+                          if (offer.id) {
+                            const newVisibility = offer.is_visible === false ? true : false;
+                            await saveOfferCodeFn({
+                              data: {
+                                id: offer.id,
+                                code: offer.code,
+                                discount_type: offer.discount_type,
+                                discount_value: offer.discount_value,
+                                min_order_amount: offer.min_order_amount,
+                                expires_at: offer.expires_at,
+                                description: offer.description || undefined,
+                                is_active: offer.is_active,
+                                is_visible: newVisibility,
+                              },
+                            });
+                            queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
+                          }
+                        }, offer.is_visible !== false ? `Promo code #${offer.code} hidden (now secret)` : `Promo code #${offer.code} made public`)
+                      }
+                    >
+                      {offer.is_visible !== false ? "🔒 Hide (Secret)" : "👁️ Show (Public)"}
+                    </Button>
+
+                    {/* Toggle Active Button */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      title={offer.is_active ? "Deactivate promo code" : "Activate promo code"}
+                      className={`h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer ${
+                        offer.is_active
+                          ? "border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
+                          : "border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10"
+                      }`}
+                      onClick={() =>
+                        run(async () => {
+                          if (offer.id) {
+                            await saveOfferCodeFn({
+                              data: {
+                                id: offer.id,
+                                code: offer.code,
+                                discount_type: offer.discount_type,
+                                discount_value: offer.discount_value,
+                                min_order_amount: offer.min_order_amount,
+                                expires_at: offer.expires_at,
+                                description: offer.description || undefined,
+                                is_active: !offer.is_active,
+                                is_visible: offer.is_visible !== false,
+                              },
+                            });
+                            queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
+                          }
+                        }, offer.is_active ? `Deactivated #${offer.code}` : `Activated #${offer.code}`)
+                      }
+                    >
+                      {offer.is_active ? "⚪ Deactivate" : "🟢 Activate"}
+                    </Button>
+
+                    {/* Edit Button */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 px-2 text-[10px] rounded-lg cursor-pointer hover:border-berry/40 font-semibold"
                       onClick={() =>
                         setOfferForm({
                           id: offer.id,
@@ -1749,15 +1949,19 @@ function AdminDashboard() {
                           min_order_amount: String(offer.min_order_amount),
                           expires_at: new Date(offer.expires_at).toISOString().slice(0, 16),
                           description: offer.description ?? "",
+                          is_active: offer.is_active,
+                          is_visible: offer.is_visible !== false,
                         })
                       }
                     >
                       Edit
                     </Button>
+
+                    {/* Delete Button */}
                     <Button
                       size="sm"
                       variant="outline"
-                      className="text-destructive hover:bg-destructive/10"
+                      className="h-7 px-2 text-[10px] rounded-lg text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer font-semibold"
                       onClick={() =>
                         run(async () => {
                           if (offer.id) {

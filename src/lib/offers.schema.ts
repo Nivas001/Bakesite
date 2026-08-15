@@ -13,6 +13,7 @@ export const offerCodeSchema = z.object({
   expires_at: z.string().min(1, "Expiry date/time is required"),
   description: z.string().max(200).optional(),
   is_active: z.boolean().default(true),
+  is_visible: z.boolean().default(true),
 });
 
 export const validateOfferCodeSchema = z.object({

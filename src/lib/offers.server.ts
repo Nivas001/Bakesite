@@ -18,6 +18,7 @@ export type OfferCodeDoc = {
   expires_at: string;
   description: string | null;
   is_active: boolean;
+  is_visible: boolean;
   $createdAt?: string | undefined;
 };
 
@@ -32,6 +33,7 @@ const SEED_OFFER_CODES: OfferCodeDoc[] = [
     expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     description: "10% off on orders above ₹200",
     is_active: true,
+    is_visible: true,
   },
   {
     id: "promo_sweet50",
@@ -42,6 +44,7 @@ const SEED_OFFER_CODES: OfferCodeDoc[] = [
     expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
     description: "Flat ₹50 off on artisan bakes above ₹350",
     is_active: true,
+    is_visible: true,
   },
 ];
 
@@ -62,7 +65,8 @@ export async function fetchOfferCodes(): Promise<OfferCodeDoc[]> {
         min_order_amount: Number(d.min_order_amount ?? 0),
         expires_at: d.expires_at,
         description: d.description ?? null,
-        is_active: Boolean(d.is_active),
+        is_active: d.is_active !== undefined ? Boolean(d.is_active) : true,
+        is_visible: d.is_visible !== undefined ? Boolean(d.is_visible) : true,
       }));
     }
   } catch {
@@ -71,10 +75,13 @@ export async function fetchOfferCodes(): Promise<OfferCodeDoc[]> {
   return memoryCodes;
 }
 
+/** Publicly visible active promo codes for the /offers page */
 export async function fetchActiveOfferCodes(): Promise<OfferCodeDoc[]> {
   const codes = await fetchOfferCodes();
   const now = Date.now();
-  return codes.filter((c) => c.is_active && new Date(c.expires_at).getTime() > now);
+  return codes.filter(
+    (c) => c.is_active && c.is_visible !== false && new Date(c.expires_at).getTime() > now,
+  );
 }
 
 export async function upsertOfferCode(input: OfferCodeInput) {
@@ -86,6 +93,7 @@ export async function upsertOfferCode(input: OfferCodeInput) {
     expires_at: input.expires_at,
     description: input.description ?? null,
     is_active: input.is_active ?? true,
+    is_visible: input.is_visible ?? true,
   };
 
   try {
