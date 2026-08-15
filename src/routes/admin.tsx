@@ -691,7 +691,7 @@ function AdminDashboard() {
                               const shortId = order.id.slice(0, 8);
                               const itemsText = order.order_items.map((i) => `• ${i.quantity}× ${i.product_name} (${formatCurrency(Number(i.line_total))})`).join("\n");
                               
-                              const origin = typeof window !== "undefined" ? window.location.origin : "https://bakesite.vercel.app";
+                              const origin = typeof window !== "undefined" ? window.location.origin : "https://anibakes.app";
                               const myOrdersUrl = `${origin}/orders`;
                               
                               let message = `🎂 *Ani Bakes Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;

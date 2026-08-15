@@ -28,7 +28,7 @@ export const CAMPAIGN_PRESETS = {
     defaultSubject: "Fresh News from Ani Bakes Counter",
     defaultBody: `Hi there,\n\nWe have some exciting news from our kitchen! Starting this week, we're introducing new morning baking slots and fresh seasonal recipes.\n\nEvery single item continues to be hand-mixed, slow-proofed, and baked fresh the morning of your chosen delivery slot.\n\nThank you for being part of our neighbourhood bakery family!`,
     defaultCtaLabel: "Browse the Counter →",
-    defaultCtaUrl: "https://bakesite.vercel.app/shop",
+    defaultCtaUrl: "https://anibakes.app/shop",
   },
   weekly_special: {
     label: "Weekly Special",
@@ -39,7 +39,7 @@ export const CAMPAIGN_PRESETS = {
     defaultSubject: "Special Bakes for This Weekend's Slots 🥐",
     defaultBody: `Hello sweet tooth,\n\nHere is what our bakers are pulling out of the ovens for this weekend's fresh slots:\n\n✨ Almond Croissant — Double baked with rich frangipane\n🍓 Strawberry Cream Slices — Fresh seasonal layers\n🍪 Triple Dark Chocolate Chunk Cookies — Crispy edges, molten centers\n\nSlots fill up quickly each morning. Reserve your next-day bake today!`,
     defaultCtaLabel: "Order Weekend Specials →",
-    defaultCtaUrl: "https://bakesite.vercel.app/shop",
+    defaultCtaUrl: "https://anibakes.app/shop",
   },
   promotion: {
     label: "Promotion",
@@ -50,7 +50,7 @@ export const CAMPAIGN_PRESETS = {
     defaultSubject: "A Sweet Treat for You — Special Discount Code 🎁",
     defaultBody: `Hi friend,\n\nAs a thank-you for being a subscriber to our fresh bakes newsletter, here is an exclusive discount for your next order!\n\nUse coupon code FRESH10 at checkout to get 10% off your entire box.\n\nValid on all next-day delivery and pickup slots. Happy indulging!`,
     defaultCtaLabel: "Use Your Discount Now →",
-    defaultCtaUrl: "https://bakesite.vercel.app/offers",
+    defaultCtaUrl: "https://anibakes.app/offers",
   },
 } as const;
 
@@ -69,7 +69,7 @@ function resolveImageUrl(url: string | null | undefined): string {
     return url;
   }
   const cleanPath = url.startsWith("/") ? url : `/${url}`;
-  return `https://bakesite.vercel.app${cleanPath}`;
+  return `https://anibakes.app${cleanPath}`;
 }
 
 function formatBodyHtml(text: string): string {

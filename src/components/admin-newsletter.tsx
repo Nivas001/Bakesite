@@ -88,7 +88,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
   const [showcaseTag, setShowcaseTag] = useState("New Launch · Fresh Bake");
   const [showcaseDesc, setShowcaseDesc] = useState("");
   const [showcaseLayout, setShowcaseLayout] = useState<"side_by_side" | "stacked">("side_by_side");
-  const [showcaseLink, setShowcaseLink] = useState("https://bakesite.vercel.app/shop");
+  const [showcaseLink, setShowcaseLink] = useState("https://anibakes.app/shop");
 
   // Attachment state
   const [attachmentB64, setAttachmentB64] = useState<string | null>(null);
@@ -120,7 +120,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
     setShowcaseTag(`${formatCurrency(Number(p.price))} · Fresh Bake`);
     setShowcaseDesc(p.description || "Baked with pure butter and premium ingredients the morning of your chosen slot.");
     setShowcaseImage(p.image_url || "/products/croissant.jpg");
-    setShowcaseLink(`https://bakesite.vercel.app/product/${p.slug}`);
+    setShowcaseLink(`https://anibakes.app/product/${p.slug}`);
     toast.success(`Loaded "${p.name}" into showcase!`);
   }
 
@@ -488,7 +488,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                       id="sc-link"
                       value={showcaseLink}
                       onChange={(e) => setShowcaseLink(e.target.value)}
-                      placeholder="https://bakesite.vercel.app/shop"
+                      placeholder="https://anibakes.app/shop"
                       className="h-8 rounded-lg text-xs font-mono"
                     />
                   </div>
