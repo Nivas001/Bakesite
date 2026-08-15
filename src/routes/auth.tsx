@@ -22,14 +22,16 @@ export type AuthSearch = {
   userId?: string | undefined;
   secret?: string | undefined;
   error?: string | undefined;
+  mode?: "signin" | "signup" | undefined;
 };
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>): AuthSearch => ({
-    redirect: typeof search['redirect'] === "string" ? (search['redirect'] as string) : undefined,
-    userId: typeof search['userId'] === "string" ? (search['userId'] as string) : undefined,
-    secret: typeof search['secret'] === "string" ? (search['secret'] as string) : undefined,
-    error: typeof search['error'] === "string" ? (search['error'] as string) : undefined,
+    redirect: typeof search["redirect"] === "string" ? (search["redirect"] as string) : undefined,
+    userId: typeof search["userId"] === "string" ? (search["userId"] as string) : undefined,
+    secret: typeof search["secret"] === "string" ? (search["secret"] as string) : undefined,
+    error: typeof search["error"] === "string" ? (search["error"] as string) : undefined,
+    mode: search["mode"] === "signup" || search["mode"] === "signin" ? search["mode"] : undefined,
   }),
   head: () => ({
     meta: [
@@ -55,7 +57,7 @@ function AuthPage() {
   const serverRecoveryFn = useServerFn(serverRecovery);
   const saveProfileFn = useServerFn(saveMyProfile);
 
-  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [authMode, setAuthMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [authenticatingOAuth, setAuthenticatingOAuth] = useState(Boolean(search.userId && search.secret));
 
   // Email Sign-in State
@@ -72,6 +74,13 @@ function AuthPage() {
   const [verificationSentEmail, setVerificationSentEmail] = useState<string | null>(null);
 
   const [busy, setBusy] = useState(false);
+
+  // Sync mode with search param if changed
+  useEffect(() => {
+    if (search.mode && (search.mode === "signin" || search.mode === "signup")) {
+      setAuthMode(search.mode);
+    }
+  }, [search.mode]);
 
   // Handle OAuth Token Callback (userId & secret from Google OAuth)
   useEffect(() => {
@@ -232,12 +241,12 @@ function AuthPage() {
 
   if (authenticatingOAuth) {
     return (
-      <div className="mx-auto w-full max-w-md px-4 py-24 text-center">
-        <div className="rounded-3xl border border-border bg-card p-8 shadow-soft space-y-4">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-berry/10 text-berry animate-pulse">
-            <span className="text-2xl font-bold">🥐</span>
+      <div className="flex min-h-[calc(100svh-8rem)] items-center justify-center px-4 py-8">
+        <div className="w-full max-w-sm rounded-2xl sm:rounded-3xl border border-border bg-card p-6 shadow-soft text-center space-y-3">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-berry/10 text-berry animate-pulse">
+            <span className="text-xl font-bold">🥐</span>
           </div>
-          <h2 className="font-display text-2xl font-bold text-cocoa">Completing Google Sign-In</h2>
+          <h2 className="font-display text-xl font-bold text-cocoa">Completing Google Sign-In</h2>
           <p className="text-xs text-muted-foreground">
             Setting up your secure bakery session, please wait…
           </p>
@@ -247,304 +256,309 @@ function AuthPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 py-16">
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold text-cocoa">
-          {verificationSentEmail
-            ? "Check your email"
-            : authMode === "signin"
-            ? "Welcome back"
-            : "Create your account"}
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {verificationSentEmail
-            ? "We sent a verification link to confirm your account."
-            : authMode === "signin"
-            ? "Sign in with your email or Google account."
-            : "Register with your email to start ordering handcrafted bakes."}
-        </p>
-      </div>
+    <div className="flex min-h-[calc(100svh-7.5rem)] flex-col justify-center px-4 py-4 sm:py-8">
+      <div className="mx-auto w-full max-w-sm sm:max-w-md">
+        
+        {/* Header Block: Compact & Well Spaced */}
+        <div className="text-center">
+          <h1 className="font-display text-xl sm:text-3xl font-bold text-cocoa">
+            {verificationSentEmail
+              ? "Check your email"
+              : authMode === "signin"
+              ? "Welcome back"
+              : "Create your account"}
+          </h1>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {verificationSentEmail
+              ? "We sent a verification link to confirm your account."
+              : authMode === "signin"
+              ? "Sign in with your email or Google account."
+              : "Register with your email to start ordering handcrafted bakes."}
+          </p>
+        </div>
 
-      <div className="mt-8 rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
-        {/* EMAIL VERIFICATION SENT SCREEN */}
-        {verificationSentEmail ? (
-          <div className="space-y-6 text-center py-2">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-berry/10 text-2xl text-berry">
-              ✉
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-cocoa">Verification link sent to</p>
-              <p className="font-mono text-sm font-bold text-berry mt-0.5">{verificationSentEmail}</p>
-              <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-                Click the verification link inside your email to activate your account. You can then add your contact phone number in your profile and place orders!
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-2">
-              <Button
-                type="button"
-                onClick={handleResendVerification}
-                disabled={busy}
-                variant="outline"
-                className="w-full rounded-2xl h-11 border-border font-medium text-xs"
-              >
-                {busy ? "Sending…" : "Resend verification email"}
-              </Button>
-
-              <Button
-                type="button"
-                onClick={() => {
-                  setVerificationSentEmail(null);
-                  setAuthMode("signin");
-                }}
-                className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 h-11 font-semibold text-xs"
-              >
-                Continue to Sign In
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Google OAuth Button */}
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2 rounded-2xl h-11 border-border font-medium hover:bg-secondary/50"
-              onClick={handleGoogleSignIn}
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24">
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                />
-              </svg>
-              Continue with Google
-            </Button>
-
-            <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
-              <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-            </div>
-
-            {/* SIGN IN VIEW */}
-            {authMode === "signin" ? (
+        {/* Card Container: Compact Padding */}
+        <div className="mt-3.5 sm:mt-6 rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-4.5 sm:p-7 shadow-soft">
+          
+          {/* EMAIL VERIFICATION SENT SCREEN */}
+          {verificationSentEmail ? (
+            <div className="space-y-4 text-center py-1">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-berry/10 text-xl text-berry">
+                ✉
+              </div>
               <div>
-                {!forgotPasswordMode ? (
-                  <form onSubmit={handleEmailSignIn} className="space-y-4">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="login-email" className="text-xs font-semibold">
-                        Email address
-                      </Label>
-                      <Input
-                        id="login-email"
-                        type="email"
-                        required
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="rounded-xl h-11"
-                      />
-                    </div>
+                <p className="text-xs font-semibold text-cocoa">Verification link sent to</p>
+                <p className="font-mono text-xs font-bold text-berry mt-0.5">{verificationSentEmail}</p>
+                <p className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
+                  Click the verification link inside your email to activate your account. You can then add your contact phone number in your profile and place orders!
+                </p>
+              </div>
 
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <Label htmlFor="login-password" className="text-xs font-semibold">
-                          Password
+              <div className="space-y-2 pt-1">
+                <Button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={busy}
+                  variant="outline"
+                  className="w-full rounded-xl sm:rounded-2xl h-10 border-border font-medium text-xs"
+                >
+                  {busy ? "Sending…" : "Resend verification email"}
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setVerificationSentEmail(null);
+                    setAuthMode("signin");
+                  }}
+                  className="w-full rounded-xl sm:rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 h-10 font-semibold text-xs cursor-pointer"
+                >
+                  Continue to Sign In
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Google OAuth Button */}
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2 rounded-xl sm:rounded-2xl h-9.5 sm:h-10 border-border font-medium text-xs sm:text-sm hover:bg-secondary/50 cursor-pointer"
+                onClick={handleGoogleSignIn}
+              >
+                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                  />
+                </svg>
+                <span>Continue with Google</span>
+              </Button>
+
+              <div className="my-3 sm:my-4 flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">
+                <span className="h-px flex-1 bg-border/80" /> or <span className="h-px flex-1 bg-border/80" />
+              </div>
+
+              {/* SIGN IN VIEW */}
+              {authMode === "signin" ? (
+                <div>
+                  {!forgotPasswordMode ? (
+                    <form onSubmit={handleEmailSignIn} className="space-y-2.5 sm:space-y-3">
+                      <div className="space-y-1">
+                        <Label htmlFor="login-email" className="text-[11px] sm:text-xs font-semibold">
+                          Email address
                         </Label>
+                        <Input
+                          id="login-email"
+                          type="email"
+                          required
+                          placeholder="you@example.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center">
+                          <Label htmlFor="login-password" className="text-[11px] sm:text-xs font-semibold">
+                            Password
+                          </Label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setForgotPasswordMode(true);
+                              setRecoveryEmail(email);
+                            }}
+                            className="text-[11px] text-berry font-medium hover:underline cursor-pointer"
+                          >
+                            Forgot password?
+                          </button>
+                        </div>
+                        <Input
+                          id="login-password"
+                          type="password"
+                          required
+                          placeholder="Your password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm"
+                        />
+                      </div>
+
+                      <Button
+                        type="submit"
+                        disabled={busy}
+                        className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl sm:rounded-2xl h-9.5 sm:h-10 font-bold text-xs sm:text-sm mt-1 shadow-soft cursor-pointer"
+                      >
+                        {busy ? "Signing in…" : "Sign In"}
+                      </Button>
+                    </form>
+                  ) : (
+                    /* FORGOT PASSWORD VIEW */
+                    <form onSubmit={handleForgotPassword} className="space-y-3">
+                      <div className="rounded-xl bg-secondary/40 p-3 border border-border/50">
+                        <p className="text-xs font-bold text-cocoa">Reset your password</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          Enter your email address and we&apos;ll send you instructions to set a new password.
+                        </p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label htmlFor="recovery-email" className="text-[11px] sm:text-xs font-semibold">
+                          Registered email address
+                        </Label>
+                        <Input
+                          id="recovery-email"
+                          type="email"
+                          required
+                          placeholder="you@example.com"
+                          value={recoveryEmail}
+                          onChange={(e) => setRecoveryEmail(e.target.value)}
+                          className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm"
+                        />
+                      </div>
+
+                      <Button
+                        type="submit"
+                        disabled={busy}
+                        className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl sm:rounded-2xl h-9.5 sm:h-10 font-bold text-xs sm:text-sm shadow-soft cursor-pointer"
+                      >
+                        {busy ? "Sending…" : "Send reset link"}
+                      </Button>
+
+                      <div className="text-center">
                         <button
                           type="button"
-                          onClick={() => {
-                            setForgotPasswordMode(true);
-                            setRecoveryEmail(email);
-                          }}
-                          className="text-xs text-berry font-medium hover:underline"
+                          onClick={() => setForgotPasswordMode(false)}
+                          className="text-xs text-muted-foreground hover:text-foreground font-medium underline cursor-pointer"
                         >
-                          Forgot password?
+                          Back to Sign in
                         </button>
                       </div>
-                      <Input
-                        id="login-password"
-                        type="password"
-                        required
-                        placeholder="Your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="rounded-xl h-11"
-                      />
+                    </form>
+                  )}
+
+                  {/* Switch to Sign Up */}
+                  <div className="mt-3.5 pt-2.5 sm:mt-5 sm:pt-3.5 text-center border-t border-border/60">
+                    <p className="text-xs text-muted-foreground">
+                      Don&apos;t have an account?{" "}
+                      <button
+                        type="button"
+                        onClick={() => setAuthMode("signup")}
+                        className="font-bold text-berry hover:underline cursor-pointer"
+                      >
+                        Create an account
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                /* SIGN UP VIEW — Optimized to fit inside 1 mobile screen */
+                <div>
+                  <form onSubmit={handleSignUp} className="space-y-2.5 sm:space-y-3">
+                    
+                    {/* Full Name & Mobile Side by Side on Mobile */}
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <div className="space-y-1">
+                        <Label htmlFor="reg-name" className="text-[11px] sm:text-xs font-semibold">
+                          Full name <span className="text-berry">*</span>
+                        </Label>
+                        <Input
+                          id="reg-name"
+                          required
+                          placeholder="Your name"
+                          value={signUpName}
+                          onChange={(e) => setSignUpName(e.target.value)}
+                          className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm px-2.5"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label htmlFor="reg-phone" className="text-[11px] sm:text-xs font-semibold">
+                          Mobile <span className="text-berry">*</span>
+                        </Label>
+                        <Input
+                          id="reg-phone"
+                          type="tel"
+                          required
+                          placeholder="10-digit number"
+                          value={signUpPhone}
+                          onChange={(e) => setSignUpPhone(e.target.value)}
+                          className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm px-2.5"
+                        />
+                      </div>
                     </div>
 
-                    <Button
-                      type="submit"
-                      disabled={busy}
-                      className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold mt-2"
-                    >
-                      {busy ? "Signing in…" : "Sign In"}
-                    </Button>
-                  </form>
-                ) : (
-                  /* FORGOT PASSWORD VIEW */
-                  <form onSubmit={handleForgotPassword} className="space-y-4">
-                    <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/50">
-                      <p className="text-xs font-bold text-cocoa">Reset your password</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        Enter your email address and we&apos;ll send you instructions to set a new password.
-                      </p>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <Label htmlFor="recovery-email" className="text-xs font-semibold">
-                        Registered email address
+                    <div className="space-y-1">
+                      <Label htmlFor="reg-email" className="text-[11px] sm:text-xs font-semibold">
+                        Email address <span className="text-berry">*</span>
                       </Label>
                       <Input
-                        id="recovery-email"
+                        id="reg-email"
                         type="email"
                         required
                         placeholder="you@example.com"
-                        value={recoveryEmail}
-                        onChange={(e) => setRecoveryEmail(e.target.value)}
-                        className="rounded-xl h-11"
+                        value={signUpEmail}
+                        onChange={(e) => setSignUpEmail(e.target.value)}
+                        className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm px-2.5"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="reg-pass" className="text-[11px] sm:text-xs font-semibold">
+                        Create password <span className="text-berry">*</span>
+                      </Label>
+                      <Input
+                        id="reg-pass"
+                        type="password"
+                        required
+                        minLength={6}
+                        placeholder="At least 6 characters"
+                        value={signUpPassword}
+                        onChange={(e) => setSignUpPassword(e.target.value)}
+                        className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm px-2.5"
                       />
                     </div>
 
                     <Button
                       type="submit"
                       disabled={busy}
-                      className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold"
+                      className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl sm:rounded-2xl h-9.5 sm:h-10 font-bold text-xs sm:text-sm shadow-soft cursor-pointer mt-1"
                     >
-                      {busy ? "Sending…" : "Send reset link"}
+                      {busy ? "Creating account…" : "Create Account"}
                     </Button>
+                  </form>
 
-                    <div className="text-center">
+                  {/* Switch to Sign In */}
+                  <div className="mt-3.5 pt-2.5 sm:mt-5 sm:pt-3.5 text-center border-t border-border/60">
+                    <p className="text-xs text-muted-foreground">
+                      Already have an account?{" "}
                       <button
                         type="button"
-                        onClick={() => setForgotPasswordMode(false)}
-                        className="text-xs text-muted-foreground hover:text-foreground font-medium underline"
+                        onClick={() => setAuthMode("signin")}
+                        className="font-bold text-berry hover:underline cursor-pointer"
                       >
-                        Back to Sign in
+                        Sign in
                       </button>
-                    </div>
-                  </form>
-                )}
-
-                {/* Switch to Sign Up */}
-                <div className="mt-6 text-center pt-4 border-t border-border/60">
-                  <p className="text-xs text-muted-foreground">
-                    Don&apos;t have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode("signup")}
-                      className="font-bold text-berry hover:underline"
-                    >
-                      Create an account
-                    </button>
-                  </p>
-                </div>
-              </div>
-            ) : (
-              /* SIGN UP VIEW */
-              <div className="space-y-4">
-                <form onSubmit={handleSignUp} className="space-y-3.5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <Label htmlFor="reg-name" className="text-xs font-semibold">
-                        Full name <span className="text-berry">*</span>
-                      </Label>
-                      <Input
-                        id="reg-name"
-                        required
-                        placeholder="Your full name"
-                        value={signUpName}
-                        onChange={(e) => setSignUpName(e.target.value)}
-                        className="rounded-xl h-10"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <Label htmlFor="reg-phone" className="text-xs font-semibold">
-                        Mobile number <span className="text-berry">*</span>
-                      </Label>
-                      <Input
-                        id="reg-phone"
-                        type="tel"
-                        required
-                        placeholder="10-digit mobile"
-                        value={signUpPhone}
-                        onChange={(e) => setSignUpPhone(e.target.value)}
-                        className="rounded-xl h-10"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <Label htmlFor="reg-email" className="text-xs font-semibold">
-                      Email address <span className="text-berry">*</span>
-                    </Label>
-                    <Input
-                      id="reg-email"
-                      type="email"
-                      required
-                      placeholder="you@example.com"
-                      value={signUpEmail}
-                      onChange={(e) => setSignUpEmail(e.target.value)}
-                      className="rounded-xl h-10"
-                    />
-                    <p className="text-[10px] text-muted-foreground">
-                      We will send a verification link to activate your account.
                     </p>
                   </div>
-
-                  <div className="space-y-1">
-                    <Label htmlFor="reg-pass" className="text-xs font-semibold">
-                      Create password <span className="text-berry">*</span>
-                    </Label>
-                    <Input
-                      id="reg-pass"
-                      type="password"
-                      required
-                      minLength={6}
-                      placeholder="At least 6 characters"
-                      value={signUpPassword}
-                      onChange={(e) => setSignUpPassword(e.target.value)}
-                      className="rounded-xl h-10"
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={busy}
-                    className="w-full bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-11 font-semibold mt-2"
-                  >
-                    {busy ? "Creating account…" : "Create Account"}
-                  </Button>
-                </form>
-
-                {/* Switch to Sign In */}
-                <div className="mt-6 text-center pt-4 border-t border-border/60">
-                  <p className="text-xs text-muted-foreground">
-                    Already have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode("signin")}
-                      className="font-bold text-berry hover:underline"
-                    >
-                      Sign in
-                    </button>
-                  </p>
                 </div>
-              </div>
-            )}
-          </>
-        )}
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
