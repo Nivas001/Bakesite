@@ -34,6 +34,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { DevPanel } from "@/components/dev-panel";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -2023,6 +2024,7 @@ function AdminDashboard() {
           )}
         </DialogContent>
       </Dialog>
+      <DevPanel />
     </div>
   );
 }

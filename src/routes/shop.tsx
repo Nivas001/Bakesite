@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { getCatalog } from "@/lib/catalog.functions";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
+import { useFlag } from "@/lib/feature-flags";
+import { Search, X } from "lucide-react";
 
 const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCatalog() });
 
@@ -26,9 +28,26 @@ export const Route = createFileRoute("/shop")({
 function Shop() {
   const { data } = useSuspenseQuery(catalogQuery);
   const [active, setActive] = useState<string | null>(null);
-  const products = active
-    ? data.products.filter((p) => p.category_slug === active)
-    : data.products;
+  const [search, setSearch] = useState("");
+  const [filterKey, setFilterKey] = useState(0); // increments to re-trigger stagger
+
+  const showSearch = useFlag("ff_shop_search");
+  const showStagger = useFlag("ff_shop_stagger");
+
+  const products = useMemo(() => {
+    let list = active ? data.products.filter((p) => p.category_slug === active) : data.products;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter((p) => p.name.toLowerCase().includes(q));
+    }
+    return list;
+  }, [active, search, data.products]);
+
+  function handleCategoryChange(slug: string | null) {
+    setActive(slug);
+    setSearch("");
+    if (showStagger) setFilterKey((k) => k + 1);
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
@@ -39,35 +58,88 @@ function Shop() {
         </p>
       </div>
 
-      {/* Category Pills: Smooth horizontal swipe on mobile, wrap on tablet/desktop */}
-      <div className="mt-6 flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar">
-        <Button
-          variant={active === null ? "default" : "outline"}
-          size="sm"
-          className="rounded-full text-xs shrink-0 h-8 px-3.5"
-          onClick={() => setActive(null)}
-        >
-          All
-        </Button>
-        {data.categories.map((category) => (
+      {/* Filters Row: Category pills + Search */}
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        {/* Category Pills */}
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar shrink-0">
           <Button
-            key={category.id}
-            variant={active === category.slug ? "default" : "outline"}
+            variant={active === null ? "default" : "outline"}
             size="sm"
-            className="rounded-full text-xs shrink-0 h-8 px-3.5"
-            onClick={() => setActive(category.slug)}
+            className="rounded-full text-xs shrink-0 h-8 px-3.5 transition-all"
+            onClick={() => handleCategoryChange(null)}
           >
-            {category.name}
+            All
           </Button>
-        ))}
+          {data.categories.map((category) => (
+            <Button
+              key={category.id}
+              variant={active === category.slug ? "default" : "outline"}
+              size="sm"
+              className="rounded-full text-xs shrink-0 h-8 px-3.5 transition-all"
+              onClick={() => handleCategoryChange(category.slug)}
+            >
+              {category.name}
+            </Button>
+          ))}
+        </div>
+
+        {/* Live Search Input */}
+        {showSearch && (
+          <div className="relative sm:ml-auto w-full sm:w-52 lg:w-64 shrink-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search bakes…"
+              className="h-8 w-full rounded-full border border-border bg-card/80 pl-8 pr-8 text-xs font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-berry/30 transition-all"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Responsive Grid: 2 columns on mobile, 3 columns on tablet, 3-4 columns on desktop */}
-      <div className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 lg:gap-6">
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {/* Product Grid */}
+      {products.length === 0 ? (
+        <div className="mt-12 flex flex-col items-center justify-center text-center py-16 gap-3">
+          <span className="text-5xl">🥐</span>
+          <p className="font-display text-lg font-bold text-cocoa">No bakes found</p>
+          <p className="text-xs text-muted-foreground max-w-xs">
+            {search ? `No results for "${search}". Try a different name.` : "Nothing in this category right now."}
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-full text-xs mt-1"
+            onClick={() => { handleCategoryChange(null); setSearch(""); }}
+          >
+            Show all bakes
+          </Button>
+        </div>
+      ) : (
+        <div
+          key={showStagger ? filterKey : undefined}
+          className="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 lg:gap-6"
+        >
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              className={showStagger ? "animate-scale-in" : ""}
+              style={showStagger ? { animationDelay: `${index * 40}ms` } : undefined}
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

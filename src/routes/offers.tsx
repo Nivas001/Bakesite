@@ -7,8 +7,9 @@ import { getCatalog } from "@/lib/catalog.functions";
 import { getPublicOfferCodes } from "@/lib/offers.functions";
 import { ProductCard } from "@/components/product-card";
 import { hasDiscount } from "@/lib/pricing";
-import { Tag, Copy, Check, Sparkles, ShoppingBag, ArrowRight } from "lucide-react";
+import { Tag, Copy, Check, ShoppingBag, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useFlag } from "@/lib/feature-flags";
 
 const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCatalog() });
 
@@ -28,6 +29,9 @@ export const Route = createFileRoute("/offers")({
   component: Offers,
 });
 
+const CONFETTI_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315, 30, 150];
+const CONFETTI_COLORS = ["text-berry", "text-amber-500", "text-emerald-500", "text-purple-500", "text-orange-400"];
+
 function Offers() {
   const { data } = useSuspenseQuery(catalogQuery);
   const fetchCodesFn = useServerFn(getPublicOfferCodes);
@@ -37,6 +41,10 @@ function Offers() {
   });
 
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [confettiCode, setConfettiCode] = useState<string | null>(null);
+
+  const showShimmer = useFlag("ff_offers_shimmer");
+  const showConfetti = useFlag("ff_offers_confetti");
 
   const offers = data.products.filter((p) => hasDiscount(p.discount_type, p.discount_value));
 
@@ -45,6 +53,10 @@ function Offers() {
     setCopiedCode(code);
     toast.success(`Coupon "${code}" copied! Apply it at checkout.`);
     setTimeout(() => setCopiedCode(null), 2500);
+    if (showConfetti) {
+      setConfettiCode(code);
+      setTimeout(() => setConfettiCode(null), 650);
+    }
   }
 
   return (
@@ -60,7 +72,7 @@ function Offers() {
         </p>
       </div>
 
-      {/* 2. Collectible Bakery Ticket Coupons (Swipeable on Mobile, 3-Cols on Desktop) */}
+      {/* 2. Collectible Bakery Ticket Coupons */}
       {promoCodes && promoCodes.length > 0 && (
         <section className="mt-6 sm:mt-8">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
@@ -68,24 +80,17 @@ function Offers() {
             <h2 className="font-display text-sm sm:text-lg font-bold text-cocoa">Active Bakery Coupons</h2>
           </div>
 
-          {/* Ticket Vouchers Track */}
           <div className="flex gap-3 overflow-x-auto no-scrollbar snap-x pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
             {promoCodes.map((promo) => {
               const isCopied = copiedCode === promo.code;
+              const isConfetti = confettiCode === promo.code;
               return (
                 <div
                   key={promo.id ?? promo.code}
-                  className="w-[82%] xs:w-[72%] shrink-0 snap-start sm:w-auto relative flex flex-col justify-between overflow-hidden rounded-2xl border border-dashed border-berry/40 bg-card/95 p-3.5 sm:p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-berry hover:shadow-lift"
+                  className={`w-[82%] xs:w-[72%] shrink-0 snap-start sm:w-auto relative flex flex-col justify-between overflow-hidden rounded-2xl border border-dashed border-berry/40 bg-card/95 p-3.5 sm:p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-berry hover:shadow-lift ${showShimmer ? "bento-shine" : ""}`}
                 >
-                  {/* Voucher Ticket Notches */}
-                  <div
-                    aria-hidden
-                    className="absolute -left-2.5 top-1/2 -translate-y-1/2 size-4 rounded-full bg-background border-r border-berry/40"
-                  />
-                  <div
-                    aria-hidden
-                    className="absolute -right-2.5 top-1/2 -translate-y-1/2 size-4 rounded-full bg-background border-l border-berry/40"
-                  />
+                  <div aria-hidden className="absolute -left-2.5 top-1/2 -translate-y-1/2 size-4 rounded-full bg-background border-r border-berry/40" />
+                  <div aria-hidden className="absolute -right-2.5 top-1/2 -translate-y-1/2 size-4 rounded-full bg-background border-l border-berry/40" />
 
                   <div>
                     <div className="flex items-center justify-between gap-2">
@@ -98,7 +103,6 @@ function Offers() {
                           : `₹${promo.discount_value} OFF`}
                       </span>
                     </div>
-
                     <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
                       {promo.description ||
                         (promo.min_order_amount > 0
@@ -109,32 +113,45 @@ function Offers() {
 
                   <div className="mt-3.5 flex items-center justify-between border-t border-dashed border-border/70 pt-2.5">
                     <span className="text-[10px] font-medium text-muted-foreground/80">
-                      Exp: {new Date(promo.expires_at).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                      })}
+                      Exp: {new Date(promo.expires_at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(promo.code)}
-                      className={`flex items-center gap-1 h-7 rounded-full px-3 text-[11px] font-semibold transition-all duration-200 cursor-pointer active:scale-95 ${
-                        isCopied
-                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold"
-                          : "bg-berry/10 text-berry hover:bg-berry hover:text-berry-foreground shadow-2xs"
-                      }`}
-                    >
-                      {isCopied ? (
-                        <>
-                          <Check className="size-3 text-emerald-500" />
-                          <span>Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="size-3" />
-                          <span>Copy code</span>
-                        </>
-                      )}
-                    </button>
+
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(promo.code)}
+                        className={`flex items-center gap-1 h-7 rounded-full px-3 text-[11px] font-semibold transition-all duration-200 cursor-pointer active:scale-95 ${
+                          isCopied
+                            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold"
+                            : "bg-berry/10 text-berry hover:bg-berry hover:text-berry-foreground shadow-2xs"
+                        }`}
+                      >
+                        {isCopied ? (
+                          <><Check className="size-3 text-emerald-500" /><span>Copied!</span></>
+                        ) : (
+                          <><Copy className="size-3" /><span>Copy code</span></>
+                        )}
+                      </button>
+
+                      {/* Confetti dots */}
+                      {isConfetti && CONFETTI_ANGLES.map((angle, i) => {
+                        const rad = (angle * Math.PI) / 180;
+                        const dist = 28 + (i % 3) * 10;
+                        const x = Math.round(Math.cos(rad) * dist);
+                        const y = Math.round(Math.sin(rad) * dist);
+                        const colorClass = CONFETTI_COLORS[i % CONFETTI_COLORS.length]!;
+                        return (
+                          <span
+                            key={angle}
+                            className={`absolute top-1/2 left-1/2 size-2 rounded-full animate-confetti-fly ${colorClass} bg-current pointer-events-none`}
+                            style={{
+                              "--confetti-end": `translate(${x}px, ${y}px)`,
+                              "--confetti-spin": `${angle * 2}deg`,
+                            } as React.CSSProperties}
+                          />
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               );
@@ -143,16 +160,14 @@ function Offers() {
         </section>
       )}
 
-      {/* 3. Discounted Products Grid (Proportional 2 cols on mobile, 3 on tablet, 4 on desktop) */}
+      {/* 3. Discounted Products Grid */}
       <section className="mt-8 sm:mt-12">
         <div className="flex items-center justify-between gap-2 mb-4">
           <h2 className="font-display text-lg sm:text-2xl font-bold text-cocoa">
             This week&apos;s bakes on discount
           </h2>
           <Button asChild variant="ghost" size="sm" className="text-xs font-semibold text-berry hover:text-berry/80">
-            <Link to="/shop">
-              Full counter <ArrowRight className="ml-1 size-3" />
-            </Link>
+            <Link to="/shop">Full counter <ArrowRight className="ml-1 size-3" /></Link>
           </Button>
         </div>
 
@@ -177,7 +192,6 @@ function Offers() {
           </div>
         )}
       </section>
-
     </div>
   );
 }

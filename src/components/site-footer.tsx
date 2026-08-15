@@ -1,7 +1,17 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { NewsletterSignup } from "./newsletter-signup";
+import { Instagram, MessageCircle, Heart } from "lucide-react";
+import { useFlag, getSocialLinks, type SocialLinks } from "@/lib/feature-flags";
 
 export function SiteFooter() {
+  const showSocial = useFlag("ff_footer_instagram");
+  const [social, setSocial] = useState<SocialLinks>({ instagram: "", whatsapp: "" });
+
+  useEffect(() => {
+    setSocial(getSocialLinks());
+  }, []);
+
   return (
     <footer className="mt-16 sm:mt-20 relative">
       {/* Scalloped Pastry Crust Edge Top Divider */}
@@ -20,12 +30,6 @@ export function SiteFooter() {
 
       <div className="bg-secondary/40">
         <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
-          {/* 
-            Footer Grid Layout:
-            - Mobile (< 640px): 1 centered column with Newsletter only.
-            - Tablet (640px - 1024px, sm:): 2 columns (Brand Bio + Newsletter). "Browse" and "How ordering works" are hidden.
-            - Desktop (>= 1024px, lg:): All 4 columns (Brand, Browse, How ordering works, Newsletter).
-          */}
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 items-start">
             
             {/* 1. Brand Bio: Hidden on mobile (<640px), visible on tablet & desktop */}
@@ -34,9 +38,37 @@ export function SiteFooter() {
               <p className="mt-2 max-w-xs text-sm text-muted-foreground">
                 A small-batch neighbourhood bakery. Everything is baked the morning of your slot.
               </p>
+              
+              {/* Social Links */}
+              {showSocial && (
+                <div className="mt-4 flex items-center gap-2">
+                  {social.instagram && (
+                    <a
+                      href={social.instagram}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Instagram"
+                      className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-pink-400/60 hover:bg-pink-50 hover:text-pink-500 dark:hover:bg-pink-500/10"
+                    >
+                      <Instagram className="size-4" />
+                    </a>
+                  )}
+                  {social.whatsapp && (
+                    <a
+                      href={social.whatsapp}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="WhatsApp"
+                      className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-emerald-400/60 hover:bg-emerald-50 hover:text-emerald-500 dark:hover:bg-emerald-500/10"
+                    >
+                      <MessageCircle className="size-4" />
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* 2. Browse Links: Desktop only (hidden on mobile & tablet) */}
+            {/* 2. Browse Links: Desktop only */}
             <div className="hidden lg:block text-sm">
               <p className="font-semibold">Browse</p>
               <ul className="mt-3 space-y-2 text-muted-foreground">
@@ -46,7 +78,7 @@ export function SiteFooter() {
               </ul>
             </div>
 
-            {/* 3. How Ordering Works: Desktop only (hidden on mobile & tablet) */}
+            {/* 3. How Ordering Works: Desktop only */}
             <div className="hidden lg:block text-sm">
               <p className="font-semibold">How ordering works</p>
               <p className="mt-3 text-muted-foreground">
@@ -54,7 +86,7 @@ export function SiteFooter() {
               </p>
             </div>
 
-            {/* 4. Newsletter: Shown on all devices (single line on mobile) */}
+            {/* 4. Newsletter: Shown on all devices */}
             <div className="text-sm text-center sm:text-left mx-auto sm:mx-0 max-w-md w-full">
               {/* Single sentence for mobile */}
               <p className="text-xs font-semibold text-cocoa sm:hidden">
@@ -76,8 +108,13 @@ export function SiteFooter() {
         </div>
 
         {/* Trademark / Copyright Bar */}
-        <div className="border-t border-border/60 py-4 text-center text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Ani Bakes Bakery
+        <div className="border-t border-border/60 py-4 px-4">
+          <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span>© {new Date().getFullYear()} Ani Bakes Bakery</span>
+            <span className="flex items-center gap-1.5">
+              Baked with <Heart className="size-3 text-berry animate-pulse" /> in Pondicherry
+            </span>
+          </div>
         </div>
       </div>
     </footer>

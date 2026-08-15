@@ -15,6 +15,7 @@ import { CartProvider } from "../lib/cart";
 import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { Toaster } from "../components/ui/sonner";
+import { ScrollToTop } from "../components/scroll-to-top";
 
 /** Microsoft Clarity heatmaps/analytics — only injected once a project id is set. */
 function clarityScripts() {
@@ -160,6 +161,7 @@ function RootComponent() {
           <SiteFooter />
         </div>
         <Toaster position="bottom-center" />
+        <ScrollToTop />
       </CartProvider>
     </QueryClientProvider>
   );
