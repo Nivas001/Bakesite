@@ -388,8 +388,16 @@ function AdminDashboard() {
   });
 
   const filteredOrders = data.orders.filter((order) => {
-    if (orderStatusFilter !== "all" && order.status !== orderStatusFilter) {
-      return false;
+    if (orderStatusFilter !== "all") {
+      if (order.status !== orderStatusFilter) {
+        return false;
+      }
+    } else {
+      // When sorting by Delivery Date in "All Orders", exclude rejected (cancelled/refunded) orders
+      // so the baker's delivery queue is clean. (Rejected orders remain viewable under the "Rejected" tab).
+      if ((orderSortBy === "date_asc" || orderSortBy === "date_desc") && order.status === "rejected") {
+        return false;
+      }
     }
     if (orderSearchQuery.trim()) {
       const q = orderSearchQuery.toLowerCase();
