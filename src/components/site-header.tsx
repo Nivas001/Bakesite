@@ -1,6 +1,19 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Menu, ShoppingBag, User } from "lucide-react";
+import {
+  Menu,
+  ShoppingBag,
+  User,
+  Home,
+  Store,
+  Tag,
+  Package,
+  ShieldCheck,
+  LogIn,
+  LogOut,
+  ChevronRight,
+  Sparkles,
+} from "lucide-react";
 import { useAuth, signOutEverywhere } from "@/hooks/use-appwrite-auth";
 import { useCart } from "@/lib/cart";
 import { useIsAdmin } from "@/hooks/use-admin";
@@ -8,10 +21,10 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const NAV = [
-  { to: "/", label: "Home" },
-  { to: "/shop", label: "Shop" },
-  { to: "/offers", label: "Offers" },
-  { to: "/orders", label: "My orders" },
+  { to: "/", label: "Home", icon: Home, badge: null },
+  { to: "/shop", label: "Shop bakes", icon: Store, badge: null },
+  { to: "/offers", label: "Special offers", icon: Tag, badge: "Offers" },
+  { to: "/orders", label: "My orders", icon: Package, badge: null },
 ] as const;
 
 export function SiteHeader() {
@@ -34,6 +47,7 @@ export function SiteHeader() {
           <span className="ml-1 text-berry">.</span>
         </Link>
 
+        {/* Desktop Navigation */}
         <nav className="ml-6 hidden items-center gap-6 md:flex">
           {NAV.map((item) => (
             <Link
@@ -56,6 +70,7 @@ export function SiteHeader() {
           )}
         </nav>
 
+        {/* Action Buttons */}
         <div className="ml-auto flex items-center gap-2">
           <Button asChild variant="ghost" size="icon" aria-label="Cart">
             <Link to="/cart" className="relative">
@@ -85,44 +100,160 @@ export function SiteHeader() {
             </Button>
           )}
 
+          {/* Mobile Drawer */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-64">
-              <nav className="mt-10 flex flex-col gap-4">
-                {NAV.map((item) => (
+            <SheetContent side="right" className="flex flex-col justify-between w-72 sm:w-80 p-5 bg-background">
+              
+              {/* Drawer Top Header & Navigation */}
+              <div>
+                <div className="flex items-center gap-2 pb-5 mb-4 border-b border-border/60">
+                  <div className="flex size-8 items-center justify-center rounded-xl bg-berry/10 text-berry">
+                    <Sparkles className="size-4" />
+                  </div>
+                  <div>
+                    <p className="font-display text-base font-bold text-cocoa leading-tight">
+                      Ani Bakes<span className="text-berry">.</span>
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">Fresh small-batch bakery</p>
+                  </div>
+                </div>
+
+                <nav className="flex flex-col gap-1.5">
+                  {NAV.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setOpen(false)}
+                        className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-secondary/70 active:scale-[0.98]"
+                        activeProps={{ className: "bg-secondary font-semibold text-cocoa" }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex size-8 items-center justify-center rounded-xl bg-secondary/80 text-muted-foreground transition-colors group-hover:bg-berry group-hover:text-berry-foreground">
+                            <Icon className="size-4" />
+                          </div>
+                          <span className="text-sm font-medium text-foreground group-hover:text-berry transition-colors">
+                            {item.label}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          {item.badge && (
+                            <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[9px] font-bold text-berry">
+                              {item.badge}
+                            </span>
+                          )}
+                          <ChevronRight className="size-4 text-muted-foreground/40 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+                        </div>
+                      </Link>
+                    );
+                  })}
+
+                  {/* Cart quick link inside drawer */}
                   <Link
-                    key={item.to}
-                    to={item.to}
+                    to="/cart"
                     onClick={() => setOpen(false)}
-                    className="text-base font-medium text-foreground"
+                    className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-secondary/70 active:scale-[0.98]"
+                    activeProps={{ className: "bg-secondary font-semibold text-cocoa" }}
                   >
-                    {item.label}
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-8 items-center justify-center rounded-xl bg-secondary/80 text-muted-foreground transition-colors group-hover:bg-berry group-hover:text-berry-foreground">
+                        <ShoppingBag className="size-4" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground group-hover:text-berry transition-colors">
+                        Cart
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {count > 0 && (
+                        <span className="rounded-full bg-berry px-2 py-0.5 text-[10px] font-bold text-berry-foreground">
+                          {count}
+                        </span>
+                      )}
+                      <ChevronRight className="size-4 text-muted-foreground/40 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+                    </div>
                   </Link>
-                ))}
-                {isAdmin && (
-                  <Link to="/admin" onClick={() => setOpen(false)} className="text-base font-medium text-berry">
-                    Admin
-                  </Link>
-                )}
-                {session ? (
-                  <>
-                    <Link to="/profile" onClick={() => setOpen(false)} className="text-base font-medium">
-                      Account
+
+                  {/* Admin link if authorized */}
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setOpen(false)}
+                      className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-berry/10 active:scale-[0.98]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex size-8 items-center justify-center rounded-xl bg-berry/15 text-berry">
+                          <ShieldCheck className="size-4" />
+                        </div>
+                        <span className="text-sm font-semibold text-berry">
+                          Admin Portal
+                        </span>
+                      </div>
+                      <ChevronRight className="size-4 text-berry/50 group-hover:translate-x-0.5 transition-all" />
                     </Link>
-                    <button onClick={signOut} className="text-left text-base font-medium text-berry">
-                      Sign out
+                  )}
+                </nav>
+              </div>
+
+              {/* Drawer Bottom: Highlighted Sign In / Account Section */}
+              <div className="pt-4 border-t border-border/60">
+                {session ? (
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      to="/profile"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-3 shadow-2xs transition-all hover:border-berry/50 hover:bg-secondary/40 active:scale-[0.98]"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-berry/15 text-berry font-bold text-xs">
+                          {session.name ? session.name.slice(0, 2).toUpperCase() : <User className="size-4" />}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-foreground truncate">
+                            {session.name || "My Account"}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground truncate">
+                            {session.email}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="size-4 text-muted-foreground shrink-0" />
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        signOut();
+                        setOpen(false);
+                      }}
+                      className="flex items-center justify-center gap-2 w-full rounded-xl py-2 text-xs font-medium text-muted-foreground hover:text-berry transition-colors cursor-pointer"
+                    >
+                      <LogOut className="size-3.5" />
+                      <span>Sign out</span>
                     </button>
-                  </>
+                  </div>
                 ) : (
-                  <Link to="/auth" search={{ redirect: undefined }} onClick={() => setOpen(false)} className="text-base font-medium text-berry">
-                    Sign in
-                  </Link>
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      to="/auth"
+                      search={{ redirect: undefined }}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center justify-center gap-2 w-full rounded-2xl bg-berry px-4 py-3 text-sm font-bold text-berry-foreground shadow-soft transition-all duration-200 hover:bg-berry/90 hover:shadow-lift active:scale-95"
+                    >
+                      <LogIn className="size-4" />
+                      <span>Sign in to Ani Bakes</span>
+                    </Link>
+                    <p className="text-center text-[10px] text-muted-foreground">
+                      Sign in for saved addresses & order tracking
+                    </p>
+                  </div>
                 )}
-              </nav>
+              </div>
+
             </SheetContent>
           </Sheet>
         </div>
