@@ -7,7 +7,8 @@ import { getCatalog } from "@/lib/catalog.functions";
 import { getPublicOfferCodes } from "@/lib/offers.functions";
 import { ProductCard } from "@/components/product-card";
 import { hasDiscount } from "@/lib/pricing";
-import { Tag, Copy, Check, Sparkles } from "lucide-react";
+import { Tag, Copy, Check, Sparkles, ShoppingBag, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCatalog() });
 
@@ -47,47 +48,68 @@ function Offers() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-12">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-4xl font-bold text-cocoa">Special offers & coupons</h1>
-          <p className="mt-3 max-w-xl text-muted-foreground">
-            A rotating handful of bakes at a friendlier price, plus exclusive checkout coupon codes.
-          </p>
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
+      
+      {/* 1. Offers Hero Header */}
+      <div className="flex flex-col gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.16em] text-berry">
+            <Sparkles className="size-3" /> Special Offers & Coupons
+          </span>
         </div>
+        <h1 className="font-display text-2xl sm:text-4xl font-bold text-cocoa leading-tight">
+          Special offers & coupons
+        </h1>
+        <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
+          A rotating handful of fresh morning bakes at a friendlier price, plus exclusive checkout coupon codes.
+        </p>
       </div>
 
-      {/* Promo Codes Spotlight Carousel / Cards */}
+      {/* 2. Collectible Bakery Ticket Coupons (Swipeable on Mobile, 3-Cols on Desktop) */}
       {promoCodes && promoCodes.length > 0 && (
-        <section className="mt-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="h-5 w-5 text-berry" />
-            <h2 className="font-display text-xl font-semibold text-cocoa">Active promo codes</h2>
+        <section className="mt-6 sm:mt-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3 sm:mb-4">
+            <div className="flex items-center gap-2">
+              <Tag className="size-4 text-berry" />
+              <h2 className="font-display text-sm sm:text-lg font-bold text-cocoa">Active Bakery Coupons</h2>
+            </div>
+            <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+              <span>💡</span> Tap <span className="font-medium text-foreground">Copy code</span> to apply during checkout
+            </span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+          {/* Ticket Vouchers Track */}
+          <div className="flex gap-3 overflow-x-auto no-scrollbar snap-x pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
             {promoCodes.map((promo) => {
               const isCopied = copiedCode === promo.code;
               return (
                 <div
                   key={promo.id ?? promo.code}
-                  className="group relative flex flex-col justify-between rounded-3xl border border-berry/30 bg-card p-5 shadow-soft transition-all hover:border-berry/60 hover:shadow-lift"
+                  className="w-[82%] xs:w-[72%] shrink-0 snap-start sm:w-auto relative flex flex-col justify-between overflow-hidden rounded-2xl border border-dashed border-berry/40 bg-card/95 p-3.5 sm:p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-berry hover:shadow-lift"
                 >
+                  {/* Voucher Ticket Notches */}
+                  <div
+                    aria-hidden
+                    className="absolute -left-2.5 top-1/2 -translate-y-1/2 size-4 rounded-full bg-background border-r border-berry/40"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute -right-2.5 top-1/2 -translate-y-1/2 size-4 rounded-full bg-background border-l border-berry/40"
+                  />
+
                   <div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Tag className="h-4 w-4 text-berry" />
-                        <span className="font-mono text-base font-extrabold text-foreground tracking-wider">
-                          {promo.code}
-                        </span>
-                      </div>
-                      <span className="rounded-full bg-berry/10 px-2.5 py-0.5 text-xs font-bold text-berry">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs sm:text-sm font-black text-cocoa tracking-wider bg-secondary/80 px-2.5 py-1 rounded-lg border border-border/60">
+                        {promo.code}
+                      </span>
+                      <span className="rounded-full bg-berry px-2.5 py-0.5 text-[10px] sm:text-xs font-bold text-berry-foreground shadow-2xs">
                         {promo.discount_type === "percent"
                           ? `${promo.discount_value}% OFF`
                           : `₹${promo.discount_value} OFF`}
                       </span>
                     </div>
 
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
                       {promo.description ||
                         (promo.min_order_amount > 0
                           ? `Valid on orders above ₹${promo.min_order_amount}`
@@ -95,9 +117,9 @@ function Offers() {
                     </p>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between border-t border-border/70 pt-3">
-                    <span className="text-[11px] text-muted-foreground">
-                      Expires: {new Date(promo.expires_at).toLocaleDateString("en-IN", {
+                  <div className="mt-3.5 flex items-center justify-between border-t border-dashed border-border/70 pt-2.5">
+                    <span className="text-[10px] font-medium text-muted-foreground/80">
+                      Exp: {new Date(promo.expires_at).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",
                       })}
@@ -105,15 +127,21 @@ function Offers() {
                     <button
                       type="button"
                       onClick={() => handleCopy(promo.code)}
-                      className="flex items-center gap-1.5 rounded-xl bg-secondary/80 px-3 py-1.5 text-xs font-semibold text-secondary-foreground transition-all hover:bg-berry hover:text-berry-foreground cursor-pointer"
+                      className={`flex items-center gap-1 h-7 rounded-full px-3 text-[11px] font-semibold transition-all duration-200 cursor-pointer active:scale-95 ${
+                        isCopied
+                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold"
+                          : "bg-berry/10 text-berry hover:bg-berry hover:text-berry-foreground shadow-2xs"
+                      }`}
                     >
                       {isCopied ? (
                         <>
-                          <Check className="h-3.5 w-3.5 text-emerald-500" /> Copied
+                          <Check className="size-3 text-emerald-500" />
+                          <span>Copied!</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="h-3.5 w-3.5" /> Copy code
+                          <Copy className="size-3" />
+                          <span>Copy code</span>
                         </>
                       )}
                     </button>
@@ -125,25 +153,41 @@ function Offers() {
         </section>
       )}
 
-      {/* Discounted Product Grid */}
-      <section className="mt-12">
-        <h2 className="font-display text-2xl font-semibold text-cocoa">This week&apos;s bakes on discount</h2>
-        {offers.length === 0 ? (
-          <p className="mt-6 text-muted-foreground">
-            No discounted bakes right now —{" "}
-            <Link to="/shop" className="text-berry hover:underline">
-              browse the full counter
+      {/* 3. Discounted Products Grid (Proportional 2 cols on mobile, 3 on tablet, 4 on desktop) */}
+      <section className="mt-8 sm:mt-12">
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <h2 className="font-display text-lg sm:text-2xl font-bold text-cocoa">
+            This week&apos;s bakes on discount
+          </h2>
+          <Button asChild variant="ghost" size="sm" className="text-xs font-semibold text-berry hover:text-berry/80">
+            <Link to="/shop">
+              Full counter <ArrowRight className="ml-1 size-3" />
             </Link>
-            .
-          </p>
+          </Button>
+        </div>
+
+        {offers.length === 0 ? (
+          <div className="glass-panel flex flex-col items-center justify-center rounded-2xl p-8 text-center border border-border/70">
+            <div className="flex size-12 items-center justify-center rounded-2xl bg-secondary text-berry mb-3">
+              <ShoppingBag className="size-6" />
+            </div>
+            <p className="font-display text-base font-semibold text-cocoa">All bakes currently at regular price</p>
+            <p className="mt-1 text-xs text-muted-foreground max-w-sm">
+              Use any of the active coupons above at checkout to save on your fresh order!
+            </p>
+            <Button asChild size="sm" className="mt-4 rounded-xl bg-berry text-berry-foreground">
+              <Link to="/shop">Browse the Bakery Counter</Link>
+            </Button>
+          </div>
         ) : (
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 lg:gap-6">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
             {offers.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}
       </section>
+
     </div>
   );
 }
