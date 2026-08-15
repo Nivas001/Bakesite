@@ -107,24 +107,24 @@ export function FeaturedProducts({ products }: { products: CatalogProduct[] }) {
 
   return (
     <div className="relative mt-6 sm:mt-10">
-      <div className="pointer-events-none absolute -top-14 right-0 hidden gap-2 sm:flex">
+      <div className="pointer-events-none absolute -top-13 sm:-top-14 right-0 hidden items-center gap-1.5 sm:gap-2 sm:flex">
         <button
           type="button"
           aria-label="Previous products"
           onClick={() => scrollToIndex(Math.max(0, active - 1))}
-          className="glass-soft pointer-events-auto grid size-10 sm:size-11 place-items-center rounded-full text-cocoa shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift active:scale-95 disabled:opacity-40 cursor-pointer"
+          className="glass-soft pointer-events-auto grid size-8.5 sm:size-9.5 place-items-center rounded-full text-cocoa shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift active:scale-95 disabled:opacity-35 cursor-pointer"
           disabled={active === 0}
         >
-          <ChevronLeft className="size-5" />
+          <ChevronLeft className="size-4 sm:size-4.5" />
         </button>
         <button
           type="button"
           aria-label="Next products"
           onClick={() => scrollToIndex(Math.min(products.length - 1, active + 1))}
-          className="glass-soft pointer-events-auto grid size-10 sm:size-11 place-items-center rounded-full text-cocoa shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift active:scale-95 disabled:opacity-40 cursor-pointer"
+          className="glass-soft pointer-events-auto grid size-8.5 sm:size-9.5 place-items-center rounded-full text-cocoa shadow-soft transition hover:-translate-y-0.5 hover:shadow-lift active:scale-95 disabled:opacity-35 cursor-pointer"
           disabled={active === products.length - 1}
         >
-          <ChevronRight className="size-5" />
+          <ChevronRight className="size-4 sm:size-4.5" />
         </button>
       </div>
 

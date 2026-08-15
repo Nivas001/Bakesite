@@ -253,12 +253,15 @@ function Home() {
               Baked at dawn, boxed for your chosen slot.
             </p>
           </div>
-          <Link
-            to="/shop"
-            className="story-link shrink-0 text-xs font-semibold uppercase tracking-wider text-berry hover:underline"
-          >
-            View all →
-          </Link>
+          <div className="flex items-center gap-3 shrink-0 sm:mr-24">
+            <Link
+              to="/shop"
+              className="story-link text-xs font-semibold uppercase tracking-wider text-berry hover:underline flex items-center gap-1"
+            >
+              <span>View all</span>
+              <ArrowRight className="size-3" />
+            </Link>
+          </div>
         </div>
         <FeaturedProducts products={featured} />
       </section>
