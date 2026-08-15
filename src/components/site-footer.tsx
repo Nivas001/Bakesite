@@ -54,13 +54,20 @@ export function SiteFooter() {
               </p>
             </div>
 
-            {/* 4. Newsletter: Shown on all devices */}
+            {/* 4. Newsletter: Shown on all devices (single line on mobile) */}
             <div className="text-sm text-center sm:text-left mx-auto sm:mx-0 max-w-md w-full">
-              <p className="font-semibold text-cocoa sm:text-foreground">Fresh bakes newsletter</p>
-              <p className="mt-1.5 text-xs text-muted-foreground">
+              {/* Single sentence for mobile */}
+              <p className="text-xs font-semibold text-cocoa sm:hidden">
+                Join our newsletter for fresh bake specials & offers
+              </p>
+
+              {/* Standard 2-line layout for tablet and desktop */}
+              <p className="hidden sm:block font-semibold text-cocoa">Fresh bakes newsletter</p>
+              <p className="hidden sm:block mt-1.5 text-xs text-muted-foreground">
                 New bakes, seasonal specials and offers — about once a month.
               </p>
-              <div className="mt-3 flex justify-center sm:justify-start">
+
+              <div className="mt-2.5 sm:mt-3 flex justify-center sm:justify-start">
                 <NewsletterSignup />
               </div>
             </div>
