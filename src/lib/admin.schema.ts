@@ -47,9 +47,17 @@ export const blackoutSchema = z.object({
   reason: z.string().trim().max(200).optional(),
 });
 
+export const CAMPAIGN_TYPES = ["announcement", "weekly_special", "promotion"] as const;
+
 export const campaignSchema = z.object({
   subject: z.string().trim().min(3, "Add a subject").max(160),
   body: z.string().trim().min(10, "Write a little more").max(5000),
+  campaign_type: z.enum(CAMPAIGN_TYPES).default("announcement").optional(),
+  cta_label: z.string().trim().max(60).optional().nullable(),
+  cta_url: z.string().trim().max(300).optional().nullable(),
+  attachment_b64: z.string().optional().nullable(),
+  attachment_name: z.string().trim().max(120).optional().nullable(),
+  attachment_mime: z.string().trim().max(80).optional().nullable(),
 });
 
 export const subscribeSchema = z.object({

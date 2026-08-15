@@ -2,11 +2,18 @@
  * Sends transactional emails via Resend (https://resend.com)
  * Free 3,000 emails/month — NO CREDIT CARD REQUIRED.
  */
+export type EmailAttachment = {
+  filename: string;
+  content: string;
+  content_type?: string | undefined;
+};
+
 export async function sendEmail(input: {
   to: string | null;
   subject: string;
-  text?: string;
-  html?: string;
+  text?: string | undefined;
+  html?: string | undefined;
+  attachments?: EmailAttachment[] | undefined;
 }): Promise<void> {
   const apiKey = process.env["RESEND_API_KEY"];
   const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
@@ -35,36 +42,37 @@ export async function sendEmail(input: {
       </div>`
         : undefined);
 
+    const payload: Record<string, unknown> = {
+      from: senderEmail,
+      to: [input.to],
+      subject: input.subject,
+      text: input.text,
+      html: formattedHtml,
+    };
+
+    if (input.attachments && input.attachments.length > 0) {
+      payload["attachments"] = input.attachments;
+    }
+
     let response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from: senderEmail,
-        to: [input.to],
-        subject: input.subject,
-        text: input.text,
-        html: formattedHtml,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok && !senderEmail.includes("onboarding@resend.dev")) {
       // Retry with sandbox sender if custom domain has temporary propagation delay
+      payload["from"] = `${bakeryName} <onboarding@resend.dev>`;
       response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          from: `${bakeryName} <onboarding@resend.dev>`,
-          to: [input.to],
-          subject: input.subject,
-          text: input.text,
-          html: formattedHtml,
-        }),
+        body: JSON.stringify(payload),
       });
     }
 

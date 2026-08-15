@@ -35,6 +35,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { DevPanel } from "@/components/dev-panel";
+import { AdminNewsletter } from "@/components/admin-newsletter";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -291,8 +292,6 @@ function AdminDashboard() {
   const [offerForm, setOfferForm] = useState<OfferCodeForm>(EMPTY_OFFER_FORM);
   const [blackoutDate, setBlackoutDate] = useState("");
   const [blackoutReason, setBlackoutReason] = useState("");
-  const [subject, setSubject] = useState("");
-  const [bodyText, setBodyText] = useState("");
 
   // Postpone / Reschedule Dialog state
   const [reschedulingOrder, setReschedulingOrder] = useState<any>(null);
@@ -1355,65 +1354,17 @@ function AdminDashboard() {
           ))}
         </TabsContent>
 
-        <TabsContent value="newsletter" className="mt-6 grid gap-8 lg:grid-cols-[1fr_340px]">
-          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-            <h2 className="font-display text-xl font-semibold">Compose a newsletter</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Sends to {data.subscribers.filter((s) => s.is_subscribed).length} subscriber
-              {data.subscribers.filter((s) => s.is_subscribed).length === 1 ? "" : "s"} through Mailgun.
-            </p>
-            <div className="mt-4 space-y-3">
-              <div>
-                <Label htmlFor="n-subject">Subject</Label>
-                <Input id="n-subject" value={subject} onChange={(e) => setSubject(e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="n-body">Message</Label>
-                <Textarea
-                  id="n-body"
-                  rows={10}
-                  value={bodyText}
-                  onChange={(e) => setBodyText(e.target.value)}
-                />
-              </div>
-              <Button
-                className="bg-berry text-berry-foreground hover:bg-berry/90"
-                onClick={() =>
-                  run(async () => {
-                    await sendNewsletterFn({ data: { subject, body: bodyText } });
-                    setSubject("");
-                    setBodyText("");
-                  }, "Newsletter sent")
-                }
-              >
-                Send newsletter
-              </Button>
-            </div>
-
-            {data.campaigns.length > 0 && (
-              <div className="mt-8">
-                <h3 className="font-semibold">Recently sent</h3>
-                <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
-                  {data.campaigns.map((campaign) => (
-                    <li key={campaign.id}>
-                      {new Date(campaign.sent_at).toLocaleDateString()} · {campaign.subject} —{" "}
-                      {campaign.recipients} recipients
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
-          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-            <h2 className="font-display text-xl font-semibold">Subscribers</h2>
-            <ul className="mt-3 max-h-[420px] space-y-1 overflow-auto text-sm text-muted-foreground">
-              {data.subscribers.length === 0 && <li>No subscribers yet.</li>}
-              {data.subscribers.map((subscriber) => (
-                <li key={subscriber.id}>{subscriber.email}</li>
-              ))}
-            </ul>
-          </div>
+        <TabsContent value="newsletter" className="mt-6">
+          <AdminNewsletter
+            subscribers={data.subscribers}
+            campaigns={data.campaigns}
+            onSend={async (campaignData) => {
+              await run(
+                () => sendNewsletterFn({ data: campaignData }),
+                "Newsletter campaign dispatched successfully!"
+              );
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-6 space-y-6">

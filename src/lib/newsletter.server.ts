@@ -7,8 +7,9 @@ import {
   listDocs,
   updateDoc,
 } from "@/integrations/appwrite/admin.server";
-import { sendEmail } from "./notifications-impl.server";
+import { sendEmail, type EmailAttachment } from "./notifications-impl.server";
 import { campaignSchema, subscribeSchema } from "./admin.schema";
+import { buildNewsletterHtml } from "./newsletter-template";
 
 export { campaignSchema, subscribeSchema };
 
@@ -65,8 +66,25 @@ export async function sendCampaign(userId: string, input: z.infer<typeof campaig
     Q.limit(500),
   ]);
 
+  const html = buildNewsletterHtml(input);
+
+  const attachments: EmailAttachment[] = [];
+  if (input.attachment_b64 && input.attachment_name) {
+    attachments.push({
+      filename: input.attachment_name,
+      content: input.attachment_b64,
+      content_type: input.attachment_mime || "application/octet-stream",
+    });
+  }
+
   for (const subscriber of recipients) {
-    await sendEmail({ to: subscriber.email, subject: input.subject, text: input.body });
+    await sendEmail({
+      to: subscriber.email,
+      subject: input.subject,
+      text: input.body,
+      html,
+      attachments: attachments.length > 0 ? attachments : undefined,
+    });
   }
 
   await createDoc(COLLECTIONS.newsletterCampaigns, {
