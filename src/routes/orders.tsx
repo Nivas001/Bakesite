@@ -278,18 +278,13 @@ function OrdersPage() {
       
       {/* Header: Clean & Compact */}
       <div className="flex items-center justify-between gap-3 mb-6">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-berry/10 border border-berry/20 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-berry">
-              <Sparkles className="size-3" /> Live Kitchen Tracker
-            </span>
-            <span className="text-xs text-muted-foreground font-medium">
-              ({orders.length} {orders.length === 1 ? "order" : "orders"})
-            </span>
-          </div>
-          <h1 className="mt-1 font-display text-2xl sm:text-3xl font-bold text-cocoa leading-tight">
+        <div className="flex items-baseline gap-2">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-cocoa leading-tight">
             Your orders
           </h1>
+          <span className="text-xs sm:text-sm text-muted-foreground font-semibold">
+            ({orders.length} {orders.length === 1 ? "order" : "orders"})
+          </span>
         </div>
 
         <Button asChild variant="outline" size="sm" className="rounded-xl font-semibold text-xs h-8 px-3 border-border bg-card/80">
