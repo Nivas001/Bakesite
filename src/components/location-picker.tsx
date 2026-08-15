@@ -8,6 +8,7 @@ interface Props {
   longitude: number | null;
   onChange: (lat: number, lng: number) => void;
   readonly?: boolean;
+  className?: string;
 }
 
 const DEFAULT_CENTER: [number, number] = [12.9716, 77.5946];
@@ -19,7 +20,7 @@ const markerIcon = L.divIcon({
   iconAnchor: [9, 9],
 });
 
-export default function LocationPicker({ latitude, longitude, onChange, readonly }: Props) {
+export default function LocationPicker({ latitude, longitude, onChange, readonly, className }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -62,35 +63,45 @@ export default function LocationPicker({ latitude, longitude, onChange, readonly
     return () => {
       map.remove();
       mapRef.current = null;
-      markerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readonly]);
 
   useEffect(() => {
-    if (mapRef.current && latitude != null && longitude != null) {
-      const start: [number, number] = [latitude, longitude];
+    if (!mapRef.current) return;
+    if (latitude != null && longitude != null) {
+      const pos: [number, number] = [latitude, longitude];
       if (markerRef.current) {
-        markerRef.current.setLatLng(start);
+        markerRef.current.setLatLng(pos);
       } else {
-        markerRef.current = L.marker(start, { icon: markerIcon }).addTo(mapRef.current);
+        markerRef.current = L.marker(pos, { icon: markerIcon }).addTo(mapRef.current);
       }
-      mapRef.current.setView(start, 16);
+    } else if (markerRef.current) {
+      markerRef.current.remove();
+      markerRef.current = null;
     }
   }, [latitude, longitude]);
 
   function locateMe() {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+      (pos) => {
+        setLocating(false);
+        const { latitude: lat, longitude: lng } = pos.coords;
         onChangeRef.current(Number(lat.toFixed(6)), Number(lng.toFixed(6)));
-        setLocating(false);
+        if (mapRef.current) {
+          mapRef.current.setView([lat, lng], 16);
+          if (markerRef.current) markerRef.current.setLatLng([lat, lng]);
+          else markerRef.current = L.marker([lat, lng], { icon: markerIcon }).addTo(mapRef.current);
+        }
       },
-      () => {
+      (err) => {
         setLocating(false);
+        alert(err.message || "Could not retrieve your location");
       },
       { enableHighAccuracy: true }
     );
@@ -100,7 +111,7 @@ export default function LocationPicker({ latitude, longitude, onChange, readonly
     <div className="relative">
       <div
         ref={containerRef}
-        className="h-64 w-full overflow-hidden rounded-2xl border border-border"
+        className={`w-full overflow-hidden rounded-2xl border border-border ${className ?? "h-64"}`}
         aria-label="Pick your delivery location on the map"
       />
       {!readonly && (
