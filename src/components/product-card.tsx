@@ -64,12 +64,12 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
         </div>
         <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
 
-        {/* Bottom Action: Small & Compact Boutique Stepper */}
-        <div className="mt-auto pt-2 flex items-center justify-center">
+        {/* Bottom Action: Aligned to Full Right */}
+        <div className="mt-auto pt-2 flex items-center justify-end">
           {quantityInCart === 0 ? (
             <button
               type="button"
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full bg-berry px-4 text-xs font-semibold text-berry-foreground shadow-xs transition-all duration-200 hover:scale-105 hover:bg-berry/90 active:scale-95 cursor-pointer"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full bg-berry px-4 text-xs font-semibold text-berry-foreground shadow-xs transition-all duration-200 hover:scale-105 hover:bg-berry/90 active:scale-95 cursor-pointer ml-auto"
               onClick={() => {
                 add({
                   productId: product.id,
@@ -86,7 +86,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
               <span>Add to cart</span>
             </button>
           ) : (
-            <div className="inline-flex h-8 items-center gap-2 rounded-full bg-secondary/80 px-1.5 py-0.5 border border-border/70 shadow-2xs">
+            <div className="inline-flex h-8 items-center gap-2 rounded-full bg-secondary/80 px-1.5 py-0.5 border border-border/70 shadow-2xs ml-auto">
               <button
                 type="button"
                 aria-label={`Decrease ${product.name} quantity`}
