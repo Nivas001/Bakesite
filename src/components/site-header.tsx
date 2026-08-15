@@ -22,9 +22,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home, badge: null },
-  { to: "/shop", label: "Shop bakes", icon: Store, badge: null },
-  { to: "/offers", label: "Special offers", icon: Tag, badge: "Offers" },
-  { to: "/orders", label: "My orders", icon: Package, badge: null },
+  { to: "/shop", label: "Shop", icon: Store, badge: null },
+  { to: "/offers", label: "Offers", icon: Tag, badge: "Deals" },
+  { to: "/orders", label: "Orders", icon: Package, badge: null },
 ] as const;
 
 export function SiteHeader() {
@@ -41,20 +41,20 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4">
-        <Link to="/" className="font-display text-xl font-bold tracking-tight text-cocoa">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-2 sm:gap-4 px-3.5 sm:px-4">
+        <Link to="/" className="font-display text-lg sm:text-xl font-bold tracking-tight text-cocoa shrink-0">
           Ani Bakes
-          <span className="ml-1 text-berry">.</span>
+          <span className="ml-0.5 text-berry">.</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="ml-6 hidden items-center gap-6 md:flex">
+        {/* Desktop & Tablet Navigation */}
+        <nav className="ml-2 sm:ml-4 lg:ml-7 hidden items-center gap-3 sm:gap-4 lg:gap-6 md:flex">
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="relative text-sm font-medium text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-cocoa after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100"
-              activeProps={{ className: "text-foreground after:scale-x-100" }}
+              className="relative text-xs lg:text-sm font-medium text-muted-foreground whitespace-nowrap transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-cocoa after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100"
+              activeProps={{ className: "text-foreground after:scale-x-100 font-semibold" }}
             >
               {item.label}
             </Link>
@@ -62,7 +62,7 @@ export function SiteHeader() {
           {isAdmin && (
             <Link
               to="/admin"
-              className="relative text-sm font-medium text-berry transition-colors hover:text-berry/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-berry after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100"
+              className="relative text-xs lg:text-sm font-bold text-berry whitespace-nowrap transition-colors hover:text-berry/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-berry after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100"
               activeProps={{ className: "after:scale-x-100" }}
             >
               Admin
@@ -71,10 +71,10 @@ export function SiteHeader() {
         </nav>
 
         {/* Action Buttons */}
-        <div className="ml-auto flex items-center gap-2">
-          <Button asChild variant="ghost" size="icon" aria-label="Cart">
+        <div className="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <Button asChild variant="ghost" size="icon" aria-label="Cart" className="size-9 sm:size-10">
             <Link to="/cart" className="relative">
-              <ShoppingBag className="size-5" />
+              <ShoppingBag className="size-4.5 sm:size-5" />
               {count > 0 && (
                 <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-berry text-[10px] font-semibold text-berry-foreground">
                   {count}
@@ -84,18 +84,18 @@ export function SiteHeader() {
           </Button>
 
           {session ? (
-            <div className="hidden items-center gap-2 sm:flex">
-              <Button asChild variant="ghost" size="sm">
+            <div className="hidden items-center gap-1.5 sm:gap-2 sm:flex">
+              <Button asChild variant="ghost" size="sm" className="h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap">
                 <Link to="/profile">
-                  <User className="mr-1 size-4" /> Account
+                  <User className="mr-1 size-3.5 sm:size-4" /> Account
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" onClick={signOut}>
+              <Button variant="outline" size="sm" onClick={signOut} className="h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap">
                 Sign out
               </Button>
             </div>
           ) : (
-            <Button asChild size="sm" className="hidden bg-berry text-berry-foreground hover:bg-berry/90 sm:inline-flex">
+            <Button asChild size="sm" className="hidden bg-berry text-berry-foreground hover:bg-berry/90 sm:inline-flex h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm whitespace-nowrap">
               <Link to="/auth" search={{ redirect: undefined }}>Sign in</Link>
             </Button>
           )}
