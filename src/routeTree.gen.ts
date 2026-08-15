@@ -19,6 +19,7 @@ import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
@@ -73,6 +74,11 @@ const ShopRoute = ShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/verify': typeof VerifyRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/verify': typeof VerifyRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/verify': typeof VerifyRoute
   '/product/$slug': typeof ProductSlugRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/shop'
+    | '/unsubscribe'
     | '/verify'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/shop'
+    | '/unsubscribe'
     | '/verify'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/reset-password'
     | '/shop'
+    | '/unsubscribe'
     | '/verify'
     | '/product/$slug'
     | '/api/public/razorpay-webhook'
@@ -195,6 +207,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ShopRoute: typeof ShopRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   VerifyRoute: typeof VerifyRoute
   ProductSlugRoute: typeof ProductSlugRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verify': {
       id: '/verify'
       path: '/verify'
@@ -307,6 +327,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ShopRoute: ShopRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   VerifyRoute: VerifyRoute,
   ProductSlugRoute: ProductSlugRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,

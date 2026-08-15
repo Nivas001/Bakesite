@@ -32,6 +32,20 @@ export async function addSubscriber(input: z.infer<typeof subscribeSchema>) {
   return { ok: true as const };
 }
 
+export async function removeSubscriber(email: string) {
+  const cleanEmail = email.toLowerCase().trim();
+  const existing = await findDoc<SubscriberDoc>(COLLECTIONS.newsletterSubscribers, [
+    Q.equal("email", cleanEmail),
+  ]);
+  if (existing) {
+    await updateDoc(COLLECTIONS.newsletterSubscribers, existing.$id, {
+      email: cleanEmail,
+      is_subscribed: false,
+    });
+  }
+  return { ok: true as const };
+}
+
 export async function fetchSubscribers() {
   const docs = await listDocs<SubscriberDoc>(COLLECTIONS.newsletterSubscribers, [
     Q.orderDesc("$createdAt"),

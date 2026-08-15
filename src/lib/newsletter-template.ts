@@ -334,16 +334,24 @@ export function buildNewsletterHtml(input: NewsletterTemplateInput): string {
 
           <!-- Footer -->
           <tr>
-            <td style="background-color: #f7ede3; padding: 24px 28px; text-align: center; border-top: 1px solid #edd9cd;">
-              <p class="serif-heading" style="margin: 0 0 6px; font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; font-size: 15px; font-weight: 600; color: #43281c;">
+            <td style="background-color: #f7ede3; padding: 26px 28px 24px; text-align: center; border-top: 1px solid #edd9cd;">
+              <p class="serif-heading" style="margin: 0 0 4px; font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 700; color: #43281c;">
                 Ani Bakes Bakery
               </p>
-              <p style="margin: 0 0 12px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 11px; line-height: 1.5; color: #876c5f;">
+              <p style="margin: 0 0 14px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 11px; line-height: 1.5; color: #876c5f;">
                 Everything is baked fresh the morning of your chosen slot · Pondicherry, India
               </p>
-              <p style="margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 10px; color: #aa9387;">
-                You are receiving this email because you subscribed to our fresh bakes newsletter at Ani Bakes.
-              </p>
+              
+              <!-- Cool Bakery Unsubscribe Box -->
+              <div style="background-color: #efe2d6; border-radius: 14px; padding: 12px 16px; margin-top: 4px; display: inline-block; max-width: 440px;">
+                <p style="margin: 0 0 4px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 11px; line-height: 1.5; color: #6e4e40; font-weight: 500;">
+                  Too full on pastries or watching your sugar? 🧁<br />
+                  You can <a href="https://anibakes.app/unsubscribe" target="_blank" style="color: #c94a29; font-weight: 700; text-decoration: underline;">take a sweet break &amp; unsubscribe</a> anytime.
+                </p>
+                <p style="margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 10px; color: #9c8072; font-style: italic;">
+                  Our ovens will still be warm whenever you crave that fresh bake aroma again. 🥐
+                </p>
+              </div>
             </td>
           </tr>
 
