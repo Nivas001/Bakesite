@@ -52,11 +52,6 @@ function Offers() {
       
       {/* 1. Offers Hero Header */}
       <div className="flex flex-col gap-1.5 sm:gap-2">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.16em] text-berry">
-            <Sparkles className="size-3" /> Special Offers & Coupons
-          </span>
-        </div>
         <h1 className="font-display text-2xl sm:text-4xl font-bold text-cocoa leading-tight">
           Special offers & coupons
         </h1>
