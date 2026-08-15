@@ -1358,6 +1358,7 @@ function AdminDashboard() {
           <AdminNewsletter
             subscribers={data.subscribers}
             campaigns={data.campaigns}
+            products={data.products}
             onSend={async (campaignData) => {
               await run(
                 () => sendNewsletterFn({ data: campaignData }),

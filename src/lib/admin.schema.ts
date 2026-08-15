@@ -58,6 +58,15 @@ export const campaignSchema = z.object({
   attachment_b64: z.string().optional().nullable(),
   attachment_name: z.string().trim().max(120).optional().nullable(),
   attachment_mime: z.string().trim().max(80).optional().nullable(),
+
+  // Featured Bake / Cake Showcase
+  showcase_enabled: z.boolean().default(false).optional(),
+  showcase_image: z.string().trim().max(800).optional().nullable(),
+  showcase_title: z.string().trim().max(160).optional().nullable(),
+  showcase_tag: z.string().trim().max(60).optional().nullable(),
+  showcase_description: z.string().trim().max(600).optional().nullable(),
+  showcase_layout: z.enum(["side_by_side", "stacked"]).default("side_by_side").optional(),
+  showcase_link: z.string().trim().max(300).optional().nullable(),
 });
 
 export const subscribeSchema = z.object({

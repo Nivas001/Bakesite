@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { formatCurrency } from "@/lib/pricing";
 import {
   Send,
   Eye,
@@ -17,10 +18,11 @@ import {
   FileText,
   Smartphone,
   Monitor,
-  CheckCircle2,
   Sparkles,
   Link as LinkIcon,
-  HelpCircle,
+  Cake,
+  LayoutGrid,
+  Rows3,
 } from "lucide-react";
 
 type Subscriber = {
@@ -39,9 +41,19 @@ type Campaign = {
   sent_at: string;
 };
 
+type ProductOption = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  price: number;
+  image_url: string | null;
+};
+
 type Props = {
   subscribers: Subscriber[];
   campaigns: Campaign[];
+  products?: ProductOption[];
   onSend: (data: {
     subject: string;
     body: string;
@@ -51,16 +63,32 @@ type Props = {
     attachment_b64?: string | null;
     attachment_name?: string | null;
     attachment_mime?: string | null;
+    showcase_enabled?: boolean;
+    showcase_image?: string | null;
+    showcase_title?: string | null;
+    showcase_tag?: string | null;
+    showcase_description?: string | null;
+    showcase_layout?: "side_by_side" | "stacked";
+    showcase_link?: string | null;
   }) => Promise<void>;
 };
 
-export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
+export function AdminNewsletter({ subscribers, campaigns, products = [], onSend }: Props) {
   const [campaignType, setCampaignType] = useState<"announcement" | "weekly_special" | "promotion">("announcement");
   const [subject, setSubject] = useState<string>(CAMPAIGN_PRESETS.announcement.defaultSubject);
   const [bodyText, setBodyText] = useState<string>(CAMPAIGN_PRESETS.announcement.defaultBody);
   const [ctaLabel, setCtaLabel] = useState<string>(CAMPAIGN_PRESETS.announcement.defaultCtaLabel);
   const [ctaUrl, setCtaUrl] = useState<string>(CAMPAIGN_PRESETS.announcement.defaultCtaUrl);
   const [enableCta, setEnableCta] = useState(true);
+
+  // Showcase state (Introducing a new cake / featured bake)
+  const [showcaseEnabled, setShowcaseEnabled] = useState(false);
+  const [showcaseImage, setShowcaseImage] = useState("");
+  const [showcaseTitle, setShowcaseTitle] = useState("");
+  const [showcaseTag, setShowcaseTag] = useState("New Launch · Fresh Bake");
+  const [showcaseDesc, setShowcaseDesc] = useState("");
+  const [showcaseLayout, setShowcaseLayout] = useState<"side_by_side" | "stacked">("side_by_side");
+  const [showcaseLink, setShowcaseLink] = useState("https://bakesite.vercel.app/shop");
 
   // Attachment state
   const [attachmentB64, setAttachmentB64] = useState<string | null>(null);
@@ -84,6 +112,18 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
     setCtaUrl(preset.defaultCtaUrl);
   }
 
+  function handleSelectProduct(productId: string) {
+    const p = products.find((prod) => prod.id === productId);
+    if (!p) return;
+    setShowcaseEnabled(true);
+    setShowcaseTitle(p.name);
+    setShowcaseTag(`${formatCurrency(Number(p.price))} · Fresh Bake`);
+    setShowcaseDesc(p.description || "Baked with pure butter and premium ingredients the morning of your chosen slot.");
+    setShowcaseImage(p.image_url || "/products/croissant.jpg");
+    setShowcaseLink(`https://bakesite.vercel.app/product/${p.slug}`);
+    toast.success(`Loaded "${p.name}" into showcase!`);
+  }
+
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -96,7 +136,6 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Extract pure base64 without data:mime;base64, prefix
       const commaIndex = result.indexOf(",");
       const b64 = commaIndex !== -1 ? result.slice(commaIndex + 1) : result;
 
@@ -104,6 +143,12 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
       setAttachmentName(file.name);
       setAttachmentMime(file.type || "application/octet-stream");
       setAttachmentSize(file.size);
+
+      // If user enabled showcase and has no image, also populate showcase image
+      if (file.type.startsWith("image/") && (!showcaseImage || !showcaseEnabled)) {
+        setShowcaseImage(`data:${file.type};base64,${b64}`);
+      }
+
       toast.success(`Attached ${file.name}`);
     };
     reader.onerror = () => {
@@ -131,6 +176,13 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
       attachment_b64: attachmentB64,
       attachment_name: attachmentName,
       attachment_mime: attachmentMime,
+      showcase_enabled: showcaseEnabled,
+      showcase_image: showcaseImage,
+      showcase_title: showcaseTitle,
+      showcase_tag: showcaseTag,
+      showcase_description: showcaseDesc,
+      showcase_layout: showcaseLayout,
+      showcase_link: showcaseLink,
     };
     return buildNewsletterHtml(input);
   }, [
@@ -143,6 +195,13 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
     attachmentB64,
     attachmentName,
     attachmentMime,
+    showcaseEnabled,
+    showcaseImage,
+    showcaseTitle,
+    showcaseTag,
+    showcaseDesc,
+    showcaseLayout,
+    showcaseLink,
   ]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -172,12 +231,19 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
         attachment_b64: attachmentB64,
         attachment_name: attachmentName,
         attachment_mime: attachmentMime,
+        showcase_enabled: showcaseEnabled,
+        showcase_image: showcaseEnabled ? showcaseImage.trim() : null,
+        showcase_title: showcaseEnabled ? showcaseTitle.trim() : null,
+        showcase_tag: showcaseEnabled ? showcaseTag.trim() : null,
+        showcase_description: showcaseEnabled ? showcaseDesc.trim() : null,
+        showcase_layout: showcaseLayout,
+        showcase_link: showcaseEnabled ? showcaseLink.trim() : null,
       });
 
       toast.success(`Newsletter dispatched to ${activeSubscribers.length} subscriber(s)!`);
-      // Reset form to default preset
       handleSelectType("announcement");
       handleRemoveAttachment();
+      setShowcaseEnabled(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to send newsletter");
     } finally {
@@ -190,7 +256,7 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
       {/* 2-Column Responsive Layout: Compose on Left, Live Preview on Right */}
       <div className="grid gap-8 lg:grid-cols-12 items-start">
         
-        {/* Left Form: Compose Card (7 cols) */}
+        {/* Left Form: Compose Card (6 cols) */}
         <div className="lg:col-span-6 xl:col-span-6 rounded-3xl border border-border/70 bg-card p-5 sm:p-6 shadow-soft space-y-6">
           
           <div>
@@ -201,7 +267,7 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
               </span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Branded email formatted in Playfair Display & Inter with custom Ani Bakes header, footer, and attachment support.
+              Branded email formatted in Playfair Display & Inter with custom Ani Bakes header, footer, product showcase, and attachment support.
             </p>
           </div>
 
@@ -247,7 +313,7 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
                 id="camp-subject"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="e.g. Fresh Morning Loaves & Pastry Specials This Weekend"
+                placeholder="e.g. Introducing Our Signature Strawberry Velvet Layer Cake"
                 required
                 maxLength={160}
                 className="h-10 rounded-xl text-xs font-medium"
@@ -264,22 +330,179 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
               </div>
               <Textarea
                 id="camp-body"
-                rows={8}
+                rows={6}
                 value={bodyText}
                 onChange={(e) => setBodyText(e.target.value)}
-                placeholder="Write your email announcement or menu details here..."
+                placeholder="Write your email introduction or announcement here..."
                 required
                 className="rounded-xl text-xs leading-relaxed resize-y"
               />
             </div>
 
-            {/* 4. Call-to-Action (CTA) Button */}
+            {/* 4. Featured Cake / Bake Showcase Block */}
+            <div className="rounded-2xl border border-berry/30 bg-berry/5 p-3.5 sm:p-4 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Cake className="size-4 text-berry" />
+                  <div>
+                    <Label htmlFor="enable-showcase" className="text-xs font-bold text-cocoa cursor-pointer">
+                      Feature a Cake / Bake in this Email
+                    </Label>
+                    <p className="text-[10px] text-muted-foreground">
+                      Showcase a photo with title, price/badge, and details on the right or below
+                    </p>
+                  </div>
+                </div>
+                <input
+                  id="enable-showcase"
+                  type="checkbox"
+                  checked={showcaseEnabled}
+                  onChange={(e) => setShowcaseEnabled(e.target.checked)}
+                  className="size-4.5 accent-berry rounded cursor-pointer"
+                />
+              </div>
+
+              {showcaseEnabled && (
+                <div className="space-y-3 pt-2 border-t border-berry/20">
+                  {/* Quick-fill from bakery products */}
+                  {products.length > 0 && (
+                    <div>
+                      <Label className="text-[11px] font-semibold text-cocoa block mb-1">
+                        ✨ Quick-Fill From Existing Products:
+                      </Label>
+                      <select
+                        defaultValue=""
+                        onChange={(e) => {
+                          if (e.target.value) handleSelectProduct(e.target.value);
+                        }}
+                        className="h-8.5 w-full rounded-xl border border-border/80 bg-card px-2.5 text-xs text-foreground cursor-pointer focus:ring-1 focus:ring-berry"
+                      >
+                        <option value="" disabled>
+                          -- Pick a bakery cake / product to auto-fill --
+                        </option>
+                        {products.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.name} ({formatCurrency(Number(p.price))})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Layout Option: Side-by-side vs Stacked */}
+                  <div>
+                    <Label className="text-[11px] font-semibold text-cocoa block mb-1.5">
+                      Showcase Photo Layout:
+                    </Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowcaseLayout("side_by_side")}
+                        className={`flex items-center justify-center gap-1.5 p-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                          showcaseLayout === "side_by_side"
+                            ? "border-berry bg-card text-berry shadow-2xs"
+                            : "border-border/60 bg-secondary/30 text-muted-foreground hover:bg-secondary/60"
+                        }`}
+                      >
+                        <LayoutGrid className="size-3.5" />
+                        <span>Side by Side (Details Right)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowcaseLayout("stacked")}
+                        className={`flex items-center justify-center gap-1.5 p-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                          showcaseLayout === "stacked"
+                            ? "border-berry bg-card text-berry shadow-2xs"
+                            : "border-border/60 bg-secondary/30 text-muted-foreground hover:bg-secondary/60"
+                        }`}
+                      >
+                        <Rows3 className="size-3.5" />
+                        <span>Stacked (Details Down)</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Title & Tag */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                      <Label htmlFor="sc-title" className="text-[11px] text-muted-foreground block mb-1">
+                        Cake / Bake Name
+                      </Label>
+                      <Input
+                        id="sc-title"
+                        value={showcaseTitle}
+                        onChange={(e) => setShowcaseTitle(e.target.value)}
+                        placeholder="e.g. Raspberry Basque Cheesecake"
+                        className="h-8 rounded-lg text-xs"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="sc-tag" className="text-[11px] text-muted-foreground block mb-1">
+                        Price / Badge Tag
+                      </Label>
+                      <Input
+                        id="sc-tag"
+                        value={showcaseTag}
+                        onChange={(e) => setShowcaseTag(e.target.value)}
+                        placeholder="e.g. ₹650 · New Launch"
+                        className="h-8 rounded-lg text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Photo URL */}
+                  <div>
+                    <Label htmlFor="sc-img" className="text-[11px] text-muted-foreground block mb-1">
+                      Cake Photo URL (or /products/filename.jpg)
+                    </Label>
+                    <Input
+                      id="sc-img"
+                      value={showcaseImage}
+                      onChange={(e) => setShowcaseImage(e.target.value)}
+                      placeholder="https://... or /products/croissant.jpg"
+                      className="h-8 rounded-lg text-xs font-mono"
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <Label htmlFor="sc-desc" className="text-[11px] text-muted-foreground block mb-1">
+                      Cake Description & Flavor Notes
+                    </Label>
+                    <Textarea
+                      id="sc-desc"
+                      rows={2}
+                      value={showcaseDesc}
+                      onChange={(e) => setShowcaseDesc(e.target.value)}
+                      placeholder="e.g. Three layers of fluffy vanilla sponge infused with fresh local farm strawberries and cream cheese frosting."
+                      className="rounded-lg text-xs resize-none"
+                    />
+                  </div>
+
+                  {/* Link URL */}
+                  <div>
+                    <Label htmlFor="sc-link" className="text-[11px] text-muted-foreground block mb-1">
+                      Order Link URL
+                    </Label>
+                    <Input
+                      id="sc-link"
+                      value={showcaseLink}
+                      onChange={(e) => setShowcaseLink(e.target.value)}
+                      placeholder="https://bakesite.vercel.app/shop"
+                      className="h-8 rounded-lg text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 5. Call-to-Action (CTA) Button */}
             <div className="rounded-2xl border border-border/60 bg-secondary/20 p-3.5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <LinkIcon className="size-3.5 text-berry" />
                   <Label htmlFor="enable-cta" className="text-xs font-semibold cursor-pointer">
-                    Include Action Button (CTA)
+                    Include Bottom Action Button (CTA)
                   </Label>
                 </div>
                 <input
@@ -321,7 +544,7 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
               )}
             </div>
 
-            {/* 5. Attachment Section */}
+            {/* 6. Attachment Section */}
             <div className="rounded-2xl border border-border/60 bg-secondary/20 p-3.5 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -440,7 +663,7 @@ export function AdminNewsletter({ subscribers, campaigns, onSend }: Props) {
               className={`transition-all duration-300 overflow-hidden rounded-2xl shadow-lift border border-border/80 bg-white ${
                 previewDevice === "mobile" ? "w-[360px]" : "w-full"
               }`}
-              style={{ height: "620px" }}
+              style={{ height: "660px" }}
             >
               <iframe
                 title="Email Campaign Preview"
