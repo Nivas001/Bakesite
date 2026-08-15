@@ -64,12 +64,12 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
         </div>
         <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
 
-        {/* Bottom Action: Add or Quantity Stepper */}
-        <div className="mt-auto pt-2">
+        {/* Bottom Action: Small & Compact Boutique Stepper */}
+        <div className="mt-auto pt-2 flex items-center justify-center">
           {quantityInCart === 0 ? (
-            <Button
-              size="sm"
-              className="h-9 w-full rounded-xl bg-berry text-berry-foreground text-xs font-medium shadow-xs transition-all duration-200 hover:scale-[1.01] hover:bg-berry/90 active:scale-98 flex items-center justify-center gap-1.5 cursor-pointer"
+            <button
+              type="button"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-full bg-berry px-4 text-xs font-semibold text-berry-foreground shadow-xs transition-all duration-200 hover:scale-105 hover:bg-berry/90 active:scale-95 cursor-pointer"
               onClick={() => {
                 add({
                   productId: product.id,
@@ -84,13 +84,13 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
             >
               <Plus className="size-3.5" />
               <span>Add to cart</span>
-            </Button>
+            </button>
           ) : (
-            <div className="flex h-9 w-full items-center justify-between rounded-xl bg-secondary/50 p-1 border border-border/60 shadow-2xs">
+            <div className="inline-flex h-8 items-center gap-2 rounded-full bg-secondary/80 px-1.5 py-0.5 border border-border/70 shadow-2xs">
               <button
                 type="button"
                 aria-label={`Decrease ${product.name} quantity`}
-                className="flex size-7 items-center justify-center rounded-lg bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer"
+                className="flex size-6 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer"
                 onClick={() => {
                   setQuantity(product.id, quantityInCart - 1);
                   if (quantityInCart - 1 === 0) {
@@ -101,17 +101,18 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
                 <Minus className="size-3" />
               </button>
 
-              <div className="flex items-center gap-1.5 px-2">
+              <div className="flex items-center gap-1 px-1">
                 <ShoppingBag className="size-3 text-berry" />
-                <span className="text-xs font-semibold text-cocoa tabular-nums">
-                  {quantityInCart} in cart
+                <span className="text-xs font-bold text-cocoa tabular-nums">
+                  {quantityInCart}
                 </span>
+                <span className="text-[11px] font-medium text-muted-foreground">in cart</span>
               </div>
 
               <button
                 type="button"
                 aria-label={`Increase ${product.name} quantity`}
-                className="flex size-7 items-center justify-center rounded-lg bg-berry text-berry-foreground transition-all hover:bg-berry/90 active:scale-90 shadow-2xs cursor-pointer"
+                className="flex size-6 items-center justify-center rounded-full bg-berry text-berry-foreground transition-all hover:bg-berry/90 active:scale-90 shadow-2xs cursor-pointer"
                 onClick={() => {
                   setQuantity(product.id, Math.min(30, quantityInCart + 1));
                 }}
