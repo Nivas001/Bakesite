@@ -229,11 +229,17 @@ const SOCIAL_LS_KEY = "anibakes_social_links";
 export type SocialLinks = {
   instagram: string;
   whatsapp: string;
+  email: string;
+  facebook: string;
+  x: string;
 };
 
 const DEFAULT_SOCIAL: SocialLinks = {
   instagram: "https://www.instagram.com/aniiibakes_.__",
   whatsapp: "",
+  email: "orders@anibakes.app",
+  facebook: "",
+  x: "",
 };
 
 export function getSocialLinks(): SocialLinks {

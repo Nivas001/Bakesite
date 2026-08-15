@@ -10,7 +10,17 @@ import {
   useFeatureFlags,
   useSocialLinks,
 } from "@/lib/feature-flags";
-import { Settings2, RotateCcw, Instagram, MessageCircle, ChevronDown, ChevronUp, Save } from "lucide-react";
+import {
+  Settings2,
+  RotateCcw,
+  Instagram,
+  MessageCircle,
+  Mail,
+  Facebook,
+  ChevronDown,
+  ChevronUp,
+  Save,
+} from "lucide-react";
 
 const CATEGORIES: FlagCategory[] = [
   "Animations",
@@ -37,10 +47,19 @@ export function DevPanel() {
 
   const [igInput, setIgInput] = useState(links.instagram);
   const [waInput, setWaInput] = useState(links.whatsapp);
+  const [emailInput, setEmailInput] = useState(links.email);
+  const [fbInput, setFbInput] = useState(links.facebook);
+  const [xInput, setXInput] = useState(links.x);
   const [socialSaved, setSocialSaved] = useState(false);
 
   function handleSaveSocial() {
-    save({ instagram: igInput.trim(), whatsapp: waInput.trim() });
+    save({
+      instagram: igInput.trim(),
+      whatsapp: waInput.trim(),
+      email: emailInput.trim(),
+      facebook: fbInput.trim(),
+      x: xInput.trim(),
+    });
     setSocialSaved(true);
     setTimeout(() => setSocialSaved(false), 2000);
   }
@@ -52,11 +71,11 @@ export function DevPanel() {
     ),
   }));
 
+  const total = Object.keys(FEATURE_FLAGS).length;
   const totalOn = Object.values(flags).filter(Boolean).length;
-  const total = Object.keys(flags).length;
 
   return (
-    <div className="mt-12 border-t border-border/60 pt-6">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-8 pt-4 border-t border-border/50">
       {/* Toggle Button */}
       <button
         type="button"
@@ -139,14 +158,14 @@ export function DevPanel() {
           {/* Social Links Editor */}
           <div className="border-t border-border/60 pt-4 space-y-3">
             <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              <span>🔗</span> Social Links
+              <span>🔗</span> Social &amp; Contact Links
             </p>
             <p className="text-[11px] text-muted-foreground">
-              These links appear in the site footer when the Instagram & Social Links flag is enabled.
+              These links appear in the site footer when the Instagram &amp; Social Links flag is enabled.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div className="space-y-1">
-                <Label htmlFor="dev-instagram" className="text-[11px] flex items-center gap-1.5">
+                <Label htmlFor="dev-instagram" className="text-[11px] flex items-center gap-1.5 font-semibold">
                   <Instagram className="size-3 text-pink-500" /> Instagram URL
                 </Label>
                 <Input
@@ -157,9 +176,10 @@ export function DevPanel() {
                   className="h-8 rounded-lg text-xs font-mono"
                 />
               </div>
+
               <div className="space-y-1">
-                <Label htmlFor="dev-whatsapp" className="text-[11px] flex items-center gap-1.5">
-                  <MessageCircle className="size-3 text-emerald-500" /> WhatsApp URL
+                <Label htmlFor="dev-whatsapp" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                  <MessageCircle className="size-3 text-emerald-500" /> WhatsApp URL / Number
                 </Label>
                 <Input
                   id="dev-whatsapp"
@@ -169,18 +189,59 @@ export function DevPanel() {
                   className="h-8 rounded-lg text-xs font-mono"
                 />
               </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="dev-email" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                  <Mail className="size-3 text-red-500" /> Gmail / Contact Email
+                </Label>
+                <Input
+                  id="dev-email"
+                  type="email"
+                  value={emailInput}
+                  onChange={(e) => setEmailInput(e.target.value)}
+                  placeholder="anibakesorders@gmail.com"
+                  className="h-8 rounded-lg text-xs font-mono"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="dev-facebook" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                  <Facebook className="size-3 text-blue-600" /> Facebook Page URL
+                </Label>
+                <Input
+                  id="dev-facebook"
+                  value={fbInput}
+                  onChange={(e) => setFbInput(e.target.value)}
+                  placeholder="https://facebook.com/yourpage"
+                  className="h-8 rounded-lg text-xs font-mono"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="dev-x" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                  <span className="text-xs font-bold leading-none">𝕏</span> X (Twitter) URL
+                </Label>
+                <Input
+                  id="dev-x"
+                  value={xInput}
+                  onChange={(e) => setXInput(e.target.value)}
+                  placeholder="https://x.com/yourhandle"
+                  className="h-8 rounded-lg text-xs font-mono"
+                />
+              </div>
             </div>
+
             <Button
               size="sm"
               onClick={handleSaveSocial}
-              className={`h-7 rounded-lg px-3 text-[11px] gap-1.5 transition-all ${
+              className={`h-7 rounded-lg px-3 text-[11px] gap-1.5 transition-all cursor-pointer ${
                 socialSaved
-                  ? "bg-emerald-500/15 text-emerald-700 border border-emerald-500/30"
+                  ? "bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 font-bold"
                   : "bg-berry text-berry-foreground hover:bg-berry/90"
               }`}
             >
               <Save className="size-3" />
-              {socialSaved ? "Saved!" : "Save social links"}
+              {socialSaved ? "Saved!" : "Save links"}
             </Button>
           </div>
         </div>

@@ -1,16 +1,97 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { NewsletterSignup } from "./newsletter-signup";
-import { Instagram, MessageCircle, Heart } from "lucide-react";
+import { Instagram, MessageCircle, Mail, Facebook, Heart } from "lucide-react";
 import { useFlag, getSocialLinks, type SocialLinks } from "@/lib/feature-flags";
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
 
 export function SiteFooter() {
   const showSocial = useFlag("ff_footer_instagram");
-  const [social, setSocial] = useState<SocialLinks>({ instagram: "", whatsapp: "" });
+  const [social, setSocial] = useState<SocialLinks>({
+    instagram: "",
+    whatsapp: "",
+    email: "",
+    facebook: "",
+    x: "",
+  });
 
   useEffect(() => {
     setSocial(getSocialLinks());
   }, []);
+
+  const socialLinksRow = (
+    <div className="flex flex-wrap items-center gap-2">
+      {social.instagram && (
+        <a
+          href={social.instagram}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Instagram"
+          title="Instagram"
+          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-pink-400/60 hover:bg-pink-50 hover:text-pink-500 dark:hover:bg-pink-500/10"
+        >
+          <Instagram className="size-4" />
+        </a>
+      )}
+      {social.whatsapp && (
+        <a
+          href={
+            social.whatsapp.startsWith("http")
+              ? social.whatsapp
+              : `https://wa.me/${social.whatsapp.replace(/\D/g, "")}`
+          }
+          target="_blank"
+          rel="noreferrer"
+          aria-label="WhatsApp"
+          title="WhatsApp"
+          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-emerald-400/60 hover:bg-emerald-50 hover:text-emerald-500 dark:hover:bg-emerald-500/10"
+        >
+          <MessageCircle className="size-4" />
+        </a>
+      )}
+      {social.email && (
+        <a
+          href={`mailto:${social.email}`}
+          aria-label="Gmail / Email Us"
+          title={`Email: ${social.email}`}
+          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-red-400/60 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
+        >
+          <Mail className="size-4" />
+        </a>
+      )}
+      {social.facebook && (
+        <a
+          href={social.facebook}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Facebook"
+          title="Facebook Page"
+          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-blue-500/60 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10"
+        >
+          <Facebook className="size-4" />
+        </a>
+      )}
+      {social.x && (
+        <a
+          href={social.x}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="X (Twitter)"
+          title="X (Twitter)"
+          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-foreground/60 hover:bg-foreground/10 hover:text-foreground"
+        >
+          <XIcon className="size-3.5" />
+        </a>
+      )}
+    </div>
+  );
 
   return (
     <footer className="mt-16 sm:mt-20 relative">
@@ -39,33 +120,8 @@ export function SiteFooter() {
                 A small-batch neighbourhood bakery. Everything is baked the morning of your slot.
               </p>
               
-              {/* Social Links */}
-              {showSocial && (
-                <div className="mt-4 flex items-center gap-2">
-                  {social.instagram && (
-                    <a
-                      href={social.instagram}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="Instagram"
-                      className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-pink-400/60 hover:bg-pink-50 hover:text-pink-500 dark:hover:bg-pink-500/10"
-                    >
-                      <Instagram className="size-4" />
-                    </a>
-                  )}
-                  {social.whatsapp && (
-                    <a
-                      href={social.whatsapp}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="WhatsApp"
-                      className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-emerald-400/60 hover:bg-emerald-50 hover:text-emerald-500 dark:hover:bg-emerald-500/10"
-                    >
-                      <MessageCircle className="size-4" />
-                    </a>
-                  )}
-                </div>
-              )}
+              {/* Social Links (Desktop) */}
+              {showSocial && <div className="mt-4">{socialLinksRow}</div>}
             </div>
 
             {/* 2. Browse Links: Desktop only */}
@@ -102,6 +158,13 @@ export function SiteFooter() {
               <div className="mt-2.5 sm:mt-3 flex justify-center sm:justify-start">
                 <NewsletterSignup />
               </div>
+
+              {/* Social Links (Mobile) */}
+              {showSocial && (
+                <div className="mt-5 flex justify-center sm:hidden">
+                  {socialLinksRow}
+                </div>
+              )}
             </div>
 
           </div>
