@@ -63,14 +63,9 @@ function Offers() {
       {/* 2. Collectible Bakery Ticket Coupons (Swipeable on Mobile, 3-Cols on Desktop) */}
       {promoCodes && promoCodes.length > 0 && (
         <section className="mt-6 sm:mt-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3 sm:mb-4">
-            <div className="flex items-center gap-2">
-              <Tag className="size-4 text-berry" />
-              <h2 className="font-display text-sm sm:text-lg font-bold text-cocoa">Active Bakery Coupons</h2>
-            </div>
-            <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-              <span>💡</span> Tap <span className="font-medium text-foreground">Copy code</span> to apply during checkout
-            </span>
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <Tag className="size-4 text-berry" />
+            <h2 className="font-display text-sm sm:text-lg font-bold text-cocoa">Active Bakery Coupons</h2>
           </div>
 
           {/* Ticket Vouchers Track */}
