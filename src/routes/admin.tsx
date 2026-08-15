@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { DevPanel } from "@/components/dev-panel";
 import { AdminNewsletter } from "@/components/admin-newsletter";
+import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -299,6 +300,10 @@ function AdminDashboard() {
   const [newSlotId, setNewSlotId] = useState(TIME_SLOTS[0]!.id);
   const [rescheduleReason, setRescheduleReason] = useState("");
   const [rescheduleBusy, setRescheduleBusy] = useState(false);
+
+  // Cancel / Refund Dialog state
+  const [cancellingOrder, setCancellingOrder] = useState<any>(null);
+  const [cancelBusy, setCancelBusy] = useState(false);
 
   const { data: offerCodes } = useQuery({
     queryKey: ["admin-offer-codes"],
@@ -732,88 +737,88 @@ function AdminDashboard() {
                     </div>
 
                     {/* Status Action Buttons */}
-                    <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-2 gap-2">
-                      {/* Confirm button */}
-                      <Button
-                        size="sm"
-                        disabled={order.status === "confirmed"}
-                        className={`h-8 text-xs font-semibold rounded-xl ${
-                          order.status === "confirmed"
-                            ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
-                            : "bg-emerald-600 text-white hover:bg-emerald-700"
-                        }`}
-                        onClick={() =>
-                          run(
-                            () => updateStatus({ data: { orderId: order.id, status: "confirmed" } }),
-                            "Order confirmed & customer emailed!",
-                          )
-                        }
-                      >
-                        {order.status === "confirmed" ? "✓ Confirmed" : "✅ Confirm"}
-                      </Button>
-
-                      {/* Postpone / Reschedule button */}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-8 text-xs font-semibold rounded-xl border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
-                        onClick={() => {
-                          setReschedulingOrder(order);
-                          setNewSlotDate(order.slot_date);
-                          const matchingSlot = TIME_SLOTS.find((s) => s.start === order.slot_start);
-                          setNewSlotId(matchingSlot ? matchingSlot.id : TIME_SLOTS[0]!.id);
-                          setRescheduleReason("");
-                        }}
-                      >
-                        🕒 Reschedule
-                      </Button>
-
-                      {/* Complete button */}
-                      <Button
-                        size="sm"
-                        disabled={
-                          order.status === "completed" ||
-                          (isFutureDelivery && !isAlreadyCompleted)
-                        }
-                        title={
-                          isFutureDelivery && !isAlreadyCompleted
-                            ? `Can only complete on or after delivery day (${order.slot_date})`
-                            : undefined
-                        }
-                        className={`h-8 text-xs font-semibold rounded-xl ${
-                          order.status === "completed"
-                            ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
-                            : isFutureDelivery && !isAlreadyCompleted
-                            ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
-                            : "bg-berry text-berry-foreground hover:bg-berry/90"
-                        }`}
-                        onClick={() =>
-                          run(
-                            () => updateStatus({ data: { orderId: order.id, status: "completed" } }),
-                            "Order completed!",
-                          )
-                        }
-                      >
-                        {isFutureDelivery && !isAlreadyCompleted ? `🔒 Due ${order.slot_date.slice(5)}` : "Completed"}
-                      </Button>
-
-                      {/* Reject / Refund button */}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-8 text-xs font-semibold rounded-xl text-destructive hover:bg-destructive/10 border-destructive/30"
-                        onClick={() => {
-                          if (confirm(`Are you sure you want to cancel & refund Order #${order.id.slice(0, 8)}?`)) {
+                    {order.status === "rejected" ? (
+                      <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-center p-2.5 rounded-2xl bg-destructive/10 border border-destructive/20 text-xs font-semibold text-destructive">
+                        <XCircle className="mr-1.5 size-4" />
+                        <span>Order Cancelled &amp; Refunded</span>
+                      </div>
+                    ) : order.status === "completed" ? (
+                      <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-center p-2.5 rounded-2xl bg-secondary/80 border border-border/60 text-xs font-semibold text-muted-foreground">
+                        <CheckCircle2 className="mr-1.5 size-4 text-emerald-600" />
+                        <span>Order Fulfilled &amp; Completed</span>
+                      </div>
+                    ) : (
+                      <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-2 gap-2">
+                        {/* Confirm button */}
+                        <Button
+                          size="sm"
+                          disabled={order.status === "confirmed"}
+                          className={`h-8 text-xs font-semibold rounded-xl ${
+                            order.status === "confirmed"
+                              ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
+                              : "bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer"
+                          }`}
+                          onClick={() =>
                             run(
-                              () => updateStatus({ data: { orderId: order.id, status: "rejected" } }),
-                              "Order cancelled and refund email sent.",
-                            );
+                              () => updateStatus({ data: { orderId: order.id, status: "confirmed" } }),
+                              "Order confirmed & customer emailed!",
+                            )
                           }
-                        }}
-                      >
-                        Cancel / Refund
-                      </Button>
-                    </div>
+                        >
+                          {order.status === "confirmed" ? "✓ Confirmed" : "✅ Confirm"}
+                        </Button>
+
+                        {/* Postpone / Reschedule button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 text-xs font-semibold rounded-xl border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10 cursor-pointer"
+                          onClick={() => {
+                            setReschedulingOrder(order);
+                            setNewSlotDate(order.slot_date);
+                            const matchingSlot = TIME_SLOTS.find((s) => s.start === order.slot_start);
+                            setNewSlotId(matchingSlot ? matchingSlot.id : TIME_SLOTS[0]!.id);
+                            setRescheduleReason("");
+                          }}
+                        >
+                          🕒 Reschedule
+                        </Button>
+
+                        {/* Complete button */}
+                        <Button
+                          size="sm"
+                          disabled={isFutureDelivery}
+                          title={
+                            isFutureDelivery
+                              ? `Can only complete on or after delivery day (${order.slot_date})`
+                              : undefined
+                          }
+                          className={`h-8 text-xs font-semibold rounded-xl ${
+                            isFutureDelivery
+                              ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
+                              : "bg-berry text-berry-foreground hover:bg-berry/90 cursor-pointer"
+                          }`}
+                          onClick={() =>
+                            run(
+                              () => updateStatus({ data: { orderId: order.id, status: "completed" } }),
+                              "Order completed!",
+                            )
+                          }
+                        >
+                          {isFutureDelivery ? `🔒 Due ${order.slot_date.slice(5)}` : "Completed"}
+                        </Button>
+
+                        {/* Reject / Refund button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 text-xs font-semibold rounded-xl text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer"
+                          onClick={() => setCancellingOrder(order)}
+                        >
+                          Cancel / Refund
+                        </Button>
+                      </div>
+                    )}
                   </article>
                 );
               })}
@@ -1974,6 +1979,84 @@ function AdminDashboard() {
               </DialogFooter>
             </form>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancellation / Refund Confirmation Modal */}
+      <Dialog
+        open={Boolean(cancellingOrder)}
+        onOpenChange={(open) => {
+          if (!open) setCancellingOrder(null);
+        }}
+      >
+        <DialogContent className="max-w-md rounded-3xl border border-border/80 bg-card p-6 shadow-lift">
+          <DialogHeader>
+            <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive border border-destructive/20 shadow-2xs">
+              <AlertTriangle className="size-6" />
+            </div>
+            <DialogTitle className="font-display text-xl sm:text-2xl font-bold text-center text-cocoa">
+              Cancel &amp; Refund Order?
+            </DialogTitle>
+            <DialogDescription className="text-center text-xs sm:text-sm text-muted-foreground mt-1.5">
+              Are you sure you want to cancel this order? This will release the baking slot and initiate a full customer refund.
+            </DialogDescription>
+          </DialogHeader>
+
+          {cancellingOrder && (
+            <div className="my-2 rounded-2xl bg-secondary/40 p-4 border border-border/60 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between font-semibold border-b border-border/50 pb-2">
+                <span className="text-cocoa font-bold text-sm">
+                  Order #{cancellingOrder.id.slice(0, 8)}
+                </span>
+                <span className="text-sm font-extrabold text-foreground">
+                  {formatCurrency(Number(cancellingOrder.total))}
+                </span>
+              </div>
+              <div className="space-y-1 text-muted-foreground">
+                <p>
+                  👤 <strong className="text-foreground">{cancellingOrder.contact_name ?? "Customer"}</strong> ({cancellingOrder.contact_phone})
+                </p>
+                <p>
+                  🕒 <strong>Slot:</strong> {cancellingOrder.slot_date} ({cancellingOrder.slot_start.slice(0, 5)} - {cancellingOrder.slot_end.slice(0, 5)})
+                </p>
+                <p className="line-clamp-2">
+                  📦 <strong>Items:</strong> {cancellingOrder.order_items.map((i: any) => `${i.quantity}× ${i.product_name}`).join(", ")}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl text-xs font-semibold h-10 w-full sm:w-auto cursor-pointer"
+              onClick={() => setCancellingOrder(null)}
+              disabled={cancelBusy}
+            >
+              Never mind, Keep Order
+            </Button>
+            <Button
+              type="button"
+              className="rounded-xl text-xs font-bold h-10 bg-destructive text-destructive-foreground hover:bg-destructive/90 w-full sm:w-auto shadow-soft cursor-pointer"
+              disabled={cancelBusy}
+              onClick={async () => {
+                if (!cancellingOrder) return;
+                setCancelBusy(true);
+                try {
+                  await run(
+                    () => updateStatus({ data: { orderId: cancellingOrder.id, status: "rejected" } }),
+                    "Order cancelled and refund email sent."
+                  );
+                  setCancellingOrder(null);
+                } finally {
+                  setCancelBusy(false);
+                }
+              }}
+            >
+              {cancelBusy ? "Processing Refund…" : "Yes, Cancel & Refund"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       <DevPanel />

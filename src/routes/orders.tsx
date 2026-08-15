@@ -139,12 +139,28 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
             </div>
           </div>
 
-          <span
-            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-bold shrink-0 ${config.badgeClass}`}
-          >
-            <StatusIcon className="size-3" />
-            <span>{config.label}</span>
-          </span>
+          {/* Status Badges */}
+          <div className="flex flex-wrap items-center gap-1.5 justify-end shrink-0">
+            {order.status === "rescheduled" || (order.status === "confirmed" && order.notes?.includes("Baker Note:")) ? (
+              <>
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-bold bg-purple-500/15 text-purple-800 dark:text-purple-300 border border-purple-500/30 shadow-2xs">
+                  <Clock className="size-3" />
+                  <span>Rescheduled</span>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 shadow-2xs">
+                  <CheckCircle2 className="size-3" />
+                  <span>Confirmed</span>
+                </span>
+              </>
+            ) : (
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-bold shrink-0 ${config.badgeClass}`}
+              >
+                <StatusIcon className="size-3" />
+                <span>{config.label}</span>
+              </span>
+            )}
+          </div>
         </div>
 
         {/* 2. Compact Baker Kitchen Notification Callout */}
