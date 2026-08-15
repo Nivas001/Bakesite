@@ -202,3 +202,65 @@ export async function updateUserName(userId: string, name: string): Promise<void
     console.warn(`Could not sync name to Appwrite Auth for user ${userId}:`, err);
   }
 }
+
+const STORAGE_BUCKET_ID = 'products';
+
+/** Ensures the storage bucket exists with public read permissions */
+export async function ensureStorageBucket(): Promise<string> {
+  try {
+    await request(`/storage/buckets/${STORAGE_BUCKET_ID}`);
+    return STORAGE_BUCKET_ID;
+  } catch {
+    try {
+      await request('/storage/buckets', {
+        method: 'POST',
+        body: {
+          bucketId: STORAGE_BUCKET_ID,
+          name: 'Bakery Products & Media',
+          permissions: ['read("any")'],
+          fileSecurity: false,
+          enabled: true,
+          maximumFileSize: 10 * 1024 * 1024,
+          allowedFileExtensions: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'],
+        },
+      });
+      return STORAGE_BUCKET_ID;
+    } catch {
+      return STORAGE_BUCKET_ID;
+    }
+  }
+}
+
+/** Uploads binary file to Appwrite Storage and returns public view URL */
+export async function uploadProductImage(input: {
+  filename: string;
+  base64: string;
+  mimeType: string;
+}): Promise<string> {
+  const bucket = await ensureStorageBucket();
+
+  const buffer = Buffer.from(input.base64, 'base64');
+  const blob = new Blob([buffer], { type: input.mimeType || 'image/jpeg' });
+
+  const formData = new FormData();
+  formData.append('fileId', 'unique()');
+  formData.append('file', blob, input.filename || 'product.jpg');
+  formData.append('permissions', JSON.stringify(['read("any")']));
+
+  const response = await fetch(`${endpoint()}/storage/buckets/${bucket}/files`, {
+    method: 'POST',
+    headers: {
+      'X-Appwrite-Project': env('APPWRITE_PROJECT_ID'),
+      'X-Appwrite-Key': env('APPWRITE_API_KEY'),
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to upload image to Appwrite Storage: ${errorText}`);
+  }
+
+  const file = (await response.json()) as { $id: string };
+  return `${endpoint()}/storage/buckets/${bucket}/files/${file.$id}/view?project=${env('APPWRITE_PROJECT_ID')}`;
+}

@@ -55,6 +55,25 @@ export const rescheduleOrderAdmin = createServerFn({ method: "POST" })
     return rescheduleOrder(data);
   });
 
+import { z } from "zod";
+
+const uploadProductImageSchema = z.object({
+  filename: z.string().trim().min(1).max(200),
+  base64: z.string().min(1),
+  mimeType: z.string().min(1).max(100),
+});
+
+export const uploadProductImageAdmin = createServerFn({ method: "POST" })
+  .middleware([requireAppwriteAuth])
+  .inputValidator((input: unknown) => uploadProductImageSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { uploadProductImage } = await import("@/integrations/appwrite/admin.server");
+    await assertAdmin(context.userId);
+    const imageUrl = await uploadProductImage(data);
+    return { imageUrl };
+  });
+
 export const saveProduct = createServerFn({ method: "POST" })
   .middleware([requireAppwriteAuth])
   .inputValidator((input: unknown) => productSchema.parse(input))

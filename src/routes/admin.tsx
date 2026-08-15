@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import {
   sendNewsletter,
   setOrderStatus,
   rescheduleOrderAdmin,
+  uploadProductImageAdmin,
 } from "@/lib/admin.functions";
 import {
   getAdminOfferCodes,
@@ -36,7 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { DevPanel } from "@/components/dev-panel";
 import { AdminNewsletter } from "@/components/admin-newsletter";
-import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, XCircle, Camera, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -288,11 +289,15 @@ function AdminDashboard() {
   const saveOfferCodeFn = useServerFn(saveAdminOfferCode);
   const removeOfferCodeFn = useServerFn(deleteAdminOfferCode);
   const rescheduleFn = useServerFn(rescheduleOrderAdmin);
+  const uploadImageFn = useServerFn(uploadProductImageAdmin);
 
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
   const [offerForm, setOfferForm] = useState<OfferCodeForm>(EMPTY_OFFER_FORM);
   const [blackoutDate, setBlackoutDate] = useState("");
   const [blackoutReason, setBlackoutReason] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [manualUrlMode, setManualUrlMode] = useState(false);
+  const productImageInputRef = useRef<HTMLInputElement>(null);
 
   // Postpone / Reschedule Dialog state
   const [reschedulingOrder, setReschedulingOrder] = useState<any>(null);
@@ -946,15 +951,149 @@ function AdminDashboard() {
                   ))}
                 </select>
               </div>
-              <div>
-                <Label htmlFor="p-img" className="text-xs font-semibold">Image URL</Label>
-                <Input
-                  id="p-img"
-                  value={form.image_url}
-                  placeholder="https://images.unsplash.com/..."
-                  className="rounded-xl h-9 text-xs mt-1"
-                  onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
-                />
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold text-foreground">
+                    Product Picture
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={() => setManualUrlMode(!manualUrlMode)}
+                    className="text-[10px] text-berry hover:underline font-semibold cursor-pointer"
+                  >
+                    {manualUrlMode ? "Switch to File Upload" : "Or enter manual URL"}
+                  </button>
+                </div>
+
+                {!manualUrlMode ? (
+                  <div>
+                    <input
+                      ref={productImageInputRef}
+                      type="file"
+                      id="product-image-file"
+                      accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+
+                        if (file.size > 10 * 1024 * 1024) {
+                          toast.error("Image file is too large. Max size is 10 MB.");
+                          return;
+                        }
+
+                        setUploadingImage(true);
+                        const reader = new FileReader();
+                        reader.onload = async () => {
+                          try {
+                            const result = reader.result as string;
+                            const commaIndex = result.indexOf(",");
+                            const base64 = commaIndex !== -1 ? result.slice(commaIndex + 1) : result;
+
+                            // Local preview
+                            setForm((f) => ({ ...f, image_url: result }));
+
+                            // Appwrite Storage upload
+                            const uploadRes = await uploadImageFn({
+                              data: {
+                                filename: file.name,
+                                base64,
+                                mimeType: file.type || "image/jpeg",
+                              },
+                            });
+
+                            if (uploadRes?.imageUrl) {
+                              setForm((f) => ({ ...f, image_url: uploadRes.imageUrl }));
+                              toast.success("Picture stored in Bakery Database!");
+                            }
+                          } catch (err) {
+                            toast.error(err instanceof Error ? err.message : "Failed to upload image");
+                          } finally {
+                            setUploadingImage(false);
+                          }
+                        };
+                        reader.onerror = () => {
+                          toast.error("Failed to read file");
+                          setUploadingImage(false);
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                      className="hidden"
+                    />
+
+                    {form.image_url ? (
+                      <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-card p-2.5 shadow-2xs">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <img
+                            src={form.image_url}
+                            alt="Product preview"
+                            className="size-12 rounded-xl object-cover border border-border/60 shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-cocoa truncate">
+                              {uploadingImage ? "Uploading to Storage…" : "Picture Attached"}
+                            </p>
+                            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold truncate">
+                              {uploadingImage ? "Transferring file…" : "✓ Stored in Bakery DB"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            disabled={uploadingImage}
+                            onClick={() => productImageInputRef.current?.click()}
+                            className="h-7 px-2 text-[10px] rounded-lg cursor-pointer"
+                          >
+                            Change
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            disabled={uploadingImage}
+                            onClick={() => {
+                              setForm((f) => ({ ...f, image_url: "" }));
+                              if (productImageInputRef.current) productImageInputRef.current.value = "";
+                            }}
+                            className="size-7 p-0 text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="product-image-file"
+                        className={`flex flex-col items-center justify-center p-4 border border-dashed border-border/80 hover:border-berry/60 bg-secondary/20 hover:bg-secondary/40 rounded-2xl cursor-pointer transition-all ${
+                          uploadingImage ? "opacity-60 pointer-events-none" : ""
+                        }`}
+                      >
+                        <div className="flex size-9 items-center justify-center rounded-xl bg-berry/10 text-berry mb-1.5 shadow-2xs">
+                          <Camera className="size-4" />
+                        </div>
+                        <span className="text-xs font-semibold text-foreground">
+                          {uploadingImage ? "Uploading picture…" : "Click or drop image to upload"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground mt-0.5">
+                          JPG, PNG, WebP up to 10MB · Automatically stored in DB
+                        </span>
+                      </label>
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <Input
+                      id="p-img"
+                      value={form.image_url}
+                      placeholder="https://... or /products/croissant.jpg"
+                      className="rounded-xl h-9 text-xs"
+                      onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
+                    />
+                  </div>
+                )}
               </div>
               <label className="flex items-center gap-2 text-xs font-medium cursor-pointer pt-1">
                 <input
