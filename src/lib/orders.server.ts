@@ -15,7 +15,7 @@ import {
 } from "@/integrations/appwrite/admin.server";
 import { finalPrice } from "./pricing";
 import type { ProductDoc } from "./catalog.server";
-import { TIME_SLOTS, toISODate } from "./slots";
+import { TIME_SLOTS, toISODate, isSlotAvailable } from "./slots";
 import { notifyAdminNewOrder, notifyCustomerOrderPlaced } from "./notifications.server";
 import { placeOrderSchema, profileSchema, type PlaceOrderInput } from "./orders.schema";
 
@@ -155,12 +155,10 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
   const slot = TIME_SLOTS.find((s) => s.id === input.slotId);
   if (!slot) throw new Error("Please pick a valid time slot.");
 
-  const today = new Date();
-  const earliest = toISODate(
-    new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1),
-  );
-  if (input.slotDate < earliest) {
-    throw new Error("Orders need at least one day of notice. Please pick a later date.");
+  if (!isSlotAvailable(input.slotDate, slot.start, 24)) {
+    throw new Error(
+      "Small-batch baking requires at least 24 hours advance notice. Please choose an available time slot.",
+    );
   }
 
   const blackout = await findDoc(COLLECTIONS.blackoutDates, [

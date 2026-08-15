@@ -10,7 +10,13 @@ import { checkOfferCode } from "@/lib/offers.functions";
 import { RequireAuth } from "@/components/require-auth";
 import { useCart } from "@/lib/cart";
 import { formatCurrency } from "@/lib/pricing";
-import { TIME_SLOTS, formatSlotDate, selectableDates } from "@/lib/slots";
+import {
+  TIME_SLOTS,
+  formatSlotDate,
+  selectableDates,
+  getAvailableSlotsForDate,
+  isSlotAvailable,
+} from "@/lib/slots";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -112,6 +118,15 @@ function CheckoutPage() {
     }
   }, [dates, slotDate]);
 
+  useEffect(() => {
+    if (slotDate) {
+      const available = getAvailableSlotsForDate(slotDate, 24);
+      if (available.length > 0 && !available.some((s) => s.id === slotId)) {
+        setSlotId(available[0]!.id);
+      }
+    }
+  }, [slotDate, slotId]);
+
   const hasValidPhone = Boolean(
     profile?.phone && profile.phone.replace(/\D/g, "").length >= 10,
   );
@@ -182,6 +197,13 @@ function CheckoutPage() {
       useAlternateContact && alternateName.trim() ? alternateName.trim() : profile.full_name;
     const finalContactPhone =
       useAlternateContact && alternatePhone.trim() ? alternatePhone.trim() : profile.phone;
+
+    const currentSelectedSlot = TIME_SLOTS.find((s) => s.id === slotId);
+    if (!currentSelectedSlot || !isSlotAvailable(slotDate, currentSelectedSlot.start, 24)) {
+      toast.error("Small-batch baking requires at least 24 hours advance notice. Please select an available slot.");
+      setBusy(false);
+      return;
+    }
 
     try {
       await submitOrder({
@@ -447,7 +469,35 @@ function CheckoutPage() {
                     period: slot.label,
                   };
                   const Icon = meta.icon;
-                  const isSelected = slotId === slot.id;
+                  const isAvailable = isSlotAvailable(slotDate, slot.start, 24);
+                  const isSelected = slotId === slot.id && isAvailable;
+
+                  if (!isAvailable) {
+                    return (
+                      <div
+                        key={slot.id}
+                        className="relative flex flex-col justify-between overflow-hidden rounded-2xl border border-dashed border-border/70 bg-muted/20 p-3 text-left opacity-55 cursor-not-allowed select-none"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
+                            <Icon className="h-3.5 w-3.5" />
+                          </div>
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-semibold text-muted-foreground">
+                            Requires 24h notice
+                          </span>
+                        </div>
+                        <div className="mt-2.5">
+                          <p className="font-sans font-medium text-xs text-muted-foreground">
+                            {meta.period}
+                          </p>
+                          <p className="font-sans text-[11px] text-muted-foreground/70">
+                            {slot.start} – {slot.end} (Unavailable)
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
                     <button
                       key={slot.id}
