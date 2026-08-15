@@ -19,27 +19,28 @@ function QuickAdd({ product }: { product: CatalogProduct }) {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="glass-soft flex items-center gap-1 rounded-2xl p-1">
+      <div className="glass-soft flex h-9 items-center gap-0.5 rounded-xl p-1 border border-border/50">
         <button
           type="button"
           aria-label={`Decrease ${product.name} quantity`}
-          className="grid size-8 place-items-center rounded-xl text-cocoa transition hover:bg-card/70 active:scale-90"
+          className="grid size-7 place-items-center rounded-lg text-cocoa transition hover:bg-card active:scale-90"
           onClick={() => setQty((q) => Math.max(1, q - 1))}
         >
-          <Minus className="size-4" />
+          <Minus className="size-3" />
         </button>
-        <span className="w-6 text-center text-sm font-semibold tabular-nums text-cocoa">{qty}</span>
+        <span className="w-5 text-center text-xs font-semibold tabular-nums text-cocoa">{qty}</span>
         <button
           type="button"
           aria-label={`Increase ${product.name} quantity`}
-          className="grid size-8 place-items-center rounded-xl text-cocoa transition hover:bg-card/70 active:scale-90"
+          className="grid size-7 place-items-center rounded-lg text-cocoa transition hover:bg-card active:scale-90"
           onClick={() => setQty((q) => Math.min(20, q + 1))}
         >
-          <Plus className="size-4" />
+          <Plus className="size-3" />
         </button>
       </div>
       <Button
-        className="flex-1 rounded-2xl bg-berry text-berry-foreground shadow-soft transition-transform duration-200 hover:scale-[1.03] hover:bg-berry/90 active:scale-95"
+        size="sm"
+        className="h-9 flex-1 rounded-xl bg-berry text-berry-foreground text-xs font-medium shadow-xs transition-all duration-200 hover:scale-[1.01] hover:bg-berry/90 active:scale-98"
         onClick={() => {
           add(
             {
@@ -56,7 +57,7 @@ function QuickAdd({ product }: { product: CatalogProduct }) {
           setQty(1);
         }}
       >
-        <ShoppingBag className="mr-2 size-4" />
+        <ShoppingBag className="mr-1.5 size-3.5" />
         Quick add
       </Button>
     </div>
