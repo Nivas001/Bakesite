@@ -25,7 +25,7 @@ export function NewsletterSignup() {
   }
 
   return (
-    <form onSubmit={submit} className="mt-3 flex flex-col gap-2 sm:flex-row">
+    <form onSubmit={submit} className="flex w-full max-w-sm items-center gap-1.5">
       <Input
         type="email"
         required
@@ -33,12 +33,13 @@ export function NewsletterSignup() {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
         aria-label="Email address"
-        className="bg-background/70"
+        className="h-9 rounded-full bg-background/85 px-3.5 text-xs placeholder:text-muted-foreground/70 shadow-2xs border-border/70 focus-visible:ring-berry"
       />
       <Button
         type="submit"
+        size="sm"
         disabled={busy}
-        className="bg-berry text-berry-foreground hover:bg-berry/90"
+        className="h-9 shrink-0 rounded-full bg-berry px-4 text-xs font-semibold text-berry-foreground hover:bg-berry/90 shadow-xs active:scale-95 transition-all cursor-pointer"
       >
         {busy ? "Joining…" : "Join"}
       </Button>
