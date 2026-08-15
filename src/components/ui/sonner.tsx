@@ -8,19 +8,21 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       position="bottom-center"
       toastOptions={{
+        className:
+          "!w-auto !max-w-fit mx-auto !rounded-full !px-4 !py-2 sm:!px-5 sm:!py-2.5 !bg-card/85 !backdrop-blur-2xl !border !border-border/80 !shadow-lift !text-cocoa !font-sans !text-xs !font-semibold !text-center !inline-flex !items-center !justify-center gap-2",
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-card/95 group-[.toaster]:text-cocoa group-[.toaster]:border-border/80 group-[.toaster]:shadow-lift rounded-2xl p-3 sm:p-3.5 text-xs font-semibold backdrop-blur-md border",
-          title: "text-xs font-bold text-cocoa",
-          description: "group-[.toast]:text-muted-foreground text-[11px] font-normal",
+            "group toast !w-auto !max-w-fit mx-auto !rounded-full !px-4 !py-2 sm:!px-5 sm:!py-2.5 !bg-card/85 !backdrop-blur-2xl !border !border-border/80 !shadow-lift !text-cocoa !font-sans !text-xs !font-semibold !text-center !inline-flex !items-center !justify-center gap-2",
+          title: "!font-sans !text-xs !font-bold !text-cocoa !text-center",
+          description: "!font-sans !text-[11px] !text-muted-foreground !text-center",
           actionButton:
-            "group-[.toast]:bg-berry group-[.toast]:text-berry-foreground rounded-full text-xs font-semibold px-3 py-1 hover:bg-berry/90 transition-all",
+            "!font-sans group-[.toast]:bg-berry group-[.toast]:text-berry-foreground rounded-full text-xs font-semibold px-3 py-1 hover:bg-berry/90 transition-all",
           cancelButton:
-            "group-[.toast]:bg-secondary group-[.toast]:text-secondary-foreground rounded-full text-xs px-3 py-1",
-          success: "!border-berry/30 !bg-card/95 !text-cocoa",
-          info: "!border-border/80 !bg-card/95 !text-cocoa",
-          error: "!border-destructive/40 !bg-card/95 !text-destructive",
-          warning: "!border-accent !bg-card/95 !text-cocoa",
+            "!font-sans group-[.toast]:bg-secondary group-[.toast]:text-secondary-foreground rounded-full text-xs px-3 py-1",
+          success: "!border-berry/40 !text-cocoa",
+          info: "!border-border/80 !text-cocoa",
+          error: "!border-destructive/40 !text-destructive",
+          warning: "!border-accent !text-cocoa",
         },
       }}
       {...props}

@@ -243,3 +243,55 @@
 @utility section-shell-plain {
   background: color-mix(in oklab, var(--background) 92%, white);
 }
+
+/* Liquid Glass Toast Pill: auto-width, center aligned, Inter font */
+[data-sonner-toaster][data-x-position='center'] {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  pointer-events: none;
+}
+
+[data-sonner-toast] {
+  pointer-events: auto;
+  width: fit-content !important;
+  max-width: calc(100vw - 2rem) !important;
+  margin: 0 auto !important;
+  border-radius: 9999px !important;
+  font-family: var(--font-body) !important;
+  background: color-mix(in oklab, var(--card) 85%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid color-mix(in oklab, var(--border) 90%, transparent) !important;
+  box-shadow: 0 16px 36px -10px oklch(0.3 0.05 28 / 22%), 0 0 0 1px oklch(1 0 0 / 20%) inset !important;
+  padding: 0.55rem 1.15rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  text-align: center !important;
+}
+
+[data-sonner-toast] [data-content] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  font-family: var(--font-body) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  font-family: var(--font-body) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  color: var(--cocoa) !important;
+  text-align: center !important;
+  letter-spacing: -0.01em !important;
+}
+
+[data-sonner-toast] [data-icon] {
+  margin-right: 0.25rem !important;
+}
+
