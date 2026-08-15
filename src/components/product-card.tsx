@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Minus, Plus, ShoppingBag } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import {
   discountLabel,
@@ -104,13 +104,9 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
                 <Minus className="size-2.5 sm:size-3" />
               </button>
 
-              <div className="flex items-center gap-0.5 sm:gap-1 px-0.5">
-                <ShoppingBag className="size-2.5 sm:size-3 text-berry" />
-                <span className="text-[11px] sm:text-xs font-bold text-cocoa tabular-nums">
-                  {quantityInCart}
-                </span>
-                <span className="text-[9px] sm:text-[11px] font-medium text-muted-foreground hidden xxs:inline">in cart</span>
-              </div>
+              <span className="min-w-4 px-1 text-center text-xs font-bold text-cocoa tabular-nums">
+                {quantityInCart}
+              </span>
 
               <button
                 type="button"
