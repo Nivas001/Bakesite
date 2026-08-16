@@ -254,8 +254,8 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
         </div>
       </div>
 
-      {/* Re-order Bakes Button */}
-      {order.status !== "awaiting_payment" && (
+      {/* Re-order Bakes Button (Only for Completed / Delivered orders) */}
+      {(order.status === "completed" || order.status === "delivered") && (
         <div className="mt-3 pt-2.5 border-t border-border/50 flex items-center justify-between">
           <span className="text-[11px] text-muted-foreground font-medium">Loved this batch?</span>
           <button
