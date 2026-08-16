@@ -2428,16 +2428,41 @@ function AdminDashboard() {
         open={bakeSheetOpen}
         onOpenChange={setBakeSheetOpen}
         orders={data.orders}
+        products={data.products}
       />
       <DevPanel />
     </div>
   );
 }
 
+function formatBakeSheetDate(iso: string): string {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return new Date(y, m - 1, d).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function formatBakeSheetDateWithWeekday(iso: string): string {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return new Date(y, m - 1, d).toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 function KitchenBakeSheetDialog({
   open,
   onOpenChange,
   orders,
+  products,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -2454,16 +2479,37 @@ function KitchenBakeSheetDialog({
       line_total: number;
     }>;
   }>;
+  products?: Array<{
+    id: string;
+    name: string;
+    image_url?: string | null;
+    slug?: string;
+  }>;
 }) {
   const activeOrders = orders.filter((o) => o.status !== "rejected" && o.status !== "refunded");
   const availableDates = Array.from(new Set(activeOrders.map((o) => o.slot_date))).sort();
   const [selectedDate, setSelectedDate] = useState<string>(availableDates[0] || toISODate(new Date()));
 
+  // Map product names / IDs to their photos
+  const productPhotoMap = new Map<string, string | null>();
+  if (products) {
+    for (const p of products) {
+      if (p.name) productPhotoMap.set(p.name.toLowerCase().trim(), p.image_url ?? null);
+      if (p.id) productPhotoMap.set(p.id, p.image_url ?? null);
+    }
+  }
+
   const dateOrders = activeOrders.filter((o) => o.slot_date === selectedDate);
 
   const productAggregates: Record<
     string,
-    { name: string; totalQty: number; ordersCount: number; slots: Record<string, number> }
+    {
+      name: string;
+      totalQty: number;
+      ordersCount: number;
+      imageUrl: string | null;
+      slots: Record<string, number>;
+    }
   > = {};
 
   let totalItemsCount = 0;
@@ -2473,145 +2519,263 @@ function KitchenBakeSheetDialog({
     totalSlotRevenue += Number(order.total);
     for (const item of order.order_items) {
       totalItemsCount += item.quantity;
-      if (!productAggregates[item.product_name]) {
-        productAggregates[item.product_name] = {
+      const key = item.product_name.trim();
+      if (!productAggregates[key]) {
+        const photo =
+          productPhotoMap.get(key.toLowerCase()) ||
+          productPhotoMap.get(key) ||
+          null;
+        productAggregates[key] = {
           name: item.product_name,
           totalQty: 0,
           ordersCount: 0,
+          imageUrl: photo,
           slots: {},
         };
       }
-      productAggregates[item.product_name]!.totalQty += item.quantity;
-      productAggregates[item.product_name]!.ordersCount += 1;
-      const slotKey = order.slot_start ? `${order.slot_start.slice(0, 5)}–${order.slot_end.slice(0, 5)}` : "General";
-      productAggregates[item.product_name]!.slots[slotKey] =
-        (productAggregates[item.product_name]!.slots[slotKey] || 0) + item.quantity;
+      productAggregates[key]!.totalQty += item.quantity;
+      productAggregates[key]!.ordersCount += 1;
+      const slotKey = order.slot_start
+        ? `${order.slot_start.slice(0, 5)}–${order.slot_end.slice(0, 5)}`
+        : "General";
+      productAggregates[key]!.slots[slotKey] =
+        (productAggregates[key]!.slots[slotKey] || 0) + item.quantity;
     }
   }
 
   const sortedItems = Object.values(productAggregates).sort((a, b) => b.totalQty - a.totalQty);
 
+  function handlePrint() {
+    window.print();
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl p-6">
-        <DialogHeader className="border-b border-border/60 pb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="flex size-10 items-center justify-center rounded-2xl bg-berry/10 text-berry">
-                <ChefHat className="size-5" />
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl">
+        {/* Custom Print CSS: Isolates ONLY this modal for printing 1 clean sheet */}
+        <style>{`
+          @media print {
+            body * {
+              visibility: hidden !important;
+            }
+            #kitchen-bake-sheet-print, #kitchen-bake-sheet-print * {
+              visibility: visible !important;
+            }
+            #kitchen-bake-sheet-print {
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              margin: 0 !important;
+              padding: 16px !important;
+              background: #ffffff !important;
+              color: #000000 !important;
+              box-shadow: none !important;
+              border: none !important;
+              overflow: visible !important;
+              z-index: 999999 !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .print-only {
+              display: block !important;
+            }
+            @page {
+              size: A4 portrait;
+              margin: 10mm 12mm;
+            }
+          }
+          @media screen {
+            .print-only {
+              display: none !important;
+            }
+          }
+        `}</style>
+
+        <div id="kitchen-bake-sheet-print" className="space-y-4">
+          {/* Header - Screen View */}
+          <DialogHeader className="border-b border-border/70 pb-4 no-print">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex size-11 items-center justify-center rounded-2xl bg-cocoa text-background shadow-xs">
+                  <ChefHat className="size-6 text-amber-300" />
+                </div>
+                <div>
+                  <DialogTitle className="font-display text-xl font-bold text-cocoa leading-tight">
+                    Morning Kitchen Bake Sheet
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                    Live batch quantities & slot window schedules for morning prep
+                  </DialogDescription>
+                </div>
               </div>
-              <div>
-                <DialogTitle className="font-display text-xl font-bold text-cocoa">
-                  Morning Kitchen Bake Sheet
-                </DialogTitle>
-                <DialogDescription className="text-xs text-muted-foreground">
-                  Aggregated quantities for kitchen prep & morning oven schedules
-                </DialogDescription>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handlePrint}
+                  className="rounded-xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs gap-2 shadow-soft px-4 h-9 cursor-pointer"
+                >
+                  <Printer className="size-4 text-amber-300" />
+                  <span>Print Bake Sheet</span>
+                </Button>
               </div>
             </div>
+          </DialogHeader>
 
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => window.print()}
-              className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs gap-1.5 shadow-soft shrink-0"
-            >
-              <Printer className="size-3.5" />
-              <span>Print Bake Sheet</span>
-            </Button>
-          </div>
-        </DialogHeader>
-
-        {/* Date Selector & Slot Metrics */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-secondary/40 p-3.5 border border-border/50">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-foreground">Baking Date:</span>
-            <select
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="h-8 rounded-lg border border-input bg-background px-3 text-xs font-semibold shadow-xs cursor-pointer"
-            >
-              {availableDates.length === 0 ? (
-                <option value={selectedDate}>{selectedDate}</option>
-              ) : (
-                availableDates.map((d) => (
-                  <option key={d} value={d}>
-                    {d} ({activeOrders.filter((o) => o.slot_date === d).length} orders)
-                  </option>
-                ))
-              )}
-            </select>
+          {/* Header - Print Only View */}
+          <div className="print-only border-b-2 border-black pb-3 mb-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="text-2xl font-black tracking-tight text-black">
+                  ANI BAKES — MORNING KITCHEN BAKE SHEET
+                </h1>
+                <p className="text-sm font-bold text-gray-800 mt-1">
+                  📅 Baking Date: {formatBakeSheetDateWithWeekday(selectedDate)}
+                </p>
+              </div>
+              <div className="text-right text-xs text-gray-700">
+                <p className="font-bold text-sm text-black">{totalItemsCount} Total Bakes</p>
+                <p>{dateOrders.length} Confirmed Orders</p>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-sans">
-            <span className="font-semibold text-cocoa">
-              📦 {dateOrders.length} {dateOrders.length === 1 ? "order" : "orders"}
-            </span>
-            <span className="text-border">|</span>
-            <span className="font-bold text-berry">
-              🥐 {totalItemsCount} total bakes
-            </span>
-            <span className="text-border">|</span>
-            <span className="font-bold text-emerald-600 dark:text-emerald-400">
-              {formatCurrency(totalSlotRevenue)}
-            </span>
-          </div>
-        </div>
+          {/* Date Selector & Metrics Bar */}
+          <div className="rounded-2xl border border-border/80 bg-secondary/30 p-3.5 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {/* Date Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-foreground shrink-0">
+                  📅 Select Date:
+                </span>
+                <select
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="h-9 rounded-xl border border-input bg-card px-3 text-xs font-bold text-cocoa shadow-2xs focus:outline-none focus:ring-2 focus:ring-cocoa/20 cursor-pointer"
+                >
+                  {availableDates.length === 0 ? (
+                    <option value={selectedDate}>{formatBakeSheetDate(selectedDate)}</option>
+                  ) : (
+                    availableDates.map((d) => (
+                      <option key={d} value={d}>
+                        {formatBakeSheetDate(d)} ({activeOrders.filter((o) => o.slot_date === d).length} orders)
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
 
-        {/* Items Table */}
-        {sortedItems.length === 0 ? (
-          <div className="py-12 text-center text-muted-foreground text-sm font-medium">
-            No active baking orders for {selectedDate}.
+              {/* High Contrast Status Badges */}
+              <div className="flex items-center gap-2 text-xs">
+                <div className="flex items-center gap-1.5 rounded-xl border border-border/80 bg-card px-3 py-1.5 font-bold text-foreground shadow-2xs">
+                  <span>📦</span>
+                  <span>{dateOrders.length} {dateOrders.length === 1 ? "order" : "orders"}</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 font-extrabold text-amber-900 dark:text-amber-300 shadow-2xs">
+                  <span>🥐</span>
+                  <span>{totalItemsCount} total bakes</span>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 font-bold text-emerald-800 dark:text-emerald-300 shadow-2xs">
+                  <span>💰</span>
+                  <span>{formatCurrency(totalSlotRevenue)}</span>
+                </div>
+              </div>
+            </div>
           </div>
-        ) : (
-          <div className="mt-4 overflow-hidden rounded-2xl border border-border/80 bg-card">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-border/60 bg-muted/50 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                  <th className="py-2.5 px-3.5">Pastry / Bake Item</th>
-                  <th className="py-2.5 px-3.5 text-center">Batch Total</th>
-                  <th className="py-2.5 px-3.5 text-right">Time Slot Breakdown</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/40 font-sans">
-                {sortedItems.map((item) => (
-                  <tr key={item.name} className="hover:bg-secondary/20 transition-colors">
-                    <td className="py-3 px-3.5 font-bold text-foreground">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">🥖</span>
-                        <span>{item.name}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-3.5 text-center">
-                      <span className="inline-flex items-center justify-center rounded-xl bg-berry/15 px-2.5 py-1 text-sm font-extrabold text-berry tracking-tight">
-                        {item.totalQty} pcs
-                      </span>
-                    </td>
-                    <td className="py-3 px-3.5 text-right font-medium text-muted-foreground">
-                      <div className="flex flex-wrap items-center justify-end gap-1.5">
-                        {Object.entries(item.slots).map(([slot, qty]) => (
-                          <span
-                            key={slot}
-                            className="rounded-lg bg-secondary/80 px-2 py-0.5 text-[10px] font-semibold text-secondary-foreground"
-                          >
-                            {slot}: <strong className="text-foreground">{qty}</strong>
-                          </span>
-                        ))}
-                      </div>
-                    </td>
+
+          {/* Items Table */}
+          {sortedItems.length === 0 ? (
+            <div className="py-14 text-center text-muted-foreground text-sm font-medium rounded-2xl border border-dashed border-border/80">
+              No active baking orders scheduled for {formatBakeSheetDate(selectedDate)}.
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-border/90 bg-card shadow-soft">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-border/80 bg-muted/60 text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                    <th className="py-3 px-4 w-12 text-center">Done</th>
+                    <th className="py-3 px-3">Pastry / Bake Item</th>
+                    <th className="py-3 px-4 text-center">Batch Quantity</th>
+                    <th className="py-3 px-4 text-right">Time Slot Breakdown</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody className="divide-y divide-border/60 font-sans">
+                  {sortedItems.map((item, index) => (
+                    <tr
+                      key={item.name}
+                      className="hover:bg-secondary/20 transition-colors"
+                    >
+                      {/* Checkbox for kitchen bake checklist */}
+                      <td className="py-3 px-4 text-center">
+                        <input
+                          type="checkbox"
+                          className="size-4.5 rounded border-2 border-border text-cocoa focus:ring-cocoa/30 cursor-pointer"
+                        />
+                      </td>
 
-        {/* Kitchen Baking Guidelines */}
-        <div className="mt-4 rounded-xl bg-muted/40 p-3 text-[11px] text-muted-foreground border border-border/40 flex items-start gap-2">
-          <span className="text-sm">👨‍🍳</span>
-          <p>
-            <strong>Kitchen Protocol:</strong> Proof dough at 2:00 AM, first oven rotation at 4:00 AM dawn. Pack in ventilated pastry boxes 30 minutes prior to dispatch window.
-          </p>
+                      {/* Product Name with Photo */}
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-3">
+                          {item.imageUrl ? (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="size-11 shrink-0 rounded-xl object-cover border border-border/80 bg-muted shadow-2xs"
+                            />
+                          ) : (
+                            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary/80 border border-border/70 text-lg shadow-2xs">
+                              🥐
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-bold text-sm text-foreground tracking-tight">
+                              {item.name}
+                            </p>
+                            <p className="text-[11px] text-muted-foreground">
+                              Ordered in {item.ordersCount} {item.ordersCount === 1 ? "order" : "orders"}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* High-Contrast Bold Batch Total */}
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center justify-center rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 px-3.5 py-1.5 text-sm font-black tracking-tight shadow-xs">
+                          {item.totalQty} pcs
+                        </span>
+                      </td>
+
+                      {/* Time Slot Breakdown */}
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex flex-wrap items-center justify-end gap-1.5">
+                          {Object.entries(item.slots).map(([slot, qty]) => (
+                            <span
+                              key={slot}
+                              className="rounded-lg bg-secondary/90 border border-border/70 px-2.5 py-1 text-[11px] font-semibold text-foreground"
+                            >
+                              {slot}: <strong className="text-cocoa font-extrabold">{qty}</strong>
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Kitchen Baking Protocol Callout */}
+          <div className="rounded-2xl bg-secondary/40 p-3.5 text-xs text-muted-foreground border border-border/60 flex items-start gap-2.5">
+            <span className="text-base">👨‍🍳</span>
+            <div className="leading-snug">
+              <span className="font-bold text-foreground">Kitchen Protocol:</span> Proof dough at 2:00 AM dawn. First bake batch into oven by 4:00 AM. Package in temperature-shielded bakery boxes 30 minutes prior to delivery slot.
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
