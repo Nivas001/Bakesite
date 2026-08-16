@@ -21,6 +21,13 @@ import {
   ChevronDown,
   ChevronUp,
   ArrowRight,
+  RotateCw,
+  ShoppingBag,
+  Truck,
+  Flame,
+  Calendar,
+  CreditCard,
+  MessageCircle,
 } from "lucide-react";
 
 export type OrderRecord = {
@@ -54,9 +61,9 @@ export const Route = createFileRoute("/orders")({
   head: () => ({
     meta: [
       { title: "Your orders — Ani Bakes Bakery" },
-      { name: "description", content: "Track the live status of your Ani Bakes bakery orders." },
+      { name: "description", content: "Track live status and reorder fresh morning bakes from Ani Bakes." },
       { property: "og:title", content: "Your orders — Ani Bakes Bakery" },
-      { property: "og:description", content: "Track the live status of your bakery orders." },
+      { property: "og:description", content: "Track live status and reorder fresh morning bakes from Ani Bakes." },
     ],
   }),
   component: () => (
@@ -68,43 +75,55 @@ export const Route = createFileRoute("/orders")({
 
 const STATUS_CONFIG: Record<
   string,
-  { label: string; badgeClass: string; icon: typeof ChefHat; desc: string }
+  {
+    label: string;
+    badgeClass: string;
+    icon: typeof ChefHat;
+    desc: string;
+    step: number; // 1: Placed, 2: Baking, 3: Completed
+  }
 > = {
   pending_approval: {
     label: "Paid · In Queue",
-    badgeClass: "bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30",
+    badgeClass: "bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30",
     icon: ChefHat,
-    desc: "Payment received! The head baker is scheduling your bakes for this morning slot.",
+    desc: "Payment confirmed! The head baker is scheduling your bakes for the morning slot.",
+    step: 1,
   },
   awaiting_payment: {
     label: "Approved · Pay Now",
-    badgeClass: "bg-blue-500/15 text-blue-800 dark:text-blue-300 border border-blue-500/30",
+    badgeClass: "bg-blue-500/15 text-blue-900 dark:text-blue-300 border border-blue-500/30",
     icon: Clock,
-    desc: "Your slot has been approved! Complete payment to secure your bakes.",
+    desc: "Your slot has been approved! Complete payment to lock in your morning bake.",
+    step: 1,
   },
   confirmed: {
     label: "Confirmed by Baker",
-    badgeClass: "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30",
-    icon: CheckCircle2,
-    desc: "Baking slot confirmed! Our kitchen is preparing to bake fresh for your slot.",
+    badgeClass: "bg-emerald-500/15 text-emerald-900 dark:text-emerald-300 border border-emerald-500/30",
+    icon: Flame,
+    desc: "Slot secured! Dough is cold-fermenting for fresh dawn baking at 4:00 AM.",
+    step: 2,
   },
   rescheduled: {
     label: "Slot Rescheduled",
-    badgeClass: "bg-purple-500/15 text-purple-800 dark:text-purple-300 border border-purple-500/30",
+    badgeClass: "bg-purple-500/15 text-purple-900 dark:text-purple-300 border border-purple-500/30",
     icon: Clock,
-    desc: "The head baker has adjusted your slot schedule to ensure optimal freshness.",
+    desc: "The head baker adjusted your delivery window to guarantee oven freshness.",
+    step: 2,
   },
   completed: {
     label: "Fulfilled / Delivered",
-    badgeClass: "bg-secondary text-secondary-foreground border border-border",
+    badgeClass: "bg-secondary text-secondary-foreground border border-border/80",
     icon: PackageCheck,
-    desc: "Your fresh bakes have been prepared and fulfilled. Enjoy!",
+    desc: "Baked fresh and delivered to your doorstep. Hope you loved every bite!",
+    step: 3,
   },
   rejected: {
     label: "Cancelled & Refunded",
     badgeClass: "bg-destructive/15 text-destructive border border-destructive/30",
     icon: XCircle,
     desc: "Slot was unavailable. Your full refund has been initiated.",
+    step: 0,
   },
 };
 
@@ -140,87 +159,93 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
     navigate({ to: "/cart" });
   }
 
+  const isFulfilled = order.status === "completed" || order.status === "delivered";
+  const isCancelled = order.status === "rejected";
+
   return (
-    <li className="rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-3.5 sm:p-5 shadow-soft transition-all overflow-hidden flex flex-col justify-between">
+    <li className="rounded-3xl border border-border/80 bg-card p-4 sm:p-6 shadow-soft transition-all duration-300 hover:shadow-lift flex flex-col justify-between overflow-hidden relative group">
       
-      {/* 1. Header Row: Date & Status Pill */}
-      <div>
-        <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-secondary text-berry shadow-2xs">
-              <StatusIcon className="size-4.5" />
+      {/* 1. Header Row: Date & Status */}
+      <div className="space-y-3.5">
+        <div className="flex items-start justify-between gap-3 border-b border-border/60 pb-3.5">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-secondary text-cocoa shadow-2xs border border-border/50">
+              <StatusIcon className="size-5 text-berry" />
             </div>
             <div className="min-w-0">
-              <p className="font-sans font-bold text-xs sm:text-sm text-foreground truncate">
-                {formatSlotDate(order.slot_date)}
-              </p>
-              <p className="text-[11px] text-muted-foreground font-medium truncate">
-                {slotLabelFor(order.slot_start)} · <span className="capitalize">{order.fulfilment_type}</span>
+              <div className="flex items-center gap-1.5">
+                <Calendar className="size-3.5 text-berry shrink-0" />
+                <p className="font-sans font-bold text-sm sm:text-base text-foreground truncate">
+                  {formatSlotDate(order.slot_date)}
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground font-medium truncate mt-0.5">
+                {slotLabelFor(order.slot_start)} · <span className="capitalize font-semibold text-foreground/80">{order.fulfilment_type}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            {order.status === "rescheduled" ? (
-              <div className="flex flex-wrap items-center justify-end gap-1">
-                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-purple-500/15 text-purple-800 dark:text-purple-300 border border-purple-500/30">
-                  <Clock className="size-3" /> Rescheduled
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
-                  <CheckCircle2 className="size-3" /> Confirmed
-                </span>
-              </div>
-            ) : (
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${config.badgeClass}`}
-              >
-                <StatusIcon className="size-3" />
-                {config.label}
-              </span>
-            )}
-            <span className="text-[10px] text-muted-foreground font-mono">
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold ${config.badgeClass}`}
+            >
+              <span className={`size-1.5 rounded-full ${isFulfilled ? "bg-muted-foreground" : isCancelled ? "bg-destructive" : "bg-emerald-500 animate-pulse"}`} />
+              {config.label}
+            </span>
+            <span className="text-[10px] text-muted-foreground font-mono font-bold tracking-wider">
               #{order.id.slice(-6).toUpperCase()}
             </span>
           </div>
         </div>
 
-        {/* 2. Status Banner / Baker Note */}
-        <div className="mt-3 rounded-xl bg-secondary/40 p-2.5 text-xs text-muted-foreground border border-border/40">
-          <p className="font-medium text-foreground">{config.desc}</p>
-          {order.notes && (
-            <p className="mt-1 text-[11px] text-muted-foreground italic">
-              "{order.notes}"
-            </p>
-          )}
-        </div>
+        {/* 2. Mini Baker Status Stepper (For Active Orders) */}
+        {!isFulfilled && !isCancelled && (
+          <div className="rounded-2xl bg-secondary/40 p-3 border border-border/50 space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-bold text-foreground">
+              <span className="flex items-center gap-1">
+                <Flame className="size-3.5 text-amber-500" /> Morning Bake Status
+              </span>
+              <span className="text-cocoa font-mono text-[10px]">{config.desc}</span>
+            </div>
 
-        {/* 3. Items List with Accordion for >3 Items */}
-        <div className="mt-3.5 space-y-1.5">
-          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">
+            {/* Visual 3-Stage Progress Bar */}
+            <div className="grid grid-cols-3 gap-1.5 pt-1">
+              <div className={`h-1.5 rounded-full ${config.step >= 1 ? "bg-berry" : "bg-secondary/80"}`} />
+              <div className={`h-1.5 rounded-full ${config.step >= 2 ? "bg-amber-500" : "bg-secondary/80"}`} />
+              <div className={`h-1.5 rounded-full ${config.step >= 3 ? "bg-emerald-500" : "bg-secondary/80"}`} />
+            </div>
+          </div>
+        )}
+
+        {/* 3. Items List with Collapsible Expander */}
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center justify-between text-xs font-extrabold uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1.5">
             <span>Bake Items ({totalItemsCount})</span>
             {isMultiItem && (
               <button
                 type="button"
                 onClick={() => setExpanded(!expanded)}
-                className="flex items-center gap-0.5 text-berry hover:underline lowercase font-semibold cursor-pointer"
+                className="flex items-center gap-1 text-berry hover:text-cocoa font-bold text-xs lowercase transition-colors cursor-pointer"
               >
                 {expanded ? (
-                  <>Show less <ChevronUp className="size-3" /></>
+                  <>Show less <ChevronUp className="size-3.5" /></>
                 ) : (
-                  <>+{items.length - 2} more <ChevronDown className="size-3" /></>
+                  <>+{items.length - 2} more <ChevronDown className="size-3.5" /></>
                 )}
               </button>
             )}
           </div>
 
-          <ul className="space-y-1 text-xs text-foreground/90">
+          <ul className="space-y-1.5 text-xs text-foreground/90">
             {displayedItems.map((item, index) => (
-              <li key={index} className="flex justify-between items-center py-0.5">
-                <span className="font-medium truncate pr-2">
-                  <span className="font-bold text-berry mr-1.5">{item.quantity}×</span>
-                  {item.product_name}
-                </span>
-                <span className="font-semibold text-muted-foreground shrink-0 text-[11px]">
+              <li key={index} className="flex justify-between items-center py-1 border-b border-border/20 last:border-0">
+                <div className="flex items-center gap-2 min-w-0 pr-2">
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-secondary/80 text-berry font-bold text-[11px]">
+                    {item.quantity}×
+                  </span>
+                  <span className="font-semibold text-foreground truncate">{item.product_name}</span>
+                </div>
+                <span className="font-bold text-muted-foreground shrink-0 text-xs">
                   {formatCurrency(Number(item.line_total))}
                 </span>
               </li>
@@ -229,55 +254,64 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
         </div>
       </div>
 
-      {/* 4. Footer: Recipient Info & Bold Total Paid */}
-      <div className="mt-3.5 border-t border-border/60 pt-3 flex items-center justify-between gap-2">
-        <div className="text-[11px] text-muted-foreground min-w-0 pr-2">
-          <p className="flex items-center gap-1 truncate font-medium text-foreground">
-            <Phone className="size-3 shrink-0 text-muted-foreground" />
-            <span className="truncate">{order.contact_phone} ({order.contact_name})</span>
-          </p>
-          {order.delivery_address && (
-            <p className="flex items-center gap-1 truncate mt-0.5 text-muted-foreground">
-              <MapPin className="size-3 shrink-0 text-muted-foreground" />
-              <span className="truncate">{order.delivery_address}</span>
+      {/* 4. Footer: Recipient Contact & Total Paid / Actions */}
+      <div className="mt-4 pt-3.5 border-t border-border/60 space-y-3">
+        
+        {/* Recipient & Address Row */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted-foreground">
+          <div className="space-y-1 min-w-0">
+            <p className="flex items-center gap-1.5 truncate font-semibold text-foreground">
+              <Phone className="size-3.5 shrink-0 text-berry" />
+              <span className="truncate">{order.contact_phone} ({order.contact_name})</span>
             </p>
-          )}
+            {order.delivery_address && (
+              <p className="flex items-center gap-1.5 truncate text-[11px] text-muted-foreground">
+                <MapPin className="size-3.5 shrink-0 text-muted-foreground" />
+                <span className="truncate">{order.delivery_address}</span>
+              </p>
+            )}
+          </div>
+
+          <div className="text-right shrink-0">
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+              {order.status === "awaiting_payment" ? "Total Due" : "Total Paid"}
+            </p>
+            <p className="font-sans text-xl font-black text-cocoa tracking-tight">
+              {formatCurrency(Number(order.total))}
+            </p>
+          </div>
         </div>
 
-        <div className="text-right shrink-0">
-          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-            {order.status === "awaiting_payment" ? "Total Due" : "Total Paid"}
-          </p>
-          <p className="font-sans text-base sm:text-lg font-black text-cocoa tracking-tight">
-            {formatCurrency(Number(order.total))}
-          </p>
-        </div>
+        {/* Action 1: Re-order Button (For Completed/Delivered orders) */}
+        {isFulfilled && (
+          <div className="pt-2 border-t border-border/40 flex items-center justify-between">
+            <span className="text-xs text-muted-foreground font-medium">Loved this batch?</span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleReorder}
+              className="rounded-full border-cocoa/30 bg-card/90 text-cocoa hover:bg-cocoa/10 hover:text-cocoa font-bold text-xs h-8.5 px-3.5 shadow-2xs cursor-pointer"
+            >
+              <RotateCw className="size-3.5 mr-1 text-berry" />
+              <span>Re-order Batch</span>
+            </Button>
+          </div>
+        )}
+
+        {/* Action 2: Complete Payment Button (For Awaiting Payment) */}
+        {order.status === "awaiting_payment" && order.payment_link_url && (
+          <div className="pt-2 border-t border-border/40">
+            <Button asChild className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs h-10 shadow-lift cursor-pointer">
+              <a href={order.payment_link_url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5">
+                <CreditCard className="size-4 text-amber-400" />
+                <span>Complete Payment to Secure Slot →</span>
+              </a>
+            </Button>
+          </div>
+        )}
+
       </div>
-
-      {/* Re-order Bakes Button (Only for Completed / Delivered orders) */}
-      {(order.status === "completed" || order.status === "delivered") && (
-        <div className="mt-3 pt-2.5 border-t border-border/50 flex items-center justify-between">
-          <span className="text-[11px] text-muted-foreground font-medium">Loved this batch?</span>
-          <button
-            type="button"
-            onClick={handleReorder}
-            className="inline-flex items-center gap-1 text-xs font-bold text-berry hover:text-berry/80 hover:underline cursor-pointer transition-colors"
-          >
-            <span>🔄 Re-order these bakes</span>
-          </button>
-        </div>
-      )}
-
-      {/* Awaiting Payment Action Button */}
-      {order.status === "awaiting_payment" && order.payment_link_url && (
-        <div className="mt-3 pt-2 border-t border-border/60">
-          <Button asChild className="w-full rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs h-9 shadow-soft">
-            <a href={order.payment_link_url} target="_blank" rel="noreferrer">
-              Complete Payment Now →
-            </a>
-          </Button>
-        </div>
-      )}
 
     </li>
   );
@@ -286,63 +320,145 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
 function OrdersPage() {
   const fetchOrders = useServerFn(getMyOrders);
   const { data, isLoading } = useQuery({ queryKey: ["my-orders"], queryFn: () => fetchOrders() });
+  const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-berry border-t-transparent" />
-        <p className="text-xs sm:text-sm font-medium">Loading your orders…</p>
+      <div className="mx-auto max-w-3xl px-4 py-24 text-center text-muted-foreground flex flex-col items-center justify-center gap-3">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-berry border-t-transparent" />
+        <p className="text-sm font-medium">Fetching your fresh bakery orders…</p>
       </div>
     );
   }
 
   const orders = (data as unknown as OrderRecord[]) ?? [];
 
+  const filteredOrders = orders.filter((order) => {
+    if (filter === "active") {
+      return order.status !== "completed" && order.status !== "delivered" && order.status !== "rejected";
+    }
+    if (filter === "completed") {
+      return order.status === "completed" || order.status === "delivered";
+    }
+    return true;
+  });
+
+  const activeCount = orders.filter(
+    (o) => o.status !== "completed" && o.status !== "delivered" && o.status !== "rejected"
+  ).length;
+  const completedCount = orders.filter(
+    (o) => o.status === "completed" || o.status === "delivered"
+  ).length;
+
   if (orders.length === 0) {
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-16 sm:py-24 text-center">
-        <div className="mx-auto flex size-16 items-center justify-center rounded-3xl bg-secondary/80 text-berry mb-4 shadow-soft">
-          <ChefHat className="size-8" />
+        <div className="mx-auto flex size-20 items-center justify-center rounded-3xl bg-secondary/80 text-berry mb-5 shadow-soft border border-border/60">
+          <ShoppingBag className="size-10" />
         </div>
-        <h1 className="font-display text-2xl sm:text-3xl font-bold text-cocoa">No orders yet</h1>
-        <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
-          Explore our artisan sourdoughs, flaky croissants, and treats baked fresh for your chosen slot.
+        <h1 className="font-nimbus text-3xl sm:text-4xl font-bold text-cocoa">
+          No orders yet
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+          Your morning slot is waiting. Explore our stone-hearth wild sourdoughs, French butter croissants, and custom celebration cakes.
         </p>
-        <Button asChild className="mt-6 rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 px-6 py-5 font-semibold text-xs sm:text-sm shadow-soft">
-          <Link to="/shop">Browse the Bakery Counter</Link>
+        <Button asChild className="mt-6 rounded-full bg-cocoa text-background hover:bg-cocoa/90 px-7 py-5 font-bold text-sm shadow-lift cursor-pointer">
+          <Link to="/shop" className="flex items-center gap-2">
+            <span>Browse Daily Counter Bakes</span>
+            <ArrowRight className="size-4" />
+          </Link>
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-10">
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
       
-      {/* Header: Clean & Compact */}
-      <div className="flex items-center justify-between gap-3 mb-6">
-        <div className="flex items-baseline gap-2">
-          <h1 className="font-display text-2xl sm:text-3xl font-bold text-cocoa leading-tight">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-6">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+              <Sparkles className="size-3.5" />
+              <span>Live Order Tracking</span>
+            </span>
+          </div>
+          <h1 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight">
             Your orders
           </h1>
-          <span className="text-xs sm:text-sm text-muted-foreground font-semibold">
-            ({orders.length} {orders.length === 1 ? "order" : "orders"})
-          </span>
         </div>
 
-        <Button asChild variant="outline" size="sm" className="rounded-xl font-semibold text-xs h-8 px-3 border-border bg-card/80">
-          <Link to="/shop" className="flex items-center gap-1">
-            <span>Order more</span>
-            <ArrowRight className="size-3" />
-          </Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button asChild variant="outline" size="sm" className="rounded-full border-cocoa/30 bg-card text-cocoa hover:bg-cocoa/10 font-bold text-xs h-9 px-4 shadow-2xs cursor-pointer">
+            <Link to="/shop" className="flex items-center gap-1.5">
+              <span>Order More Bakes</span>
+              <ArrowRight className="size-3.5" />
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      {/* Order Cards Grid: 1 Col on Mobile (< 640px), 2 Cols on Tablet & Desktop (sm: at 640px+) */}
-      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {orders.map((order) => (
-          <OrderCardItem key={order.id} order={order} />
-        ))}
-      </ul>
+      {/* Filter Tabs & Quick Stat Pills */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-secondary/50 border border-border/60">
+          <button
+            type="button"
+            onClick={() => setFilter("all")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              filter === "all"
+                ? "bg-cocoa text-background shadow-2xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All Orders ({orders.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter("active")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              filter === "active"
+                ? "bg-cocoa text-background shadow-2xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Active Slots ({activeCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilter("completed")}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              filter === "completed"
+                ? "bg-cocoa text-background shadow-2xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Delivered ({completedCount})
+          </button>
+        </div>
+
+        <span className="text-xs font-semibold text-muted-foreground hidden sm:inline-block">
+          Handcrafted in small batches every dawn from 4:00 AM
+        </span>
+      </div>
+
+      {/* Orders Grid (1 Col Mobile, 2 Cols Tablet & Desktop) */}
+      {filteredOrders.length === 0 ? (
+        <div className="rounded-3xl border border-border/70 bg-card p-10 text-center space-y-3">
+          <p className="font-bold text-base text-foreground">No orders found under this filter.</p>
+          <p className="text-xs text-muted-foreground">Select 'All Orders' to view your complete order history.</p>
+          <Button variant="outline" size="sm" onClick={() => setFilter("all")} className="rounded-full mt-2">
+            Show All Orders
+          </Button>
+        </div>
+      ) : (
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {filteredOrders.map((order) => (
+            <OrderCardItem key={order.id} order={order} />
+          ))}
+        </ul>
+      )}
+
     </div>
   );
 }
