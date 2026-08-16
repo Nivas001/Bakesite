@@ -104,9 +104,9 @@ export function SiteHeader() {
                 size="sm"
                 className="hidden text-xs text-muted-foreground hover:text-foreground sm:inline-flex h-8 px-2.5"
               >
-                <Link to="/orders">
+                <Link to="/profile">
                   <User className="mr-1.5 size-3.5" />
-                  My Orders
+                  Account
                 </Link>
               </Button>
               <Button
