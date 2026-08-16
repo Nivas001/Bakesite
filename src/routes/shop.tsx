@@ -29,19 +29,27 @@ function Shop() {
   const { data } = useSuspenseQuery(catalogQuery);
   const [active, setActive] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"featured" | "price_asc" | "price_desc" | "name_asc">("featured");
   const [filterKey, setFilterKey] = useState(0); // increments to re-trigger stagger
 
   const showSearch = useFlag("ff_shop_search");
   const showStagger = useFlag("ff_shop_stagger");
 
   const products = useMemo(() => {
-    let list = active ? data.products.filter((p) => p.category_slug === active) : data.products;
+    let list = active ? data.products.filter((p) => p.category_slug === active) : [...data.products];
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((p) => p.name.toLowerCase().includes(q));
     }
+    if (sortBy === "price_asc") {
+      list.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price_desc") {
+      list.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "name_asc") {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    }
     return list;
-  }, [active, search, data.products]);
+  }, [active, search, sortBy, data.products]);
 
   function handleCategoryChange(slug: string | null) {
     setActive(slug);
@@ -58,8 +66,8 @@ function Shop() {
         </p>
       </div>
 
-      {/* Filters Row: Category pills + Search */}
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+      {/* Filters Row: Category pills + Search + Sort */}
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 justify-between">
         {/* Category Pills */}
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar shrink-0">
           <Button
@@ -83,28 +91,43 @@ function Shop() {
           ))}
         </div>
 
-        {/* Live Search Input */}
-        {showSearch && (
-          <div className="relative sm:ml-auto w-full sm:w-52 lg:w-64 shrink-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search bakes…"
-              className="h-8 w-full rounded-full border border-border bg-card/80 pl-8 pr-8 text-xs font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-berry/30 transition-all"
-            />
-            {search && (
-              <button
-                type="button"
-                onClick={() => setSearch("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              >
-                <X className="size-3.5" />
-              </button>
-            )}
-          </div>
-        )}
+        {/* Search & Sort Controls */}
+        <div className="flex items-center gap-2 sm:ml-auto w-full sm:w-auto">
+          {/* Live Search Input */}
+          {showSearch && (
+            <div className="relative flex-1 sm:w-48 lg:w-56 shrink-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search bakes…"
+                className="h-8 w-full rounded-full border border-border bg-card/80 pl-8 pr-8 text-xs font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-berry/30 transition-all"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                >
+                  <X className="size-3.5" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Sort Dropdown */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="h-8 rounded-full border border-border bg-card/80 px-3 text-xs font-semibold text-cocoa shadow-2xs focus:outline-none focus:ring-2 focus:ring-berry/30 cursor-pointer shrink-0"
+          >
+            <option value="featured">Sort: Featured</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="name_asc">Name: A to Z</option>
+          </select>
+        </div>
       </div>
 
       {/* Product Grid */}

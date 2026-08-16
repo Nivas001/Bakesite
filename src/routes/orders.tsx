@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useCart } from "@/lib/cart";
 import { getMyOrders } from "@/lib/orders.functions";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
@@ -108,6 +110,8 @@ const STATUS_CONFIG: Record<
 
 function OrderCardItem({ order }: { order: OrderRecord }) {
   const [expanded, setExpanded] = useState(false);
+  const { add } = useCart();
+  const navigate = useNavigate();
   const config = STATUS_CONFIG[order.status] ?? STATUS_CONFIG["pending_approval"]!;
   const StatusIcon = config.icon;
 
@@ -115,6 +119,26 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
   const items = order.order_items;
   const isMultiItem = items.length > 3;
   const displayedItems = isMultiItem && !expanded ? items.slice(0, 2) : items;
+
+  function handleReorder() {
+    let addedCount = 0;
+    for (const item of order.order_items) {
+      if (item.product_id) {
+        const unitPrice = Number(item.line_total) / Math.max(1, item.quantity);
+        add({
+          productId: item.product_id,
+          slug: item.product_name.toLowerCase().replace(/\s+/g, "-"),
+          name: item.product_name,
+          unitPrice,
+          basePrice: unitPrice,
+          imageUrl: null,
+        });
+        addedCount += item.quantity;
+      }
+    }
+    toast.success(`Added ${addedCount || "all"} items from order to your cart tray!`);
+    navigate({ to: "/cart" });
+  }
 
   return (
     <li className="rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-3.5 sm:p-5 shadow-soft transition-all overflow-hidden flex flex-col justify-between">
@@ -131,71 +155,59 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
                 {formatSlotDate(order.slot_date)}
               </p>
               <p className="text-[11px] text-muted-foreground font-medium truncate">
-                {slotLabelFor(order.slot_start)}
-              </p>
-              <p className="text-[10px] text-muted-foreground capitalize mt-0.5">
-                {order.fulfilment_type === "delivery" ? "🚚 Delivery" : "🛍️ Pickup"} · #{order.id.slice(0, 8)}
+                {slotLabelFor(order.slot_start)} · <span className="capitalize">{order.fulfilment_type}</span>
               </p>
             </div>
           </div>
 
-          {/* Status Badges */}
-          <div className="flex flex-wrap items-center gap-1.5 justify-end shrink-0">
-            {order.status === "rescheduled" || (order.status === "confirmed" && order.notes?.includes("Baker Note:")) ? (
-              <>
-                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-bold bg-purple-500/15 text-purple-800 dark:text-purple-300 border border-purple-500/30 shadow-2xs">
-                  <Clock className="size-3" />
-                  <span>Rescheduled</span>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {order.status === "rescheduled" ? (
+              <div className="flex flex-wrap items-center justify-end gap-1">
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-purple-500/15 text-purple-800 dark:text-purple-300 border border-purple-500/30">
+                  <Clock className="size-3" /> Rescheduled
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 shadow-2xs">
-                  <CheckCircle2 className="size-3" />
-                  <span>Confirmed</span>
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
+                  <CheckCircle2 className="size-3" /> Confirmed
                 </span>
-              </>
+              </div>
             ) : (
               <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] sm:text-xs font-bold shrink-0 ${config.badgeClass}`}
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${config.badgeClass}`}
               >
                 <StatusIcon className="size-3" />
-                <span>{config.label}</span>
+                {config.label}
               </span>
             )}
+            <span className="text-[10px] text-muted-foreground font-mono">
+              #{order.id.slice(-6).toUpperCase()}
+            </span>
           </div>
         </div>
 
-        {/* 2. Compact Baker Kitchen Notification Callout */}
-        <div className="mt-3 rounded-xl bg-secondary/35 p-2.5 border border-border/40 flex items-start gap-2">
-          <Sparkles className="size-3.5 shrink-0 text-berry mt-0.5" />
-          <div className="text-[11px] text-muted-foreground leading-tight space-y-1 min-w-0">
-            <p className="text-foreground font-medium">{config.desc}</p>
-            {order.notes && order.notes.includes("Baker Note:") && (
-              <p className="text-purple-700 dark:text-purple-300 font-semibold">
-                {order.notes.slice(order.notes.indexOf("Baker Note:"))}
-              </p>
-            )}
-          </div>
+        {/* 2. Status Banner / Baker Note */}
+        <div className="mt-3 rounded-xl bg-secondary/40 p-2.5 text-xs text-muted-foreground border border-border/40">
+          <p className="font-medium text-foreground">{config.desc}</p>
+          {order.notes && (
+            <p className="mt-1 text-[11px] text-muted-foreground italic">
+              "{order.notes}"
+            </p>
+          )}
         </div>
 
-        {/* 3. High-Density Ordered Items List */}
-        <div className="mt-3">
-          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-            <span>Bake Box ({totalItemsCount} {totalItemsCount === 1 ? "bake" : "bakes"})</span>
+        {/* 3. Items List with Accordion for >3 Items */}
+        <div className="mt-3.5 space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border/40 pb-1">
+            <span>Bake Items ({totalItemsCount})</span>
             {isMultiItem && (
               <button
                 type="button"
                 onClick={() => setExpanded(!expanded)}
-                className="text-berry normal-case font-semibold hover:underline flex items-center gap-0.5 cursor-pointer"
+                className="flex items-center gap-0.5 text-berry hover:underline lowercase font-semibold cursor-pointer"
               >
                 {expanded ? (
-                  <>
-                    <span>Collapse</span>
-                    <ChevronUp className="size-3" />
-                  </>
+                  <>Show less <ChevronUp className="size-3" /></>
                 ) : (
-                  <>
-                    <span>+{items.length - 2} more bakes</span>
-                    <ChevronDown className="size-3" />
-                  </>
+                  <>+{items.length - 2} more <ChevronDown className="size-3" /></>
                 )}
               </button>
             )}
@@ -241,6 +253,20 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
           </p>
         </div>
       </div>
+
+      {/* Re-order Bakes Button */}
+      {order.status !== "awaiting_payment" && (
+        <div className="mt-3 pt-2.5 border-t border-border/50 flex items-center justify-between">
+          <span className="text-[11px] text-muted-foreground font-medium">Loved this batch?</span>
+          <button
+            type="button"
+            onClick={handleReorder}
+            className="inline-flex items-center gap-1 text-xs font-bold text-berry hover:text-berry/80 hover:underline cursor-pointer transition-colors"
+          >
+            <span>🔄 Re-order these bakes</span>
+          </button>
+        </div>
+      )}
 
       {/* Awaiting Payment Action Button */}
       {order.status === "awaiting_payment" && order.payment_link_url && (

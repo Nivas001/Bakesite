@@ -47,6 +47,8 @@ import {
   EyeOff,
   Lock,
   Unlock,
+  ChefHat,
+  Printer,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -365,6 +367,7 @@ function AdminDashboard() {
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
   const [orderSortBy, setOrderSortBy] = useState<string>("priority");
   const [orderSearchQuery, setOrderSearchQuery] = useState<string>("");
+  const [bakeSheetOpen, setBakeSheetOpen] = useState<boolean>(false);
 
   const [userSearchQuery, setUserSearchQuery] = useState<string>("");
   const [userVerifiedFilter, setUserVerifiedFilter] = useState<"all" | "verified" | "unverified">("all");
@@ -584,7 +587,18 @@ function AdminDashboard() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBakeSheetOpen(true)}
+                  className="h-9 rounded-xl border-berry/40 bg-berry/10 text-berry hover:bg-berry/20 font-bold text-xs gap-1.5 shadow-2xs cursor-pointer"
+                >
+                  <ChefHat className="size-3.5" />
+                  <span>Kitchen Bake Sheet</span>
+                </Button>
+
                 <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
                   Sort:
                 </span>
@@ -2410,7 +2424,196 @@ function AdminDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <KitchenBakeSheetDialog
+        open={bakeSheetOpen}
+        onOpenChange={setBakeSheetOpen}
+        orders={data.orders}
+      />
       <DevPanel />
     </div>
+  );
+}
+
+function KitchenBakeSheetDialog({
+  open,
+  onOpenChange,
+  orders,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  orders: Array<{
+    id: string;
+    slot_date: string;
+    slot_start: string;
+    slot_end: string;
+    status: string;
+    total: number;
+    order_items: Array<{
+      quantity: number;
+      product_name: string;
+      line_total: number;
+    }>;
+  }>;
+}) {
+  const activeOrders = orders.filter((o) => o.status !== "rejected" && o.status !== "refunded");
+  const availableDates = Array.from(new Set(activeOrders.map((o) => o.slot_date))).sort();
+  const [selectedDate, setSelectedDate] = useState<string>(availableDates[0] || toISODate(new Date()));
+
+  const dateOrders = activeOrders.filter((o) => o.slot_date === selectedDate);
+
+  const productAggregates: Record<
+    string,
+    { name: string; totalQty: number; ordersCount: number; slots: Record<string, number> }
+  > = {};
+
+  let totalItemsCount = 0;
+  let totalSlotRevenue = 0;
+
+  for (const order of dateOrders) {
+    totalSlotRevenue += Number(order.total);
+    for (const item of order.order_items) {
+      totalItemsCount += item.quantity;
+      if (!productAggregates[item.product_name]) {
+        productAggregates[item.product_name] = {
+          name: item.product_name,
+          totalQty: 0,
+          ordersCount: 0,
+          slots: {},
+        };
+      }
+      productAggregates[item.product_name]!.totalQty += item.quantity;
+      productAggregates[item.product_name]!.ordersCount += 1;
+      const slotKey = order.slot_start ? `${order.slot_start.slice(0, 5)}–${order.slot_end.slice(0, 5)}` : "General";
+      productAggregates[item.product_name]!.slots[slotKey] =
+        (productAggregates[item.product_name]!.slots[slotKey] || 0) + item.quantity;
+    }
+  }
+
+  const sortedItems = Object.values(productAggregates).sort((a, b) => b.totalQty - a.totalQty);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl p-6">
+        <DialogHeader className="border-b border-border/60 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-10 items-center justify-center rounded-2xl bg-berry/10 text-berry">
+                <ChefHat className="size-5" />
+              </div>
+              <div>
+                <DialogTitle className="font-display text-xl font-bold text-cocoa">
+                  Morning Kitchen Bake Sheet
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">
+                  Aggregated quantities for kitchen prep & morning oven schedules
+                </DialogDescription>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => window.print()}
+              className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs gap-1.5 shadow-soft shrink-0"
+            >
+              <Printer className="size-3.5" />
+              <span>Print Bake Sheet</span>
+            </Button>
+          </div>
+        </DialogHeader>
+
+        {/* Date Selector & Slot Metrics */}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-secondary/40 p-3.5 border border-border/50">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-foreground">Baking Date:</span>
+            <select
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="h-8 rounded-lg border border-input bg-background px-3 text-xs font-semibold shadow-xs cursor-pointer"
+            >
+              {availableDates.length === 0 ? (
+                <option value={selectedDate}>{selectedDate}</option>
+              ) : (
+                availableDates.map((d) => (
+                  <option key={d} value={d}>
+                    {d} ({activeOrders.filter((o) => o.slot_date === d).length} orders)
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3 text-xs font-sans">
+            <span className="font-semibold text-cocoa">
+              📦 {dateOrders.length} {dateOrders.length === 1 ? "order" : "orders"}
+            </span>
+            <span className="text-border">|</span>
+            <span className="font-bold text-berry">
+              🥐 {totalItemsCount} total bakes
+            </span>
+            <span className="text-border">|</span>
+            <span className="font-bold text-emerald-600 dark:text-emerald-400">
+              {formatCurrency(totalSlotRevenue)}
+            </span>
+          </div>
+        </div>
+
+        {/* Items Table */}
+        {sortedItems.length === 0 ? (
+          <div className="py-12 text-center text-muted-foreground text-sm font-medium">
+            No active baking orders for {selectedDate}.
+          </div>
+        ) : (
+          <div className="mt-4 overflow-hidden rounded-2xl border border-border/80 bg-card">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-border/60 bg-muted/50 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <th className="py-2.5 px-3.5">Pastry / Bake Item</th>
+                  <th className="py-2.5 px-3.5 text-center">Batch Total</th>
+                  <th className="py-2.5 px-3.5 text-right">Time Slot Breakdown</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/40 font-sans">
+                {sortedItems.map((item) => (
+                  <tr key={item.name} className="hover:bg-secondary/20 transition-colors">
+                    <td className="py-3 px-3.5 font-bold text-foreground">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">🥖</span>
+                        <span>{item.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-3.5 text-center">
+                      <span className="inline-flex items-center justify-center rounded-xl bg-berry/15 px-2.5 py-1 text-sm font-extrabold text-berry tracking-tight">
+                        {item.totalQty} pcs
+                      </span>
+                    </td>
+                    <td className="py-3 px-3.5 text-right font-medium text-muted-foreground">
+                      <div className="flex flex-wrap items-center justify-end gap-1.5">
+                        {Object.entries(item.slots).map(([slot, qty]) => (
+                          <span
+                            key={slot}
+                            className="rounded-lg bg-secondary/80 px-2 py-0.5 text-[10px] font-semibold text-secondary-foreground"
+                          >
+                            {slot}: <strong className="text-foreground">{qty}</strong>
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Kitchen Baking Guidelines */}
+        <div className="mt-4 rounded-xl bg-muted/40 p-3 text-[11px] text-muted-foreground border border-border/40 flex items-start gap-2">
+          <span className="text-sm">👨‍🍳</span>
+          <p>
+            <strong>Kitchen Protocol:</strong> Proof dough at 2:00 AM, first oven rotation at 4:00 AM dawn. Pack in ventilated pastry boxes 30 minutes prior to dispatch window.
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

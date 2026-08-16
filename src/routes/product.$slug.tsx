@@ -176,6 +176,26 @@ function ProductPage() {
             {product.description}
           </p>
 
+          {/* Artisan Quality & Dietary Badges */}
+          <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border/70 bg-card/70 p-3 text-xs text-muted-foreground shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">🌾</span>
+              <span className="font-medium text-foreground">Slow Fermentation</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm">🧈</span>
+              <span className="font-medium text-foreground">100% Pure Dairy Butter</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm">✨</span>
+              <span className="font-medium text-foreground">Baked at 4 AM Dawn</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm">🌿</span>
+              <span className="font-medium text-foreground">Clean Pantry Ingredients</span>
+            </div>
+          </div>
+
           {/* "How it gets to you" */}
           {showHowItWorks && (
             <div className="mt-6 rounded-2xl border border-border/60 bg-secondary/30 p-4">

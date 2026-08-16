@@ -318,6 +318,12 @@ function CheckoutPage() {
                       placeholder="e.g. WELCOME10"
                       value={promoCodeInput}
                       onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleApplyPromo();
+                        }
+                      }}
                       className="uppercase font-mono text-sm tracking-wider rounded-xl bg-background/50 focus:bg-background"
                     />
                     <Button
@@ -343,107 +349,192 @@ function CheckoutPage() {
                   <Calendar className="h-5 w-5 text-berry" />
                   <h2 className="font-display text-lg font-semibold">Date</h2>
                 </div>
-                <p className="mb-3 text-xs text-muted-foreground">
-                  Select next available baking & dispatch day
+                <p className="mb-4 text-xs text-muted-foreground">
+                  Pick your dispatch day (orders require 24h advance preparation)
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {dates.map((date, idx) => {
-                    const { weekdayShort, weekdayLong, day, monthShort } = parseDateParts(date);
-                    const isSelected = slotDate === date;
-                    const isEarliest = idx === 0;
+                {dates.length === 0 ? (
+                  <p className="text-sm text-destructive">
+                    No available baking slots in the next few days.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+                    {dates.map((date, index) => {
+                      const isSelected = slotDate === date;
+                      const { weekdayShort, weekdayLong, day, monthShort } = parseDateParts(date);
+                      const isEarliest = index === 0;
 
-                    if (isEarliest) {
+                      if (isEarliest) {
+                        return (
+                          <button
+                            key={date}
+                            type="button"
+                            onClick={() => setSlotDate(date)}
+                            className={`group relative col-span-2 sm:col-span-3 flex items-center justify-between overflow-hidden rounded-2xl border p-3.5 text-left transition-all duration-200 cursor-pointer ${
+                              isSelected
+                                ? "border-berry bg-berry/10 text-foreground ring-2 ring-berry shadow-xs"
+                                : "border-border bg-background/50 hover:border-berry/40 hover:bg-card"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`flex size-11 flex-col items-center justify-center rounded-xl font-sans transition-colors ${
+                                  isSelected
+                                    ? "bg-berry text-berry-foreground"
+                                    : "bg-secondary text-foreground group-hover:bg-berry/20"
+                                }`}
+                              >
+                                <span className="text-[10px] font-bold uppercase tracking-wider leading-none">
+                                  {weekdayShort}
+                                </span>
+                                <span className="text-base font-extrabold leading-none mt-0.5">
+                                  {day}
+                                </span>
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-sans font-bold text-sm text-foreground tracking-tight">
+                                    {weekdayLong}, {day} {monthShort}
+                                  </p>
+                                </div>
+                                <p className="text-[11px] text-muted-foreground">
+                                  Next Available Dispatch
+                                </p>
+                              </div>
+                            </div>
+
+                            <div>
+                              {isSelected ? (
+                                <span className="flex items-center gap-1 rounded-full bg-berry px-2 py-0.5 text-[10px] font-bold text-berry-foreground">
+                                  <Check className="h-3 w-3" /> Selected
+                                </span>
+                              ) : (
+                                <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-semibold text-secondary-foreground">
+                                  Earliest
+                                </span>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      }
+
                       return (
                         <button
                           key={date}
                           type="button"
                           onClick={() => setSlotDate(date)}
-                          className={`group relative sm:col-span-2 flex items-center justify-between overflow-hidden rounded-2xl border p-3.5 text-left transition-all duration-200 cursor-pointer ${
+                          className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-3 text-left transition-all duration-200 cursor-pointer ${
                             isSelected
                               ? "border-berry bg-berry/10 text-foreground ring-2 ring-berry shadow-xs"
                               : "border-border bg-background/50 hover:border-berry/40 hover:bg-card"
                           }`}
                         >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl transition-colors ${
+                          <div className="flex items-start justify-between">
+                            <span
+                              className={`rounded-lg px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
                                 isSelected
-                                  ? "bg-berry text-berry-foreground font-bold"
-                                  : "bg-muted text-foreground group-hover:bg-berry/10 group-hover:text-berry"
+                                  ? "bg-berry text-berry-foreground"
+                                  : "bg-muted text-muted-foreground group-hover:text-berry"
                               }`}
                             >
-                              <span className="text-[10px] uppercase font-bold tracking-wider leading-none">
-                                {weekdayShort}
-                              </span>
-                              <span className="text-base font-extrabold leading-none mt-0.5">
-                                {day}
-                              </span>
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-sans font-bold text-sm text-foreground tracking-tight">
-                                  {weekdayLong}, {day} {monthShort}
-                                </p>
-                              </div>
-                              <p className="text-[11px] text-muted-foreground">
-                                Next Available Dispatch
-                              </p>
-                            </div>
-                          </div>
-
-                          <div>
+                              {weekdayShort}
+                            </span>
                             {isSelected ? (
-                              <span className="flex items-center gap-1 rounded-full bg-berry px-2 py-0.5 text-[10px] font-bold text-berry-foreground">
-                                <Check className="h-3 w-3" /> Selected
+                              <span className="flex items-center gap-0.5 rounded-full bg-berry px-1.5 py-0.5 text-[9px] font-bold text-berry-foreground">
+                                <Check className="h-2.5 w-2.5" /> Selected
                               </span>
                             ) : (
-                              <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-semibold text-secondary-foreground">
-                                Earliest
-                              </span>
+                              <span className="text-[10px] text-muted-foreground">{monthShort}</span>
                             )}
+                          </div>
+
+                          <div className="mt-2.5 flex items-baseline gap-1.5">
+                            <span className="font-sans text-xl font-extrabold text-foreground leading-none">
+                              {day}
+                            </span>
+                            <span className="font-sans text-xs font-semibold text-muted-foreground">
+                              {monthShort}
+                            </span>
                           </div>
                         </button>
                       );
-                    }
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Bento Time Window Card */}
+            <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock className="h-5 w-5 text-berry" />
+                  <h2 className="font-display text-lg font-semibold">Time window</h2>
+                </div>
+                <p className="mb-4 text-xs text-muted-foreground">
+                  Select your preferred {fulfilmentType} window
+                </p>
+
+                <div className="space-y-2.5">
+                  {TIME_SLOTS.map((s) => {
+                    const isSelected = slotId === s.id;
+                    const available = slotDate ? isSlotAvailable(slotDate, s.start, 24) : true;
+                    const meta = SLOT_METADATA[s.id] ?? {
+                      icon: Clock,
+                      tag: "Available",
+                      period: "Slot",
+                    };
+                    const Icon = meta.icon;
 
                     return (
                       <button
-                        key={date}
+                        key={s.id}
                         type="button"
-                        onClick={() => setSlotDate(date)}
-                        className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-3 text-left transition-all duration-200 cursor-pointer ${
-                          isSelected
-                            ? "border-berry bg-berry/10 text-foreground ring-2 ring-berry shadow-xs"
-                            : "border-border bg-background/50 hover:border-berry/40 hover:bg-card"
+                        disabled={!available}
+                        onClick={() => setSlotId(s.id)}
+                        className={`group relative flex w-full items-center justify-between rounded-2xl border p-3 text-left transition-all duration-200 ${
+                          !available
+                            ? "cursor-not-allowed border-border/40 bg-muted/20 opacity-40"
+                            : isSelected
+                              ? "border-berry bg-berry/10 ring-2 ring-berry shadow-xs cursor-pointer"
+                              : "border-border bg-background/50 hover:border-berry/40 hover:bg-card cursor-pointer"
                         }`}
                       >
-                        <div className="flex items-start justify-between">
-                          <span
-                            className={`rounded-lg px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`flex size-9 items-center justify-center rounded-xl transition-colors ${
                               isSelected
                                 ? "bg-berry text-berry-foreground"
-                                : "bg-muted text-muted-foreground group-hover:text-berry"
+                                : "bg-secondary text-muted-foreground group-hover:text-foreground"
                             }`}
                           >
-                            {weekdayShort}
-                          </span>
-                          {isSelected ? (
-                            <span className="flex items-center gap-0.5 rounded-full bg-berry px-1.5 py-0.5 text-[9px] font-bold text-berry-foreground">
-                              <Check className="h-2.5 w-2.5" /> Selected
-                            </span>
-                          ) : (
-                            <span className="text-[10px] text-muted-foreground">{monthShort}</span>
-                          )}
+                            <Icon className="size-4" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-sans text-xs font-bold text-foreground">
+                                {s.label.split("·")[0]?.trim()}
+                              </p>
+                              <span className="text-[10px] text-muted-foreground font-medium">
+                                ({s.label.split("·")[1]?.trim()})
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground">{meta.tag}</p>
+                          </div>
                         </div>
 
-                        <div className="mt-2.5 flex items-baseline gap-1.5">
-                          <span className="font-sans text-xl font-extrabold text-foreground leading-none">
-                            {day}
-                          </span>
-                          <span className="font-sans text-xs font-semibold text-muted-foreground">
-                            {monthShort}
-                          </span>
+                        <div>
+                          {isSelected ? (
+                            <span className="flex items-center gap-1 rounded-full bg-berry px-2 py-0.5 text-[10px] font-bold text-berry-foreground">
+                              <Check className="h-3 w-3" /> Selected
+                            </span>
+                          ) : available ? (
+                            <span className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground">
+                              Select
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-medium text-destructive">Closed</span>
+                          )}
                         </div>
                       </button>
                     );
@@ -451,131 +542,35 @@ function CheckoutPage() {
                 </div>
               </div>
             </section>
-
-            {/* Bento Time Window Card */}
-            <section className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-              <div className="flex items-center gap-2 mb-3">
-                <Clock className="h-5 w-5 text-berry" />
-                <h2 className="font-display text-lg font-semibold">Time window</h2>
-              </div>
-              <p className="mb-3 text-xs text-muted-foreground">
-                Choose your delivery arrival window
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {TIME_SLOTS.map((slot) => {
-                  const meta = SLOT_METADATA[slot.id] ?? {
-                    icon: Clock,
-                    tag: "Bakery slot",
-                    period: slot.label,
-                  };
-                  const Icon = meta.icon;
-                  const isAvailable = isSlotAvailable(slotDate, slot.start, 24);
-                  const isSelected = slotId === slot.id && isAvailable;
-
-                  if (!isAvailable) {
-                    return (
-                      <div
-                        key={slot.id}
-                        className="relative flex flex-col justify-between overflow-hidden rounded-2xl border border-dashed border-border/70 bg-muted/20 p-3 text-left opacity-55 cursor-not-allowed select-none"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
-                            <Icon className="h-3.5 w-3.5" />
-                          </div>
-                          <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-semibold text-muted-foreground">
-                            Requires 24h notice
-                          </span>
-                        </div>
-                        <div className="mt-2.5">
-                          <p className="font-sans font-medium text-xs text-muted-foreground">
-                            {meta.period}
-                          </p>
-                          <p className="font-sans text-[11px] text-muted-foreground/70">
-                            {slot.start} – {slot.end} (Unavailable)
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <button
-                      key={slot.id}
-                      type="button"
-                      onClick={() => setSlotId(slot.id)}
-                      className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-3 text-left transition-all duration-200 cursor-pointer ${
-                        isSelected
-                          ? "border-berry bg-berry/10 text-foreground ring-2 ring-berry shadow-xs"
-                          : "border-border bg-background/50 hover:border-berry/40 hover:bg-card"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div
-                          className={`flex h-7 w-7 items-center justify-center rounded-xl transition-colors ${
-                            isSelected
-                              ? "bg-berry text-berry-foreground"
-                              : "bg-muted text-muted-foreground group-hover:text-berry"
-                          }`}
-                        >
-                          <Icon className="h-3.5 w-3.5" />
-                        </div>
-                        {isSelected ? (
-                          <span className="flex items-center gap-1 rounded-full bg-berry px-1.5 py-0.5 text-[9px] font-bold text-berry-foreground">
-                            <Check className="h-2.5 w-2.5" /> Selected
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground">
-                            {meta.tag}
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-2.5">
-                        <p className="font-sans font-bold text-xs text-foreground tracking-tight">
-                          {meta.period}
-                        </p>
-                        <p className="font-sans text-[11px] text-muted-foreground">
-                          {slot.start} – {slot.end}
-                        </p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
           </div>
 
-          {/* Separate Delivery Details and Additional Notes Cards */}
+          {/* 50/50 Bottom Row: Contact Details & Additional Notes */}
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Delivery Details Card */}
-            <section className="flex flex-col justify-between rounded-3xl border border-border bg-card p-6 shadow-soft">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-berry" />
-                    <h2 className="font-display text-lg font-semibold">Delivery Details</h2>
-                  </div>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-xl"
-                  >
-                    <Link to="/profile" search={{ returnTo: "/checkout" }}>
-                      <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                      Edit
-                    </Link>
-                  </Button>
+            {/* Contact Details Card */}
+            <section className="flex flex-col rounded-3xl border border-border bg-card p-6 shadow-soft">
+              <div className="flex items-center justify-between border-b border-border/80 pb-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-berry" />
+                  <h2 className="font-display text-lg font-semibold">Contact & Delivery</h2>
                 </div>
+                {profile && (
+                  <Link
+                    to="/profile"
+                    search={{ returnTo: "/checkout" }}
+                    className="text-xs font-semibold text-berry hover:underline flex items-center gap-1"
+                  >
+                    <Pencil className="h-3 w-3" /> Edit in profile
+                  </Link>
+                )}
+              </div>
 
-                {!profile || !isProfileReady || (fulfilmentType === "delivery" && !profile.address) ? (
-                  <div className="rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 p-6 text-center space-y-3">
-                    <p className="text-sm font-semibold text-cocoa">
-                      {!hasValidPhone
-                        ? "Contact phone number required before placing an order."
-                        : "Please complete your delivery details to proceed."}
-                    </p>
+              <div className="flex flex-1 flex-col justify-between">
+                {!profile || !isProfileReady ? (
+                  <div className="rounded-2xl border border-dashed border-berry/40 bg-berry/5 p-4 text-center space-y-3">
                     <p className="text-xs text-muted-foreground">
-                      Full name, contact mobile number, and delivery address are required.
+                      {!hasValidPhone
+                        ? "A phone number is required so our delivery partner can coordinate your drop-off."
+                        : "Please complete your delivery address and name in your profile."}
                     </p>
                     <Button
                       asChild
@@ -614,24 +609,60 @@ function CheckoutPage() {
                             <MapPin className="h-4 w-4 text-berry" />
                           </div>
                           <div className="w-full">
-                            <p className="text-[11px] text-muted-foreground">Address</p>
-                            <p className="whitespace-pre-wrap text-sm font-medium text-foreground leading-snug">
+                            <div className="flex items-center justify-between">
+                              <p className="text-[11px] text-muted-foreground">Delivery Address</p>
+                              <Link
+                                to="/profile"
+                                search={{ returnTo: "/checkout" }}
+                                className="text-[10px] font-semibold text-berry hover:underline"
+                              >
+                                Edit
+                              </Link>
+                            </div>
+                            <p className="whitespace-pre-wrap text-sm font-medium text-foreground leading-snug mt-0.5">
                               {profile.address}
                             </p>
-                            {profile.latitude != null && profile.longitude != null && (
-                              <div className="mt-3 overflow-hidden rounded-xl border border-border">
-                                <ClientOnly fallback={<div className="h-28 w-full bg-muted" />}>
-                                  <Suspense fallback={<div className="h-28 w-full bg-muted" />}>
-                                    <div className="h-28">
-                                      <LocationPicker
-                                        latitude={profile.latitude}
-                                        longitude={profile.longitude}
-                                        readonly
-                                        onChange={() => {}}
-                                      />
-                                    </div>
-                                  </Suspense>
-                                </ClientOnly>
+                            {profile.latitude != null && profile.longitude != null ? (
+                              <div className="mt-3">
+                                <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
+                                  <span className="inline-flex items-center gap-1 font-semibold text-cocoa">
+                                    <MapPin className="size-3 text-berry" /> Doorstep GPS Pin Set
+                                  </span>
+                                  <Link
+                                    to="/profile"
+                                    search={{ returnTo: "/checkout" }}
+                                    className="text-[10px] text-berry hover:underline font-semibold"
+                                  >
+                                    Adjust Pin on Map ➔
+                                  </Link>
+                                </div>
+                                <div className="overflow-hidden rounded-xl border border-border">
+                                  <ClientOnly fallback={<div className="h-28 w-full bg-muted" />}>
+                                    <Suspense fallback={<div className="h-28 w-full bg-muted" />}>
+                                      <div className="h-28">
+                                        <LocationPicker
+                                          latitude={profile.latitude}
+                                          longitude={profile.longitude}
+                                          readonly
+                                          onChange={() => {}}
+                                        />
+                                      </div>
+                                    </Suspense>
+                                  </ClientOnly>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="mt-2.5 rounded-xl border border-dashed border-berry/30 bg-berry/5 p-2.5 flex items-center justify-between">
+                                <span className="text-[11px] text-muted-foreground">
+                                  📍 Add doorstep GPS pin for effortless rider delivery
+                                </span>
+                                <Link
+                                  to="/profile"
+                                  search={{ returnTo: "/checkout" }}
+                                  className="text-[10px] font-bold text-berry hover:underline shrink-0 ml-2"
+                                >
+                                  Pin on Map →
+                                </Link>
                               </div>
                             )}
                           </div>
@@ -690,15 +721,41 @@ function CheckoutPage() {
               </div>
             </section>
 
-            {/* Additional Notes Card */}
+            {/* Additional Notes Card with Quick Baker Suggestion Chips */}
             <section className="flex flex-col rounded-3xl border border-border bg-card p-6 shadow-soft">
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-5 w-5 text-berry" />
-                <h2 className="font-display text-lg font-semibold">Additional Notes</h2>
+                <h2 className="font-display text-lg font-semibold">Baker & Delivery Notes</h2>
               </div>
-              <p className="mb-3 text-xs text-muted-foreground">
-                Special delivery instructions, gate codes, or dietary notes (optional)
+              <p className="mb-2.5 text-xs text-muted-foreground">
+                Special requests, slice preferences, gate codes, or gift box notes (optional)
               </p>
+
+              {/* Quick Suggestion Chips */}
+              <div className="flex flex-wrap gap-1.5 mb-2.5">
+                {[
+                  "🎂 Write Happy Birthday on box",
+                  "🥖 Please slice the loaf",
+                  "🔔 Ring bell on arrival",
+                  "🚪 Leave at security / door",
+                  "🎁 Gift packing requested",
+                ].map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => {
+                      setNotes((prev) => {
+                        const clean = chip.replace(/^[^\s]+\s/, "");
+                        return prev ? `${prev} · ${clean}` : clean;
+                      });
+                    }}
+                    className="rounded-full border border-border/70 bg-secondary/50 px-2.5 py-1 text-[10px] font-medium text-foreground hover:bg-berry/10 hover:border-berry/40 transition-colors cursor-pointer"
+                  >
+                    + {chip}
+                  </button>
+                ))}
+              </div>
+
               <div className="flex flex-1 flex-col">
                 <Label htmlFor="notes" className="sr-only">
                   Notes for the bakery
@@ -706,7 +763,7 @@ function CheckoutPage() {
                 <Textarea
                   id="notes"
                   placeholder="e.g. Leave with reception, ring bell twice, extra napkins requested..."
-                  className="min-h-[140px] flex-1 resize-none rounded-2xl border-border bg-background/50 p-3.5 text-sm transition-colors focus:bg-background focus:ring-1 focus:ring-berry"
+                  className="min-h-[110px] flex-1 resize-none rounded-2xl border-border bg-background/50 p-3.5 text-sm transition-colors focus:bg-background focus:ring-1 focus:ring-berry"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
