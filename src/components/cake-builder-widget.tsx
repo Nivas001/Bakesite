@@ -433,7 +433,7 @@ export function CakeBuilderWidget() {
           </div>
 
           {/* RIGHT: Live Realistic Showcase Column (5 Columns) */}
-          <div className="lg:col-span-5 rounded-3xl border border-border/80 bg-card p-6 shadow-lift flex flex-col justify-between overflow-hidden relative">
+          <div className="lg:col-span-5 rounded-3xl border border-border/80 bg-card p-6 shadow-lift flex flex-col justify-between overflow-hidden relative lg:sticky lg:top-24 h-fit">
             <div>
               {/* Header Badge */}
               <div className="flex items-center justify-between border-b border-border/60 pb-3 mb-4">
