@@ -155,25 +155,21 @@ export function CakeStudioCarousel() {
 
   return (
     <section className="relative overflow-hidden py-12 sm:py-16 bg-secondary/20 border-y border-border/70">
-      {/* Background Glows */}
+      {/* Ambient Background Glows */}
       <div className="absolute -left-20 top-1/3 size-72 rounded-full bg-berry/10 blur-3xl pointer-events-none" />
       <div className="absolute -right-20 bottom-10 size-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
 
       <div className="mx-auto w-full max-w-6xl px-4">
         
-        {/* Section Header */}
+        {/* Section Header (Cleaned: Subheader removed) */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-berry mb-2">
-              <Sparkles className="size-3.5" />
-              <span>The Celebration Cake Studio</span>
-            </div>
             <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight">
               Bespoke bakes for core memories
             </h2>
           </div>
 
-          {/* Carousel Navigation Buttons */}
+          {/* Carousel Navigation Controls */}
           <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
             <span className="text-xs font-mono font-bold text-muted-foreground">
               <strong className="text-cocoa font-extrabold">{String(current + 1).padStart(2, "0")}</strong> / {String(CAKE_SLIDES.length).padStart(2, "0")}
@@ -201,9 +197,9 @@ export function CakeStudioCarousel() {
         </div>
 
         {/* Locked-Height Grid (Zero jumping across all 8 slides) */}
-        <div className="grid grid-cols-1 lg:grid-cols-[30%_66%] gap-6 lg:gap-[4%] items-stretch lg:h-[560px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[32%_64%] gap-6 lg:gap-[4%] items-stretch lg:h-[560px]">
           
-          {/* Left Column: Fixed height card with perfectly aligned rows */}
+          {/* Left Column: Fixed height card with perfectly non-overflowing tags */}
           <div className="flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-6 shadow-soft h-full min-h-[500px] lg:min-h-0">
             <div className="space-y-3.5">
               
@@ -243,16 +239,16 @@ export function CakeStudioCarousel() {
                 </div>
                 <div className="grid grid-cols-[85px_1fr] items-center gap-2 pt-1.5 border-t border-border/40">
                   <span className="font-bold text-foreground shrink-0">Handcrafted:</span>
-                  <span className="text-berry font-bold truncate">Ani Bakes Studio, Pondy</span>
+                  <span className="text-berry font-bold truncate">Ani Bakes Studio</span>
                 </div>
               </div>
 
-              {/* Tags Slot (Fixed Height) */}
-              <div className="h-7 flex items-center overflow-hidden gap-1.5">
-                {activeSlide.tags.map((tag) => (
+              {/* Tags Slot (Non-Overflowing Flex Wrap Grid) */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {activeSlide.tags.slice(0, 4).map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-border/80 bg-secondary/30 px-2.5 py-0.5 text-[10px] font-semibold text-foreground shadow-2xs whitespace-nowrap"
+                    className="inline-flex items-center rounded-full border border-border/80 bg-secondary/40 px-2.5 py-1 text-[10.5px] font-medium text-foreground shadow-2xs"
                   >
                     {tag}
                   </span>
@@ -297,7 +293,7 @@ export function CakeStudioCarousel() {
                   asChild
                   variant="outline"
                   size="sm"
-                  className="w-full rounded-2xl border-border/80 hover:border-berry/40 text-xs font-semibold text-muted-foreground hover:text-foreground h-8.5"
+                  className="w-full rounded-2xl border-border/80 hover:border-cocoa/40 text-xs font-semibold text-muted-foreground hover:text-cocoa h-8.5"
                 >
                   <Link to="/shop">
                     <span>Browse All Daily Counter Bakes</span>
@@ -308,7 +304,7 @@ export function CakeStudioCarousel() {
             </div>
           </div>
 
-          {/* Right Column: Fixed height 3D Showcase Card */}
+          {/* Right Column: Fixed height 3D Showcase Card (Clean: Pondicherry Kitchen tag removed) */}
           <div
             ref={containerRef}
             onMouseMove={handleMouseMove}
@@ -327,25 +323,22 @@ export function CakeStudioCarousel() {
                 transformStyle: "preserve-3d",
               }}
             >
-              {/* Product Photograph */}
+              {/* Product Photograph with Smooth Crossfade */}
               <img
                 key={activeSlide.image}
                 src={activeSlide.image}
                 alt={activeSlide.title}
-                className="w-full h-full object-cover select-none animate-in fade-in duration-300"
+                className="w-full h-full object-cover select-none transition-all duration-500"
               />
 
               {/* Dynamic Gradient Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent pointer-events-none" />
 
-              {/* Floating Detail Chips (Top Right) */}
-              <div className="absolute top-4 right-4 flex flex-col items-end gap-2 pointer-events-none">
+              {/* Floating Badge (Top Right) */}
+              <div className="absolute top-4 right-4 pointer-events-none">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 text-xs font-extrabold shadow-lg">
                   <Sparkles className="size-3 text-amber-300" />
                   <span>{activeSlide.badge}</span>
-                </span>
-                <span className="rounded-full bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200/50 px-3 py-1 text-[11px] font-bold shadow-md">
-                  📍 Pondicherry Kitchen
                 </span>
               </div>
 
