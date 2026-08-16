@@ -23,7 +23,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 const NAV = [
   { to: "/", label: "Home", icon: Home, badge: null },
   { to: "/shop", label: "Shop", icon: Store, badge: null },
-  { to: "/offers", label: "Offers", icon: Tag, badge: "Deals" },
+  { to: "/offers", label: "Offers", icon: Tag, badge: null },
   { to: "/orders", label: "Orders", icon: Package, badge: null },
 ] as const;
 
