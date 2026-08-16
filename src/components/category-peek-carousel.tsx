@@ -111,15 +111,6 @@ export function CategoryPeekCarousel({
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <div className="flex items-center gap-1.5 mb-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-berry">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                The Bakery Counter
-              </span>
-              <span className="text-xs text-muted-foreground hidden sm:inline-block">
-                · Handcrafted every dawn from 4:00 AM
-              </span>
-            </div>
             <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa">
               Explore by bake category
             </h2>
@@ -131,7 +122,7 @@ export function CategoryPeekCarousel({
               asChild
               variant="outline"
               size="sm"
-              className="rounded-full border-border bg-card/90 text-berry hover:bg-secondary/60 text-xs font-bold h-9 px-4 shadow-2xs"
+              className="rounded-full border-cocoa/30 bg-card/90 text-cocoa hover:bg-cocoa/10 hover:text-cocoa text-xs font-bold h-9 px-4 shadow-2xs cursor-pointer"
             >
               <Link to="/shop">
                 Browse Full Catalog <ArrowRight className="ml-1.5 size-3.5" />
@@ -293,7 +284,7 @@ export function CategoryPeekCarousel({
               onClick={() => setActiveIndex(idx)}
               className={`h-2 rounded-full transition-all cursor-pointer ${
                 activeIndex === idx
-                  ? "w-7 bg-berry"
+                  ? "w-7 bg-cocoa"
                   : "w-2 bg-border hover:bg-muted-foreground/60"
               }`}
             />
