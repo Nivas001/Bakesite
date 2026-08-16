@@ -115,7 +115,7 @@ export function SiteFooter() {
             
             {/* 1. Brand Bio: Hidden on mobile (<640px), visible on tablet & desktop */}
             <div className="hidden sm:block">
-              <p className="font-display text-lg font-bold text-cocoa">Ani Bakes</p>
+              <p className="font-nimbus text-2xl font-bold text-cocoa">Ani Bakes<span className="text-berry">.</span></p>
               <p className="mt-2 max-w-xs text-sm text-muted-foreground">
                 A small-batch neighbourhood bakery. Everything is baked the morning of your slot.
               </p>
@@ -173,7 +173,7 @@ export function SiteFooter() {
         {/* Trademark / Copyright Bar */}
         <div className="border-t border-border/60 py-4 px-4">
           <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span>© {new Date().getFullYear()} Ani Bakes Bakery</span>
+            <span>© {new Date().getFullYear()} <span className="font-nimbus font-bold text-cocoa text-sm">Ani Bakes</span> Bakery</span>
             <span className="flex items-center gap-1.5">
               Baked with <Heart className="size-3 text-berry animate-pulse" /> in Pondicherry
             </span>

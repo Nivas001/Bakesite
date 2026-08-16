@@ -42,7 +42,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-2 sm:gap-4 px-3.5 sm:px-4">
-        <Link to="/" className="font-display text-lg sm:text-xl font-bold tracking-tight text-cocoa shrink-0">
+        <Link to="/" className="font-nimbus text-xl sm:text-2xl font-bold tracking-normal text-cocoa shrink-0 transition-transform hover:scale-[1.02]">
           Ani Bakes
           <span className="ml-0.5 text-berry">.</span>
         </Link>
@@ -59,38 +59,63 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          {isAdmin && (
-            <Link
-              to="/admin"
-              className="relative text-xs lg:text-sm font-bold text-berry whitespace-nowrap transition-colors hover:text-berry/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-berry after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100"
-              activeProps={{ className: "after:scale-x-100" }}
-            >
-              Admin
-            </Link>
-          )}
         </nav>
 
-        {/* Action Buttons */}
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2 shrink-0">
-          <Button asChild variant="ghost" size="icon" aria-label="Cart" className="size-9 sm:size-10">
-            <Link to="/cart" className="relative">
-              <ShoppingBag className="size-4.5 sm:size-5" />
+        {/* Right Action Icons (Cart, Account, Mobile Menu) */}
+        <div className="ml-auto flex items-center gap-1.5 sm:gap-2.5">
+          {isAdmin && (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="hidden lg:inline-flex rounded-full border-berry/30 bg-berry/10 text-berry hover:bg-berry/20 text-xs font-semibold h-8 px-3"
+            >
+              <Link to="/admin">
+                <ShieldCheck className="mr-1.5 size-3.5" />
+                Admin
+              </Link>
+            </Button>
+          )}
+
+          {/* Cart Icon with Dynamic Pill Badge */}
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            className="relative size-9 rounded-full transition-transform hover:scale-105 active:scale-95"
+            aria-label="Cart"
+          >
+            <Link to="/cart">
+              <ShoppingBag className="size-4.5 text-foreground" />
               {count > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-berry text-[10px] font-semibold text-berry-foreground">
-                  {count}
+                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-berry text-[10px] font-bold text-berry-foreground shadow-xs animate-in zoom-in-75">
+                  {count > 9 ? "9+" : count}
                 </span>
               )}
             </Link>
           </Button>
 
+          {/* Auth State Button */}
           {session ? (
-            <div className="hidden items-center gap-1.5 sm:gap-2 sm:flex">
-              <Button asChild variant="ghost" size="sm" className="h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap">
-                <Link to="/profile">
-                  <User className="mr-1 size-3.5 sm:size-4" /> Account
+            <div className="flex items-center gap-1.5">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="hidden text-xs text-muted-foreground hover:text-foreground sm:inline-flex h-8 px-2.5"
+              >
+                <Link to="/orders">
+                  <User className="mr-1.5 size-3.5" />
+                  My Orders
                 </Link>
               </Button>
-              <Button variant="outline" size="sm" onClick={signOut} className="h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={signOut}
+                className="hidden text-xs text-muted-foreground hover:text-destructive sm:inline-flex h-8 px-2.5"
+              >
+                <LogOut className="mr-1.5 size-3.5" />
                 Sign out
               </Button>
             </div>
@@ -116,7 +141,7 @@ export function SiteHeader() {
                     <Sparkles className="size-4" />
                   </div>
                   <div>
-                    <p className="font-display text-base font-bold text-cocoa leading-tight">
+                    <p className="font-nimbus text-lg font-bold text-cocoa leading-tight">
                       Ani Bakes<span className="text-berry">.</span>
                     </p>
                     <p className="text-[10px] text-muted-foreground">Fresh small-batch bakery</p>
