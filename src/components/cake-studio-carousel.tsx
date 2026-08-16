@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
-import { Sparkles, ArrowRight, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
+import { Sparkles, ArrowRight, ChevronLeft, ChevronRight, MessageCircle, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface CakeSlide {
@@ -26,8 +26,44 @@ export const CAKE_SLIDES: CakeSlide[] = [
     tags: ["🍓 Strawberry Confit", "✨ Custom Lettering", "💕 4-Inch Bento", "🧈 French Buttercream"],
     serves: "2–3 Persons",
     price: "₹550",
-    occasion: "Anniversaries & Bestie Birthdays",
+    occasion: "Anniversaries & Besties",
     badge: "Most Loved Bento",
+  },
+  {
+    id: "butterfly-lilac",
+    title: '"Butterfly Dream" Lilac Swirl Cake',
+    subtitle: "Edible Golden Butterfly & Pearl Swirl",
+    image: "/cakes/butterfly-lilac-cake.jpg",
+    story: "Two-tone lilac swirl with 3D edible gold & lilac flutter butterflies and glistening sugar pearls over a Madagascar vanilla crumb.",
+    tags: ["🦋 3D Gold Butterflies", "🦪 Edible Pearl Beading", "💜 Lavender Vanilla", "🎂 5-Inch Tier"],
+    serves: "4–6 Persons",
+    price: "₹890",
+    occasion: "Garden Birthdays & High-Teas",
+    badge: "New Creation",
+  },
+  {
+    id: "coral-heart",
+    title: '"Golden Heart & Petal" Celebration Cake',
+    subtitle: "Piped Buttercream Hearts & 24K Gold Heart",
+    image: "/cakes/coral-heart-cake.jpg",
+    story: "Peach-coral buttercream swirl adorned with hand-piped heart droplets, golden pearls, and an edible 24K gilded chocolate heart centerpiece.",
+    tags: ["💛 24K Gold Heart", "💕 Buttercream Hearts", "🍓 Strawberry Crumb", "✨ Golden Spheres"],
+    serves: "4–6 Persons",
+    price: "₹850",
+    occasion: "Valentine & Anniversaries",
+    badge: "Signature Romance",
+  },
+  {
+    id: "biscoff-herringbone",
+    title: '"Biscoff Caramel Chevron" Feast Slab',
+    subtitle: "Caramel Feathered Slab with Golden Topper",
+    image: "/cakes/biscoff-herringbone-cake.jpg",
+    story: "Multi-layered square feast slab with handcrafted caramel herringbone feathering, crunchy lotus crumb border, and golden acrylic topper.",
+    tags: ["🍪 Biscoff Feathering", "👑 Acrylic Gold Topper", "🍯 Salted Caramel", "🎂 Square Slab"],
+    serves: "8–12 Persons",
+    price: "₹1,550",
+    occasion: "Grand Milestone Birthdays",
+    badge: "Celebration Feast",
   },
   {
     id: "lavender-pearl",
@@ -38,7 +74,7 @@ export const CAKE_SLIDES: CakeSlide[] = [
     tags: ["🌸 Sugar Blossoms", "🦪 Edible Pearls", "🌿 Pure Vanilla", "🎂 6-Inch Tier"],
     serves: "6–8 Persons",
     price: "₹1,250",
-    occasion: "Milestone Birthdays & High-Teas",
+    occasion: "Milestone Birthdays",
     badge: "Artisan Showpiece",
   },
   {
@@ -50,7 +86,7 @@ export const CAKE_SLIDES: CakeSlide[] = [
     tags: ["✨ 24K Gold Shimmer", "🍫 70% Couverture", "👑 Celebration Slab", "🌰 Hazelnut Truffle"],
     serves: "8–12 Persons",
     price: "₹1,650",
-    occasion: "Luxury Birthdays & Grand Feasts",
+    occasion: "Luxury Birthdays & Feasts",
     badge: "Head Baker's Signature",
   },
   {
@@ -62,7 +98,7 @@ export const CAKE_SLIDES: CakeSlide[] = [
     tags: ["🥜 Roasted Pistachio", "🍪 Lotus Biscoff Swirl", "🍫 Belgian Fudge", "✨ Mosaic Grid"],
     serves: "10–14 Persons",
     price: "₹1,450",
-    occasion: "Celebration Gifting & Office Feasts",
+    occasion: "Celebration Gifting",
     badge: "Crowd Favorite",
   },
   {
@@ -72,7 +108,7 @@ export const CAKE_SLIDES: CakeSlide[] = [
     image: "/cakes/trio-snack-loaves.jpg",
     story: "Baked in golden bakery foil tins: Classic Chocolate Chip Golden Blondie, Double Dark Cocoa Fudge Loaf, and White-Chip Velvet Cake.",
     tags: ["🍯 Golden Blondie", "🍫 Double Fudge", "❤️ Red Velvet Bar", "📦 Gift Tin Packaging"],
-    serves: "3 Loaves (6–9 Servings)",
+    serves: "6–9 Servings",
     price: "₹780",
     occasion: "Afternoon Teas & Gifting",
     badge: "Teatime Essential",
@@ -125,7 +161,7 @@ export function CakeStudioCarousel() {
 
       <div className="mx-auto w-full max-w-6xl px-4">
         
-        {/* Section Header with completely static, non-jumping navigation */}
+        {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
             <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-berry mb-2">
@@ -164,19 +200,21 @@ export function CakeStudioCarousel() {
           </div>
         </div>
 
-        {/* Locked-Height Grid (Prevents any jumping or layout shift) */}
+        {/* Locked-Height Grid (Zero jumping across all 8 slides) */}
         <div className="grid grid-cols-1 lg:grid-cols-[30%_66%] gap-6 lg:gap-[4%] items-stretch lg:h-[560px]">
           
-          {/* Left Column: Fixed height container with anchored slots */}
+          {/* Left Column: Fixed height card with perfectly aligned rows */}
           <div className="flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-6 shadow-soft h-full min-h-[500px] lg:min-h-0">
             <div className="space-y-3.5">
-              {/* Badge & Serves Slot */}
-              <div className="flex items-center justify-between h-7">
-                <span className="rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30 px-3 py-0.5 text-[11px] font-extrabold uppercase tracking-wider">
+              
+              {/* Badge & Perfectly Aligned Serves Row */}
+              <div className="flex items-center justify-between gap-2 h-7">
+                <span className="rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30 px-3 py-0.5 text-[11px] font-extrabold uppercase tracking-wider truncate">
                   {activeSlide.badge}
                 </span>
-                <span className="text-xs font-bold text-muted-foreground">
-                  {activeSlide.serves}
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary/80 px-2.5 py-0.5 text-xs font-bold text-cocoa shrink-0 border border-border/50">
+                  <Users className="size-3 text-berry" />
+                  <span>{activeSlide.serves}</span>
                 </span>
               </div>
 
@@ -197,15 +235,15 @@ export function CakeStudioCarousel() {
                 </p>
               </div>
 
-              {/* Occasion / Origin Box Slot (Fixed Height) */}
-              <div className="rounded-2xl bg-secondary/40 p-3 border border-border/60 text-xs text-muted-foreground space-y-1 h-[68px] flex flex-col justify-center">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-foreground">Perfect for:</span>
-                  <span className="font-medium text-cocoa line-clamp-1">{activeSlide.occasion}</span>
+              {/* Occasion & Studio Info Box: Clean Grid Alignment */}
+              <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/60 text-xs text-muted-foreground space-y-1.5 h-[72px] flex flex-col justify-center">
+                <div className="grid grid-cols-[85px_1fr] items-center gap-2">
+                  <span className="font-bold text-foreground shrink-0">Perfect for:</span>
+                  <span className="font-semibold text-cocoa truncate">{activeSlide.occasion}</span>
                 </div>
-                <div className="flex items-center justify-between pt-1 border-t border-border/40">
-                  <span className="font-semibold text-foreground">Handcrafted at:</span>
-                  <span className="text-berry font-bold">Ani Bakes Studio, Pondy</span>
+                <div className="grid grid-cols-[85px_1fr] items-center gap-2 pt-1.5 border-t border-border/40">
+                  <span className="font-bold text-foreground shrink-0">Handcrafted:</span>
+                  <span className="text-berry font-bold truncate">Ani Bakes Studio, Pondy</span>
                 </div>
               </div>
 
@@ -289,7 +327,7 @@ export function CakeStudioCarousel() {
                 transformStyle: "preserve-3d",
               }}
             >
-              {/* Product Photograph with Smooth Fill */}
+              {/* Product Photograph */}
               <img
                 key={activeSlide.image}
                 src={activeSlide.image}
@@ -311,7 +349,7 @@ export function CakeStudioCarousel() {
                 </span>
               </div>
 
-              {/* Caption & Navigation Pill Bar (Bottom Overlay) */}
+              {/* Caption & Indicator Bullets (Bottom Overlay) */}
               <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 text-white">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
