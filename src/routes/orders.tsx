@@ -200,19 +200,24 @@ function OrderCardItem({ order }: { order: OrderRecord }) {
 
         {/* 2. Mini Baker Status Stepper (For Active Orders) */}
         {!isFulfilled && !isCancelled && (
-          <div className="rounded-2xl bg-secondary/40 p-3 border border-border/50 space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-bold text-foreground">
-              <span className="flex items-center gap-1">
+          <div className="rounded-2xl bg-secondary/40 p-3 sm:p-3.5 border border-border/50 space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-foreground">
+              <span className="inline-flex items-center gap-1.5 text-cocoa">
                 <Flame className="size-3.5 text-amber-500" /> Morning Bake Status
               </span>
-              <span className="text-cocoa font-mono text-[10px]">{config.desc}</span>
+              <span className="text-[10px] font-mono text-muted-foreground uppercase font-bold">
+                Stage 0{config.step}/03
+              </span>
             </div>
+            <p className="text-xs text-muted-foreground leading-relaxed font-medium">
+              {config.desc}
+            </p>
 
             {/* Visual 3-Stage Progress Bar */}
             <div className="grid grid-cols-3 gap-1.5 pt-1">
-              <div className={`h-1.5 rounded-full ${config.step >= 1 ? "bg-berry" : "bg-secondary/80"}`} />
-              <div className={`h-1.5 rounded-full ${config.step >= 2 ? "bg-amber-500" : "bg-secondary/80"}`} />
-              <div className={`h-1.5 rounded-full ${config.step >= 3 ? "bg-emerald-500" : "bg-secondary/80"}`} />
+              <div className={`h-1.5 rounded-full ${config.step >= 1 ? "bg-cocoa" : "bg-border/60"}`} />
+              <div className={`h-1.5 rounded-full ${config.step >= 2 ? "bg-amber-500" : "bg-border/60"}`} />
+              <div className={`h-1.5 rounded-full ${config.step >= 3 ? "bg-emerald-500" : "bg-border/60"}`} />
             </div>
           </div>
         )}
