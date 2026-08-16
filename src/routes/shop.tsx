@@ -52,7 +52,7 @@ function Shop() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
       <div className="flex flex-col gap-1 sm:gap-2">
-        <h1 className="font-display text-2xl sm:text-4xl font-bold text-cocoa">The bakery counter</h1>
+        <h1 className="font-nimbus text-3xl sm:text-5xl font-bold text-cocoa">The bakery counter</h1>
         <p className="max-w-xl text-xs sm:text-sm text-muted-foreground">
           Everything is baked in small batches on the morning of your slot.
         </p>

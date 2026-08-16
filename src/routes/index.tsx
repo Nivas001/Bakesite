@@ -197,9 +197,9 @@ function Home() {
             <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-secondary/90 px-3 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] text-secondary-foreground backdrop-blur">
               <Sparkles className="size-3 text-berry" /> Baked to order
             </span>
-            <h1 className="font-display text-2xl font-bold leading-tight text-cocoa sm:text-4xl lg:text-5xl">
+            <h1 className="font-nimbus text-3xl font-bold leading-[1.18] text-cocoa sm:text-5xl lg:text-6xl tracking-tight">
               Slow bakes, warm mornings, and a slot that{" "}
-              <span className="italic text-berry">suits you.</span>
+              <span className="italic text-berry font-serif">suits you.</span>
             </h1>
             <p className="max-w-md text-xs sm:text-sm leading-relaxed text-muted-foreground">
               Everything at Ani Bakes is made in small batches the morning of your delivery. Choose
@@ -246,7 +246,7 @@ function Home() {
             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry">
               Daily Selection
             </span>
-            <h2 className="mt-0.5 font-display text-xl sm:text-3xl font-bold leading-tight text-cocoa">
+            <h2 className="mt-0.5 font-nimbus text-2xl sm:text-4xl font-bold leading-tight text-cocoa">
               Fresh from the counter
             </h2>
             <p className="text-xs sm:text-sm italic text-muted-foreground">
@@ -279,7 +279,7 @@ function Home() {
                 · Handcrafted every dawn from 4:00 AM
               </span>
             </div>
-            <h2 className="font-display text-lg sm:text-3xl font-bold text-cocoa">
+            <h2 className="font-nimbus text-2xl sm:text-4xl font-bold text-cocoa">
               Explore by bake category
             </h2>
           </div>
@@ -325,7 +325,7 @@ function Home() {
                     </span>
                   </div>
 
-                  <h3 className="mt-3 sm:mt-4 font-display text-sm sm:text-lg font-bold text-cocoa transition-colors group-hover:text-berry leading-tight">
+                  <h3 className="mt-3 sm:mt-4 font-recurso text-base sm:text-xl font-bold text-cocoa transition-colors group-hover:text-berry leading-tight tracking-wide">
                     {category.name}
                   </h3>
                   <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground line-clamp-2 hidden xs:block">
@@ -349,7 +349,7 @@ function Home() {
           <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry">
             Why Ani Bakes
           </span>
-          <h2 className="mt-1 font-display text-xl sm:text-3xl font-bold text-cocoa">
+          <h2 className="mt-1 font-nimbus text-2xl sm:text-4xl font-bold text-cocoa">
             The small-batch difference you can taste
           </h2>
           <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
@@ -480,7 +480,7 @@ function Home() {
           <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry">
             Neighbourhood Love
           </span>
-          <h2 className="mt-1 font-display text-xl sm:text-3xl font-bold text-cocoa">
+          <h2 className="mt-1 font-nimbus text-2xl sm:text-4xl font-bold text-cocoa">
             Loved down the street
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground">
@@ -562,7 +562,7 @@ function Home() {
                 value={`faq-${i}`}
                 className="overflow-hidden rounded-xl sm:rounded-2xl border border-border bg-card px-4 py-1 sm:px-6 shadow-2xs transition-all hover:border-berry/30"
               >
-                <AccordionTrigger className="py-3.5 text-left font-display text-sm font-semibold text-cocoa hover:no-underline sm:text-base">
+                <AccordionTrigger className="py-3.5 text-left font-sans text-sm font-semibold text-cocoa hover:no-underline sm:text-base">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="pb-3.5 text-xs sm:text-sm leading-relaxed text-muted-foreground">

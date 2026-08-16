@@ -64,7 +64,7 @@ function Offers() {
       
       {/* 1. Offers Hero Header */}
       <div className="flex flex-col gap-1.5 sm:gap-2">
-        <h1 className="font-display text-2xl sm:text-4xl font-bold text-cocoa leading-tight">
+        <h1 className="font-nimbus text-3xl sm:text-5xl font-bold text-cocoa leading-tight">
           Special offers & coupons
         </h1>
         <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
