@@ -40,35 +40,49 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-2 sm:gap-4 px-3.5 sm:px-4">
-        <Link to="/" className="font-nimbus text-xl sm:text-2xl font-bold tracking-normal text-cocoa shrink-0 transition-transform hover:scale-[1.02]">
-          Ani Bakes
-          <span className="ml-0.5 text-berry">.</span>
+    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/65 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_4px_24px_0_rgba(0,0,0,0.04)] transition-all">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 sm:gap-4 px-3.5 sm:px-6">
+        
+        {/* Brand Logo with Liquid Glass Pill */}
+        <Link
+          to="/"
+          className="group flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all hover:bg-secondary/40"
+        >
+          <span className="font-nimbus text-xl sm:text-2xl font-bold tracking-tight text-cocoa transition-transform group-hover:scale-[1.02]">
+            Ani Bakes
+          </span>
+          <span className="flex size-2 rounded-full bg-berry animate-pulse" />
         </Link>
 
-        {/* Desktop & Tablet Navigation */}
-        <nav className="ml-2 sm:ml-4 lg:ml-7 hidden items-center gap-3 sm:gap-4 lg:gap-6 md:flex">
+        {/* Desktop Navigation with Floating Frosted Glass Pills */}
+        <nav className="hidden md:flex items-center gap-1 rounded-full border border-border/60 bg-secondary/35 p-1 backdrop-blur-md shadow-2xs">
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
-              className="relative text-xs lg:text-sm font-medium text-muted-foreground whitespace-nowrap transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-cocoa after:transition-transform after:duration-300 after:ease-out hover:after:scale-x-100"
-              activeProps={{ className: "text-foreground after:scale-x-100 font-semibold" }}
+              className="relative rounded-full px-3.5 py-1 text-xs lg:text-sm font-semibold text-muted-foreground whitespace-nowrap transition-all hover:bg-card hover:text-foreground hover:shadow-2xs active:scale-95"
+              activeProps={{
+                className: "bg-card text-cocoa font-bold shadow-xs ring-1 ring-border/80",
+              }}
             >
               {item.label}
+              {item.badge && (
+                <span className="ml-1.5 rounded-full bg-berry/15 px-1.5 py-0.2 text-[9px] font-extrabold text-berry">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
 
-        {/* Right Action Icons (Cart, Account, Mobile Menu) */}
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2.5">
+        {/* Right Action Icons (Admin, Cart, Account, Mobile Menu) */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {isAdmin && (
             <Button
               asChild
               variant="outline"
               size="sm"
-              className="hidden lg:inline-flex rounded-full border-berry/30 bg-berry/10 text-berry hover:bg-berry/20 text-xs font-semibold h-8 px-3"
+              className="hidden lg:inline-flex rounded-full border-berry/30 bg-berry/10 text-berry hover:bg-berry/20 text-xs font-semibold h-8 px-3 shadow-2xs backdrop-blur-xs"
             >
               <Link to="/admin">
                 <ShieldCheck className="mr-1.5 size-3.5" />
@@ -77,18 +91,18 @@ export function SiteHeader() {
             </Button>
           )}
 
-          {/* Cart Icon with Dynamic Pill Badge */}
+          {/* Cart Icon with Liquid Glow Badge */}
           <Button
             asChild
             variant="ghost"
             size="icon"
-            className="relative size-9 rounded-full transition-transform hover:scale-105 active:scale-95"
+            className="relative size-9 rounded-full border border-border/40 bg-card/60 backdrop-blur-md shadow-2xs transition-all hover:bg-secondary hover:scale-105 active:scale-95"
             aria-label="Cart"
           >
             <Link to="/cart">
               <ShoppingBag className="size-4.5 text-foreground" />
               {count > 0 && (
-                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-berry text-[10px] font-bold text-berry-foreground shadow-xs animate-in zoom-in-75">
+                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-berry text-[10px] font-bold text-berry-foreground shadow-xs animate-in zoom-in-75 ring-2 ring-background">
                   {count > 9 ? "9+" : count}
                 </span>
               )}
@@ -97,12 +111,12 @@ export function SiteHeader() {
 
           {/* Auth State Button */}
           {session ? (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <Button
                 asChild
                 variant="ghost"
                 size="sm"
-                className="hidden text-xs text-muted-foreground hover:text-foreground sm:inline-flex h-8 px-2.5"
+                className="hidden text-xs font-semibold text-muted-foreground hover:text-foreground sm:inline-flex h-8 px-3 rounded-full border border-border/40 bg-card/40 backdrop-blur-xs"
               >
                 <Link to="/profile">
                   <User className="mr-1.5 size-3.5" />
@@ -113,14 +127,17 @@ export function SiteHeader() {
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
-                className="hidden text-xs text-muted-foreground hover:text-destructive sm:inline-flex h-8 px-2.5"
+                className="hidden text-xs font-semibold text-muted-foreground hover:text-destructive sm:inline-flex h-8 px-2.5 rounded-full hover:bg-destructive/10"
               >
-                <LogOut className="mr-1.5 size-3.5" />
-                Sign out
+                <LogOut className="size-3.5" />
               </Button>
             </div>
           ) : (
-            <Button asChild size="sm" className="hidden bg-berry text-berry-foreground hover:bg-berry/90 sm:inline-flex h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm whitespace-nowrap">
+            <Button
+              asChild
+              size="sm"
+              className="hidden bg-berry text-berry-foreground hover:bg-berry/90 sm:inline-flex h-8 sm:h-9 px-4 rounded-full text-xs sm:text-sm font-semibold shadow-soft whitespace-nowrap"
+            >
               <Link to="/auth" search={{ redirect: undefined }}>Sign in</Link>
             </Button>
           )}

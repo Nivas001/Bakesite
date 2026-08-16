@@ -59,31 +59,46 @@ export const Route = createFileRoute("/")({
 
 const CATEGORY_META: Record<
   string,
-  { icon: typeof Croissant; desc: string; color: string; badge: string }
+  {
+    icon: typeof Croissant;
+    desc: string;
+    image: string;
+    badge: string;
+    tag: string;
+    accentGlow: string;
+  }
 > = {
   breads: {
     icon: Croissant,
-    desc: "Slow-fermented artisan sourdough & morning loaves",
-    color: "from-amber-500/10 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/20",
-    badge: "Slow Ferment",
+    desc: "Wild sourdough, rustic loaves & golden morning blondies",
+    image: "/cakes/trio-snack-loaves.jpg",
+    badge: "36h Ferment",
+    tag: "Stone Hearth",
+    accentGlow: "from-amber-600/30 to-amber-900/60",
   },
   cakes: {
     icon: Sparkles,
-    desc: "Celebration layer cakes & tea-time sponge slices",
-    color: "from-rose-500/10 to-rose-500/5 text-rose-600 dark:text-rose-400 border-rose-500/20",
-    badge: "Celebration",
+    desc: "Korean bento boxes, ombré tiers & custom celebration bakes",
+    image: "/cakes/pink-bento-cake.jpg",
+    badge: "Pure Buttercream",
+    tag: "Celebration",
+    accentGlow: "from-rose-600/30 to-pink-900/60",
   },
   pastries: {
     icon: Leaf,
-    desc: "French butter croissants, danishes & cruffins",
-    color: "from-emerald-500/10 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    badge: "Pure Butter",
+    desc: "100% French butter croissants, danishes & pistachio swirls",
+    image: "/cakes/biscoff-nut-brownie.jpg",
+    badge: "27 Flaky Layers",
+    tag: "Artisan Laminate",
+    accentGlow: "from-emerald-600/30 to-emerald-900/60",
   },
   cookies: {
     icon: Star,
-    desc: "Crispy-edged, chewy-centred chunky cookies",
-    color: "from-orange-500/10 to-orange-500/5 text-orange-600 dark:text-orange-400 border-orange-500/20",
-    badge: "Small Batch",
+    desc: "Belgian fudge brownies, chewy cookies & golden slabs",
+    image: "/cakes/royal-gold-brownie.jpg",
+    badge: "70% Couverture",
+    tag: "Small-Batch",
+    accentGlow: "from-amber-700/30 to-stone-900/60",
   },
 };
 
@@ -141,33 +156,8 @@ function Home() {
   return (
     <div className="w-full space-y-12 sm:space-y-20 overflow-x-clip">
       
-      {/* Container 1: Hero & Live Ambient Telemetry */}
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10 space-y-4 pt-2">
-        
-        {/* Live Ambient Kitchen Telemetry Bar (Inspired by Haoqi) */}
-        <div className="flex flex-wrap items-center justify-between gap-2.5 rounded-2xl bg-secondary/40 border border-border/80 px-4 py-2.5 text-xs font-semibold text-foreground shadow-2xs backdrop-blur-sm">
-          <div className="flex items-center gap-2">
-            <span className="relative flex size-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
-            </span>
-            <span className="font-bold text-cocoa">📍 Pondicherry Kitchen</span>
-            <span className="text-border">·</span>
-            <span className="text-muted-foreground hidden xs:inline">4:00 AM Dawn Bake Ritual</span>
-          </div>
-
-          <div className="flex items-center gap-3 text-xs">
-            <span className="font-mono text-amber-600 dark:text-amber-400 font-bold">
-              🔥 Oven #2 Active (220°C)
-            </span>
-            <span className="hidden sm:inline text-border">·</span>
-            <span className="hidden sm:inline font-bold text-emerald-600 dark:text-emerald-400">
-              📦 Next Slot: Tomorrow Morning
-            </span>
-          </div>
-        </div>
-
-        {/* Hero Section */}
+      {/* Container 1: Hero Section */}
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10 pt-2">
         <section className="relative">
           <div
             aria-hidden
@@ -268,39 +258,41 @@ function Home() {
       {/* 6. Polaroid Moments Wall (Real Celebrations) */}
       <PolaroidMomentsWall />
 
-      {/* 7. Category Counter Showcase: 2x2 grid on mobile, 4 columns on desktop */}
+      {/* 7. Category Counter Showcase: Immersive Visual Portals */}
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
-        <section className="section-shell section-shell-tint rounded-2xl sm:rounded-[2.25rem] p-4 sm:p-8 border border-border/80 shadow-soft">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
+        <section className="rounded-3xl p-6 sm:p-10 border border-border/80 bg-card/60 backdrop-blur-sm shadow-soft">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <span className="inline-flex items-center gap-1 rounded-full bg-berry/10 border border-berry/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-berry">
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-berry">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   The Bakery Counter
                 </span>
-                <span className="text-[11px] text-muted-foreground hidden sm:inline-block">
+                <span className="text-xs text-muted-foreground hidden sm:inline-block">
                   · Handcrafted every dawn from 4:00 AM
                 </span>
               </div>
-              <h2 className="font-nimbus text-2xl sm:text-4xl font-bold text-cocoa">
+              <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa">
                 Explore by bake category
               </h2>
             </div>
-            <Button asChild variant="outline" size="sm" className="w-fit rounded-xl border-border bg-card/90 text-berry hover:bg-secondary/60 text-xs font-semibold h-8 px-3.5 shadow-2xs">
+            <Button asChild variant="outline" size="sm" className="w-fit rounded-full border-border bg-card/90 text-berry hover:bg-secondary/60 text-xs font-bold h-9 px-4 shadow-2xs">
               <Link to="/shop">
-                Browse all <ArrowRight className="ml-1 h-3 w-3" />
+                Browse Full Catalog <ArrowRight className="ml-1.5 size-3.5" />
               </Link>
             </Button>
           </div>
 
-          {/* 2x2 Grid on Mobile, 4 Cols on Desktop */}
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+          {/* 4-Card Immersive Photo Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {data.categories.slice(0, 4).map((category) => {
               const meta = CATEGORY_META[category.slug] ?? {
                 icon: Croissant,
                 desc: category.description ?? "Freshly crafted daily bakes",
-                color: "from-secondary/40 to-secondary/10 text-berry border-border",
+                image: "/cakes/pink-bento-cake.jpg",
                 badge: "Artisan",
+                tag: "Fresh Batch",
+                accentGlow: "from-amber-600/30 to-amber-900/60",
               };
               const Icon = meta.icon;
               const productCount = data.products.filter(
@@ -311,34 +303,44 @@ function Home() {
                 <Link
                   key={category.id}
                   to="/shop"
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card p-3 sm:p-5 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-berry/50 hover:shadow-lift cursor-pointer"
+                  className="group relative h-72 sm:h-80 rounded-3xl overflow-hidden border border-border/70 shadow-soft transition-all duration-300 hover:shadow-lift hover:-translate-y-1.5 cursor-pointer flex flex-col justify-between p-5"
                 >
-                  <div
-                    aria-hidden
-                    className={`pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-gradient-to-br ${meta.color} opacity-35 blur-xl transition-opacity duration-300 group-hover:opacity-75`}
+                  {/* Background Photo with Smooth Hover Scale */}
+                  <img
+                    src={meta.image}
+                    alt={category.name}
+                    className="absolute inset-0 w-full h-full object-cover select-none transition-transform duration-700 ease-out group-hover:scale-110"
                   />
 
-                  <div className="relative">
-                    <div className="flex items-center justify-between">
-                      <div className="flex size-9 sm:size-11 items-center justify-center rounded-xl bg-secondary/90 text-berry shadow-2xs transition-transform duration-300 group-hover:scale-105 group-hover:bg-berry group-hover:text-berry-foreground">
-                        <Icon className="size-4 sm:size-5" />
-                      </div>
-                      <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[9px] sm:text-[11px] font-bold text-cocoa/80 border border-border/40">
-                        {productCount > 0 ? `${productCount} bakes` : meta.badge}
-                      </span>
-                    </div>
+                  {/* Dark Vignette Overlay for High Legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
 
-                    <h3 className="mt-3 sm:mt-4 font-recurso text-base sm:text-xl font-bold text-cocoa transition-colors group-hover:text-berry leading-tight tracking-wide">
-                      {category.name}
-                    </h3>
-                    <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground line-clamp-2 hidden xs:block">
-                      {meta.desc}
-                    </p>
+                  {/* Top Badges: Icon + Live Count */}
+                  <div className="relative z-10 flex items-center justify-between">
+                    <div className="flex size-10 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 text-white shadow-xs transition-transform group-hover:scale-105">
+                      <Icon className="size-5" />
+                    </div>
+                    <span className="rounded-full bg-black/50 backdrop-blur-md border border-white/20 px-2.5 py-1 text-[10px] font-extrabold text-white uppercase tracking-wider">
+                      {productCount > 0 ? `${productCount} bakes` : meta.badge}
+                    </span>
                   </div>
 
-                  <div className="mt-3 sm:mt-5 flex items-center justify-between border-t border-border/60 pt-2.5 sm:pt-3 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry">
-                    <span>Explore</span>
-                    <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                  {/* Bottom Content: Title & Action */}
+                  <div className="relative z-10 space-y-2">
+                    <span className="inline-block rounded-md bg-amber-400/90 text-black px-2 py-0.5 text-[9px] font-black uppercase tracking-wider">
+                      {meta.tag}
+                    </span>
+                    <h3 className="font-display text-2xl font-bold text-white leading-tight">
+                      {category.name}
+                    </h3>
+                    <p className="text-xs text-white/80 line-clamp-2 leading-relaxed">
+                      {meta.desc}
+                    </p>
+
+                    <div className="pt-2 flex items-center justify-between text-xs font-extrabold text-amber-300 border-t border-white/15">
+                      <span>Explore Collection</span>
+                      <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                    </div>
                   </div>
                 </Link>
               );

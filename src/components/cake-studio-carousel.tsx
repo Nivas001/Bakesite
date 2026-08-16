@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
-import { Sparkles, ArrowRight, ChevronLeft, ChevronRight, Cake, Heart, MessageCircle } from "lucide-react";
+import { Sparkles, ArrowRight, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface CakeSlide {
@@ -38,7 +38,7 @@ export const CAKE_SLIDES: CakeSlide[] = [
     tags: ["🌸 Sugar Blossoms", "🦪 Edible Pearls", "🌿 Pure Vanilla", "🎂 6-Inch Tier"],
     serves: "6–8 Persons",
     price: "₹1,250",
-    occasion: "Milestone Birthdays & Showstopper High-Teas",
+    occasion: "Milestone Birthdays & High-Teas",
     badge: "Artisan Showpiece",
   },
   {
@@ -72,9 +72,9 @@ export const CAKE_SLIDES: CakeSlide[] = [
     image: "/cakes/trio-snack-loaves.jpg",
     story: "Baked in golden bakery foil tins: Classic Chocolate Chip Golden Blondie, Double Dark Cocoa Fudge Loaf, and White-Chip Velvet Cake.",
     tags: ["🍯 Golden Blondie", "🍫 Double Fudge", "❤️ Red Velvet Bar", "📦 Gift Tin Packaging"],
-    serves: "3 Snack Loaves (6–9 Servings)",
+    serves: "3 Loaves (6–9 Servings)",
     price: "₹780",
-    occasion: "Afternoon Teas & Gourmet Snacking",
+    occasion: "Afternoon Teas & Gifting",
     badge: "Teatime Essential",
   },
 ];
@@ -103,8 +103,8 @@ export function CakeStudioCarousel() {
     const y = e.clientY - rect.top;
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -6; // max 6 deg
-    const rotateY = ((x - centerX) / centerX) * 6; // max 6 deg
+    const rotateX = ((y - centerY) / centerY) * -5;
+    const rotateY = ((x - centerX) / centerX) * 5;
     setTilt({ x: rotateX, y: rotateY });
   };
 
@@ -118,27 +118,27 @@ export function CakeStudioCarousel() {
   );
 
   return (
-    <section className="relative overflow-hidden py-12 sm:py-20 bg-secondary/25 border-y border-border/70">
-      {/* Subtle Background Glow Orbs */}
+    <section className="relative overflow-hidden py-12 sm:py-16 bg-secondary/20 border-y border-border/70">
+      {/* Background Glows */}
       <div className="absolute -left-20 top-1/3 size-72 rounded-full bg-berry/10 blur-3xl pointer-events-none" />
       <div className="absolute -right-20 bottom-10 size-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
 
       <div className="mx-auto w-full max-w-6xl px-4">
         
-        {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        {/* Section Header with completely static, non-jumping navigation */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
           <div>
             <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-berry mb-2">
               <Sparkles className="size-3.5" />
               <span>The Celebration Cake Studio</span>
             </div>
-            <h2 className="font-nimbus text-3xl sm:text-5xl font-bold text-cocoa leading-tight">
+            <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight">
               Bespoke bakes for core memories
             </h2>
           </div>
 
-          {/* Carousel Slide Indicators & Navigation Buttons */}
-          <div className="flex items-center gap-3 self-start sm:self-auto">
+          {/* Carousel Navigation Buttons */}
+          <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
             <span className="text-xs font-mono font-bold text-muted-foreground">
               <strong className="text-cocoa font-extrabold">{String(current + 1).padStart(2, "0")}</strong> / {String(CAKE_SLIDES.length).padStart(2, "0")}
             </span>
@@ -164,15 +164,15 @@ export function CakeStudioCarousel() {
           </div>
         </div>
 
-        {/* The 25% Text / 70% Image / 5% Gap Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[30%_66%] gap-6 lg:gap-[4%] items-stretch">
+        {/* Locked-Height Grid (Prevents any jumping or layout shift) */}
+        <div className="grid grid-cols-1 lg:grid-cols-[30%_66%] gap-6 lg:gap-[4%] items-stretch lg:h-[560px]">
           
-          {/* Left Column (25-30%): Editorial Story & Custom Order Card */}
-          <div className="flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-6 sm:p-7 shadow-soft transition-all">
-            <div className="space-y-4">
-              {/* Badge */}
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider">
+          {/* Left Column: Fixed height container with anchored slots */}
+          <div className="flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-6 shadow-soft h-full min-h-[500px] lg:min-h-0">
+            <div className="space-y-3.5">
+              {/* Badge & Serves Slot */}
+              <div className="flex items-center justify-between h-7">
+                <span className="rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30 px-3 py-0.5 text-[11px] font-extrabold uppercase tracking-wider">
                   {activeSlide.badge}
                 </span>
                 <span className="text-xs font-bold text-muted-foreground">
@@ -180,39 +180,41 @@ export function CakeStudioCarousel() {
                 </span>
               </div>
 
-              {/* Title & Subtitle */}
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-berry">
+              {/* Title & Subtitle Slot (Fixed Height) */}
+              <div className="h-16 flex flex-col justify-center">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-berry line-clamp-1">
                   {activeSlide.subtitle}
                 </p>
-                <h3 className="font-display text-xl sm:text-2xl font-bold text-cocoa mt-1 leading-snug">
+                <h3 className="font-display text-xl font-bold text-cocoa leading-tight line-clamp-2 mt-0.5">
                   {activeSlide.title}
                 </h3>
               </div>
 
-              {/* Description */}
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                {activeSlide.story}
-              </p>
+              {/* Description Slot (Fixed Height) */}
+              <div className="h-16 flex items-start">
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                  {activeSlide.story}
+                </p>
+              </div>
 
-              {/* Occasion / Servings pill */}
-              <div className="rounded-2xl bg-secondary/40 p-3 border border-border/60 text-xs text-muted-foreground space-y-1">
+              {/* Occasion / Origin Box Slot (Fixed Height) */}
+              <div className="rounded-2xl bg-secondary/40 p-3 border border-border/60 text-xs text-muted-foreground space-y-1 h-[68px] flex flex-col justify-center">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-foreground">Perfect for:</span>
-                  <span className="font-medium text-cocoa">{activeSlide.occasion}</span>
+                  <span className="font-medium text-cocoa line-clamp-1">{activeSlide.occasion}</span>
                 </div>
                 <div className="flex items-center justify-between pt-1 border-t border-border/40">
                   <span className="font-semibold text-foreground">Handcrafted at:</span>
-                  <span className="text-berry font-bold">Ani Bakes Studio, Pondicherry</span>
+                  <span className="text-berry font-bold">Ani Bakes Studio, Pondy</span>
                 </div>
               </div>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              {/* Tags Slot (Fixed Height) */}
+              <div className="h-7 flex items-center overflow-hidden gap-1.5">
                 {activeSlide.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-border/80 bg-secondary/30 px-2.5 py-1 text-[10px] font-semibold text-foreground shadow-2xs"
+                    className="rounded-full border border-border/80 bg-secondary/30 px-2.5 py-0.5 text-[10px] font-semibold text-foreground shadow-2xs whitespace-nowrap"
                   >
                     {tag}
                   </span>
@@ -220,8 +222,8 @@ export function CakeStudioCarousel() {
               </div>
             </div>
 
-            {/* Bottom Actions: Price & Order CTA */}
-            <div className="pt-6 border-t border-border/70 mt-6 space-y-3">
+            {/* Bottom Actions Slot (Anchored Strictly at Base) */}
+            <div className="pt-4 border-t border-border/70 mt-4 space-y-2.5">
               <div className="flex items-baseline justify-between">
                 <div>
                   <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
@@ -239,8 +241,8 @@ export function CakeStudioCarousel() {
               <div className="flex flex-col gap-2">
                 <Button
                   asChild
-                  size="lg"
-                  className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs shadow-lift h-11 transition-all hover:scale-[1.01] cursor-pointer"
+                  size="default"
+                  className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs shadow-lift h-10 transition-all hover:scale-[1.01] cursor-pointer"
                 >
                   <a
                     href={`https://wa.me/917448724920?text=${whatsappMessage}`}
@@ -257,7 +259,7 @@ export function CakeStudioCarousel() {
                   asChild
                   variant="outline"
                   size="sm"
-                  className="w-full rounded-2xl border-border/80 hover:border-berry/40 text-xs font-semibold text-muted-foreground hover:text-foreground h-9"
+                  className="w-full rounded-2xl border-border/80 hover:border-berry/40 text-xs font-semibold text-muted-foreground hover:text-foreground h-8.5"
                 >
                   <Link to="/shop">
                     <span>Browse All Daily Counter Bakes</span>
@@ -268,13 +270,13 @@ export function CakeStudioCarousel() {
             </div>
           </div>
 
-          {/* Right Column (70%): High-Resolution 3D Tilt Showcase Card */}
+          {/* Right Column: Fixed height 3D Showcase Card */}
           <div
             ref={containerRef}
             onMouseMove={handleMouseMove}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={handleMouseLeave}
-            className="relative min-h-[380px] sm:min-h-[480px] lg:min-h-[520px] rounded-3xl overflow-hidden border border-border/80 bg-card shadow-lift transition-all duration-200 group flex items-center justify-center"
+            className="relative h-[380px] sm:h-[480px] lg:h-full rounded-3xl overflow-hidden border border-border/80 bg-card shadow-lift transition-all duration-200 group flex items-center justify-center"
             style={{
               perspective: "1200px",
             }}
@@ -283,11 +285,11 @@ export function CakeStudioCarousel() {
             <div
               className="relative w-full h-full transition-transform duration-200 ease-out"
               style={{
-                transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${isHovered ? 1.015 : 1})`,
+                transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${isHovered ? 1.012 : 1})`,
                 transformStyle: "preserve-3d",
               }}
             >
-              {/* Product Photograph with Subtle Zoom */}
+              {/* Product Photograph with Smooth Fill */}
               <img
                 key={activeSlide.image}
                 src={activeSlide.image}
@@ -298,7 +300,7 @@ export function CakeStudioCarousel() {
               {/* Dynamic Gradient Vignette */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
 
-              {/* Floating Tactile Flavor & Detail Chips (Top Right) */}
+              {/* Floating Detail Chips (Top Right) */}
               <div className="absolute top-4 right-4 flex flex-col items-end gap-2 pointer-events-none">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 text-xs font-extrabold shadow-lg">
                   <Sparkles className="size-3 text-amber-300" />
@@ -309,13 +311,13 @@ export function CakeStudioCarousel() {
                 </span>
               </div>
 
-              {/* Caption Bar (Bottom Left Overlay) */}
+              {/* Caption & Navigation Pill Bar (Bottom Overlay) */}
               <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 text-white">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
                     Artisan Custom Creation
                   </p>
-                  <p className="font-display text-base sm:text-xl font-bold text-white leading-tight mt-0.5">
+                  <p className="font-display text-base sm:text-lg font-bold text-white leading-tight mt-0.5">
                     {activeSlide.title}
                   </p>
                 </div>

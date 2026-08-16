@@ -97,8 +97,8 @@ export function PolaroidMomentsWall() {
                   ))}
                 </div>
 
-                {/* Handwritten Review Note */}
-                <p className="font-script text-base text-foreground leading-snug">
+                {/* Clean Legible Inter Review Note */}
+                <p className="font-sans text-xs sm:text-[13px] font-medium text-foreground/90 leading-relaxed">
                   "{memory.note}"
                 </p>
 
