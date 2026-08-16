@@ -31,6 +31,7 @@ import { CakeStudioCarousel } from "@/components/cake-studio-carousel";
 import { CakeBuilderWidget } from "@/components/cake-builder-widget";
 import { BakerLaboratoryBento } from "@/components/baker-laboratory-bento";
 import { PolaroidMomentsWall } from "@/components/polaroid-moments-wall";
+import { CategoryPeekCarousel } from "@/components/category-peek-carousel";
 
 const catalogQuery = queryOptions({
   queryKey: ["catalog"],
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Order artisanal cakes, cookies and pastries from Ani Bakes. Pick a next-day slot, pay to secure, and enjoy fresh bakes.",
+          "Handcrafted small-batch bakery in Pondicherry. Fresh cakes, cookies, breads, and pastries baked the morning of your slot.",
       },
       { property: "og:title", content: "Ani Bakes Bakery — Fresh small-batch cakes & cookies" },
       {
@@ -56,51 +57,6 @@ export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogQuery),
   component: Home,
 });
-
-const CATEGORY_META: Record<
-  string,
-  {
-    icon: typeof Croissant;
-    desc: string;
-    image: string;
-    badge: string;
-    tag: string;
-    accentGlow: string;
-  }
-> = {
-  breads: {
-    icon: Croissant,
-    desc: "Wild sourdough, rustic loaves & golden morning blondies",
-    image: "/cakes/trio-snack-loaves.jpg",
-    badge: "36h Ferment",
-    tag: "Stone Hearth",
-    accentGlow: "from-amber-600/30 to-amber-900/60",
-  },
-  cakes: {
-    icon: Sparkles,
-    desc: "Korean bento boxes, ombré tiers & custom celebration bakes",
-    image: "/cakes/pink-bento-cake.jpg",
-    badge: "Pure Buttercream",
-    tag: "Celebration",
-    accentGlow: "from-rose-600/30 to-pink-900/60",
-  },
-  pastries: {
-    icon: Leaf,
-    desc: "100% French butter croissants, danishes & pistachio swirls",
-    image: "/cakes/biscoff-nut-brownie.jpg",
-    badge: "27 Flaky Layers",
-    tag: "Artisan Laminate",
-    accentGlow: "from-emerald-600/30 to-emerald-900/60",
-  },
-  cookies: {
-    icon: Star,
-    desc: "Belgian fudge brownies, chewy cookies & golden slabs",
-    image: "/cakes/royal-gold-brownie.jpg",
-    badge: "70% Couverture",
-    tag: "Small-Batch",
-    accentGlow: "from-amber-700/30 to-stone-900/60",
-  },
-};
 
 const FAQ_ITEMS = [
   {
@@ -258,96 +214,8 @@ function Home() {
       {/* 6. Polaroid Moments Wall (Real Celebrations) */}
       <PolaroidMomentsWall />
 
-      {/* 7. Category Counter Showcase: Immersive Visual Portals */}
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
-        <section className="rounded-3xl p-6 sm:p-10 border border-border/80 bg-card/60 backdrop-blur-sm shadow-soft">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-            <div>
-              <div className="flex items-center gap-1.5 mb-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-berry">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  The Bakery Counter
-                </span>
-                <span className="text-xs text-muted-foreground hidden sm:inline-block">
-                  · Handcrafted every dawn from 4:00 AM
-                </span>
-              </div>
-              <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa">
-                Explore by bake category
-              </h2>
-            </div>
-            <Button asChild variant="outline" size="sm" className="w-fit rounded-full border-border bg-card/90 text-berry hover:bg-secondary/60 text-xs font-bold h-9 px-4 shadow-2xs">
-              <Link to="/shop">
-                Browse Full Catalog <ArrowRight className="ml-1.5 size-3.5" />
-              </Link>
-            </Button>
-          </div>
-
-          {/* 4-Card Immersive Photo Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-            {data.categories.slice(0, 4).map((category) => {
-              const meta = CATEGORY_META[category.slug] ?? {
-                icon: Croissant,
-                desc: category.description ?? "Freshly crafted daily bakes",
-                image: "/cakes/pink-bento-cake.jpg",
-                badge: "Artisan",
-                tag: "Fresh Batch",
-                accentGlow: "from-amber-600/30 to-amber-900/60",
-              };
-              const Icon = meta.icon;
-              const productCount = data.products.filter(
-                (p) => p.category_id === category.id,
-              ).length;
-
-              return (
-                <Link
-                  key={category.id}
-                  to="/shop"
-                  className="group relative h-72 sm:h-80 rounded-3xl overflow-hidden border border-border/70 shadow-soft transition-all duration-300 hover:shadow-lift hover:-translate-y-1.5 cursor-pointer flex flex-col justify-between p-5"
-                >
-                  {/* Background Photo with Smooth Hover Scale */}
-                  <img
-                    src={meta.image}
-                    alt={category.name}
-                    className="absolute inset-0 w-full h-full object-cover select-none transition-transform duration-700 ease-out group-hover:scale-110"
-                  />
-
-                  {/* Dark Vignette Overlay for High Legibility */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20 pointer-events-none" />
-
-                  {/* Top Badges: Icon + Live Count */}
-                  <div className="relative z-10 flex items-center justify-between">
-                    <div className="flex size-10 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 text-white shadow-xs transition-transform group-hover:scale-105">
-                      <Icon className="size-5" />
-                    </div>
-                    <span className="rounded-full bg-black/50 backdrop-blur-md border border-white/20 px-2.5 py-1 text-[10px] font-extrabold text-white uppercase tracking-wider">
-                      {productCount > 0 ? `${productCount} bakes` : meta.badge}
-                    </span>
-                  </div>
-
-                  {/* Bottom Content: Title & Action */}
-                  <div className="relative z-10 space-y-2">
-                    <span className="inline-block rounded-md bg-amber-400/90 text-black px-2 py-0.5 text-[9px] font-black uppercase tracking-wider">
-                      {meta.tag}
-                    </span>
-                    <h3 className="font-display text-2xl font-bold text-white leading-tight">
-                      {category.name}
-                    </h3>
-                    <p className="text-xs text-white/80 line-clamp-2 leading-relaxed">
-                      {meta.desc}
-                    </p>
-
-                    <div className="pt-2 flex items-center justify-between text-xs font-extrabold text-amber-300 border-t border-white/15">
-                      <span>Explore Collection</span>
-                      <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      </div>
+      {/* 7. Category Counter Showcase: Peek-Ahead Coverflow Carousel */}
+      <CategoryPeekCarousel categories={data.categories} products={data.products} />
 
       {/* 8. Frequently Asked Questions with Swipeable Filter Pills */}
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
