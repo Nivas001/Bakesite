@@ -2,6 +2,55 @@
 @source "../src";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: "TAN NIMBUS";
+  src: url("/fonts/TAN-NIMBUS.otf") format("opentype"),
+       url("/fonts/TAN-NIMBUS.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Blogh";
+  src: url("/fonts/Blogh.otf") format("opentype");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Recurso Sans";
+  src: url("/fonts/RecursoSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Recurso Sans";
+  src: url("/fonts/RecursoSans-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Recurso Sans";
+  src: url("/fonts/RecursoSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Recurso Sans";
+  src: url("/fonts/RecursoSans-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -66,6 +115,10 @@
   --color-cocoa: var(--cocoa);
   --font-display: var(--font-display);
   --font-sans: var(--font-body);
+  --font-nimbus: var(--font-nimbus);
+  --font-blogh: var(--font-blogh);
+  --font-recurso: var(--font-recurso);
+  --font-script: var(--font-script);
   --shadow-soft: var(--shadow-soft);
   --shadow-lift: var(--shadow-lift);
 }
@@ -97,7 +150,11 @@
   --matcha: oklch(0.925 0.031 20);
   --matcha-foreground: oklch(0.34 0.048 25);
   --cocoa: oklch(0.31 0.045 28);
-  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-nimbus: "TAN NIMBUS", "Playfair Display", Georgia, serif;
+  --font-blogh: "Blogh", "Playfair Display", Georgia, serif;
+  --font-recurso: "Recurso Sans", "Inter", sans-serif;
+  --font-script: "Caveat", cursive;
+  --font-display: "TAN NIMBUS", "Playfair Display", Georgia, serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
   --shadow-soft: 0 12px 32px -18px oklch(0.6 0.13 22 / 35%);
   --shadow-lift: 0 20px 45px -24px oklch(0.6 0.13 22 / 45%);
@@ -114,6 +171,12 @@
   --sidebar-accent-foreground: oklch(0.34 0.048 25);
   --sidebar-border: oklch(0.888 0.048 20);
   --sidebar-ring: oklch(0.771 0.126 20);
+}
+
+:root[data-custom-fonts="false"] {
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-nimbus: "Playfair Display", ui-serif, Georgia, serif;
+  --font-blogh: "Playfair Display", ui-serif, Georgia, serif;
 }
 
 .dark {

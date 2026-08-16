@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 export type FlagKey =
+  | "ff_custom_bakery_fonts"
   | "ff_scroll_reveal"
   | "ff_floating_particles"
   | "ff_stats_ticker"
@@ -25,7 +26,7 @@ export type FlagKey =
   | "ff_footer_instagram"
   | "ff_scroll_to_top";
 
-export type FlagCategory = "Animations" | "Home Page" | "Shop Page" | "Product Page" | "Offers Page" | "Footer";
+export type FlagCategory = "Typography" | "Animations" | "Home Page" | "Shop Page" | "Product Page" | "Offers Page" | "Footer";
 
 export type FlagDefinition = {
   label: string;
@@ -36,6 +37,14 @@ export type FlagDefinition = {
 };
 
 export const FEATURE_FLAGS: Record<FlagKey, FlagDefinition> = {
+  ff_custom_bakery_fonts: {
+    label: "Artisan Display Typography (TAN NIMBUS)",
+    description:
+      "Uses the bespoke curvy TAN NIMBUS display font for all bakery headings, counter titles, and marquee banners. When toggled OFF, reverts cleanly to standard Playfair Display & Inter.",
+    category: "Typography",
+    emoji: "🥖",
+    defaultValue: true,
+  },
   ff_scroll_reveal: {
     label: "Scroll-Reveal Animations",
     description:

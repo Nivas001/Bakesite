@@ -88,6 +88,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+import { useFlag } from "../lib/feature-flags";
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -112,7 +114,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Inter:wght@400;500;600;700&display=swap",
       },
       {
         rel: "stylesheet",
@@ -148,6 +150,17 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const customFonts = useFlag("ff_custom_bakery_fonts");
+
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      if (customFonts === false) {
+        document.documentElement.setAttribute("data-custom-fonts", "false");
+      } else {
+        document.documentElement.removeAttribute("data-custom-fonts");
+      }
+    }
+  }, [customFonts]);
 
   return (
     <QueryClientProvider client={queryClient}>

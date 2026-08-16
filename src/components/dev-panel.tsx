@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 const CATEGORIES: FlagCategory[] = [
+  "Typography",
   "Animations",
   "Home Page",
   "Shop Page",
@@ -32,6 +33,7 @@ const CATEGORIES: FlagCategory[] = [
 ];
 
 const CATEGORY_ICONS: Record<FlagCategory, string> = {
+  Typography: "🥖",
   Animations: "🎬",
   "Home Page": "🏠",
   "Shop Page": "🛒",
