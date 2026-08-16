@@ -1,6 +1,6 @@
 // Client-safe Appwrite configuration (no secrets).
 export const APPWRITE_ENDPOINT =
-  import.meta.env['VITE_APPWRITE_ENDPOINT'] ?? 'https://cloud.appwrite.io/v1';
+  import.meta.env['VITE_APPWRITE_ENDPOINT'] ?? 'https://auth.anibakes.app/v1';
 export const APPWRITE_PROJECT_ID = import.meta.env['VITE_APPWRITE_PROJECT_ID'] ?? '';
 
 /** Collection ids used across the app. Keep in sync with scripts/appwrite-setup.ts */
