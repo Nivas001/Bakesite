@@ -685,7 +685,7 @@ export function AboutUsPage() {
                   className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-amber-300 font-bold text-xs sm:text-sm h-11 transition-all cursor-pointer"
                 >
                   <Compass className="size-4" />
-                  <span>View 3D GLB Model ↓</span>
+                  <span>View 3D GLB Studio ↓</span>
                 </a>
               </div>
             </div>
@@ -694,12 +694,7 @@ export function AboutUsPage() {
         </div>
       </section>
 
-      {/* 3. Real-Time WebGL 3D GLB Model Atelier (Supports 360 Free Orbit & Multiple Models) */}
-      <section className="py-6 px-4 sm:px-6 max-w-6xl mx-auto">
-        <Cake3dModelViewer />
-      </section>
-
-      {/* 4. DUAL VIEW SYSTEM: EITHER COLLAGE ARTBOARD OR GUIDED STORY */}
+      {/* 3. DUAL VIEW SYSTEM: EITHER COLLAGE ARTBOARD OR GUIDED STORY */}
 
       {viewMode === "collage" ? (
         /* ===================================================================== */
@@ -1252,7 +1247,12 @@ export function AboutUsPage() {
         </section>
       )}
 
-      {/* 4. Bottom Bakery Call-To-Action */}
+      {/* 4. Real-Time WebGL 3D GLB Model Atelier (Supports 360 Free Orbit & Multiple Models) */}
+      <section className="py-8 px-4 sm:px-6 max-w-6xl mx-auto">
+        <Cake3dModelViewer />
+      </section>
+
+      {/* 5. Bottom Bakery Call-To-Action */}
       <section className="py-10 px-4 sm:px-6 max-w-4xl mx-auto text-center">
         <div className="rounded-3xl border-2 border-border/80 bg-card p-8 sm:p-12 shadow-soft space-y-4">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-berry">
