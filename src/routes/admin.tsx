@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dialog";
 import { DevPanel } from "@/components/dev-panel";
 import { AdminNewsletter } from "@/components/admin-newsletter";
+import { AdminCustomerMoments } from "@/components/admin-customer-moments";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -498,6 +499,7 @@ function AdminDashboard() {
             Users ({usersList.length})
           </TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          <TabsTrigger value="reviews">Customer Reviews</TabsTrigger>
           <TabsTrigger value="offers">Offer codes</TabsTrigger>
           <TabsTrigger value="calendar">Closed dates</TabsTrigger>
           <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
@@ -2220,6 +2222,10 @@ function AdminDashboard() {
               })}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="reviews" className="mt-6">
+          <AdminCustomerMoments />
         </TabsContent>
       </Tabs>
 
