@@ -19,6 +19,7 @@ import { useCart } from "@/lib/cart";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useHeroNavbarTheme } from "@/lib/hero-navbar-theme";
 
 const NAV = [
   { to: "/", label: "Home", icon: Home, badge: null },
@@ -34,6 +35,7 @@ export function SiteHeader() {
   const { isAdmin } = useIsAdmin();
   const { user: session } = useAuth();
   const [open, setOpen] = useState(false);
+  const { inHero, bgColor } = useHeroNavbarTheme();
 
   async function signOut() {
     await signOutEverywhere();
@@ -41,7 +43,21 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/65 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_4px_24px_0_rgba(0,0,0,0.04)] transition-all">
+    <header
+      style={
+        inHero && bgColor
+          ? {
+              backgroundColor: bgColor,
+              borderColor: "rgba(44, 24, 16, 0.15)",
+            }
+          : undefined
+      }
+      className={`sticky top-0 z-50 border-b ${
+        inHero && bgColor
+          ? "border-[#2C1810]/15"
+          : "border-border/50 bg-background/65 backdrop-blur-2xl backdrop-saturate-150"
+      } shadow-[0_4px_24px_0_rgba(0,0,0,0.04)] transition-all duration-700`}
+    >
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 sm:gap-4 px-3.5 sm:px-6">
         
         {/* Brand Logo with Liquid Glass Pill */}
