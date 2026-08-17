@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import {
   Menu,
@@ -32,15 +32,18 @@ const NAV = [
 export function SiteHeader() {
   const { count } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAdmin } = useIsAdmin();
   const { user: session } = useAuth();
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const { inHero, bgColor, textColor } = useHeroNavbarTheme();
+
+  const isHomePage = location.pathname === "/" || location.pathname === "";
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrollY(window.scrollY);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -53,15 +56,17 @@ export function SiteHeader() {
   }
 
   // Active theme overrides
-  const isHeroActive = inHero && !!bgColor;
-  const showBorder = scrolled || !isHeroActive;
+  const isHeroActive = isHomePage && scrollY < 650 && (inHero || scrollY < 100);
+  const activeBgColor = isHeroActive ? (bgColor ?? "#F5C2CD") : null;
+  const activeTextColor = isHeroActive ? (textColor ?? "#3A1018") : null;
+  const showBorder = scrollY > 20 || !isHeroActive;
 
   return (
     <header
       style={
-        isHeroActive
+        isHeroActive && activeBgColor
           ? {
-              backgroundColor: bgColor,
+              backgroundColor: activeBgColor,
               borderColor: showBorder ? "rgba(44, 24, 16, 0.15)" : "transparent",
             }
           : undefined
@@ -82,7 +87,7 @@ export function SiteHeader() {
           className="group flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all hover:bg-black/5"
         >
           <span
-            style={isHeroActive && textColor ? { color: textColor } : undefined}
+            style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
             className="font-nimbus text-xl sm:text-2xl font-bold tracking-tight text-cocoa transition-colors duration-700 group-hover:scale-[1.02]"
           >
             Ani Bakes
@@ -106,7 +111,7 @@ export function SiteHeader() {
             <Link
               key={item.to}
               to={item.to}
-              style={isHeroActive && textColor ? { color: textColor } : undefined}
+              style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
               className="relative rounded-full px-3.5 py-1 text-xs lg:text-sm font-semibold text-muted-foreground whitespace-nowrap transition-all hover:bg-card hover:text-foreground hover:shadow-2xs active:scale-95"
               activeProps={{
                 className: "bg-card text-cocoa font-bold shadow-xs ring-1 ring-border/80",
@@ -134,7 +139,7 @@ export function SiteHeader() {
                 ? {
                     backgroundColor: "rgba(255, 255, 255, 0.45)",
                     borderColor: "rgba(44, 24, 16, 0.15)",
-                    color: textColor ?? undefined,
+                    color: activeTextColor ?? undefined,
                   }
                 : undefined
             }
@@ -156,7 +161,7 @@ export function SiteHeader() {
                 ? {
                     backgroundColor: "rgba(255, 255, 255, 0.45)",
                     borderColor: "rgba(44, 24, 16, 0.12)",
-                    color: textColor ?? undefined,
+                    color: activeTextColor ?? undefined,
                   }
                 : undefined
             }
@@ -165,7 +170,7 @@ export function SiteHeader() {
           >
             <Link to="/cart">
               <ShoppingBag
-                style={isHeroActive && textColor ? { color: textColor } : undefined}
+                style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
                 className="size-4.5 text-foreground transition-colors duration-700"
               />
               {count > 0 && (
@@ -188,7 +193,7 @@ export function SiteHeader() {
                     ? {
                         backgroundColor: "rgba(255, 255, 255, 0.45)",
                         borderColor: "rgba(44, 24, 16, 0.12)",
-                        color: textColor ?? undefined,
+                        color: activeTextColor ?? undefined,
                       }
                     : undefined
                 }
@@ -203,7 +208,7 @@ export function SiteHeader() {
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
-                style={isHeroActive && textColor ? { color: textColor } : undefined}
+                style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
                 className="hidden text-xs font-semibold text-muted-foreground hover:text-destructive sm:inline-flex h-8 px-2.5 rounded-full hover:bg-destructive/10 transition-colors duration-700"
               >
                 <LogOut className="size-3.5" />
@@ -225,7 +230,7 @@ export function SiteHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                style={isHeroActive && textColor ? { color: textColor } : undefined}
+                style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
                 className="md:hidden transition-colors duration-700"
                 aria-label="Menu"
               >
