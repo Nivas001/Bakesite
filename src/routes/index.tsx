@@ -32,6 +32,7 @@ import { CakeBuilderWidget } from "@/components/cake-builder-widget";
 import { BakerLaboratoryBento } from "@/components/baker-laboratory-bento";
 import { PolaroidMomentsWall } from "@/components/polaroid-moments-wall";
 import { CategoryPeekCarousel } from "@/components/category-peek-carousel";
+import { TextLoop } from "@/components/ui/text-loop";
 
 const catalogQuery = queryOptions({
   queryKey: ["catalog"],
@@ -126,7 +127,7 @@ function Home() {
                   <Sparkles className="size-3 text-berry" /> Baked to order
                 </span>
                 <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[10px] font-extrabold text-amber-900 dark:text-amber-300">
-                  🧈 100% French Butter
+                  ✨ Small-Batch Daily Bake
                 </span>
               </div>
 
@@ -171,6 +172,29 @@ function Home() {
             </div>
           </div>
         </section>
+      </div>
+
+      {/* Kinetic Flowing Bakery Text Ribbon */}
+      <div className="w-full py-1 -my-6 sm:-my-10 overflow-hidden select-none pointer-events-auto">
+        <TextLoop
+          text="Ani Bakes ✦ Fresh 4:00 AM Dawn Bakes ✦ 36-Hour Sourdough ✦ Zero Preservatives ✦ Small-Batch Studio"
+          shape="wave"
+          speed={48}
+          direction="forward"
+          separator="🥮"
+          curviness={15}
+          fontSize={26}
+          fontWeight={800}
+          fontFamily="var(--font-blogh), var(--font-body), sans-serif"
+          letterSpacing={2}
+          uppercase
+          color="#3A1C14"
+          ribbon
+          ribbonColor="#FDF1E8"
+          ribbonWidth={52}
+          pauseOnHover={false}
+          className="opacity-95"
+        />
       </div>
 
       {/* 2. Daily Selection — Fresh from the counter */}
