@@ -238,7 +238,7 @@ export function AboutUsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 border-b border-white/10 pb-5">
             <div className="flex items-center gap-2">
               <span className="flex size-3 rounded-full bg-amber-400 animate-ping" />
-              <span className="font-blogh text-lg sm:text-xl text-amber-300 uppercase tracking-wide">
+              <span className="font-nimbus text-lg sm:text-xl text-amber-300 uppercase tracking-wide">
                 Interactive 3D Cake Atelier
               </span>
             </div>
@@ -329,7 +329,7 @@ export function AboutUsPage() {
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider">
                   Pure Craft Architecture
                 </span>
-                <h2 className="font-blogh text-2xl sm:text-3xl text-white leading-tight">
+                <h2 className="font-nimbus text-2xl sm:text-3xl text-white leading-tight">
                   {currentCakeSpec.title}
                 </h2>
                 <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
@@ -341,25 +341,25 @@ export function AboutUsPage() {
               <div className="grid grid-cols-2 gap-2.5 pt-2">
                 <div className="rounded-2xl bg-white/5 border border-white/10 p-3 text-center">
                   <p className="text-[10px] uppercase font-bold text-zinc-400">Calories / Slice</p>
-                  <p className="font-blogh text-xl sm:text-2xl text-amber-300 mt-0.5">
+                  <p className="font-sans font-black text-xl sm:text-2xl text-amber-300 mt-0.5 tracking-tight">
                     {currentCakeSpec.macros.calories}
                   </p>
                 </div>
                 <div className="rounded-2xl bg-white/5 border border-white/10 p-3 text-center">
                   <p className="text-[10px] uppercase font-bold text-zinc-400">Clean Protein</p>
-                  <p className="font-blogh text-xl sm:text-2xl text-rose-300 mt-0.5">
+                  <p className="font-sans font-black text-xl sm:text-2xl text-rose-300 mt-0.5 tracking-tight">
                     {currentCakeSpec.macros.protein}
                   </p>
                 </div>
                 <div className="rounded-2xl bg-white/5 border border-white/10 p-3 text-center">
                   <p className="text-[10px] uppercase font-bold text-zinc-400">Refined Sugars</p>
-                  <p className="font-blogh text-xl sm:text-2xl text-emerald-300 mt-0.5">
+                  <p className="font-sans font-black text-xl sm:text-2xl text-emerald-300 mt-0.5 tracking-tight">
                     {currentCakeSpec.macros.sugar}
                   </p>
                 </div>
                 <div className="rounded-2xl bg-white/5 border border-white/10 p-3 text-center">
                   <p className="text-[10px] uppercase font-bold text-zinc-400">Dairy Butter</p>
-                  <p className="font-blogh text-xl sm:text-2xl text-amber-200 mt-0.5">
+                  <p className="font-sans font-black text-xl sm:text-2xl text-amber-200 mt-0.5 tracking-tight">
                     {currentCakeSpec.macros.butterfat}
                   </p>
                 </div>
@@ -487,7 +487,7 @@ export function AboutUsPage() {
             {/* Active Pin Detailed Info Callout */}
             <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-4 shadow-[3px_3px_0px_#2C1810] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-blogh text-sm text-[#E83181] uppercase tracking-wide">
+                <span className="font-sans font-black text-sm text-[#E83181] uppercase tracking-wide">
                   Pin #{activeMuffinHotspot}: {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.badge}
                 </span>
                 <span className="text-[10px] font-black uppercase text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
@@ -650,8 +650,8 @@ export function AboutUsPage() {
 
             {/* Vision Quote Footer */}
             <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-4 shadow-[3px_3px_0px_#2C1810] text-center">
-              <p className="font-blogh text-xs sm:text-sm text-[#2E1854] uppercase tracking-wide">
-                Guiding Healthy Indulgence with 0% Compromise on Flavor
+              <p className="font-nimbus text-xs sm:text-sm font-bold text-[#2E1854] uppercase tracking-wide">
+                Guiding Healthy Indulgence with Zero Compromise on Flavor
               </p>
             </div>
           </div>
@@ -686,32 +686,32 @@ export function AboutUsPage() {
             <div className="grid grid-cols-2 gap-3 my-6">
               <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
                 <span className="text-xl">🔥</span>
-                <h3 className="font-blogh text-xs sm:text-sm text-[#5C3218] uppercase">4:00 AM Dawn Bake</h3>
-                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug">
+                <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">4:00 AM Dawn Bake</h3>
+                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
                   Baked fresh every single morning for your slot.
                 </p>
               </div>
 
               <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
                 <span className="text-xl">🌾</span>
-                <h3 className="font-blogh text-xs sm:text-sm text-[#5C3218] uppercase">36-Hour Wild Ferment</h3>
-                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug">
+                <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">36-Hour Wild Ferment</h3>
+                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
                   Slow cold proofing for gut health and open crumb.
                 </p>
               </div>
 
               <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
                 <span className="text-xl">🧈</span>
-                <h3 className="font-blogh text-xs sm:text-sm text-[#5C3218] uppercase">100% French Butter</h3>
-                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug">
+                <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">100% French Butter</h3>
+                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
                   84% butterfat dairy. Zero margarine or palm oil.
                 </p>
               </div>
 
               <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
                 <span className="text-xl">🍫</span>
-                <h3 className="font-blogh text-xs sm:text-sm text-[#5C3218] uppercase">70% Belgian Callebaut</h3>
-                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug">
+                <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">70% Belgian Couverture</h3>
+                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
                   Real cocoa butter and pure Bourbon vanilla beans.
                 </p>
               </div>
