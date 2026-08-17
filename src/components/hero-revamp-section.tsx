@@ -85,7 +85,7 @@ export function HeroRevampSection() {
     <div
       onMouseMove={handleMouseMove}
       style={{ backgroundColor: activeFlavor.canvasBg }}
-      className="w-full flex flex-col justify-between text-[#3A1C14] overflow-hidden relative transition-colors duration-700 pt-6 sm:pt-10 pb-1 sm:pb-2"
+      className="w-full min-h-[92vh] lg:min-h-[calc(100vh-4.5rem)] flex flex-col justify-between text-[#3A1C14] overflow-hidden relative transition-colors duration-700 pt-10 sm:pt-14 lg:pt-18 pb-2 sm:pb-3"
     >
       {/* Ambient Soft Glows */}
       <div
@@ -98,10 +98,10 @@ export function HeroRevampSection() {
       />
 
       {/* Main Vertical Hero Container */}
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-3 sm:gap-5 my-auto text-center">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-4 sm:gap-6 my-auto text-center">
         
-        {/* 1. [TOP]: Single-Line Bold Blogh Headline across horizontal space */}
-        <div className="w-full max-w-[96vw] mx-auto text-center px-2 sm:px-4 overflow-hidden">
+        {/* 1. [TOP]: Single-Line Bold Blogh Headline with Generous Navbar Breathing Space */}
+        <div className="w-full max-w-[96vw] mx-auto text-center px-2 sm:px-4 overflow-hidden pt-2 sm:pt-4">
           <h1
             style={{ color: activeFlavor.headingText }}
             className="font-blogh whitespace-nowrap text-[clamp(1.2rem,4.3vw,4.75rem)] tracking-tight leading-none transition-colors duration-500 drop-shadow-xs"
@@ -116,12 +116,33 @@ export function HeroRevampSection() {
           </h1>
         </div>
 
-        {/* 2. [MIDDLE]: Seamless 3D Pastry Photo with 3D Depth Typography */}
-        <div className="relative w-full max-w-3xl flex items-center justify-center min-h-[240px] sm:min-h-[340px] lg:min-h-[400px]">
+        {/* 2. [MIDDLE]: Seamless 3D Pastry Photo with 3D Depth Typography Layered IN FRONT (After) */}
+        <div className="relative w-full max-w-3xl flex items-center justify-center min-h-[260px] sm:min-h-[360px] lg:min-h-[420px]">
           
-          {/* Giant 3D Depth Typography in Blogh font */}
+          {/* Seamless 3D Floating Pastry (Feathered edge dissolving) */}
           <div
-            className="absolute -top-4 sm:-top-8 right-2 sm:right-10 z-10 pointer-events-none select-none"
+            className="relative z-10 w-full max-w-lg sm:max-w-xl lg:max-w-2xl transition-transform duration-200 ease-out"
+            style={{
+              transform: `perspective(1000px) rotateX(${-mousePos.y * 10}deg) rotateY(${mousePos.x * 10}deg) scale(1.02)`,
+            }}
+          >
+            <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full flex items-center justify-center">
+              <img
+                key={activeFlavor.id}
+                src={activeFlavor.heroImage}
+                alt={activeFlavor.title}
+                className="size-full object-cover transition-all duration-700 pointer-events-none"
+                style={{
+                  maskImage: "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
+                  WebkitMaskImage: "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Giant 3D Depth Typography in Blogh font Layered IN FRONT (After the Photo) */}
+          <div
+            className="absolute -top-6 sm:-top-10 right-1 sm:right-6 z-30 pointer-events-none select-none"
             style={{
               transform: `perspective(800px) rotateZ(-12deg) rotateY(${mousePos.x * 14}deg) rotateX(${-mousePos.y * 14}deg)`,
               transition: "transform 0.15s ease-out",
@@ -146,31 +167,10 @@ export function HeroRevampSection() {
               {/* Top Face */}
               <span
                 style={{ color: activeFlavor.depthFront }}
-                className="relative font-blogh text-6xl sm:text-8xl lg:text-[10rem] tracking-tight drop-shadow-md transition-colors duration-500"
+                className="relative font-blogh text-6xl sm:text-8xl lg:text-[10rem] tracking-tight drop-shadow-xl transition-colors duration-500"
               >
                 {activeFlavor.word}
               </span>
-            </div>
-          </div>
-
-          {/* Seamless 3D Floating Pastry (No box, no card frame, feathered radial mask) */}
-          <div
-            className="relative z-20 w-full max-w-lg sm:max-w-xl lg:max-w-2xl transition-transform duration-200 ease-out"
-            style={{
-              transform: `perspective(1000px) rotateX(${-mousePos.y * 12}deg) rotateY(${mousePos.x * 12}deg) scale(1.03)`,
-            }}
-          >
-            <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full flex items-center justify-center">
-              <img
-                key={activeFlavor.id}
-                src={activeFlavor.heroImage}
-                alt={activeFlavor.title}
-                className="size-full object-cover transition-all duration-700 pointer-events-none"
-                style={{
-                  maskImage: "radial-gradient(circle at center, black 40%, rgba(0,0,0,0.85) 55%, transparent 76%)",
-                  WebkitMaskImage: "radial-gradient(circle at center, black 40%, rgba(0,0,0,0.85) 55%, transparent 76%)",
-                }}
-              />
             </div>
           </div>
 
