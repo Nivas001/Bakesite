@@ -139,11 +139,11 @@ export function HeroRevampSection() {
             </div>
           </div>
 
-          {/* Giant 3D Depth Typography in Blogh font Layered IN FRONT (After the Photo) */}
+          {/* Giant 3D Depth Typography in Blogh font Layered IN FRONT (Anchored safely below headline) */}
           <div
-            className="absolute -top-3 sm:-top-8 lg:-top-10 right-2 sm:right-6 z-30 pointer-events-none select-none"
+            className="absolute bottom-1 sm:bottom-2 lg:bottom-3 right-1 sm:right-4 lg:-right-4 xl:-right-8 z-30 pointer-events-none select-none"
             style={{
-              transform: `perspective(800px) rotateZ(-12deg) rotateY(${mousePos.x * 14}deg) rotateX(${-mousePos.y * 14}deg)`,
+              transform: `perspective(800px) rotateZ(-7deg) rotateY(${mousePos.x * 12}deg) rotateX(${-mousePos.y * 12}deg)`,
               transition: "transform 0.15s ease-out",
             }}
           >
@@ -152,21 +152,21 @@ export function HeroRevampSection() {
               <span
                 aria-hidden
                 style={{ color: activeFlavor.depthShadow }}
-                className="absolute top-2 sm:top-3.5 left-2 sm:left-3.5 font-blogh text-4xl sm:text-7xl lg:text-[9.5rem] opacity-50 tracking-tight transition-colors duration-500"
+                className="absolute top-1.5 sm:top-2.5 lg:top-3 left-1.5 sm:left-2.5 lg:left-3 font-blogh text-3xl sm:text-6xl lg:text-[5.75rem] xl:text-[6.75rem] opacity-50 tracking-tight transition-colors duration-500"
               >
                 {activeFlavor.word}
               </span>
               <span
                 aria-hidden
                 style={{ color: activeFlavor.depthMid }}
-                className="absolute top-1 sm:top-2 left-1 sm:left-2 font-blogh text-4xl sm:text-7xl lg:text-[9.5rem] opacity-75 tracking-tight transition-colors duration-500"
+                className="absolute top-0.5 sm:top-1.5 lg:top-1.5 left-0.5 sm:left-1.5 lg:left-1.5 font-blogh text-3xl sm:text-6xl lg:text-[5.75rem] xl:text-[6.75rem] opacity-75 tracking-tight transition-colors duration-500"
               >
                 {activeFlavor.word}
               </span>
               {/* Top Face */}
               <span
                 style={{ color: activeFlavor.depthFront }}
-                className="relative font-blogh text-4xl sm:text-7xl lg:text-[9.5rem] tracking-tight drop-shadow-xl transition-colors duration-500"
+                className="relative font-blogh text-3xl sm:text-6xl lg:text-[5.75rem] xl:text-[6.75rem] tracking-tight drop-shadow-xl transition-colors duration-500"
               >
                 {activeFlavor.word}
               </span>
