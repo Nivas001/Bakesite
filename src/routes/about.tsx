@@ -23,6 +23,7 @@ import {
   Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Cake3dModelViewer } from "@/components/cake-3d-model-viewer";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -423,32 +424,42 @@ export function AboutUsPage() {
             </p>
           </div>
 
-          {/* Interactive Mode Toggle with High Contrast & Visual distinction */}
-          <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-secondary/80 border-2 border-border/80 shadow-xs self-start md:self-auto shrink-0">
-            <button
-              type="button"
-              onClick={() => setViewMode("collage")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                viewMode === "collage"
-                  ? "bg-cocoa text-background shadow-md ring-2 ring-cocoa/20 scale-[1.02]"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}
+          {/* Interactive Mode Toggle with High Contrast & Quick 3D Studio Jump */}
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-auto shrink-0">
+            <a
+              href="#3d-cake-studio"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl bg-amber-400 text-black font-extrabold text-xs shadow-soft hover:bg-amber-300 transition-all cursor-pointer ring-2 ring-amber-400/30"
             >
-              <Layers className="size-4" />
-              <span>Collage Artboard</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("story")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                viewMode === "story"
-                  ? "bg-cocoa text-background shadow-md ring-2 ring-cocoa/20 scale-[1.02]"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-              }`}
-            >
-              <BookOpen className="size-4" />
-              <span>Guided Story Mode</span>
-            </button>
+              <Sparkles className="size-3.5" />
+              <span>3D GLB Studio ↓</span>
+            </a>
+
+            <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-secondary/80 border-2 border-border/80 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setViewMode("collage")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === "collage"
+                    ? "bg-cocoa text-background shadow-md ring-2 ring-cocoa/20 scale-[1.02]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                }`}
+              >
+                <Layers className="size-4" />
+                <span>Collage Artboard</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("story")}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === "story"
+                    ? "bg-cocoa text-background shadow-md ring-2 ring-cocoa/20 scale-[1.02]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                }`}
+              >
+                <BookOpen className="size-4" />
+                <span>Guided Story Mode</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -658,17 +669,24 @@ export function AboutUsPage() {
                 </div>
               </div>
 
-              {/* CTA button */}
-              <div className="pt-2">
+              {/* CTA buttons */}
+              <div className="pt-2 flex flex-col sm:flex-row gap-2">
                 <Button
                   asChild
-                  className="w-full rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs sm:text-sm h-11 shadow-lift cursor-pointer"
+                  className="flex-1 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs sm:text-sm h-11 shadow-lift cursor-pointer"
                 >
                   <Link to="/" className="flex items-center justify-center gap-2">
                     <span>Customize This Cake in Studio</span>
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
+                <a
+                  href="#3d-cake-studio"
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-amber-300 font-bold text-xs sm:text-sm h-11 transition-all cursor-pointer"
+                >
+                  <Compass className="size-4" />
+                  <span>View 3D GLB Model ↓</span>
+                </a>
               </div>
             </div>
 
@@ -676,7 +694,12 @@ export function AboutUsPage() {
         </div>
       </section>
 
-      {/* 3. DUAL VIEW SYSTEM: EITHER COLLAGE ARTBOARD OR GUIDED STORY */}
+      {/* 3. Real-Time WebGL 3D GLB Model Atelier (Supports 360 Free Orbit & Multiple Models) */}
+      <section className="py-6 px-4 sm:px-6 max-w-6xl mx-auto">
+        <Cake3dModelViewer />
+      </section>
+
+      {/* 4. DUAL VIEW SYSTEM: EITHER COLLAGE ARTBOARD OR GUIDED STORY */}
 
       {viewMode === "collage" ? (
         /* ===================================================================== */
