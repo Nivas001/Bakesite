@@ -112,13 +112,13 @@ function Home() {
       : FAQ_ITEMS.filter((f) => f.category === selectedFaqCategory);
 
   return (
-    <div className="w-full space-y-12 sm:space-y-20 overflow-x-clip">
+    <div className="w-full overflow-x-clip -mt-3 sm:-mt-6">
       
-      {/* 1. Revamped 3D Hero Section */}
+      {/* 1. Full-Width 3D Confectionery Hero Section */}
       <HeroRevampSection />
 
       {/* Kinetic Flowing Bakery Text Ribbon */}
-      <div className="w-full py-1.5 sm:py-3 overflow-hidden select-none pointer-events-auto">
+      <div className="w-full py-1.5 sm:py-3 overflow-hidden select-none pointer-events-auto bg-background">
         <TextLoop
           text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
           shape="wave"
@@ -140,8 +140,10 @@ function Home() {
         />
       </div>
 
-      {/* 2. Daily Selection — Fresh from the counter */}
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
+      {/* Main Content Sections with Standard Spacing */}
+      <div className="w-full space-y-12 sm:space-y-20 pt-3 sm:pt-6">
+        {/* 2. Daily Selection — Fresh from the counter */}
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
         <section className="section-shell section-shell-plain">
           <div className="flex items-end justify-between gap-3 mb-2">
             <div>
@@ -286,6 +288,7 @@ function Home() {
         </section>
       </div>
 
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Sparkles, Star, Clock, Flame, ChevronRight, Heart } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FLAVORS = [
@@ -11,9 +11,10 @@ const FLAVORS = [
     borderColor: "border-[#4A2D80]/60",
     label: "Artisanal magic",
     title: "Wild Blueberry & Violet Glaze",
-    subtitle: "Stone-milled flour with reduced berry coulis",
     image: "/hero/mini-blueberry-donut.jpg",
+    heroImage: "/hero/hero-3d-blueberry-donut.jpg",
     accentColor: "#9353D3",
+    word: "DONUTING",
   },
   {
     id: "caramel",
@@ -22,9 +23,10 @@ const FLAVORS = [
     borderColor: "border-[#E5A80B]/60",
     label: "Real ingredients",
     title: "Golden Honey Caramel Glaze",
-    subtitle: "Slow-caramelized farm honey & sea salt flakes",
     image: "/hero/mini-caramel-donut.jpg",
+    heroImage: "/hero/hero-3d-caramel-donut.jpg",
     accentColor: "#F5A524",
+    word: "CRAFTING",
   },
   {
     id: "strawberry",
@@ -33,9 +35,10 @@ const FLAVORS = [
     borderColor: "border-[#B01456]/60",
     label: "Natural flavors",
     title: "Pink Strawberry Nonpareil",
-    subtitle: "Fresh organic strawberry glaze & crunchy sprinkles",
     image: "/hero/mini-strawberry-donut.jpg",
+    heroImage: "/hero/hero-3d-donut-sprinkles.jpg",
     accentColor: "#F31260",
+    word: "DONUTING",
   },
 ];
 
@@ -51,100 +54,78 @@ export function HeroRevampSection() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-3 sm:px-8 lg:px-10 pt-1 sm:pt-2">
+    <div className="w-full bg-gradient-to-br from-[#FFAED1] via-[#F89BBF] to-[#FFA3C8] text-[#3A1C14] overflow-hidden relative border-b border-white/30">
+      {/* Soft Background Wave Contours */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-25 mix-blend-overlay"
+      >
+        <svg className="w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="none">
+          <path
+            d="M0,200 C300,350 700,50 1000,220 L1000,600 L0,600 Z"
+            fill="white"
+            opacity="0.3"
+          />
+          <path
+            d="M0,380 C400,250 600,480 1000,320 L1000,600 L0,600 Z"
+            fill="white"
+            opacity="0.25"
+          />
+        </svg>
+      </div>
+
+      {/* Ambient Glows */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-20 -left-20 size-80 rounded-full bg-white/30 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-20 -right-20 size-96 rounded-full bg-[#DE1D72]/25 blur-3xl"
+      />
+
+      {/* Floating Decorative Sprinkle Particles */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-10 left-1/3 size-3 rounded-full bg-[#00C2FF] shadow-xs animate-bounce"
+        style={{ animationDuration: "3.2s" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-1/4 right-1/4 size-2.5 rounded-full bg-[#FFE600] shadow-xs animate-bounce"
+        style={{ animationDuration: "2.5s", animationDelay: "0.5s" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-12 left-1/4 size-3.5 rounded-full bg-[#7828C8] shadow-xs animate-bounce"
+        style={{ animationDuration: "4s", animationDelay: "1s" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-20 right-1/3 size-3 rounded-full bg-[#17C964] shadow-xs animate-bounce"
+        style={{ animationDuration: "3.6s", animationDelay: "0.8s" }}
+      />
+
+      {/* Main Hero Container */}
       <section
         onMouseMove={handleMouseMove}
-        className="relative overflow-hidden rounded-[2rem] sm:rounded-[2.75rem] bg-gradient-to-br from-[#FFAED1] via-[#F89BBF] to-[#FFA3C8] shadow-2xl border border-white/40 p-5 sm:p-8 lg:p-12 text-[#3A1C14] transition-all duration-300"
+        className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10 py-7 sm:py-10 lg:py-14"
       >
-        {/* Soft Background Wave Contours */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-25 mix-blend-overlay"
-        >
-          <svg className="w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="none">
-            <path
-              d="M0,200 C300,350 700,50 1000,220 L1000,600 L0,600 Z"
-              fill="white"
-              opacity="0.3"
-            />
-            <path
-              d="M0,380 C400,250 600,480 1000,320 L1000,600 L0,600 Z"
-              fill="white"
-              opacity="0.25"
-            />
-          </svg>
-        </div>
-
-        {/* Ambient Glows */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-20 -left-20 size-72 rounded-full bg-white/30 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -bottom-20 -right-20 size-80 rounded-full bg-[#DE1D72]/25 blur-3xl"
-        />
-
-        {/* Floating Decorative Sprinkle Candies */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-12 left-1/3 size-3 rounded-full bg-[#00C2FF] shadow-xs animate-bounce"
-          style={{ animationDuration: "3.2s" }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-1/4 right-1/4 size-2.5 rounded-full bg-[#FFE600] shadow-xs animate-bounce"
-          style={{ animationDuration: "2.5s", animationDelay: "0.5s" }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-16 left-1/4 size-3.5 rounded-full bg-[#7828C8] shadow-xs animate-bounce"
-          style={{ animationDuration: "4s", animationDelay: "1s" }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-24 right-1/3 size-3 rounded-full bg-[#17C964] shadow-xs animate-bounce"
-          style={{ animationDuration: "3.6s", animationDelay: "0.8s" }}
-        />
-
-        {/* Main 2-Column Showcase Grid */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           
-          {/* LEFT COLUMN: Floating Flavor Pills & Brand Narrative (5 cols on lg) */}
-          <div className="lg:col-span-5 flex flex-col justify-center gap-5 sm:gap-6">
+          {/* LEFT COLUMN: Clean Blogh Headline, Floating Flavor Pills & CTAs (5 cols on lg) */}
+          <div className="lg:col-span-5 flex flex-col justify-center gap-4 sm:gap-6">
             
-            {/* Top Micro Badges */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.16em] text-[#A8156C] backdrop-blur shadow-2xs">
-                <Sparkles className="size-3 text-[#DE1D72]" /> Artisanal Confectionery
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#DE1D72] text-white px-3 py-1 text-[11px] font-black tracking-wide shadow-2xs">
-                ✨ Baked at 4:00 AM Dawn
-              </span>
-            </div>
-
-            {/* Editorial Headline */}
+            {/* Bold Blogh Headline */}
             <div>
-              <h1 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.12] text-[#2C101B] tracking-tight">
-                Pure Joy in <br />
-                <span className="text-[#B01777] italic font-serif">Every Fresh Glaze.</span>
+              <h1 className="font-blogh text-4xl sm:text-5xl lg:text-6xl text-[#2C101B] tracking-tight leading-[1.02]">
+                PURE JOY IN <br />
+                <span className="text-[#A8156C]">EVERY FRESH GLAZE</span>
               </h1>
-              <p className="mt-2.5 max-w-md text-xs sm:text-sm font-medium leading-relaxed text-[#59263D]">
-                Handcrafted small-batch brioche donuts, slow wild sourdoughs, and celebration cakes made fresh the morning of your slot.
-              </p>
             </div>
 
-            {/* Floating Flavor Pills (Exact match to Reference) */}
-            <div className="flex flex-col gap-3 pt-1">
-              <div className="flex items-center gap-3">
-                <span className="text-[11px] font-black uppercase tracking-widest text-[#7B1D4C]">
-                  Signature Glazes:
-                </span>
-                <span className="text-[10px] bg-white/60 text-[#7B1D4C] px-2 py-0.5 rounded-md font-bold">
-                  Tap to explore
-                </span>
-              </div>
-
+            {/* Floating Flavor Pills (Click to switch 3D Hero Donut) */}
+            <div className="flex flex-col gap-2.5 pt-1">
               <div className="space-y-2.5">
                 {FLAVORS.map((flavor, index) => {
                   const isSelected = activeFlavor.id === flavor.id;
@@ -154,7 +135,7 @@ export function HeroRevampSection() {
                       type="button"
                       onClick={() => setActiveFlavor(flavor)}
                       className={`group relative flex items-center w-full max-w-sm rounded-full ${flavor.pillBg} ${flavor.textColor} p-1.5 pr-5 sm:pr-6 shadow-md border ${flavor.borderColor} transition-all duration-300 hover:scale-[1.03] active:scale-98 cursor-pointer ${
-                        isSelected ? "ring-3 ring-white/80 shadow-lg scale-[1.02]" : "opacity-90 hover:opacity-100"
+                        isSelected ? "ring-3 ring-white/90 shadow-lg scale-[1.03]" : "opacity-90 hover:opacity-100"
                       }`}
                       style={{
                         transform: `rotate(${index === 0 ? "-2deg" : index === 1 ? "1deg" : "-1deg"})`,
@@ -190,8 +171,8 @@ export function HeroRevampSection() {
               </div>
             </div>
 
-            {/* CTAs */}
-            <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2.5 pt-2">
+            {/* Quick Action CTAs */}
+            <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2.5 pt-1">
               <Button
                 asChild
                 size="default"
@@ -213,15 +194,15 @@ export function HeroRevampSection() {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: 3D Giant Glazed Donut + 3D Arched Blogh Depth Text (7 cols on lg) */}
-          <div className="lg:col-span-7 relative flex items-center justify-center min-h-[320px] sm:min-h-[440px] lg:min-h-[500px]">
+          {/* RIGHT COLUMN: Active 3D Giant Glazed Donut + 3D Arched Blogh Depth Text (7 cols on lg) */}
+          <div className="lg:col-span-7 relative flex items-center justify-center min-h-[300px] sm:min-h-[420px] lg:min-h-[480px]">
             
             {/* Scalloped Starburst Die-Cut Badge ("Explore Flavors") */}
             <div
-              className="absolute top-4 left-2 sm:top-6 sm:left-4 z-30 animate-pulse"
+              className="absolute top-2 left-1 sm:top-4 sm:left-4 z-30 animate-pulse"
               style={{ animationDuration: "4s" }}
             >
-              <div className="relative size-20 sm:size-24 flex items-center justify-center">
+              <div className="relative size-18 sm:size-22 flex items-center justify-center">
                 {/* 12-point SVG scalloped starburst */}
                 <svg
                   viewBox="0 0 100 100"
@@ -241,9 +222,9 @@ export function HeroRevampSection() {
               </div>
             </div>
 
-            {/* Giant 3D Depth Typography: "DONUTING" / "BAKING" */}
+            {/* Giant 3D Depth Typography in Blogh font: "DONUTING" */}
             <div
-              className="absolute top-2 sm:top-0 right-2 sm:right-6 z-10 pointer-events-none select-none"
+              className="absolute top-0 right-2 sm:right-6 z-10 pointer-events-none select-none"
               style={{
                 transform: `perspective(800px) rotateZ(-12deg) rotateY(${mousePos.x * 12}deg) rotateX(${-mousePos.y * 12}deg)`,
                 transition: "transform 0.15s ease-out",
@@ -255,22 +236,22 @@ export function HeroRevampSection() {
                   aria-hidden
                   className="absolute top-2.5 left-2.5 font-blogh text-6xl sm:text-8xl lg:text-9xl text-[#750D4F] opacity-70 tracking-tight"
                 >
-                  DONUTING
+                  {activeFlavor.word}
                 </span>
                 <span
                   aria-hidden
                   className="absolute top-1.5 left-1.5 font-blogh text-6xl sm:text-8xl lg:text-9xl text-[#941164] opacity-80 tracking-tight"
                 >
-                  DONUTING
+                  {activeFlavor.word}
                 </span>
                 {/* Top Face */}
                 <span className="relative font-blogh text-6xl sm:text-8xl lg:text-9xl text-[#C71585] tracking-tight drop-shadow-md">
-                  DONUTING
+                  {activeFlavor.word}
                 </span>
               </div>
             </div>
 
-            {/* Hero 3D Donut Composition with Parallax Movement */}
+            {/* Active Hero 3D Donut Composition with Parallax & Cross-Fade */}
             <div
               className="relative z-20 w-full max-w-lg lg:max-w-xl transition-transform duration-200 ease-out"
               style={{
@@ -279,9 +260,10 @@ export function HeroRevampSection() {
             >
               <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-2xl border-2 border-white/60 group">
                 <img
-                  src="/hero/hero-3d-donut-sprinkles.jpg"
-                  alt="Photorealistic 3D giant glazed strawberry donut with bursting rainbow sprinkles"
-                  className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  key={activeFlavor.id}
+                  src={activeFlavor.heroImage}
+                  alt={activeFlavor.title}
+                  className="size-full object-cover transition-all duration-500 group-hover:scale-105"
                 />
 
                 {/* Subtle Inner Glass Vignette */}
@@ -292,7 +274,10 @@ export function HeroRevampSection() {
 
                 {/* Floating Telemetry Tooltip Badge */}
                 <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 z-30 flex items-center gap-2 rounded-full bg-white/90 px-3.5 py-1.5 text-[10px] sm:text-xs font-black text-[#2C101B] backdrop-blur shadow-md border border-white">
-                  <span className="size-2 rounded-full bg-[#17C964] animate-ping" />
+                  <span
+                    className="size-2 rounded-full animate-ping"
+                    style={{ backgroundColor: activeFlavor.accentColor }}
+                  />
                   <span>Selected: {activeFlavor.title}</span>
                 </div>
               </div>
