@@ -166,10 +166,10 @@ export function CakeBuilderWidget() {
         </div>
 
         {/* Single-Screen Desktop Layout (6 Cols Left / 6 Cols Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch lg:h-[580px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
           
           {/* LEFT: Bento Controls (6 Columns) */}
-          <div className="lg:col-span-6 flex flex-col justify-between gap-3 h-full">
+          <div className="lg:col-span-6 flex flex-col justify-between gap-3.5">
             
             {/* Bento Card 1: Canvas Size & Base Sponge */}
             <div className="rounded-3xl border border-border/80 bg-card p-4 sm:p-5 shadow-soft space-y-3">
@@ -326,16 +326,20 @@ export function CakeBuilderWidget() {
           </div>
 
           {/* RIGHT: Live Realistic Showcase + Toppings & Order CTA (6 Columns) */}
-          <div className="lg:col-span-6 rounded-3xl border border-border/80 bg-card p-5 shadow-lift flex flex-col justify-between overflow-hidden relative h-full">
+          <div className="lg:col-span-6 rounded-3xl border border-border/80 bg-card p-4 sm:p-5 shadow-lift flex flex-col justify-between gap-3.5 overflow-hidden relative">
             
-            {/* Top Showcase: High-Res Real Cake Photograph with Inter Inscription Plaque */}
-            <div className="space-y-3">
+            {/* Top Showcase: High-Res Real Cake Photograph with Inscription Plaque */}
+            <div className="flex flex-col gap-3">
+              
+              {/* Header inside right card */}
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
                     Live Cake Atelier
                   </span>
-                  <h4 className="font-sans font-bold text-sm text-foreground">{selectedFlavor.name}</h4>
+                  <h4 className="font-sans font-bold text-sm sm:text-base text-foreground leading-tight">
+                    {selectedFlavor.name} • {selectedSize.name}
+                  </h4>
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 text-[10px] font-bold">
                   <Sparkles className="size-2.5" /> Real Studio Bake
@@ -343,7 +347,7 @@ export function CakeBuilderWidget() {
               </div>
 
               {/* High-Resolution Cake Photograph Container */}
-              <div className="relative w-full h-48 sm:h-56 rounded-2xl overflow-hidden border border-border/80 shadow-md group">
+              <div className="relative w-full h-52 sm:h-64 rounded-2xl overflow-hidden border border-border/80 shadow-md group">
                 <img
                   src={selectedFlavor.image}
                   alt={selectedFlavor.name}
@@ -355,29 +359,29 @@ export function CakeBuilderWidget() {
 
                 {/* Floating Top Badges */}
                 <div className="absolute top-2.5 left-3 right-3 flex items-center justify-between pointer-events-none">
-                  <span className="rounded-full bg-black/60 backdrop-blur-md border border-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-sm">
-                    {selectedSize.name}
+                  <span className="rounded-full bg-black/65 backdrop-blur-md border border-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-sm">
+                    {selectedSize.serves}
                   </span>
-                  <span className="rounded-full bg-amber-400 text-black px-2 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                  <span className="rounded-full bg-amber-400 text-black px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-sm">
                     {selectedFlavor.badge}
                   </span>
                 </div>
 
-                {/* Real-time Custom Message Plaque in Crisp Inter Font */}
+                {/* Real-time Custom Message Plaque */}
                 <div className="absolute inset-x-3 bottom-3 z-10 flex flex-col items-center">
-                  <div className="w-full rounded-xl bg-black/65 backdrop-blur-md border border-white/30 p-2.5 text-center shadow-xl">
+                  <div className="w-full rounded-xl bg-black/70 backdrop-blur-md border border-white/30 p-2.5 sm:p-3 text-center shadow-xl">
                     <p className="text-[9px] font-bold uppercase tracking-widest text-amber-300 mb-0.5">
                       Hand-Piped Inscription
                     </p>
-                    <p className="font-sans font-black text-base sm:text-lg text-white tracking-wide uppercase leading-tight drop-shadow-md break-words">
+                    <p className="font-sans font-black text-sm sm:text-base lg:text-lg text-white tracking-wide uppercase leading-tight drop-shadow-md break-words">
                       {cakeMessage.trim() ? cakeMessage : "Your Inscription Here"}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Artisan Toppings & Dietary Integrated Right Below Photo */}
-              <div className="space-y-1.5">
+              {/* Artisan Toppings & Dietary Integrated in Bento */}
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
                     Artisan Make-Up Toppings ({selectedAddons.length})
@@ -396,17 +400,17 @@ export function CakeBuilderWidget() {
                         key={addon.id}
                         type="button"
                         onClick={() => toggleAddon(addon.id)}
-                        className={`flex items-center justify-between px-2 py-1 rounded-lg border text-left transition-all cursor-pointer ${
+                        className={`flex items-center justify-between px-2.5 py-1.5 rounded-xl border text-left transition-all cursor-pointer ${
                           isChecked
-                            ? "border-amber-500 bg-amber-500/15 text-foreground ring-1 ring-amber-500 font-bold"
-                            : "border-border/70 bg-background/40 hover:bg-secondary/40 text-muted-foreground"
+                            ? "border-amber-500 bg-amber-500/15 text-foreground ring-1 ring-amber-500 font-bold shadow-2xs"
+                            : "border-border/70 bg-background/50 hover:bg-secondary/60 text-muted-foreground"
                         }`}
                       >
-                        <div className="flex items-center gap-1 min-w-0">
-                          <span className="text-xs shrink-0">{addon.icon}</span>
-                          <span className="text-[10px] truncate">{addon.name}</span>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-sm shrink-0">{addon.icon}</span>
+                          <span className="text-[10.5px] truncate">{addon.name}</span>
                         </div>
-                        <span className="text-[9px] font-mono font-bold text-cocoa shrink-0 ml-0.5">+₹{addon.price}</span>
+                        <span className="text-[9.5px] font-mono font-bold text-cocoa shrink-0 ml-0.5">+₹{addon.price}</span>
                       </button>
                     );
                   })}
@@ -416,38 +420,40 @@ export function CakeBuilderWidget() {
                 <button
                   type="button"
                   onClick={() => setIsEggless(!isEggless)}
-                  className={`w-full py-1 px-3 rounded-lg border text-center text-[10.5px] font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 mt-1 ${
+                  className={`w-full py-1.5 px-3.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
                     isEggless
                       ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
-                      : "bg-background/50 text-foreground border-border/80 hover:bg-secondary"
+                      : "bg-background/50 text-foreground border-border/80 hover:bg-secondary/60"
                   }`}
                 >
-                  <Leaf className={`size-3 ${isEggless ? "text-white" : "text-emerald-500"}`} />
-                  <span>{isEggless ? "✓ 100% Eggless Vegetarian" : "Standard Farm Fresh Egg"}</span>
+                  <Leaf className={`size-3.5 ${isEggless ? "text-white" : "text-emerald-500"}`} />
+                  <span>{isEggless ? "✓ 100% Eggless Vegetarian Bake" : "Standard Farm Fresh Egg Recipe"}</span>
                 </button>
               </div>
             </div>
 
-            {/* Total Price & 1-Click WhatsApp Order CTA (Anchored at Base) */}
-            <div className="pt-2.5 border-t border-border/60 mt-2 space-y-2">
-              <div className="flex items-baseline justify-between">
+            {/* Total Price & 1-Click WhatsApp Order CTA (Seamlessly Integrated inside Bento) */}
+            <div className="pt-3 border-t border-border/60 space-y-2.5">
+              <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider">
                     Total Estimated Price
                   </p>
-                  <p className="font-sans text-2xl font-black text-cocoa tracking-tight">
+                  <p className="font-sans text-2xl sm:text-3xl font-black text-cocoa tracking-tight leading-none mt-0.5">
                     ₹{totalEstimate}
                   </p>
                 </div>
-                <span className="text-[10px] text-muted-foreground font-medium truncate ml-2">
-                  Base ₹{selectedSize.basePrice} + Toppings ₹{addonTotal}
-                </span>
+                <div className="text-right">
+                  <span className="text-[11px] text-muted-foreground font-semibold bg-secondary/80 px-2.5 py-1 rounded-lg border border-border/60">
+                    Base ₹{selectedSize.basePrice} + Toppings ₹{addonTotal}
+                  </span>
+                </div>
               </div>
 
               <Button
                 asChild
                 size="default"
-                className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs shadow-lift h-10 transition-all hover:scale-[1.01] cursor-pointer"
+                className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs sm:text-sm shadow-lift h-11 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
               >
                 <a
                   href={`https://wa.me/917448724920?text=${whatsappText}`}
@@ -455,7 +461,7 @@ export function CakeBuilderWidget() {
                   rel="noreferrer"
                   className="flex items-center justify-center gap-2"
                 >
-                  <MessageCircle className="size-4 text-emerald-400" />
+                  <MessageCircle className="size-4.5 text-emerald-400" />
                   <span>Book This Bespoke Cake via WhatsApp</span>
                 </a>
               </Button>
