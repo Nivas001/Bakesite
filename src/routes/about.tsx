@@ -233,21 +233,164 @@ export function AboutUsPage() {
   const [activeDietFilter, setActiveDietFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"collage" | "story">("collage");
   const [activeStoryChapter, setActiveStoryChapter] = useState<number>(1);
-  const [isRotating, setIsRotating] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
 
+  // 360° Drag-to-Rotate State
+  const [rotationY, setRotationY] = useState(0);
+  const [rotationX, setRotationX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [hasDragged, setHasDragged] = useState(false);
+
   const heroCardRef = useRef<HTMLDivElement>(null);
+  const animFrameRef = useRef<number | null>(null);
+  const dragDataRef = useRef({
+    startX: 0,
+    startY: 0,
+    startRotY: 0,
+    startRotX: 0,
+    lastX: 0,
+    lastTime: 0,
+    velocity: 0,
+  });
+
   const currentCakeSpec = CAKE_SPECS[activeAngle];
   const currentChapter = STORY_CHAPTERS[activeStoryChapter - 1]!;
 
+  // Helper to map normalized degrees to angle quadrant
+  const getAngleFromDeg = (deg: number): CakeAngle => {
+    const norm = ((deg % 360) + 360) % 360;
+    if (norm >= 45 && norm < 135) return "orbit";
+    if (norm >= 135 && norm < 225) return "crumb";
+    if (norm >= 225 && norm < 315) return "top";
+    return "front";
+  };
+
+  // Pointer Drag Handlers
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setIsDragging(true);
+    setHasDragged(true);
+    setShowTooltip(false);
+
+    dragDataRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startRotY: rotationY,
+      startRotX: rotationX,
+      lastX: e.clientX,
+      lastTime: performance.now(),
+      velocity: 0,
+    };
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+
+    const now = performance.now();
+    const dt = Math.max(1, now - dragDataRef.current.lastTime);
+    const dxInstant = e.clientX - dragDataRef.current.lastX;
+    const instantVelocity = dxInstant / dt;
+
+    dragDataRef.current.velocity = instantVelocity * 15;
+    dragDataRef.current.lastX = e.clientX;
+    dragDataRef.current.lastTime = now;
+
+    const totalDx = e.clientX - dragDataRef.current.startX;
+    const totalDy = e.clientY - dragDataRef.current.startY;
+
+    const newRotY = dragDataRef.current.startRotY + totalDx * 0.55;
+    const newRotX = Math.max(-12, Math.min(12, dragDataRef.current.startRotX - totalDy * 0.2));
+
+    setRotationY(newRotY);
+    setRotationX(newRotX);
+    setActiveAngle(getAngleFromDeg(newRotY));
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging) return;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {}
+    setIsDragging(false);
+
+    // Momentum friction physics
+    let v = dragDataRef.current.velocity;
+    if (Math.abs(v) > 0.1) {
+      let currentY = rotationY;
+      const runInertia = () => {
+        currentY += v;
+        v *= 0.92; // friction deceleration
+        setRotationY(currentY);
+        setActiveAngle(getAngleFromDeg(currentY));
+
+        if (Math.abs(v) > 0.05) {
+          animFrameRef.current = requestAnimationFrame(runInertia);
+        } else {
+          animFrameRef.current = null;
+        }
+      };
+      animFrameRef.current = requestAnimationFrame(runInertia);
+    }
+  };
+
+  // Smooth Snap to Angle
+  const snapToAngle = (targetAngle: CakeAngle) => {
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+    const angleTargets: Record<CakeAngle, number> = {
+      front: 0,
+      orbit: 90,
+      crumb: 180,
+      top: 270,
+    };
+    const targetDeg = angleTargets[targetAngle];
+
+    // Find shortest rotational path from current rotationY
+    const currentNorm = ((rotationY % 360) + 360) % 360;
+    let diff = targetDeg - currentNorm;
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+
+    const startY = rotationY;
+    const finalY = rotationY + diff;
+    const startTime = performance.now();
+    const duration = 550;
+
+    const animateSnap = (time: number) => {
+      const elapsed = time - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      // Smooth easeOutCubic
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const newY = startY + (finalY - startY) * ease;
+      setRotationY(newY);
+      setActiveAngle(getAngleFromDeg(newY));
+
+      if (progress < 1) {
+        animFrameRef.current = requestAnimationFrame(animateSnap);
+      } else {
+        animFrameRef.current = null;
+        setRotationX(0);
+      }
+    };
+
+    animFrameRef.current = requestAnimationFrame(animateSnap);
+    setShowTooltip(false);
+    setHasDragged(true);
+  };
+
   function handleSpinClick() {
-    setIsRotating(true);
     const angles: CakeAngle[] = ["front", "orbit", "crumb", "top"];
     const nextIdx = (angles.indexOf(activeAngle) + 1) % angles.length;
-    setActiveAngle(angles[nextIdx]!);
-    setShowTooltip(false);
-    setTimeout(() => setIsRotating(false), 600);
+    snapToAngle(angles[nextIdx]!);
   }
+
+  const normalizedDegree = Math.round(((rotationY % 360) + 360) % 360);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground selection:bg-berry/20 pb-20 overflow-x-hidden">
@@ -302,7 +445,7 @@ export function AboutUsPage() {
       <section className="py-6 px-4 sm:px-6 max-w-6xl mx-auto">
         <div
           ref={heroCardRef}
-          className="relative rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-b from-[#1C120C] via-[#2A1810] to-[#180E08] text-white p-6 sm:p-10 shadow-2xl overflow-hidden group"
+          className="relative rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-b from-[#1C120C] via-[#2A1810] to-[#180E08] text-white p-6 sm:p-10 shadow-2xl overflow-hidden group select-none"
         >
           {/* Ambient Lighting & Glows */}
           <div className="absolute -top-24 -left-24 size-96 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
@@ -310,10 +453,14 @@ export function AboutUsPage() {
 
           {/* Top Bar inside the Hero Canvas */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 border-b border-white/10 pb-5">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <span className="flex size-3 rounded-full bg-amber-400 animate-ping" />
               <span className="font-nimbus text-lg sm:text-xl text-amber-300 uppercase tracking-wide">
                 Interactive 3D Cake Atelier
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/10 text-amber-200 border border-white/15 text-[11px] font-mono font-bold">
+                <Compass className="size-3 text-amber-400" />
+                {normalizedDegree}°
               </span>
             </div>
 
@@ -323,13 +470,10 @@ export function AboutUsPage() {
                 <button
                   key={angle}
                   type="button"
-                  onClick={() => {
-                    setActiveAngle(angle);
-                    setShowTooltip(false);
-                  }}
+                  onClick={() => snapToAngle(angle)}
                   className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     activeAngle === angle
-                      ? "bg-amber-400 text-black shadow-xs font-black"
+                      ? "bg-amber-400 text-black shadow-xs font-black scale-[1.03]"
                       : "text-white/70 hover:text-white hover:bg-white/10"
                   }`}
                 >
@@ -345,63 +489,114 @@ export function AboutUsPage() {
             {/* Cake Visual Stage (7 Columns) */}
             <div className="lg:col-span-7 flex flex-col items-center justify-center relative">
               
-              {/* Interactive Tooltip Trigger */}
-              {showTooltip && (
-                <div className="absolute -top-3 z-30 flex items-center gap-1.5 bg-white/90 backdrop-blur-md text-zinc-900 border border-zinc-200 px-3.5 py-1.5 rounded-full text-xs font-black shadow-xl animate-bounce pointer-events-none">
-                  <MousePointerClick className="size-3.5 text-amber-600" />
-                  <span>Click to spin and explore ingredient layers</span>
-                </div>
-              )}
-
-              {/* Central Cake Showcase with 3D Hover & Click-to-Spin */}
+              {/* Interactive Drag Pill / Tooltip Indicator */}
               <div
-                onClick={handleSpinClick}
-                className="relative size-72 sm:size-96 rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl cursor-grab active:cursor-grabbing transition-transform duration-500 group-hover:scale-[1.02] flex items-center justify-center"
+                className={`absolute -top-3.5 z-30 flex items-center gap-1.5 bg-white/95 backdrop-blur-md text-zinc-900 border border-amber-300 px-3.5 py-1.5 rounded-full text-xs font-black shadow-xl transition-all duration-300 pointer-events-none ${
+                  isDragging ? "scale-105 bg-amber-300 text-black" : hasDragged ? "opacity-75" : "animate-bounce"
+                }`}
               >
-                <img
-                  src="/about/hero-3d-caramel-cake.jpg"
-                  alt="3D Dark Chocolate & Salted Caramel Cake"
-                  className={`w-full h-full object-cover select-none transition-all duration-700 ${
-                    isRotating ? "rotate-3 scale-105" : ""
-                  }`}
-                />
-
-                {/* Subtle Radial Vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
-
-                {/* Anchored Glowing Die-Cut Labels */}
-                {currentCakeSpec.hotspots.map((hs, idx) => (
-                  <div
-                    key={idx}
-                    className="absolute z-20 pointer-events-none transition-all duration-500 animate-in fade-in"
-                    style={{ top: hs.top, left: hs.left }}
-                  >
-                    <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-black/80 shadow-[2px_2px_0px_#000] ring-2 ring-white/40 ${hs.bg}`}
-                    >
-                      <Sparkles className="size-2.5" />
-                      <span>{hs.label}</span>
-                    </span>
-                  </div>
-                ))}
+                <Compass className={`size-3.5 text-amber-600 ${isDragging ? "animate-spin" : ""}`} />
+                <span>{isDragging ? `Rotating Cake: ${normalizedDegree}°` : "⟷ Drag horizontally to rotate 360°"}</span>
               </div>
 
-              {/* Interactive Spin Controls Bar */}
-              <button
-                type="button"
-                onClick={handleSpinClick}
-                className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-amber-300 transition-all cursor-pointer shadow-md active:scale-95"
-              >
-                <RotateCw className={`size-3.5 ${isRotating ? "animate-spin" : ""}`} />
-                <span>Spin 3D Cake Angle ({activeAngle.toUpperCase()})</span>
-              </button>
+              {/* 3D Turntable Platter Outer Ring */}
+              <div className="relative flex flex-col items-center justify-center pt-2">
+                
+                {/* Turntable Platter Base Stand with Metallic Edge & Degree Markers */}
+                <div
+                  className="absolute bottom-3 size-72 sm:size-96 rounded-full border-4 border-amber-800/40 bg-gradient-to-b from-[#331C12] via-[#20110A] to-[#120905] shadow-[0_20px_50px_rgba(0,0,0,0.8)] pointer-events-none transition-transform duration-75"
+                  style={{
+                    transform: `perspective(900px) rotateX(68deg) rotateZ(${rotationY}deg)`,
+                  }}
+                >
+                  {/* Turntable Compass Markers */}
+                  <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-amber-300/80">0° FRONT</span>
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold text-amber-300/80">90°</span>
+                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-amber-300/80">180° CRUMB</span>
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold text-amber-300/80">270°</span>
+                  <div className="absolute inset-4 rounded-full border border-dashed border-amber-500/20" />
+                </div>
+
+                {/* Central Cake Showcase with 360° Drag & Touch Pointer Events */}
+                <div
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerCancel={handlePointerUp}
+                  className={`relative size-72 sm:size-96 rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl transition-all duration-100 flex items-center justify-center touch-none ${
+                    isDragging ? "cursor-grabbing ring-4 ring-amber-400/40 scale-[1.02]" : "cursor-grab hover:scale-[1.01]"
+                  }`}
+                  style={{
+                    transform: `perspective(1000px) rotateY(${rotationY}deg) rotateX(${rotationX}deg)`,
+                    transformStyle: "preserve-3d",
+                  }}
+                >
+                  <img
+                    src="/about/hero-3d-caramel-cake.jpg"
+                    alt="3D Dark Chocolate & Salted Caramel Cake"
+                    className="size-full object-cover select-none pointer-events-none"
+                    draggable={false}
+                  />
+
+                  {/* Dynamic Radial Lighting Highlight that shifts with rotation */}
+                  <div
+                    className="absolute inset-0 pointer-events-none transition-all duration-75"
+                    style={{
+                      background: `radial-gradient(ellipse 70% 70% at ${
+                        50 + Math.sin((rotationY * Math.PI) / 180) * 28
+                      }% ${
+                        45 + Math.cos((rotationX * Math.PI) / 180) * 15
+                      }%, rgba(255,255,255,0.18) 0%, transparent 65%)`,
+                    }}
+                  />
+
+                  {/* Subtle Radial Bottom Shadow */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+
+                  {/* Anchored Glowing Die-Cut Labels (Adapts to Active Angle) */}
+                  {currentCakeSpec.hotspots.map((hs, idx) => (
+                    <div
+                      key={idx}
+                      className="absolute z-20 pointer-events-none transition-all duration-500 animate-in fade-in"
+                      style={{
+                        top: hs.top,
+                        left: hs.left,
+                        transform: `translateZ(25px)`,
+                      }}
+                    >
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-black/80 shadow-[2px_2px_0px_#000] ring-2 ring-white/40 ${hs.bg}`}
+                      >
+                        <Sparkles className="size-2.5" />
+                        <span>{hs.label}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+
+              {/* Interactive Spin & Angle Controls Bar */}
+              <div className="mt-4 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSpinClick}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-bold text-amber-300 transition-all cursor-pointer shadow-md active:scale-95"
+                >
+                  <RotateCw className="size-3.5" />
+                  <span>Next Angle ({activeAngle.toUpperCase()})</span>
+                </button>
+                <span className="text-[11px] text-zinc-400 font-mono">
+                  {normalizedDegree}° / 360°
+                </span>
+              </div>
             </div>
 
             {/* Spec Sheet & Macro Breakdown (5 Columns) */}
             <div className="lg:col-span-5 space-y-4">
               <div className="space-y-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider">
-                  Pure Craft Architecture
+                  Pure Craft Architecture · {activeAngle.toUpperCase()}
                 </span>
                 <h2 className="font-nimbus text-2xl sm:text-3xl text-white leading-tight">
                   {currentCakeSpec.title}
