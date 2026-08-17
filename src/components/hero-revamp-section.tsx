@@ -1,62 +1,59 @@
 import React, { useState } from "react";
-import TextLoop from "@/components/ui/text-loop";
+import { TextLoop } from "@/components/ui/text-loop";
 
 const FLAVORS = [
   {
     id: "strawberry",
-    pillBg: "bg-[#D61B6B] hover:bg-[#E52579]",
-    textColor: "text-white",
-    borderColor: "border-[#B01456]/60",
-    label: "Natural flavors",
-    title: "Pink Strawberry Nonpareil Donut",
-    pillLabel: "Strawberry Donut",
-    image: "/hero/mini-strawberry-donut.jpg",
+    label: "Strawberry",
+    pillLabel: "Glazed Donuts",
     heroImage: "/hero/hero-3d-donut-sprinkles.jpg",
-    accentColor: "#F31260",
-    canvasBg: "#E3A9B8",
+    image: "/hero/mini-strawberry-donut.jpg",
+    title: "Pink Strawberry Nonpareil Donut",
+    pillBg: "bg-[#E63956]",
+    textColor: "text-white",
+    borderColor: "border-[#C9203E]",
+    canvasBg: "#F5C2CD",
     word: "DONUTING",
     headlineHighlight: "FRESH GLAZED DONUTS",
-    headingText: "#2C101B",
-    highlightText: "#9E105C",
-    depthFront: "#B01777",
-    depthMid: "#7A0D50",
-    depthShadow: "#4D0832",
-    ribbonColor: "#FBE8EF",
-    ribbonTextColor: "#3A1020",
+    headingText: "#3A1018",
+    highlightText: "#9B112D",
+    depthFront: "#C41E3A",
+    depthMid: "#8B1228",
+    depthShadow: "#4E0713",
+    ribbonColor: "#FCE7EC",
+    ribbonTextColor: "#3A1018",
   },
   {
     id: "mango",
-    pillBg: "bg-[#E6A817] hover:bg-[#F2B624]",
-    textColor: "text-[#3A1C14]",
-    borderColor: "border-[#C98E08]/60",
-    label: "Real ingredients",
-    title: "Velvet Mango Cheesecake",
-    pillLabel: "Mango Cheesecake",
-    image: "/hero/mini-mango-cheesecake.jpg",
+    label: "Mango",
+    pillLabel: "Cheesecake",
     heroImage: "/hero/hero-3d-mango-cheesecake.jpg",
-    accentColor: "#F5A524",
-    canvasBg: "#E8C982",
+    image: "/hero/mini-mango-cheesecake.jpg",
+    title: "Alphonso Mango Glaze Cheesecake",
+    pillBg: "bg-[#D97706]",
+    textColor: "text-white",
+    borderColor: "border-[#B45309]",
+    canvasBg: "#FDE68A",
     word: "CHEESECAKING",
     headlineHighlight: "MANGO CHEESECAKE",
-    headingText: "#331800",
-    highlightText: "#B45309",
-    depthFront: "#D97706",
-    depthMid: "#92400E",
-    depthShadow: "#522200",
-    ribbonColor: "#FDF4DB",
-    ribbonTextColor: "#3A1E00",
+    headingText: "#361D04",
+    highlightText: "#92400E",
+    depthFront: "#B45309",
+    depthMid: "#78350F",
+    depthShadow: "#451A03",
+    ribbonColor: "#FFFBEB",
+    ribbonTextColor: "#361D04",
   },
   {
     id: "cookie",
-    pillBg: "bg-[#3D1D10] hover:bg-[#542917]",
-    textColor: "text-white",
-    borderColor: "border-[#2B1408]/60",
-    label: "Artisanal magic",
-    title: "Chunky Chocolate Chip Cookie",
-    pillLabel: "Chunky Cookie",
-    image: "/hero/mini-cookie.jpg",
+    label: "Choc Chip",
+    pillLabel: "Cookie",
     heroImage: "/hero/hero-3d-cookie.jpg",
-    accentColor: "#8B4513",
+    image: "/hero/mini-cookie.jpg",
+    title: "Warm Chunky Chocolate Chip Cookie",
+    pillBg: "bg-[#78350F]",
+    textColor: "text-white",
+    borderColor: "border-[#572607]",
     canvasBg: "#DFCCB5",
     word: "COOKING",
     headlineHighlight: "CHUNKY CHOC COOKIES",
@@ -85,7 +82,7 @@ export function HeroRevampSection() {
     <div
       onMouseMove={handleMouseMove}
       style={{ backgroundColor: activeFlavor.canvasBg }}
-      className="w-full min-h-[92vh] lg:min-h-[calc(100vh-4.5rem)] flex flex-col justify-between text-[#3A1C14] overflow-hidden relative transition-colors duration-700 pt-10 sm:pt-14 lg:pt-18 pb-2 sm:pb-3"
+      className="w-full min-h-0 lg:min-h-[calc(100vh-4.5rem)] flex flex-col justify-between text-[#3A1C14] overflow-hidden relative transition-colors duration-700 pt-6 sm:pt-10 lg:pt-14 pb-1 sm:pb-2"
     >
       {/* Ambient Soft Glows */}
       <div
@@ -98,30 +95,32 @@ export function HeroRevampSection() {
       />
 
       {/* Main Vertical Hero Container */}
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-4 sm:gap-6 my-auto text-center">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-3 sm:gap-5 my-auto text-center">
         
-        {/* 1. [TOP]: Single-Line Bold Blogh Headline with Generous Navbar Breathing Space */}
-        <div className="w-full max-w-[96vw] mx-auto text-center px-2 sm:px-4 overflow-hidden pt-2 sm:pt-4">
+        {/* 1. [TOP]: Punchy Responsive Blogh Headline */}
+        <div className="w-full max-w-[96vw] mx-auto text-center px-2 sm:px-4 overflow-hidden pt-1 sm:pt-2">
           <h1
             style={{ color: activeFlavor.headingText }}
-            className="font-blogh whitespace-nowrap text-[clamp(1.2rem,4.3vw,4.75rem)] tracking-tight leading-none transition-colors duration-500 drop-shadow-xs"
+            className="font-blogh tracking-tight leading-[1.08] transition-colors duration-500 drop-shadow-xs text-center flex flex-col items-center justify-center lg:inline-block lg:whitespace-nowrap lg:text-[clamp(2.2rem,4.3vw,4.75rem)]"
           >
-            PURE JOY IN{" "}
+            <span className="text-lg sm:text-2xl lg:text-inherit font-bold opacity-90 block lg:inline mr-0 lg:mr-3">
+              PURE JOY IN
+            </span>
             <span
               style={{ color: activeFlavor.highlightText }}
-              className="transition-colors duration-500"
+              className="text-2xl sm:text-4xl lg:text-inherit font-black tracking-wide transition-colors duration-500 block lg:inline mt-0.5 lg:mt-0"
             >
               {activeFlavor.headlineHighlight}
             </span>
           </h1>
         </div>
 
-        {/* 2. [MIDDLE]: Seamless 3D Pastry Photo with 3D Depth Typography Layered IN FRONT (After) */}
-        <div className="relative w-full max-w-3xl flex items-center justify-center min-h-[260px] sm:min-h-[360px] lg:min-h-[420px]">
+        {/* 2. [MIDDLE]: Seamless 3D Pastry Photo with 3D Depth Typography Layered IN FRONT */}
+        <div className="relative w-full max-w-3xl flex items-center justify-center min-h-[170px] sm:min-h-[260px] lg:min-h-[380px]">
           
           {/* Seamless 3D Floating Pastry (Feathered edge dissolving) */}
           <div
-            className="relative z-10 w-full max-w-lg sm:max-w-xl lg:max-w-2xl transition-transform duration-200 ease-out"
+            className="relative z-10 w-full max-w-sm sm:max-w-xl lg:max-w-2xl transition-transform duration-200 ease-out"
             style={{
               transform: `perspective(1000px) rotateX(${-mousePos.y * 10}deg) rotateY(${mousePos.x * 10}deg) scale(1.02)`,
             }}
@@ -142,7 +141,7 @@ export function HeroRevampSection() {
 
           {/* Giant 3D Depth Typography in Blogh font Layered IN FRONT (After the Photo) */}
           <div
-            className="absolute -top-6 sm:-top-10 right-1 sm:right-6 z-30 pointer-events-none select-none"
+            className="absolute -top-3 sm:-top-8 lg:-top-10 right-2 sm:right-6 z-30 pointer-events-none select-none"
             style={{
               transform: `perspective(800px) rotateZ(-12deg) rotateY(${mousePos.x * 14}deg) rotateX(${-mousePos.y * 14}deg)`,
               transition: "transform 0.15s ease-out",
@@ -153,21 +152,21 @@ export function HeroRevampSection() {
               <span
                 aria-hidden
                 style={{ color: activeFlavor.depthShadow }}
-                className="absolute top-3 sm:top-3.5 left-3 sm:left-3.5 font-blogh text-6xl sm:text-8xl lg:text-[10rem] opacity-50 tracking-tight transition-colors duration-500"
+                className="absolute top-2 sm:top-3.5 left-2 sm:left-3.5 font-blogh text-4xl sm:text-7xl lg:text-[9.5rem] opacity-50 tracking-tight transition-colors duration-500"
               >
                 {activeFlavor.word}
               </span>
               <span
                 aria-hidden
                 style={{ color: activeFlavor.depthMid }}
-                className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 font-blogh text-6xl sm:text-8xl lg:text-[10rem] opacity-75 tracking-tight transition-colors duration-500"
+                className="absolute top-1 sm:top-2 left-1 sm:left-2 font-blogh text-4xl sm:text-7xl lg:text-[9.5rem] opacity-75 tracking-tight transition-colors duration-500"
               >
                 {activeFlavor.word}
               </span>
               {/* Top Face */}
               <span
                 style={{ color: activeFlavor.depthFront }}
-                className="relative font-blogh text-6xl sm:text-8xl lg:text-[10rem] tracking-tight drop-shadow-xl transition-colors duration-500"
+                className="relative font-blogh text-4xl sm:text-7xl lg:text-[9.5rem] tracking-tight drop-shadow-xl transition-colors duration-500"
               >
                 {activeFlavor.word}
               </span>
@@ -176,9 +175,9 @@ export function HeroRevampSection() {
 
         </div>
 
-        {/* 3. [BOTTOM]: 3 Flavor Pill Buttons in a Horizontal Row */}
-        <div className="w-full flex items-center justify-center pt-1 sm:pt-2">
-          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 w-full">
+        {/* 3. [BOTTOM]: 3 Flavor Pill Buttons in a Streamlined Row */}
+        <div className="w-full flex items-center justify-center pt-1">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 w-full">
             {FLAVORS.map((flavor, index) => {
               const isSelected = activeFlavor.id === flavor.id;
               return (
@@ -186,9 +185,9 @@ export function HeroRevampSection() {
                   key={flavor.id}
                   type="button"
                   onClick={() => setActiveFlavor(flavor)}
-                  className={`group relative flex items-center rounded-full ${flavor.pillBg} ${flavor.textColor} p-1.5 pr-4 sm:pr-5 shadow-lg border ${flavor.borderColor} transition-all duration-300 hover:scale-[1.04] active:scale-98 cursor-pointer ${
+                  className={`group relative flex items-center rounded-full ${flavor.pillBg} ${flavor.textColor} p-1 pr-3 sm:p-1.5 sm:pr-4 shadow-md border ${flavor.borderColor} transition-all duration-300 hover:scale-[1.04] active:scale-98 cursor-pointer ${
                     isSelected
-                      ? "ring-4 ring-white/95 shadow-xl scale-[1.04] z-20"
+                      ? "ring-3 sm:ring-4 ring-white/95 shadow-lg scale-[1.04] z-20"
                       : "opacity-85 hover:opacity-100"
                   }`}
                   style={{
@@ -196,7 +195,7 @@ export function HeroRevampSection() {
                   }}
                 >
                   {/* Circular Product Thumbnail */}
-                  <div className="size-9 sm:size-11 rounded-full overflow-hidden shrink-0 border-2 border-white shadow-xs bg-white/20 p-0.5">
+                  <div className="size-7 sm:size-10 rounded-full overflow-hidden shrink-0 border-1.5 sm:border-2 border-white shadow-xs bg-white/20 p-0.5">
                     <img
                       src={flavor.image}
                       alt={flavor.label}
@@ -205,11 +204,11 @@ export function HeroRevampSection() {
                   </div>
 
                   {/* Pill Label Text */}
-                  <div className="ml-2.5 sm:ml-3 text-left">
-                    <span className="block text-xs sm:text-sm font-black tracking-wide leading-tight">
+                  <div className="ml-2 sm:ml-2.5 text-left">
+                    <span className="block text-[11px] sm:text-xs font-black tracking-wide leading-tight">
                       {flavor.label}
                     </span>
-                    <span className="block text-[10px] sm:text-[11px] opacity-90 font-semibold leading-tight mt-0.5">
+                    <span className="block text-[9px] sm:text-[10px] opacity-90 font-semibold leading-tight mt-0.5">
                       {flavor.pillLabel}
                     </span>
                   </div>
@@ -221,16 +220,16 @@ export function HeroRevampSection() {
 
       </div>
 
-      {/* 4. [BOTTOM WAVE]: Kinetic TextLoop Ribbon integrated directly with matching background (zero gap) */}
-      <div className="w-full mt-2 sm:mt-4 overflow-hidden select-none pointer-events-auto">
+      {/* 4. [BOTTOM WAVE]: Kinetic TextLoop Ribbon with Responsive Sizing */}
+      <div className="w-full mt-2 sm:mt-3 overflow-hidden select-none pointer-events-auto">
         <TextLoop
           text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
           shape="wave"
-          speed={48}
+          speed={46}
           direction="forward"
           separator="🥮"
           curviness={10}
-          fontSize={22}
+          fontSize={24}
           fontWeight={800}
           fontFamily="var(--font-blogh), var(--font-body), sans-serif"
           letterSpacing={2}
@@ -238,7 +237,7 @@ export function HeroRevampSection() {
           color={activeFlavor.ribbonTextColor}
           ribbon
           ribbonColor={activeFlavor.ribbonColor}
-          ribbonWidth={42}
+          ribbonWidth={44}
           pauseOnHover={false}
           className="opacity-95"
         />

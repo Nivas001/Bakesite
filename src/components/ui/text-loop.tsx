@@ -2,7 +2,6 @@ import React, { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } f
 import { gsap } from "gsap";
 import "./text-loop.css";
 
-const VIEW_W = 1200;
 const EDGE_PAD = 4;
 
 export type TextLoopShape = "wave" | "circle" | "infinity" | "arch" | "line";
@@ -47,9 +46,9 @@ const getViewHeight = (shape: TextLoopShape, curviness: number, ribbonWidth: num
   }
 };
 
-const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number, viewH: number) => {
+const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number, viewH: number, viewW: number) => {
   const c = Math.max(0, curviness);
-  const CX = VIEW_W / 2;
+  const CX = viewW / 2;
   const CY = viewH / 2;
   const room = Math.max(10, CY - Math.max(0, ribbonWidth) / 2 - EDGE_PAD);
 
@@ -72,14 +71,15 @@ const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number,
     }
     case "arch": {
       const rise = Math.min(120 + c * 1.1, room * 2);
-      return `M 120 ${CY + rise / 2} Q ${CX} ${CY - rise * 1.5} ${VIEW_W - 120} ${CY + rise / 2}`;
+      return `M 120 ${CY + rise / 2} Q ${CX} ${CY - rise * 1.5} ${viewW - 120} ${CY + rise / 2}`;
     }
     case "line":
-      return `M -320 ${CY} L ${VIEW_W + 320} ${CY}`;
+      return `M -200 ${CY} L ${viewW + 200} ${CY}`;
     case "wave":
     default: {
       const a = Math.min(c * 1.2, room);
-      return `M -320 ${CY} Q -160 ${CY - a} 0 ${CY} T 320 ${CY} T 640 ${CY} T 960 ${CY} T 1280 ${CY} T ${VIEW_W + 320} ${CY}`;
+      const step = viewW / 4;
+      return `M -200 ${CY} Q ${-step / 2} ${CY - a} 0 ${CY} T ${step} ${CY} T ${step * 2} ${CY} T ${step * 3} ${CY} T ${viewW} ${CY} T ${viewW + 200} ${CY}`;
     }
   }
 };
@@ -111,16 +111,33 @@ export function TextLoop({
   const headRef = useRef<SVGTextPathElement>(null);
   const tailRef = useRef<SVGTextPathElement>(null);
 
+  const [isMobile, setIsMobile] = useState(false);
   const [metrics, setMetrics] = useState({ length: 0, reps: 1 });
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const rawId = useId();
   const pathId = `text-loop-${rawId.replace(/:/g, "")}`;
 
-  const viewH = useMemo(() => getViewHeight(shape, curviness, ribbonWidth), [shape, curviness, ribbonWidth]);
+  const viewW = isMobile ? 560 : 1200;
+  const effectiveFontSize = isMobile ? Math.max(fontSize * 1.55, 32) : fontSize;
+  const effectiveRibbonWidth = isMobile ? Math.max(ribbonWidth * 1.4, 56) : ribbonWidth;
+
+  const viewH = useMemo(
+    () => getViewHeight(shape, curviness, effectiveRibbonWidth),
+    [shape, curviness, effectiveRibbonWidth]
+  );
 
   const d = useMemo(
-    () => path || buildPath(shape, curviness, ribbonWidth, viewH),
-    [path, shape, curviness, ribbonWidth, viewH]
+    () => path || buildPath(shape, curviness, effectiveRibbonWidth, viewH, viewW),
+    [path, shape, curviness, effectiveRibbonWidth, viewH, viewW]
   );
 
   const unit = useMemo(() => {
@@ -131,12 +148,12 @@ export function TextLoop({
 
   const textStyle = useMemo(
     () => ({
-      fontSize: `${fontSize}px`,
+      fontSize: `${effectiveFontSize}px`,
       fontWeight,
       letterSpacing: `${letterSpacing}px`,
       ...(fontFamily ? { fontFamily } : {}),
     }),
-    [fontSize, fontWeight, letterSpacing, fontFamily]
+    [effectiveFontSize, fontWeight, letterSpacing, fontFamily]
   );
 
   useLayoutEffect(() => {
@@ -170,7 +187,7 @@ export function TextLoop({
     return () => {
       cancelled = true;
     };
-  }, [d, unit, fontSize, fontWeight, letterSpacing, fontFamily]);
+  }, [d, unit, effectiveFontSize, fontWeight, letterSpacing, fontFamily]);
 
   useEffect(() => {
     const { length } = metrics;
@@ -224,7 +241,7 @@ export function TextLoop({
     <div ref={rootRef} className={`text-loop ${className}`.trim()} style={style}>
       <svg
         className="text-loop-svg"
-        viewBox={`0 0 ${VIEW_W} ${viewH}`}
+        viewBox={`0 0 ${viewW} ${viewH}`}
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label={text}
@@ -235,7 +252,7 @@ export function TextLoop({
           d={d}
           fill="none"
           stroke={ribbon ? ribbonColor : "none"}
-          strokeWidth={ribbon ? ribbonWidth : 0}
+          strokeWidth={ribbon ? effectiveRibbonWidth : 0}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
