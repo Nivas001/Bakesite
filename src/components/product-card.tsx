@@ -55,7 +55,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
           <p className="text-[9px] sm:text-[11px] uppercase tracking-wider font-semibold text-muted-foreground/90 line-clamp-1">
             {product.category_name}
           </p>
-          <h3 className="font-display text-xs sm:text-base font-semibold leading-snug line-clamp-1 sm:line-clamp-2 mt-0.5">
+          <h3 className="font-blogh uppercase tracking-wide text-xs sm:text-base font-bold leading-snug line-clamp-1 sm:line-clamp-2 mt-0.5 text-cocoa">
             <Link to="/product/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
               {product.name}
             </Link>

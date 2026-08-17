@@ -175,7 +175,7 @@ export function FeaturedProducts({ products }: { products: CatalogProduct[] }) {
                 <p className="text-[10px] sm:text-xs uppercase tracking-wider font-semibold text-muted-foreground line-clamp-1">
                   {product.category_name}
                 </p>
-                <h3 className="font-display text-sm sm:text-lg font-semibold leading-snug line-clamp-1 sm:line-clamp-2">
+                <h3 className="font-blogh uppercase tracking-wide text-sm sm:text-lg font-bold leading-snug line-clamp-1 sm:line-clamp-2 text-cocoa">
                   <Link to="/product/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
                     {product.name}
                   </Link>
