@@ -111,7 +111,7 @@ function Home() {
       : FAQ_ITEMS.filter((f) => f.category === selectedFaqCategory);
 
   return (
-    <div className="w-full overflow-x-clip -mt-3 sm:-mt-6">
+    <div className="w-full overflow-x-clip">
       
       {/* 1. Full-Width 3D Confectionery Hero Section (Includes Seamless Integrated TextLoop) */}
       <HeroRevampSection />

@@ -124,19 +124,27 @@ export function SiteHeader() {
 
         {/* Right Action Icons (Admin, Cart, Account, Mobile Menu) */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {isAdmin && (
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="hidden lg:inline-flex rounded-full border-berry/30 bg-berry/10 text-berry hover:bg-berry/20 text-xs font-semibold h-8 px-3 shadow-2xs backdrop-blur-xs"
-            >
-              <Link to="/admin">
-                <ShieldCheck className="mr-1.5 size-3.5" />
-                Admin
-              </Link>
-            </Button>
-          )}
+          {/* Admin Portal Button */}
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            style={
+              isHeroActive
+                ? {
+                    backgroundColor: "rgba(255, 255, 255, 0.45)",
+                    borderColor: "rgba(44, 24, 16, 0.15)",
+                    color: textColor ?? undefined,
+                  }
+                : undefined
+            }
+            className="inline-flex rounded-full border-berry/30 bg-berry/10 text-berry hover:bg-berry/20 text-xs font-semibold h-8 px-2.5 sm:px-3 shadow-2xs backdrop-blur-xs transition-colors duration-700"
+          >
+            <Link to="/admin">
+              <ShieldCheck className="mr-1 sm:mr-1.5 size-3.5" />
+              <span>Admin</span>
+            </Link>
+          </Button>
 
           {/* Cart Icon with Liquid Glow Badge */}
           <Button
@@ -296,24 +304,22 @@ export function SiteHeader() {
                     </div>
                   </Link>
 
-                  {/* Admin link if authorized */}
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setOpen(false)}
-                      className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-berry/10 active:scale-[0.98]"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="flex size-8 items-center justify-center rounded-xl bg-berry/15 text-berry">
-                          <ShieldCheck className="size-4" />
-                        </div>
-                        <span className="text-sm font-semibold text-berry">
-                          Admin Portal
-                        </span>
+                  {/* Admin link inside drawer */}
+                  <Link
+                    to="/admin"
+                    onClick={() => setOpen(false)}
+                    className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-berry/10 active:scale-[0.98]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-8 items-center justify-center rounded-xl bg-berry/15 text-berry">
+                        <ShieldCheck className="size-4" />
                       </div>
-                      <ChevronRight className="size-4 text-berry/50 group-hover:translate-x-0.5 transition-all" />
-                    </Link>
-                  )}
+                      <span className="text-sm font-semibold text-berry">
+                        Admin Portal
+                      </span>
+                    </div>
+                    <ChevronRight className="size-4 text-berry/50 group-hover:translate-x-0.5 transition-all" />
+                  </Link>
                 </nav>
               </div>
 

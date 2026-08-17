@@ -132,10 +132,10 @@ export function HeroRevampSection() {
       style={{ backgroundColor: activeFlavor.canvasBg }}
       className="w-full min-h-0 lg:min-h-[calc(100vh-4.5rem)] flex flex-col justify-between text-[#3A1C14] overflow-hidden relative transition-colors duration-700 pt-6 sm:pt-10 lg:pt-14 pb-1 sm:pb-2"
     >
-      {/* Ambient Soft Glows */}
+      {/* Ambient Soft Glows (positioned away from top seam so header and hero background are 100% identical) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 -left-24 size-96 rounded-full bg-white/25 blur-3xl"
+        className="pointer-events-none absolute top-1/2 -translate-y-1/2 -left-32 size-96 rounded-full bg-white/20 blur-3xl"
       />
       <div
         aria-hidden
