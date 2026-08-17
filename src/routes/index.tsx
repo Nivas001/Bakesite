@@ -177,7 +177,7 @@ function Home() {
       {/* Kinetic Flowing Bakery Text Ribbon */}
       <div className="w-full py-1 -my-6 sm:-my-10 overflow-hidden select-none pointer-events-auto">
         <TextLoop
-          text="Ani Bakes ✦ Fresh 4:00 AM Dawn Bakes ✦ 36-Hour Sourdough ✦ Zero Preservatives ✦ Small-Batch Studio"
+          text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
           shape="wave"
           speed={48}
           direction="forward"
