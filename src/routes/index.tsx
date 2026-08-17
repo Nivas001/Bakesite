@@ -175,7 +175,7 @@ function Home() {
       </div>
 
       {/* Kinetic Flowing Bakery Text Ribbon */}
-      <div className="w-full -my-4 sm:-my-8 overflow-hidden select-none pointer-events-auto">
+      <div className="w-full py-1.5 sm:py-3 overflow-hidden select-none pointer-events-auto">
         <TextLoop
           text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
           shape="wave"
