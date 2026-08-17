@@ -104,6 +104,8 @@ const CAKE_SPECS: Record<
   {
     title: string;
     description: string;
+    image: string;
+    angleDegree: number;
     macros: { calories: string; protein: string; sugar: string; butterfat: string };
     hotspots: Array<{ top: string; left: string; label: string; bg: string }>;
   }
@@ -112,6 +114,8 @@ const CAKE_SPECS: Record<
     title: "3-Tier Dark Chocolate & Salted Caramel Masterpiece",
     description:
       "Exposed 70% dark Belgian cocoa sponge layers stacked with organic coconut milk caramel cream and dripping couverture ganache.",
+    image: "/about/cake-3d-front.jpg",
+    angleDegree: 0,
     macros: { calories: "185 kcal", protein: "12g", sugar: "0g Refined", butterfat: "84% French" },
     hotspots: [
       { top: "18%", left: "32%", label: "24K Gold Leaf", bg: "bg-amber-400 text-amber-950" },
@@ -124,6 +128,8 @@ const CAKE_SPECS: Record<
     title: "360° Studio Rotation: Handcrafted Symmetry",
     description:
       "Every angle showcases hand-piped caramel droplets, gilded chocolate truffle spheres, and glossy slow-dripping Belgian ganache.",
+    image: "/about/cake-3d-orbit.jpg",
+    angleDegree: 90,
     macros: { calories: "185 kcal", protein: "12g", sugar: "0g Refined", butterfat: "84% French" },
     hotspots: [
       { top: "25%", left: "48%", label: "Couverture Truffles", bg: "bg-amber-500 text-white" },
@@ -135,20 +141,26 @@ const CAKE_SPECS: Record<
     title: "Macro Crumb & Air Pocket Architecture",
     description:
       "Wild cold proofing creates airy alveoli and custard-like sponge that holds rich moisture without requiring artificial chemical emulsifiers.",
+    image: "/about/cake-3d-crumb.jpg",
+    angleDegree: 180,
     macros: { calories: "185 kcal", protein: "14g", sugar: "0g Refined", butterfat: "84% French" },
     hotspots: [
       { top: "30%", left: "40%", label: "Organic Wheat Germ", bg: "bg-yellow-400 text-yellow-950" },
       { top: "55%", left: "60%", label: "Cold Retard Crust", bg: "bg-amber-700 text-white" },
+      { top: "75%", left: "68%", label: "Air Pocket Sponge", bg: "bg-emerald-500 text-emerald-950" },
     ],
   },
   top: {
     title: "Gilded Crown & Truffle Centerpiece",
     description:
       "A coronation of 4 hand-rolled dark chocolate truffles dusted with edible 24K gold dust and sea salt flakes.",
+    image: "/about/cake-3d-top.jpg",
+    angleDegree: 270,
     macros: { calories: "190 kcal", protein: "12g", sugar: "0g Refined", butterfat: "84% French" },
     hotspots: [
       { top: "20%", left: "50%", label: "Gilded Spheres", bg: "bg-amber-400 text-amber-950" },
       { top: "50%", left: "30%", label: "Caramel Rosettes", bg: "bg-orange-500 text-white" },
+      { top: "40%", left: "65%", label: "Mirror Glaze Crown", bg: "bg-amber-700 text-white" },
     ],
   },
 };
@@ -527,20 +539,32 @@ export function AboutUsPage() {
                     isDragging ? "cursor-grabbing ring-4 ring-amber-400/40 scale-[1.02]" : "cursor-grab hover:scale-[1.01]"
                   }`}
                   style={{
-                    transform: `perspective(1000px) rotateY(${rotationY}deg) rotateX(${rotationX}deg)`,
+                    transform: `perspective(1000px) rotateY(${((((rotationY % 90) + 90) % 90) - 45) * 0.25}deg) rotateX(${rotationX}deg)`,
                     transformStyle: "preserve-3d",
                   }}
                 >
-                  <img
-                    src="/about/hero-3d-caramel-cake.jpg"
-                    alt="3D Dark Chocolate & Salted Caramel Cake"
-                    className="size-full object-cover select-none pointer-events-none"
-                    draggable={false}
-                  />
+                  {/* Real Multi-Angle 3D Photogrammetry Cake Frames */}
+                  {(["front", "orbit", "crumb", "top"] as CakeAngle[]).map((ang) => {
+                    const spec = CAKE_SPECS[ang];
+                    const isActive = activeAngle === ang;
+                    return (
+                      <img
+                        key={ang}
+                        src={spec.image}
+                        alt={spec.title}
+                        className={`absolute inset-0 size-full object-cover select-none pointer-events-none transition-all duration-500 ease-out ${
+                          isActive
+                            ? "opacity-100 scale-100 z-10"
+                            : "opacity-0 scale-[1.03] z-0"
+                        }`}
+                        draggable={false}
+                      />
+                    );
+                  })}
 
                   {/* Dynamic Radial Lighting Highlight that shifts with rotation */}
                   <div
-                    className="absolute inset-0 pointer-events-none transition-all duration-75"
+                    className="absolute inset-0 pointer-events-none z-20 transition-all duration-75"
                     style={{
                       background: `radial-gradient(ellipse 70% 70% at ${
                         50 + Math.sin((rotationY * Math.PI) / 180) * 28
@@ -551,13 +575,13 @@ export function AboutUsPage() {
                   />
 
                   {/* Subtle Radial Bottom Shadow */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none z-20" />
 
                   {/* Anchored Glowing Die-Cut Labels (Adapts to Active Angle) */}
                   {currentCakeSpec.hotspots.map((hs, idx) => (
                     <div
                       key={idx}
-                      className="absolute z-20 pointer-events-none transition-all duration-500 animate-in fade-in"
+                      className="absolute z-30 pointer-events-none transition-all duration-500 animate-in fade-in"
                       style={{
                         top: hs.top,
                         left: hs.left,
