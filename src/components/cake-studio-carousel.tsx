@@ -161,18 +161,21 @@ export function CakeStudioCarousel() {
 
       <div className="mx-auto w-full max-w-6xl px-4">
         
-        {/* Section Header (Cleaned: Subheader removed) */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        {/* Section Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry block mb-1">
+              Custom Celebration Studio
+            </span>
+            <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-[1.1] uppercase tracking-wide">
               Bespoke bakes for core memories
             </h2>
           </div>
 
-          {/* Carousel Navigation Controls */}
+          {/* Carousel Navigation Controls (Inter font for 01 / 08 counter) */}
           <div className="flex items-center gap-3 self-start sm:self-auto shrink-0">
-            <span className="text-xs font-mono font-bold text-muted-foreground">
-              <strong className="text-cocoa font-extrabold">{String(current + 1).padStart(2, "0")}</strong> / {String(CAKE_SLIDES.length).padStart(2, "0")}
+            <span className="text-xs sm:text-sm font-sans font-medium text-muted-foreground tracking-widest tabular-nums">
+              <strong className="text-cocoa font-bold">{String(current + 1).padStart(2, "0")}</strong> / {String(CAKE_SLIDES.length).padStart(2, "0")}
             </span>
 
             <div className="flex items-center gap-1.5">
@@ -180,7 +183,7 @@ export function CakeStudioCarousel() {
                 type="button"
                 onClick={handlePrev}
                 aria-label="Previous Cake"
-                className="flex size-9 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer"
+                className="flex size-9 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer"
               >
                 <ChevronLeft className="size-4" />
               </button>
@@ -188,7 +191,7 @@ export function CakeStudioCarousel() {
                 type="button"
                 onClick={handleNext}
                 aria-label="Next Cake"
-                className="flex size-9 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer"
+                className="flex size-9 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer"
               >
                 <ChevronRight className="size-4" />
               </button>
@@ -197,58 +200,63 @@ export function CakeStudioCarousel() {
         </div>
 
         {/* Locked-Height Grid (Zero jumping across all 8 slides) */}
-        <div className="grid grid-cols-1 lg:grid-cols-[32%_64%] gap-6 lg:gap-[4%] items-stretch lg:h-[560px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[34%_63%] gap-6 lg:gap-[3%] items-stretch lg:h-[580px]">
           
-          {/* Left Column: Fixed height card with perfectly non-overflowing tags */}
-          <div className="flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-6 shadow-soft h-full min-h-[500px] lg:min-h-0">
-            <div className="space-y-3.5">
+          {/* Left Column: Modern Bento Interior Card */}
+          <div className="flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft h-full min-h-[500px] lg:min-h-0">
+            <div className="space-y-4">
               
-              {/* Badge & Perfectly Aligned Serves Row */}
-              <div className="flex items-center justify-between gap-2 h-7">
-                <span className="rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30 px-3 py-0.5 text-[11px] font-extrabold uppercase tracking-wider truncate">
+              {/* Top Row: Category Subtitle + Badge */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest text-berry truncate">
+                  {activeSlide.subtitle}
+                </span>
+                <span className="rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider shrink-0">
                   {activeSlide.badge}
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-secondary/80 px-2.5 py-0.5 text-xs font-bold text-cocoa shrink-0 border border-border/50">
-                  <Users className="size-3 text-berry" />
-                  <span>{activeSlide.serves}</span>
-                </span>
               </div>
 
-              {/* Title & Subtitle Slot (Fixed Height) */}
-              <div className="h-16 flex flex-col justify-center">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-berry line-clamp-1">
-                  {activeSlide.subtitle}
-                </p>
-                <h3 className="font-display text-xl font-bold text-cocoa leading-tight line-clamp-2 mt-0.5">
+              {/* Title & Description in Blogh & Inter */}
+              <div>
+                <h3 className="font-blogh text-lg sm:text-2xl font-bold text-cocoa leading-tight uppercase tracking-wide">
                   {activeSlide.title}
                 </h3>
-              </div>
-
-              {/* Description Slot (Fixed Height) */}
-              <div className="h-16 flex items-start">
-                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
+                <p className="mt-2 text-xs sm:text-[13px] text-muted-foreground leading-relaxed line-clamp-3">
                   {activeSlide.story}
                 </p>
               </div>
 
-              {/* Occasion & Studio Info Box: Clean Grid Alignment */}
-              <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/60 text-xs text-muted-foreground space-y-1.5 h-[72px] flex flex-col justify-center">
-                <div className="grid grid-cols-[85px_1fr] items-center gap-2">
-                  <span className="font-bold text-foreground shrink-0">Perfect for:</span>
-                  <span className="font-semibold text-cocoa truncate">{activeSlide.occasion}</span>
+              {/* Modern Mini-Bento Interior Grid (Replacing old table & "Handcrafted by") */}
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                {/* Bento Item 1: Servings */}
+                <div className="rounded-2xl bg-secondary/50 p-2.5 sm:p-3 border border-border/60 flex items-center gap-2.5">
+                  <div className="size-8 rounded-xl bg-berry/10 flex items-center justify-center shrink-0">
+                    <Users className="size-4 text-berry" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground block">Portion</span>
+                    <span className="text-xs sm:text-[13px] font-bold text-cocoa truncate block">{activeSlide.serves}</span>
+                  </div>
                 </div>
-                <div className="grid grid-cols-[85px_1fr] items-center gap-2 pt-1.5 border-t border-border/40">
-                  <span className="font-bold text-foreground shrink-0">Handcrafted:</span>
-                  <span className="text-berry font-bold truncate">Ani Bakes Studio</span>
+
+                {/* Bento Item 2: Occasion */}
+                <div className="rounded-2xl bg-secondary/50 p-2.5 sm:p-3 border border-border/60 flex items-center gap-2.5">
+                  <div className="size-8 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                    <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground block">Best For</span>
+                    <span className="text-xs sm:text-[13px] font-bold text-cocoa truncate block">{activeSlide.occasion}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Tags Slot (Non-Overflowing Flex Wrap Grid) */}
+              {/* Tags Slot (Clean Modern Pills) */}
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {activeSlide.tags.slice(0, 4).map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center rounded-full border border-border/80 bg-secondary/40 px-2.5 py-1 text-[10.5px] font-medium text-foreground shadow-2xs"
+                    className="inline-flex items-center rounded-full border border-border/80 bg-secondary/40 px-2.5 py-1 text-[10.5px] sm:text-[11px] font-medium text-foreground shadow-2xs"
                   >
                     {tag}
                   </span>
@@ -257,17 +265,17 @@ export function CakeStudioCarousel() {
             </div>
 
             {/* Bottom Actions Slot (Anchored Strictly at Base) */}
-            <div className="pt-4 border-t border-border/70 mt-4 space-y-2.5">
+            <div className="pt-4 border-t border-border/70 mt-4 space-y-3">
               <div className="flex items-baseline justify-between">
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                  <p className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                     Starting from
                   </p>
-                  <p className="font-sans text-2xl font-black text-cocoa tracking-tight">
+                  <p className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa tracking-tight">
                     {activeSlide.price}
                   </p>
                 </div>
-                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="text-[11px] sm:text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                   ✓ Baked Fresh to Order
                 </span>
               </div>
@@ -276,7 +284,7 @@ export function CakeStudioCarousel() {
                 <Button
                   asChild
                   size="default"
-                  className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs shadow-lift h-10 transition-all hover:scale-[1.01] cursor-pointer"
+                  className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs sm:text-sm shadow-lift h-10 sm:h-11 transition-all hover:scale-[1.01] cursor-pointer"
                 >
                   <a
                     href={`https://wa.me/917448724920?text=${whatsappMessage}`}
@@ -304,7 +312,7 @@ export function CakeStudioCarousel() {
             </div>
           </div>
 
-          {/* Right Column: Fixed height 3D Showcase Card (Clean: Pondicherry Kitchen tag removed) */}
+          {/* Right Column: 3D Showcase Card with Refined Tags & Bottom Overlay */}
           <div
             ref={containerRef}
             onMouseMove={handleMouseMove}
@@ -332,28 +340,28 @@ export function CakeStudioCarousel() {
               />
 
               {/* Dynamic Gradient Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/10 pointer-events-none" />
 
-              {/* Floating Badge (Top Right) */}
-              <div className="absolute top-4 right-4 pointer-events-none">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white px-3 py-1.5 text-xs font-extrabold shadow-lg">
-                  <Sparkles className="size-3 text-amber-300" />
+              {/* Floating Badge (Top Right) with Clean Glassmorphism */}
+              <div className="absolute top-4 right-4 z-10 pointer-events-none">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/25 text-white px-3.5 py-1.5 text-xs font-bold shadow-lg">
+                  <Sparkles className="size-3.5 text-amber-300" />
                   <span>{activeSlide.badge}</span>
                 </span>
               </div>
 
               {/* Caption & Indicator Bullets (Bottom Overlay) */}
-              <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 text-white">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
+              <div className="absolute bottom-4 left-4 right-4 z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-black/55 backdrop-blur-md border border-white/20 text-white">
+                <div className="min-w-0">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block mb-0.5">
                     Artisan Custom Creation
-                  </p>
-                  <p className="font-display text-base sm:text-lg font-bold text-white leading-tight mt-0.5">
+                  </span>
+                  <p className="font-blogh text-base sm:text-xl font-bold text-white leading-tight uppercase tracking-wide truncate">
                     {activeSlide.title}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
                   {CAKE_SLIDES.map((slide, idx) => (
                     <button
                       key={slide.id}
@@ -362,8 +370,8 @@ export function CakeStudioCarousel() {
                       onClick={() => setCurrent(idx)}
                       className={`h-2 rounded-full transition-all cursor-pointer ${
                         current === idx
-                          ? "w-6 bg-amber-300"
-                          : "w-2 bg-white/50 hover:bg-white/80"
+                          ? "w-6 sm:w-7 bg-amber-300 shadow-xs"
+                          : "w-2 bg-white/40 hover:bg-white/80"
                       }`}
                     />
                   ))}
@@ -378,3 +386,5 @@ export function CakeStudioCarousel() {
     </section>
   );
 }
+
+export default CakeStudioCarousel;
