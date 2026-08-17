@@ -92,30 +92,39 @@
     color-mix(in srgb, var(--ag-overlay) calc(var(--ag-dim, 0.25) * 100%), transparent);
 }
 
-/* Top Right 5-Star Rating Badge */
+/* Top Right Rating Badge: e.g. "★ 5/5" */
 .ag-panel__stars {
   position: absolute;
   top: 14px;
   right: 14px;
   display: flex;
   align-items: center;
-  gap: 2px;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 4px 8px;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 4px 10px;
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   z-index: 5;
   pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .ag-panel__stars svg {
-  width: 12px;
-  height: 12px;
+  width: 13px;
+  height: 13px;
   fill: #f59e0b;
   color: #f59e0b;
+  flex-shrink: 0;
+}
+
+.ag-panel__rating-text {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fef3c7;
+  letter-spacing: -0.01em;
 }
 
 /* Bottom Customer Review Label Content */

@@ -45,7 +45,7 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({
   height = 460,
   gap = 12,
   radius = 20,
-  expandRatio = 0.52,
+  expandRatio = 0.72,
   orientation = "horizontal",
   duration = 0.6,
   ease = "power3.out",
@@ -221,7 +221,7 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({
         return (
           <Tag
             key={i}
-            ref={(el) => {
+            ref={(el: HTMLElement | null) => {
               panelRefs.current[i] = el;
             }}
             className={`ag-panel${isActive ? " ag-panel--active" : ""}`}
@@ -248,11 +248,10 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({
               <span className="ag-panel__overlay" aria-hidden="true" />
             </span>
 
-            {/* Top Right Star Rating Badge */}
+            {/* Top Right Rating Badge: e.g. "5/5" */}
             <span className="ag-panel__stars" aria-label={`${rating} out of 5 stars`}>
-              {Array.from({ length: rating }).map((_, starIdx) => (
-                <Star key={starIdx} className="size-3 fill-amber-400 text-amber-400" />
-              ))}
+              <Star className="size-3.5 fill-amber-400 text-amber-400" />
+              <span className="ag-panel__rating-text">{rating}/5</span>
             </span>
 
             {/* Bottom Content: Reviewer in Blogh Font + Occasion + Review Note in Inter Font */}

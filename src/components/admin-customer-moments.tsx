@@ -217,10 +217,9 @@ export function AdminCustomerMoments() {
                   alt={moment.customer}
                   className="size-full object-cover"
                 />
-                <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 backdrop-blur-xs px-2 py-1 rounded-full text-amber-400 text-xs">
-                  {Array.from({ length: moment.rating }).map((_, i) => (
-                    <Star key={i} className="size-3 fill-amber-400 text-amber-400" />
-                  ))}
+                <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/75 backdrop-blur-xs px-2.5 py-1 rounded-full text-amber-400 text-xs">
+                  <Star className="size-3.5 fill-amber-400 text-amber-400" />
+                  <span className="font-black text-[11px] text-amber-300">{moment.rating}/5</span>
                 </div>
                 {!moment.isActive && (
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-xs uppercase tracking-wider">

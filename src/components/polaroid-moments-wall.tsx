@@ -38,7 +38,7 @@ export function PolaroidMomentsWall() {
             <AccordionGallery
               items={galleryItems}
               defaultIndex={0}
-              expandRatio={0.52}
+              expandRatio={0.72}
               trigger="hover"
               height={460}
               gap={12}
