@@ -7,6 +7,7 @@ import {
   deleteDoc,
   findDoc,
   getDoc,
+  updateDoc,
   listDocs,
   upsertDoc,
   updateUserPhone,
@@ -16,10 +17,26 @@ import {
 import { finalPrice } from "./pricing";
 import type { ProductDoc } from "./catalog.server";
 import { TIME_SLOTS, toISODate, isSlotAvailable } from "./slots";
-import { notifyAdminNewOrder, notifyCustomerOrderPlaced } from "./notifications.server";
-import { placeOrderSchema, profileSchema, type PlaceOrderInput } from "./orders.schema";
+import { notifyAdminNewOrder, notifyCustomerOrderPlaced, notifyCustomerOrderUpdate } from "./notifications.server";
+import {
+  placeOrderSchema,
+  profileSchema,
+  cancelRescheduledOrderSchema,
+  reportOrderIssueSchema,
+  type PlaceOrderInput,
+  type CancelRescheduledOrderInput,
+  type ReportOrderIssueInput,
+} from "./orders.schema";
 
-export { placeOrderSchema, profileSchema, type PlaceOrderInput };
+export {
+  placeOrderSchema,
+  profileSchema,
+  cancelRescheduledOrderSchema,
+  reportOrderIssueSchema,
+  type PlaceOrderInput,
+  type CancelRescheduledOrderInput,
+  type ReportOrderIssueInput,
+};
 
 export type OrderDoc = {
   user_id: string;
@@ -161,36 +178,35 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     );
   }
 
-  const blackout = await findDoc(COLLECTIONS.blackoutDates, [
-    Q.equal("blackout_date", input.slotDate),
-  ]);
-  if (blackout) throw new Error("The bakery is closed on that date. Please pick another day.");
-
-  const ids = input.items.map((i) => i.productId);
+  const productIds = Array.from(new Set(input.items.map((i) => i.productId)));
   const products = await listDocs<ProductDoc>(COLLECTIONS.products, [
-    Q.equal("$id", ids),
-    Q.limit(50),
+    Q.equal("$id", productIds),
+    Q.limit(100),
   ]);
+  const productMap = new Map(products.map((p) => [p.$id, p]));
 
   let subtotal = 0;
   let total = 0;
-  const rows = input.items.map((item) => {
-    const product = products.find((p) => p.$id === item.productId);
+  const rows: Array<Omit<OrderItemDoc, "order_id">> = [];
+
+  for (const item of input.items) {
+    const product = productMap.get(item.productId);
     if (!product || !product.is_active) {
-      throw new Error("One of the items is no longer available.");
+      throw new Error(`Product ${product ? product.name : item.productId} is unavailable.`);
     }
-    const base = Number(product.price);
-    const unit = finalPrice(base, product.discount_type, Number(product.discount_value));
-    subtotal += base * item.quantity;
-    total += unit * item.quantity;
-    return {
+    const unit = finalPrice(product.price, product.discount_type, product.discount_value);
+    const lineSubtotal = product.price * item.quantity;
+    const lineTotal = unit * item.quantity;
+    subtotal += lineSubtotal;
+    total += lineTotal;
+    rows.push({
       product_id: product.$id,
       product_name: product.name,
       unit_price: unit,
       quantity: item.quantity,
-      line_total: Math.round(unit * item.quantity * 100) / 100,
-    };
-  });
+      line_total: lineTotal,
+    });
+  }
 
   let promoDiscount = 0;
   if (input.promoCode) {
@@ -267,4 +283,77 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
   });
 
   return { orderId: order.$id };
+}
+
+/** Customer cancels / rejects an order because it was rescheduled */
+export async function cancelRescheduledOrderForUser(userId: string, input: CancelRescheduledOrderInput) {
+  const order = await getDoc<OrderDoc>(COLLECTIONS.orders, input.orderId);
+  if (!order) throw new Error("Order not found.");
+  if (order.user_id !== userId) throw new Error("Unauthorized to modify this order.");
+  if (order.status !== "rescheduled") {
+    throw new Error("This order is not in a rescheduled state.");
+  }
+
+  const updatedNotes = `${order.notes ? `${order.notes} | ` : ""}Cancelled by Customer (Rejected Rescheduled Slot): ${input.reason.trim()}`;
+
+  const updated = await updateDoc<OrderDoc>(COLLECTIONS.orders, input.orderId, {
+    status: "rejected",
+    notes: updatedNotes,
+  });
+
+  let customerEmail: string | undefined = undefined;
+  const user = await getUserById(userId).catch(() => null);
+  if (user?.email) customerEmail = user.email;
+
+  await notifyCustomerOrderUpdate({
+    orderId: updated.$id,
+    status: "rejected",
+    phone: updated.contact_phone,
+    name: updated.contact_name,
+    total: Number(updated.total),
+    email: customerEmail,
+  });
+
+  return {
+    ok: true as const,
+    message: "Rescheduled slot rejected. Your order has been cancelled and full refund has been initiated.",
+  };
+}
+
+/** Customer reports an issue on a completed/delivered order */
+export async function reportOrderIssueForUser(userId: string, input: ReportOrderIssueInput) {
+  const order = await getDoc<OrderDoc>(COLLECTIONS.orders, input.orderId);
+  if (!order) throw new Error("Order not found.");
+  if (order.user_id !== userId) throw new Error("Unauthorized to report issue for this order.");
+
+  const categoryLabels: Record<string, string> = {
+    damaged_packaging: "Damaged Packaging",
+    missing_items: "Missing Items",
+    wrong_items: "Wrong Items Received",
+    taste_freshness: "Taste or Freshness Concern",
+    delivery_delay: "Delivery Delay / Transit Issue",
+    other: "Other Inquiries",
+  };
+
+  const catLabel = categoryLabels[input.category] ?? input.category;
+  const updatedNotes = `${order.notes ? `${order.notes} | ` : ""}Support Issue Reported [${catLabel}]: ${input.description.trim()} (Resolution: ${input.preferredResolution})`;
+
+  await updateDoc<OrderDoc>(COLLECTIONS.orders, input.orderId, {
+    notes: updatedNotes,
+  });
+
+  const whatsappMessage = encodeURIComponent(
+    `Hi Ani Bakes Studio! 🥐 I am reporting an issue with my completed order #${order.$id.slice(-6).toUpperCase()}.\n\n` +
+    `• Issue: ${catLabel}\n` +
+    `• Details: ${input.description.trim()}\n` +
+    `• Preferred Resolution: ${input.preferredResolution}\n\n` +
+    `Please help review and assist.`
+  );
+
+  return {
+    ok: true as const,
+    orderId: order.$id,
+    whatsappUrl: `https://wa.me/917448724920?text=${whatsappMessage}`,
+    message: "Your issue has been logged. Our head baker will inspect and resolve this promptly.",
+  };
 }

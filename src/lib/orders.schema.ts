@@ -38,4 +38,25 @@ export const placeOrderSchema = z.object({
   promoDiscount: z.number().min(0).optional(),
 });
 
+export const cancelRescheduledOrderSchema = z.object({
+  orderId: id,
+  reason: z.string().trim().min(2, "Please provide a reason for cancelling").max(300),
+});
+
+export const reportOrderIssueSchema = z.object({
+  orderId: id,
+  category: z.enum([
+    "damaged_packaging",
+    "missing_items",
+    "wrong_items",
+    "taste_freshness",
+    "delivery_delay",
+    "other",
+  ]),
+  description: z.string().trim().min(5, "Please provide more details regarding the issue").max(600),
+  preferredResolution: z.enum(["refund", "replacement_batch", "callback_support"]),
+});
+
 export type PlaceOrderInput = z.infer<typeof placeOrderSchema>;
+export type CancelRescheduledOrderInput = z.infer<typeof cancelRescheduledOrderSchema>;
+export type ReportOrderIssueInput = z.infer<typeof reportOrderIssueSchema>;
