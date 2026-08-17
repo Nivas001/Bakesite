@@ -221,15 +221,15 @@ export function HeroRevampSection() {
       </div>
 
       {/* 4. [BOTTOM WAVE]: Kinetic TextLoop Ribbon */}
-      <div className="w-full mt-2 sm:mt-3 overflow-hidden select-none pointer-events-auto">
+      <div className="w-full mt-2 sm:mt-4 overflow-hidden select-none pointer-events-auto">
         <TextLoop
           text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
           shape="wave"
-          speed={46}
+          speed={48}
           direction="forward"
           separator="🥮"
-          curviness={5}
-          fontSize={22}
+          curviness={10}
+          fontSize={24}
           fontWeight={800}
           fontFamily="var(--font-blogh), var(--font-body), sans-serif"
           letterSpacing={2}
@@ -237,7 +237,7 @@ export function HeroRevampSection() {
           color={activeFlavor.ribbonTextColor}
           ribbon
           ribbonColor={activeFlavor.ribbonColor}
-          ribbonWidth={44}
+          ribbonWidth={46}
           pauseOnHover={false}
           className="opacity-95"
         />
