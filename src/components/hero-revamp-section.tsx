@@ -14,6 +14,7 @@ const FLAVORS = [
     borderColor: "border-[#C9203E]",
     canvasBg: "#F5C2CD",
     word: "DONUTING",
+    sizeClass: "text-3xl sm:text-5xl lg:text-[4.85rem] xl:text-[5.75rem]",
     headlineHighlight: "FRESH GLAZED DONUTS",
     headingText: "#3A1018",
     highlightText: "#9B112D",
@@ -34,7 +35,8 @@ const FLAVORS = [
     textColor: "text-white",
     borderColor: "border-[#B45309]",
     canvasBg: "#FDE68A",
-    word: "CHEESECAKING",
+    word: "CHEESECAKE",
+    sizeClass: "text-2xl sm:text-4xl lg:text-[3.6rem] xl:text-[4.35rem]",
     headlineHighlight: "MANGO CHEESECAKE",
     headingText: "#361D04",
     highlightText: "#92400E",
@@ -55,7 +57,8 @@ const FLAVORS = [
     textColor: "text-white",
     borderColor: "border-[#572607]",
     canvasBg: "#DFCCB5",
-    word: "COOKING",
+    word: "COOKIING",
+    sizeClass: "text-2xl sm:text-4xl lg:text-[4rem] xl:text-[4.75rem]",
     headlineHighlight: "CHUNKY CHOC COOKIES",
     headingText: "#2B1408",
     highlightText: "#7A3E1D",
@@ -115,7 +118,7 @@ export function HeroRevampSection() {
           </h1>
         </div>
 
-        {/* 2. [MIDDLE]: Seamless 3D Pastry Photo with 3D Depth Typography Layered IN FRONT */}
+        {/* 2. [MIDDLE]: Seamless 3D Pastry Photo with 3D Depth Typography Layered Elegantly */}
         <div className="relative w-full max-w-3xl flex items-center justify-center min-h-[170px] sm:min-h-[260px] lg:min-h-[380px]">
           
           {/* Seamless 3D Floating Pastry (Feathered edge dissolving) */}
@@ -139,11 +142,11 @@ export function HeroRevampSection() {
             </div>
           </div>
 
-          {/* Giant 3D Depth Typography in Blogh font Layered IN FRONT (Anchored safely below headline) */}
+          {/* Giant 3D Depth Typography in Blogh font Layered in Bottom-Right Corner */}
           <div
-            className="absolute bottom-1 sm:bottom-2 lg:bottom-3 right-1 sm:right-4 lg:-right-4 xl:-right-8 z-30 pointer-events-none select-none"
+            className="absolute bottom-0 sm:bottom-1 lg:bottom-1 right-0 sm:right-2 lg:-right-2 xl:-right-6 z-30 pointer-events-none select-none"
             style={{
-              transform: `perspective(800px) rotateZ(-7deg) rotateY(${mousePos.x * 12}deg) rotateX(${-mousePos.y * 12}deg)`,
+              transform: `perspective(800px) rotateZ(-6deg) rotateY(${mousePos.x * 10}deg) rotateX(${-mousePos.y * 10}deg)`,
               transition: "transform 0.15s ease-out",
             }}
           >
@@ -152,21 +155,21 @@ export function HeroRevampSection() {
               <span
                 aria-hidden
                 style={{ color: activeFlavor.depthShadow }}
-                className="absolute top-1.5 sm:top-2.5 lg:top-3 left-1.5 sm:left-2.5 lg:left-3 font-blogh text-3xl sm:text-6xl lg:text-[5.75rem] xl:text-[6.75rem] opacity-50 tracking-tight transition-colors duration-500"
+                className={`absolute top-1.5 sm:top-2.5 lg:top-2.5 left-1.5 sm:left-2.5 lg:left-2.5 font-blogh ${activeFlavor.sizeClass} opacity-50 tracking-tight transition-colors duration-500`}
               >
                 {activeFlavor.word}
               </span>
               <span
                 aria-hidden
                 style={{ color: activeFlavor.depthMid }}
-                className="absolute top-0.5 sm:top-1.5 lg:top-1.5 left-0.5 sm:left-1.5 lg:left-1.5 font-blogh text-3xl sm:text-6xl lg:text-[5.75rem] xl:text-[6.75rem] opacity-75 tracking-tight transition-colors duration-500"
+                className={`absolute top-0.5 sm:top-1.5 lg:top-1.5 left-0.5 sm:left-1.5 lg:left-1.5 font-blogh ${activeFlavor.sizeClass} opacity-75 tracking-tight transition-colors duration-500`}
               >
                 {activeFlavor.word}
               </span>
               {/* Top Face */}
               <span
                 style={{ color: activeFlavor.depthFront }}
-                className="relative font-blogh text-3xl sm:text-6xl lg:text-[5.75rem] xl:text-[6.75rem] tracking-tight drop-shadow-xl transition-colors duration-500"
+                className={`relative font-blogh ${activeFlavor.sizeClass} tracking-tight drop-shadow-xl transition-colors duration-500`}
               >
                 {activeFlavor.word}
               </span>
@@ -190,28 +193,22 @@ export function HeroRevampSection() {
                       ? "ring-3 sm:ring-4 ring-white/95 shadow-lg scale-[1.04] z-20"
                       : "opacity-85 hover:opacity-100"
                   }`}
-                  style={{
-                    transform: `rotate(${index === 0 ? "-2deg" : index === 1 ? "0deg" : "2deg"})`,
-                  }}
                 >
-                  {/* Circular Product Thumbnail */}
-                  <div className="size-7 sm:size-10 rounded-full overflow-hidden shrink-0 border-1.5 sm:border-2 border-white shadow-xs bg-white/20 p-0.5">
+                  <div className="size-6 sm:size-7.5 rounded-full overflow-hidden shrink-0 border border-white/40 shadow-xs mr-2 sm:mr-2.5">
                     <img
                       src={flavor.image}
-                      alt={flavor.label}
-                      className="size-full object-cover rounded-full transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12"
+                      alt={flavor.title}
+                      className="size-full object-cover"
                     />
                   </div>
 
-                  {/* Pill Label Text */}
-                  <div className="ml-2 sm:ml-2.5 text-left">
-                    <span className="block text-[11px] sm:text-xs font-black tracking-wide leading-tight">
-                      {flavor.label}
-                    </span>
-                    <span className="block text-[9px] sm:text-[10px] opacity-90 font-semibold leading-tight mt-0.5">
-                      {flavor.pillLabel}
-                    </span>
-                  </div>
+                  <span className="font-blogh font-bold text-xs sm:text-sm tracking-wider uppercase drop-shadow-xs">
+                    {flavor.label} {flavor.pillLabel}
+                  </span>
+
+                  {isSelected && (
+                    <span className="ml-1.5 sm:ml-2 size-1.5 sm:size-2 rounded-full bg-white animate-pulse" />
+                  )}
                 </button>
               );
             })}
