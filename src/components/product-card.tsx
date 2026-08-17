@@ -19,11 +19,11 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
   const quantityInCart = cartLine?.quantity ?? 0;
 
   return (
-    <article className="glass-panel group flex flex-col rounded-[1.35rem] sm:rounded-[1.75rem] md:rounded-[2rem] p-2.5 sm:p-3.5 md:p-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
+    <article className="group flex flex-col rounded-[1.6rem] sm:rounded-[2rem] border-2 border-[#2C1810]/15 hover:border-[#2C1810]/40 bg-[#FFFDF9] dark:bg-[#1E110A] p-3 sm:p-4 shadow-[0_8px_24px_rgba(44,24,16,0.06)] hover:shadow-[0_16px_36px_rgba(44,24,16,0.12)] transition-all duration-300 hover:-translate-y-1.5">
       <Link
         to="/product/$slug"
         params={{ slug: product.slug }}
-        className="relative block overflow-hidden rounded-[1rem] sm:rounded-[1.35rem]"
+        className="relative block overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] border border-black/10 bg-black/5"
       >
         <img
           src={product.image_url ?? "/products/croissant.jpg"}

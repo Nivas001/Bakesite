@@ -5,7 +5,7 @@ import { getCatalog } from "@/lib/catalog.functions";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { useFlag } from "@/lib/feature-flags";
-import { Search, X } from "lucide-react";
+import { Search, X, ArrowUpDown } from "lucide-react";
 
 const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCatalog() });
 
@@ -30,17 +30,26 @@ function Shop() {
   const [active, setActive] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"featured" | "price_asc" | "price_desc" | "name_asc">("featured");
-  const [filterKey, setFilterKey] = useState(0); // increments to re-trigger stagger
+  const [filterKey, setFilterKey] = useState(0);
 
-  const showSearch = useFlag("ff_shop_search");
-  const showStagger = useFlag("ff_shop_stagger");
+  const showSearch = useFlag("ff_shop_search") ?? true;
+  const showStagger = useFlag("ff_shop_stagger") ?? true;
 
   const products = useMemo(() => {
-    let list = active ? data.products.filter((p) => p.category_slug === active) : [...data.products];
+    let list = active
+      ? data.products.filter((p) => p.category_slug === active)
+      : [...data.products];
+
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(q));
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.description?.toLowerCase().includes(q) ||
+          p.category_name?.toLowerCase().includes(q)
+      );
     }
+
     if (sortBy === "price_asc") {
       list.sort((a, b) => a.price - b.price);
     } else if (sortBy === "price_desc") {
@@ -53,21 +62,22 @@ function Shop() {
 
   function handleCategoryChange(slug: string | null) {
     setActive(slug);
-    setSearch("");
-    if (showStagger) setFilterKey((k) => k + 1);
+    setFilterKey((k) => k + 1);
   }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
       <div className="flex flex-col gap-1 sm:gap-2">
-        <h1 className="font-nimbus text-3xl sm:text-5xl font-bold text-cocoa">The bakery counter</h1>
+        <h1 className="font-blogh text-3xl sm:text-5xl lg:text-6xl font-bold text-cocoa uppercase tracking-wide leading-tight">
+          The bakery counter
+        </h1>
         <p className="max-w-xl text-xs sm:text-sm text-muted-foreground">
           Everything is baked in small batches on the morning of your slot.
         </p>
       </div>
 
       {/* Filters Row: Category pills + Search + Sort */}
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 justify-between">
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4 justify-between">
         {/* Category Pills */}
         <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar shrink-0">
           <Button
@@ -92,23 +102,23 @@ function Shop() {
         </div>
 
         {/* Search & Sort Controls */}
-        <div className="flex items-center gap-2 sm:ml-auto w-full sm:w-auto">
-          {/* Live Search Input */}
+        <div className="flex items-center gap-3 sm:ml-auto w-full sm:w-auto">
+          {/* Minimalist Underline Search Bar */}
           {showSearch && (
-            <div className="relative flex-1 sm:w-48 lg:w-56 shrink-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+            <div className="relative flex-1 sm:w-48 lg:w-56 flex items-center border-b-2 border-[#2C1810]/30 hover:border-[#2C1810]/60 focus-within:border-[#2C1810] transition-colors pb-1 shrink-0">
+              <Search className="size-3.5 text-[#2C1810]/60 mr-2 shrink-0 pointer-events-none" />
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search bakes…"
-                className="h-8 w-full rounded-full border border-border bg-card/80 pl-8 pr-8 text-xs font-medium placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-berry/30 transition-all"
+                className="w-full bg-transparent text-xs font-semibold text-cocoa placeholder:text-muted-foreground/70 focus:outline-none"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-1"
                 >
                   <X className="size-3.5" />
                 </button>
@@ -116,17 +126,20 @@ function Shop() {
             </div>
           )}
 
-          {/* Sort Dropdown */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
-            className="h-8 rounded-full border border-border bg-card/80 px-3 text-xs font-semibold text-cocoa shadow-2xs focus:outline-none focus:ring-2 focus:ring-berry/30 cursor-pointer shrink-0"
-          >
-            <option value="featured">Sort: Featured</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-            <option value="name_asc">Name: A to Z</option>
-          </select>
+          {/* Enhanced Sort Dropdown */}
+          <div className="relative shrink-0">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="h-8.5 rounded-full border-2 border-[#2C1810]/20 bg-white/95 dark:bg-[#1E110A] pl-3.5 pr-8 text-xs font-bold text-cocoa shadow-2xs hover:border-[#2C1810]/50 focus:outline-none focus:border-[#2C1810] cursor-pointer appearance-none transition-all"
+            >
+              <option value="featured">Sort: Featured</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="name_asc">Name: A to Z</option>
+            </select>
+            <ArrowUpDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3 text-[#2C1810]/60 pointer-events-none" />
+          </div>
         </div>
       </div>
 
