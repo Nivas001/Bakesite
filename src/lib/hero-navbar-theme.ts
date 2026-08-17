@@ -3,13 +3,15 @@ import { useSyncExternalStore } from "react";
 export interface HeroThemeState {
   inHero: boolean;
   bgColor: string | null;
-  textColor?: string | null;
+  textColor: string | null;
+  accentColor: string | null;
 }
 
 let currentState: HeroThemeState = {
   inHero: false,
   bgColor: null,
   textColor: null,
+  accentColor: null,
 };
 
 const listeners = new Set<() => void>();
@@ -24,11 +26,11 @@ export function setHeroTheme(newState: Partial<HeroThemeState>) {
     ...newState,
   };
 
-  // Only notify if state actually changed
   if (
     updated.inHero !== currentState.inHero ||
     updated.bgColor !== currentState.bgColor ||
-    updated.textColor !== currentState.textColor
+    updated.textColor !== currentState.textColor ||
+    updated.accentColor !== currentState.accentColor
   ) {
     currentState = updated;
     notify();
@@ -37,7 +39,12 @@ export function setHeroTheme(newState: Partial<HeroThemeState>) {
 
 export function resetHeroTheme() {
   if (currentState.inHero || currentState.bgColor !== null) {
-    currentState = { inHero: false, bgColor: null, textColor: null };
+    currentState = {
+      inHero: false,
+      bgColor: null,
+      textColor: null,
+      accentColor: null,
+    };
     notify();
   }
 }

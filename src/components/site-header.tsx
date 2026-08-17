@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Menu,
   ShoppingBag,
@@ -35,48 +35,78 @@ export function SiteHeader() {
   const { isAdmin } = useIsAdmin();
   const { user: session } = useAuth();
   const [open, setOpen] = useState(false);
-  const { inHero, bgColor } = useHeroNavbarTheme();
+  const [scrolled, setScrolled] = useState(false);
+  const { inHero, bgColor, textColor } = useHeroNavbarTheme();
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   async function signOut() {
     await signOutEverywhere();
     navigate({ to: "/", replace: true });
   }
 
+  // Active theme overrides
+  const isHeroActive = inHero && !!bgColor;
+  const showBorder = scrolled || !isHeroActive;
+
   return (
     <header
       style={
-        inHero && bgColor
+        isHeroActive
           ? {
               backgroundColor: bgColor,
-              borderColor: "rgba(44, 24, 16, 0.15)",
+              borderColor: showBorder ? "rgba(44, 24, 16, 0.15)" : "transparent",
             }
           : undefined
       }
       className={`sticky top-0 z-50 border-b ${
-        inHero && bgColor
-          ? "border-[#2C1810]/15"
-          : "border-border/50 bg-background/65 backdrop-blur-2xl backdrop-saturate-150"
-      } shadow-[0_4px_24px_0_rgba(0,0,0,0.04)] transition-all duration-700`}
+        isHeroActive
+          ? showBorder
+            ? "border-[#2C1810]/15 shadow-[0_4px_24px_0_rgba(0,0,0,0.04)]"
+            : "border-transparent shadow-none"
+          : "border-border/50 bg-background/65 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_4px_24px_0_rgba(0,0,0,0.04)]"
+      } transition-all duration-700`}
     >
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 sm:gap-4 px-3.5 sm:px-6">
         
         {/* Brand Logo with Liquid Glass Pill */}
         <Link
           to="/"
-          className="group flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all hover:bg-secondary/40"
+          className="group flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all hover:bg-black/5"
         >
-          <span className="font-nimbus text-xl sm:text-2xl font-bold tracking-tight text-cocoa transition-transform group-hover:scale-[1.02]">
+          <span
+            style={isHeroActive && textColor ? { color: textColor } : undefined}
+            className="font-nimbus text-xl sm:text-2xl font-bold tracking-tight text-cocoa transition-colors duration-700 group-hover:scale-[1.02]"
+          >
             Ani Bakes
           </span>
           <span className="flex size-2 rounded-full bg-berry animate-pulse" />
         </Link>
 
         {/* Desktop Navigation with Floating Frosted Glass Pills */}
-        <nav className="hidden md:flex items-center gap-1 rounded-full border border-border/60 bg-secondary/35 p-1 backdrop-blur-md shadow-2xs">
+        <nav
+          style={
+            isHeroActive
+              ? {
+                  backgroundColor: "rgba(255, 255, 255, 0.45)",
+                  borderColor: "rgba(44, 24, 16, 0.12)",
+                }
+              : undefined
+          }
+          className="hidden md:flex items-center gap-1 rounded-full border border-border/60 bg-secondary/35 p-1 backdrop-blur-md shadow-2xs transition-colors duration-700"
+        >
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
+              style={isHeroActive && textColor ? { color: textColor } : undefined}
               className="relative rounded-full px-3.5 py-1 text-xs lg:text-sm font-semibold text-muted-foreground whitespace-nowrap transition-all hover:bg-card hover:text-foreground hover:shadow-2xs active:scale-95"
               activeProps={{
                 className: "bg-card text-cocoa font-bold shadow-xs ring-1 ring-border/80",
@@ -113,11 +143,23 @@ export function SiteHeader() {
             asChild
             variant="ghost"
             size="icon"
+            style={
+              isHeroActive
+                ? {
+                    backgroundColor: "rgba(255, 255, 255, 0.45)",
+                    borderColor: "rgba(44, 24, 16, 0.12)",
+                    color: textColor ?? undefined,
+                  }
+                : undefined
+            }
             className="relative size-9 rounded-full border border-border/40 bg-card/60 backdrop-blur-md shadow-2xs transition-all hover:bg-secondary hover:scale-105 active:scale-95"
             aria-label="Cart"
           >
             <Link to="/cart">
-              <ShoppingBag className="size-4.5 text-foreground" />
+              <ShoppingBag
+                style={isHeroActive && textColor ? { color: textColor } : undefined}
+                className="size-4.5 text-foreground transition-colors duration-700"
+              />
               {count > 0 && (
                 <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-berry text-[10px] font-bold text-berry-foreground shadow-xs animate-in zoom-in-75 ring-2 ring-background">
                   {count > 9 ? "9+" : count}
@@ -133,7 +175,16 @@ export function SiteHeader() {
                 asChild
                 variant="ghost"
                 size="sm"
-                className="hidden text-xs font-semibold text-muted-foreground hover:text-foreground sm:inline-flex h-8 px-3 rounded-full border border-border/40 bg-card/40 backdrop-blur-xs"
+                style={
+                  isHeroActive
+                    ? {
+                        backgroundColor: "rgba(255, 255, 255, 0.45)",
+                        borderColor: "rgba(44, 24, 16, 0.12)",
+                        color: textColor ?? undefined,
+                      }
+                    : undefined
+                }
+                className="hidden text-xs font-semibold text-muted-foreground hover:text-foreground sm:inline-flex h-8 px-3 rounded-full border border-border/40 bg-card/40 backdrop-blur-xs transition-colors duration-700"
               >
                 <Link to="/profile">
                   <User className="mr-1.5 size-3.5" />
@@ -144,7 +195,8 @@ export function SiteHeader() {
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
-                className="hidden text-xs font-semibold text-muted-foreground hover:text-destructive sm:inline-flex h-8 px-2.5 rounded-full hover:bg-destructive/10"
+                style={isHeroActive && textColor ? { color: textColor } : undefined}
+                className="hidden text-xs font-semibold text-muted-foreground hover:text-destructive sm:inline-flex h-8 px-2.5 rounded-full hover:bg-destructive/10 transition-colors duration-700"
               >
                 <LogOut className="size-3.5" />
               </Button>
@@ -162,7 +214,13 @@ export function SiteHeader() {
           {/* Mobile Drawer */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
+              <Button
+                variant="ghost"
+                size="icon"
+                style={isHeroActive && textColor ? { color: textColor } : undefined}
+                className="md:hidden transition-colors duration-700"
+                aria-label="Menu"
+              >
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>

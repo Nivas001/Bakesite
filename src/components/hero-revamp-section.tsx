@@ -87,6 +87,8 @@ export function HeroRevampSection() {
       setHeroTheme({
         inHero: isVisible,
         bgColor: isVisible ? activeFlavor.canvasBg : null,
+        textColor: isVisible ? activeFlavor.headingText : null,
+        accentColor: isVisible ? activeFlavor.highlightText : null,
       });
     };
 
