@@ -2,6 +2,7 @@ import React, { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } f
 import { gsap } from "gsap";
 import "./text-loop.css";
 
+const VIEW_W = 1400;
 const EDGE_PAD = 4;
 
 export type TextLoopShape = "wave" | "circle" | "infinity" | "arch" | "line";
@@ -34,9 +35,9 @@ const getViewHeight = (shape: TextLoopShape, curviness: number, ribbonWidth: num
   const rw = Math.max(0, ribbonWidth);
   switch (shape) {
     case "line":
-      return Math.round(Math.max(50, rw + 16));
+      return Math.round(Math.max(56, rw + 18));
     case "wave":
-      return Math.round(Math.max(70, rw + c * 2 + 18));
+      return Math.round(Math.max(76, rw + c * 2 + 18));
     case "arch":
       return Math.round(Math.max(140, rw + c * 1.4 + 60));
     case "circle":
@@ -46,11 +47,11 @@ const getViewHeight = (shape: TextLoopShape, curviness: number, ribbonWidth: num
   }
 };
 
-const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number, viewH: number, viewW: number) => {
+const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number, viewH: number) => {
   const c = Math.max(0, curviness);
-  const CX = viewW / 2;
+  const CX = VIEW_W / 2;
   const CY = viewH / 2;
-  const room = Math.max(10, CY - Math.max(0, ribbonWidth) / 2 - EDGE_PAD);
+  const room = Math.max(8, CY - Math.max(0, ribbonWidth) / 2 - EDGE_PAD);
 
   switch (shape) {
     case "circle": {
@@ -71,15 +72,14 @@ const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number,
     }
     case "arch": {
       const rise = Math.min(120 + c * 1.1, room * 2);
-      return `M 120 ${CY + rise / 2} Q ${CX} ${CY - rise * 1.5} ${viewW - 120} ${CY + rise / 2}`;
+      return `M 120 ${CY + rise / 2} Q ${CX} ${CY - rise * 1.5} ${VIEW_W - 120} ${CY + rise / 2}`;
     }
     case "line":
-      return `M -200 ${CY} L ${viewW + 200} ${CY}`;
+      return `M -400 ${CY} L ${VIEW_W + 400} ${CY}`;
     case "wave":
     default: {
-      const a = Math.min(c * 1.2, room);
-      const step = viewW / 4;
-      return `M -200 ${CY} Q ${-step / 2} ${CY - a} 0 ${CY} T ${step} ${CY} T ${step * 2} ${CY} T ${step * 3} ${CY} T ${viewW} ${CY} T ${viewW + 200} ${CY}`;
+      const a = Math.min(c * 0.9, room);
+      return `M -400 ${CY} Q -200 ${CY - a} 0 ${CY} Q 200 ${CY + a} 400 ${CY} Q 600 ${CY - a} 800 ${CY} Q 1000 ${CY + a} 1200 ${CY} Q 1400 ${CY - a} ${VIEW_W + 400} ${CY}`;
     }
   }
 };
@@ -88,10 +88,10 @@ export function TextLoop({
   text = "Ani Bakes ✦ Fresh Dawn Bakes",
   shape = "wave",
   path,
-  speed = 50,
+  speed = 48,
   direction = "forward",
   separator = "✦",
-  curviness = 12,
+  curviness = 6,
   fontSize = 24,
   fontWeight = 700,
   fontFamily,
@@ -111,72 +111,49 @@ export function TextLoop({
   const headRef = useRef<SVGTextPathElement>(null);
   const tailRef = useRef<SVGTextPathElement>(null);
 
-  const [isMobile, setIsMobile] = useState(false);
-  const [metrics, setMetrics] = useState({ length: 0, reps: 1 });
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const [unitWidth, setUnitWidth] = useState(0);
 
   const rawId = useId();
   const pathId = `text-loop-${rawId.replace(/:/g, "")}`;
 
-  const viewW = isMobile ? 560 : 1200;
-  const effectiveFontSize = isMobile ? Math.max(fontSize * 1.55, 32) : fontSize;
-  const effectiveRibbonWidth = isMobile ? Math.max(ribbonWidth * 1.4, 56) : ribbonWidth;
-
   const viewH = useMemo(
-    () => getViewHeight(shape, curviness, effectiveRibbonWidth),
-    [shape, curviness, effectiveRibbonWidth]
+    () => getViewHeight(shape, curviness, ribbonWidth),
+    [shape, curviness, ribbonWidth]
   );
 
   const d = useMemo(
-    () => path || buildPath(shape, curviness, effectiveRibbonWidth, viewH, viewW),
-    [path, shape, curviness, effectiveRibbonWidth, viewH, viewW]
+    () => path || buildPath(shape, curviness, ribbonWidth, viewH),
+    [path, shape, curviness, ribbonWidth, viewH]
   );
 
   const unit = useMemo(() => {
     const base = uppercase ? String(text).toUpperCase() : String(text);
-    const gap = separator ? `\u00A0${separator}\u00A0` : "\u00A0\u00A0\u00A0";
+    const gap = separator ? `\u00A0\u00A0${separator}\u00A0\u00A0` : "\u00A0\u00A0\u00A0\u00A0";
     return `${base}${gap}`;
   }, [text, separator, uppercase]);
 
   const textStyle = useMemo(
     () => ({
-      fontSize: `${effectiveFontSize}px`,
+      fontSize: `${fontSize}px`,
       fontWeight,
       letterSpacing: `${letterSpacing}px`,
       ...(fontFamily ? { fontFamily } : {}),
     }),
-    [effectiveFontSize, fontWeight, letterSpacing, fontFamily]
+    [fontSize, fontWeight, letterSpacing, fontFamily]
   );
 
   useLayoutEffect(() => {
-    const pathEl = pathRef.current;
     const measureEl = measureRef.current;
-    if (!pathEl || !measureEl) return undefined;
+    if (!measureEl) return;
 
     let cancelled = false;
 
     const measure = () => {
       if (cancelled) return;
-      let length = 0;
-      let unitWidth = 0;
       try {
-        length = pathEl.getTotalLength();
-        unitWidth = measureEl.getComputedTextLength();
-      } catch {
-        return;
-      }
-      if (!length) return;
-
-      const reps = unitWidth > 0 ? Math.max(1, Math.round(length / unitWidth)) : 1;
-      setMetrics((prev) => (prev.length === length && prev.reps === reps ? prev : { length, reps }));
+        const w = measureEl.getComputedTextLength();
+        if (w > 0) setUnitWidth(w);
+      } catch {}
     };
 
     measure();
@@ -187,18 +164,29 @@ export function TextLoop({
     return () => {
       cancelled = true;
     };
-  }, [d, unit, effectiveFontSize, fontWeight, letterSpacing, fontFamily]);
+  }, [unit, fontSize, fontWeight, letterSpacing, fontFamily]);
 
   useEffect(() => {
-    const { length } = metrics;
     const head = headRef.current;
     const tail = tailRef.current;
-    if (!head || !tail || !length) return undefined;
+    const pathEl = pathRef.current;
+    if (!head || !tail || !pathEl || unitWidth <= 0) return undefined;
+
+    let pathLength = 0;
+    try {
+      pathLength = pathEl.getTotalLength();
+    } catch {
+      return undefined;
+    }
+    if (pathLength <= 0) return undefined;
+
+    // Use unitWidth as the seamless loop cycle length
+    const loopCycle = unitWidth;
 
     const apply = (offset: number) => {
-      const partner = offset >= 0 ? offset - length : offset + length;
-      head.setAttribute("startOffset", String(offset));
-      tail.setAttribute("startOffset", String(partner));
+      const normalized = ((offset % loopCycle) + loopCycle) % loopCycle;
+      head.setAttribute("startOffset", `${normalized}px`);
+      tail.setAttribute("startOffset", `${normalized - loopCycle}px`);
     };
 
     apply(0);
@@ -209,8 +197,8 @@ export function TextLoop({
 
     const state = { offset: 0 };
     const tween = gsap.to(state, {
-      offset: direction === "reverse" ? -length : length,
-      duration: length / speed,
+      offset: direction === "reverse" ? -loopCycle : loopCycle,
+      duration: loopCycle / speed,
       ease: "none",
       repeat: -1,
       onUpdate: () => apply(state.offset),
@@ -232,17 +220,19 @@ export function TextLoop({
         root.removeEventListener("pointerleave", resume);
       }
     };
-  }, [metrics, speed, direction, pauseOnHover]);
+  }, [unitWidth, speed, direction, pauseOnHover]);
 
-  const loopText = unit.repeat(metrics.reps);
-  const fitLength = metrics.length || undefined;
+  // Repeat enough times to cover the full viewport path seamlessly
+  const repeatedText = useMemo(() => {
+    return unit.repeat(12);
+  }, [unit]);
 
   return (
     <div ref={rootRef} className={`text-loop ${className}`.trim()} style={style}>
       <svg
         className="text-loop-svg"
-        viewBox={`0 0 ${viewW} ${viewH}`}
-        preserveAspectRatio="xMidYMid meet"
+        viewBox={`0 0 ${VIEW_W} ${viewH}`}
+        preserveAspectRatio="xMidYMid slice"
         role="img"
         aria-label={text}
       >
@@ -252,7 +242,7 @@ export function TextLoop({
           d={d}
           fill="none"
           stroke={ribbon ? ribbonColor : "none"}
-          strokeWidth={ribbon ? effectiveRibbonWidth : 0}
+          strokeWidth={ribbon ? ribbonWidth : 0}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -262,14 +252,14 @@ export function TextLoop({
         </text>
 
         <text className="text-loop-text" style={textStyle} fill={color} dominantBaseline="central" aria-hidden="true">
-          <textPath ref={headRef} href={`#${pathId}`} startOffset={0} textLength={fitLength} lengthAdjust="spacing">
-            {loopText}
+          <textPath ref={headRef} href={`#${pathId}`} startOffset="0px">
+            {repeatedText}
           </textPath>
         </text>
 
         <text className="text-loop-text" style={textStyle} fill={color} dominantBaseline="central" aria-hidden="true">
-          <textPath ref={tailRef} href={`#${pathId}`} startOffset={0} textLength={fitLength} lengthAdjust="spacing">
-            {loopText}
+          <textPath ref={tailRef} href={`#${pathId}`} startOffset="0px">
+            {repeatedText}
           </textPath>
         </text>
       </svg>

@@ -97,18 +97,18 @@ export function HeroRevampSection() {
       {/* Main Vertical Hero Container */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-3 sm:gap-5 my-auto text-center">
         
-        {/* 1. [TOP]: Punchy Responsive Blogh Headline */}
-        <div className="w-full max-w-[96vw] mx-auto text-center px-2 sm:px-4 overflow-hidden pt-1 sm:pt-2">
+        {/* 1. [TOP]: Prominent Bold Blogh Headline (Giant on Desktop, Stacked on Mobile) */}
+        <div className="w-full max-w-[98vw] mx-auto text-center px-2 sm:px-4 overflow-hidden pt-1 sm:pt-2">
           <h1
             style={{ color: activeFlavor.headingText }}
-            className="font-blogh tracking-tight leading-[1.08] transition-colors duration-500 drop-shadow-xs text-center flex flex-col items-center justify-center lg:inline-block lg:whitespace-nowrap lg:text-[clamp(2.2rem,4.3vw,4.75rem)]"
+            className="font-blogh tracking-tight leading-none transition-colors duration-500 drop-shadow-xs text-center text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.25rem] 2xl:text-[5.75rem] lg:whitespace-nowrap"
           >
-            <span className="text-lg sm:text-2xl lg:text-inherit font-bold opacity-90 block lg:inline mr-0 lg:mr-3">
+            <span className="block lg:inline mr-0 lg:mr-3.5 opacity-90">
               PURE JOY IN
             </span>
             <span
               style={{ color: activeFlavor.highlightText }}
-              className="text-2xl sm:text-4xl lg:text-inherit font-black tracking-wide transition-colors duration-500 block lg:inline mt-0.5 lg:mt-0"
+              className="transition-colors duration-500 block lg:inline mt-1 lg:mt-0"
             >
               {activeFlavor.headlineHighlight}
             </span>
@@ -220,7 +220,7 @@ export function HeroRevampSection() {
 
       </div>
 
-      {/* 4. [BOTTOM WAVE]: Kinetic TextLoop Ribbon with Responsive Sizing */}
+      {/* 4. [BOTTOM WAVE]: Kinetic TextLoop Ribbon */}
       <div className="w-full mt-2 sm:mt-3 overflow-hidden select-none pointer-events-auto">
         <TextLoop
           text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
@@ -228,8 +228,8 @@ export function HeroRevampSection() {
           speed={46}
           direction="forward"
           separator="🥮"
-          curviness={10}
-          fontSize={24}
+          curviness={5}
+          fontSize={22}
           fontWeight={800}
           fontFamily="var(--font-blogh), var(--font-body), sans-serif"
           letterSpacing={2}
