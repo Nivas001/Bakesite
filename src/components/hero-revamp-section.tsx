@@ -101,10 +101,10 @@ export function HeroRevampSection() {
       <div className="relative z-10 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-3 sm:gap-5 my-auto text-center">
         
         {/* 1. [TOP]: Single-Line Bold Blogh Headline across horizontal space */}
-        <div className="w-full text-center px-1 sm:px-3 overflow-hidden">
+        <div className="w-full max-w-[96vw] mx-auto text-center px-2 sm:px-4 overflow-hidden">
           <h1
             style={{ color: activeFlavor.headingText }}
-            className="font-blogh whitespace-nowrap text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-none transition-colors duration-500 drop-shadow-xs"
+            className="font-blogh whitespace-nowrap text-[clamp(1.2rem,4.3vw,4.75rem)] tracking-tight leading-none transition-colors duration-500 drop-shadow-xs"
           >
             PURE JOY IN{" "}
             <span
