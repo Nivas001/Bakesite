@@ -271,7 +271,7 @@ export function CakeStudioCarousel() {
                   <p className="text-[9px] sm:text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                     Starting from
                   </p>
-                  <p className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa tracking-tight">
+                  <p className="font-sans text-2xl sm:text-3xl font-extrabold text-cocoa tracking-tight tabular-nums">
                     {activeSlide.price}
                   </p>
                 </div>
