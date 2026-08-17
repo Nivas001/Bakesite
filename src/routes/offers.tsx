@@ -1,15 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { getCatalog } from "@/lib/catalog.functions";
 import { getPublicOfferCodes } from "@/lib/offers.functions";
 import { ProductCard } from "@/components/product-card";
 import { hasDiscount } from "@/lib/pricing";
-import { Tag, Copy, Check, ShoppingBag, ArrowRight } from "lucide-react";
+import { Tag, Copy, Check, ShoppingBag, ArrowRight, Sparkles, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFlag } from "@/lib/feature-flags";
+import { DriftWall } from "@/components/ui/drift-wall";
 
 const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCatalog() });
 
@@ -48,6 +49,16 @@ function Offers() {
 
   const offers = data.products.filter((p) => hasDiscount(p.discount_type, p.discount_value));
 
+  // Dynamic products array feeding into DriftWall (updates automatically when products are added)
+  const driftItems = useMemo(() => {
+    return data.products.map((p) => ({
+      image: p.image_url,
+      title: p.name,
+      href: `/product/${p.slug}`,
+      price: p.price,
+    }));
+  }, [data.products]);
+
   function handleCopy(code: string) {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
@@ -60,7 +71,7 @@ function Offers() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10 space-y-10 sm:space-y-16">
       
       {/* 1. Offers Hero Header */}
       <div className="flex flex-col gap-1.5 sm:gap-2">
@@ -74,7 +85,7 @@ function Offers() {
 
       {/* 2. Collectible Bakery Ticket Coupons */}
       {promoCodes && promoCodes.length > 0 && (
-        <section className="mt-6 sm:mt-8">
+        <section>
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <Tag className="size-4 text-berry" />
             <h2 className="font-display text-sm sm:text-lg font-bold text-cocoa">Active Bakery Coupons</h2>
@@ -161,7 +172,7 @@ function Offers() {
       )}
 
       {/* 3. Discounted Products Grid */}
-      <section className="mt-8 sm:mt-12">
+      <section>
         <div className="flex items-center justify-between gap-2 mb-4">
           <h2 className="font-display text-lg sm:text-2xl font-bold text-cocoa">
             This week&apos;s bakes on discount
@@ -192,6 +203,72 @@ function Offers() {
           </div>
         )}
       </section>
+
+      {/* 4. [NEW]: 3D Perspective DriftWall Product Showcase (All Dynamic Shop Products) */}
+      <section className="pt-4 border-t border-border/60">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 sm:mb-6">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <Sparkles className="size-4 text-berry" />
+              <span className="text-xs font-bold uppercase tracking-wider text-berry">Fresh from the Counter</span>
+            </div>
+            <h2 className="font-nimbus text-2xl sm:text-3xl lg:text-4xl font-bold text-cocoa">
+              Explore our whole bakery atelier
+            </h2>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-xl">
+              Hover and drift through every single small-batch cake, pastry, cookie, and seasonal treat in our kitchen. Click any tile to inspect or order.
+            </p>
+          </div>
+
+          <Button asChild className="rounded-full bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft w-fit">
+            <Link to="/shop">
+              Shop All Bakes <ArrowRight className="ml-1.5 size-4" />
+            </Link>
+          </Button>
+        </div>
+
+        {/* 3D Interactive DriftWall Container */}
+        <div className="relative w-full h-[460px] sm:h-[540px] lg:h-[600px] rounded-3xl overflow-hidden border border-[#2C1810]/15 bg-[#1A0E08] shadow-[0_16px_48px_rgba(44,24,16,0.18)]">
+          {/* Ambient Corner Atmosphere */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-20 -left-20 size-72 rounded-full bg-berry/20 blur-3xl"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-20 -right-20 size-72 rounded-full bg-amber-500/15 blur-3xl"
+          />
+
+          {/* Interactive 3D Drifting Tile Wall */}
+          <DriftWall
+            items={driftItems}
+            columns={5}
+            tileWidth={220}
+            tileHeight={144}
+            gap={18}
+            radius={16}
+            tilt={15}
+            turn={-12}
+            perspective={1200}
+            depth={110}
+            speed={36}
+            direction="up"
+            variance={0.45}
+            parallax={0.65}
+            lift={68}
+            fade={0.65}
+            dim={0.62}
+            overlayColor="#1A0E08"
+          />
+
+          {/* Bottom Floating Hint Overlay */}
+          <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full bg-black/60 px-4 py-1.5 text-[11px] font-medium text-white/90 backdrop-blur-md border border-white/10 shadow-lg">
+            <Layers className="size-3.5 text-berry" />
+            <span>Move cursor to tilt perspective • Click any bake to view details</span>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
