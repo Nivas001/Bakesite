@@ -32,7 +32,6 @@ import { CakeBuilderWidget } from "@/components/cake-builder-widget";
 import { BakerLaboratoryBento } from "@/components/baker-laboratory-bento";
 import { PolaroidMomentsWall } from "@/components/polaroid-moments-wall";
 import { CategoryPeekCarousel } from "@/components/category-peek-carousel";
-import { TextLoop } from "@/components/ui/text-loop";
 import { HeroRevampSection } from "@/components/hero-revamp-section";
 
 const catalogQuery = queryOptions({
@@ -114,34 +113,11 @@ function Home() {
   return (
     <div className="w-full overflow-x-clip -mt-3 sm:-mt-6">
       
-      {/* 1. Full-Width 3D Confectionery Hero Section */}
+      {/* 1. Full-Width 3D Confectionery Hero Section (Includes Seamless Integrated TextLoop) */}
       <HeroRevampSection />
 
-      {/* Kinetic Flowing Bakery Text Ribbon */}
-      <div className="w-full py-1.5 sm:py-3 overflow-hidden select-none pointer-events-auto bg-background">
-        <TextLoop
-          text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
-          shape="wave"
-          speed={48}
-          direction="forward"
-          separator="🥮"
-          curviness={10}
-          fontSize={22}
-          fontWeight={800}
-          fontFamily="var(--font-blogh), var(--font-body), sans-serif"
-          letterSpacing={2}
-          uppercase
-          color="#3A1C14"
-          ribbon
-          ribbonColor="#FDF1E8"
-          ribbonWidth={42}
-          pauseOnHover={false}
-          className="opacity-95"
-        />
-      </div>
-
       {/* Main Content Sections with Standard Spacing */}
-      <div className="w-full space-y-12 sm:space-y-20 pt-3 sm:pt-6">
+      <div className="w-full space-y-12 sm:space-y-20 pt-4 sm:pt-8">
         {/* 2. Daily Selection — Fresh from the counter */}
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
         <section className="section-shell section-shell-plain">
