@@ -33,6 +33,7 @@ import { BakerLaboratoryBento } from "@/components/baker-laboratory-bento";
 import { PolaroidMomentsWall } from "@/components/polaroid-moments-wall";
 import { CategoryPeekCarousel } from "@/components/category-peek-carousel";
 import { TextLoop } from "@/components/ui/text-loop";
+import { HeroRevampSection } from "@/components/hero-revamp-section";
 
 const catalogQuery = queryOptions({
   queryKey: ["catalog"],
@@ -113,66 +114,8 @@ function Home() {
   return (
     <div className="w-full space-y-12 sm:space-y-20 overflow-x-clip">
       
-      {/* Container 1: Hero Section */}
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10 pt-2">
-        <section className="relative">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-3 rounded-[2.5rem] bg-gradient-to-tr from-secondary via-accent to-berry/30 opacity-25 blur-3xl sm:-inset-6 sm:rounded-[3.5rem]"
-          />
-          <div className="glass-panel relative grid overflow-hidden rounded-2xl shadow-lift sm:rounded-[2.25rem] md:grid-cols-2">
-            <div className="flex flex-col justify-center gap-3.5 p-5 sm:gap-6 sm:p-10 lg:p-12">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/90 px-3 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] text-secondary-foreground backdrop-blur">
-                  <Sparkles className="size-3 text-berry" /> Baked to order
-                </span>
-                <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[10px] font-extrabold text-amber-900 dark:text-amber-300">
-                  ✨ Small-Batch Daily Bake
-                </span>
-              </div>
-
-              <h1 className="font-nimbus text-3xl font-bold leading-[1.18] text-cocoa sm:text-5xl lg:text-6xl tracking-tight">
-                Slow bakes, warm mornings, and a slot that{" "}
-                <span className="italic text-berry font-serif">suits you.</span>
-              </h1>
-              <p className="max-w-md text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                Everything at Ani Bakes is handcrafted in small batches the morning of your delivery. Choose
-                your bakes, pick a slot, and our head baker prepares your order fresh.
-              </p>
-              <div className="flex flex-col xs:flex-row gap-2.5 pt-1 sm:gap-3">
-                <Button
-                  asChild
-                  size="default"
-                  className="w-full xs:w-auto rounded-xl sm:rounded-2xl bg-berry px-5 sm:px-7 text-xs sm:text-sm font-semibold text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.02] hover:bg-berry/90 active:scale-95"
-                >
-                  <Link to="/shop">
-                    Browse bakery <ArrowRight className="ml-1.5 size-3.5" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="default"
-                  variant="outline"
-                  className="w-full xs:w-auto rounded-xl sm:rounded-2xl border-border bg-card/60 px-5 sm:px-7 text-xs sm:text-sm font-semibold backdrop-blur transition-transform duration-200 hover:scale-[1.02] active:scale-95"
-                >
-                  <Link to="/offers">See offers</Link>
-                </Button>
-              </div>
-            </div>
-            <div className="relative h-44 sm:h-64 md:h-full min-h-[180px] md:min-h-[420px]">
-              <img
-                src={heroImage}
-                alt="Freshly baked breads and pastries on a wooden bakery counter"
-                className="h-full w-full object-cover"
-              />
-              <div
-                aria-hidden
-                className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-l from-transparent to-background/20"
-              />
-            </div>
-          </div>
-        </section>
-      </div>
+      {/* 1. Revamped 3D Hero Section */}
+      <HeroRevampSection />
 
       {/* Kinetic Flowing Bakery Text Ribbon */}
       <div className="w-full py-1.5 sm:py-3 overflow-hidden select-none pointer-events-auto">
