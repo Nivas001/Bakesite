@@ -175,15 +175,15 @@ function Home() {
       </div>
 
       {/* Kinetic Flowing Bakery Text Ribbon */}
-      <div className="w-full py-1 -my-6 sm:-my-10 overflow-hidden select-none pointer-events-auto">
+      <div className="w-full -my-4 sm:-my-8 overflow-hidden select-none pointer-events-auto">
         <TextLoop
           text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
           shape="wave"
           speed={48}
           direction="forward"
           separator="🥮"
-          curviness={15}
-          fontSize={26}
+          curviness={10}
+          fontSize={22}
           fontWeight={800}
           fontFamily="var(--font-blogh), var(--font-body), sans-serif"
           letterSpacing={2}
@@ -191,7 +191,7 @@ function Home() {
           color="#3A1C14"
           ribbon
           ribbonColor="#FDF1E8"
-          ribbonWidth={52}
+          ribbonWidth={42}
           pauseOnHover={false}
           className="opacity-95"
         />

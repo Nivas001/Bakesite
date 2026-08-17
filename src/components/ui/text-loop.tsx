@@ -3,10 +3,7 @@ import { gsap } from "gsap";
 import "./text-loop.css";
 
 const VIEW_W = 1200;
-const VIEW_H = 520;
-const CX = VIEW_W / 2;
-const CY = VIEW_H / 2;
-const EDGE_PAD = 6;
+const EDGE_PAD = 4;
 
 export type TextLoopShape = "wave" | "circle" | "infinity" | "arch" | "line";
 export type TextLoopDirection = "forward" | "reverse";
@@ -33,9 +30,28 @@ export interface TextLoopProps {
   style?: React.CSSProperties;
 }
 
-const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number) => {
+const getViewHeight = (shape: TextLoopShape, curviness: number, ribbonWidth: number): number => {
   const c = Math.max(0, curviness);
-  const room = Math.max(20, CY - Math.max(0, ribbonWidth) / 2 - EDGE_PAD);
+  const rw = Math.max(0, ribbonWidth);
+  switch (shape) {
+    case "line":
+      return Math.round(Math.max(50, rw + 16));
+    case "wave":
+      return Math.round(Math.max(70, rw + c * 2 + 18));
+    case "arch":
+      return Math.round(Math.max(140, rw + c * 1.4 + 60));
+    case "circle":
+    case "infinity":
+    default:
+      return 520;
+  }
+};
+
+const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number, viewH: number) => {
+  const c = Math.max(0, curviness);
+  const CX = VIEW_W / 2;
+  const CY = viewH / 2;
+  const room = Math.max(10, CY - Math.max(0, ribbonWidth) / 2 - EDGE_PAD);
 
   switch (shape) {
     case "circle": {
@@ -62,7 +78,7 @@ const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number)
       return `M -320 ${CY} L ${VIEW_W + 320} ${CY}`;
     case "wave":
     default: {
-      const a = Math.min(c * 2.2, room * 2);
+      const a = Math.min(c * 1.2, room);
       return `M -320 ${CY} Q -160 ${CY - a} 0 ${CY} T 320 ${CY} T 640 ${CY} T 960 ${CY} T 1280 ${CY} T ${VIEW_W + 320} ${CY}`;
     }
   }
@@ -72,19 +88,19 @@ export function TextLoop({
   text = "Ani Bakes ✦ Fresh Dawn Bakes",
   shape = "wave",
   path,
-  speed = 55,
+  speed = 50,
   direction = "forward",
   separator = "✦",
-  curviness = 18,
-  fontSize = 32,
+  curviness = 12,
+  fontSize = 24,
   fontWeight = 700,
   fontFamily,
   letterSpacing = 1.5,
   uppercase = true,
   color = "#442723",
   ribbon = true,
-  ribbonColor = "#FBEBDF",
-  ribbonWidth = 50,
+  ribbonColor = "#FDF1E8",
+  ribbonWidth = 46,
   pauseOnHover = false,
   className = "",
   style = {},
@@ -100,9 +116,11 @@ export function TextLoop({
   const rawId = useId();
   const pathId = `text-loop-${rawId.replace(/:/g, "")}`;
 
+  const viewH = useMemo(() => getViewHeight(shape, curviness, ribbonWidth), [shape, curviness, ribbonWidth]);
+
   const d = useMemo(
-    () => path || buildPath(shape, curviness, ribbonWidth),
-    [path, shape, curviness, ribbonWidth]
+    () => path || buildPath(shape, curviness, ribbonWidth, viewH),
+    [path, shape, curviness, ribbonWidth, viewH]
   );
 
   const unit = useMemo(() => {
@@ -206,7 +224,7 @@ export function TextLoop({
     <div ref={rootRef} className={`text-loop ${className}`.trim()} style={style}>
       <svg
         className="text-loop-svg"
-        viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+        viewBox={`0 0 ${VIEW_W} ${viewH}`}
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label={text}
