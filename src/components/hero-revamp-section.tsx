@@ -82,8 +82,8 @@ export function HeroRevampSection() {
 
     const checkVisibility = () => {
       const rect = el.getBoundingClientRect();
-      // Hero is considered active in the header if its top is near top and bottom is below header (64px)
-      const isVisible = rect.top <= 64 && rect.bottom >= 48;
+      // Hero is active in header as long as the hero bottom is below the header (64px) and top is near top
+      const isVisible = rect.bottom > 64 && rect.top <= 200;
       setHeroTheme({
         inHero: isVisible,
         bgColor: isVisible ? activeFlavor.canvasBg : null,
@@ -92,31 +92,18 @@ export function HeroRevampSection() {
       });
     };
 
-    // Run initial check
+    // Run check immediately
     checkVisibility();
 
-    const observer = new IntersectionObserver(
-      () => {
-        checkVisibility();
-      },
-      {
-        root: null,
-        rootMargin: "-64px 0px 0px 0px",
-        threshold: [0, 0.05, 0.1, 0.2, 0.5, 0.8, 1],
-      }
-    );
-
-    observer.observe(el);
     window.addEventListener("scroll", checkVisibility, { passive: true });
     window.addEventListener("resize", checkVisibility, { passive: true });
 
     return () => {
-      observer.disconnect();
       window.removeEventListener("scroll", checkVisibility);
       window.removeEventListener("resize", checkVisibility);
       resetHeroTheme();
     };
-  }, [activeFlavor.canvasBg]);
+  }, [activeFlavor.canvasBg, activeFlavor.headingText, activeFlavor.highlightText]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();

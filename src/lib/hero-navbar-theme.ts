@@ -7,12 +7,27 @@ export interface HeroThemeState {
   accentColor: string | null;
 }
 
-let currentState: HeroThemeState = {
-  inHero: false,
-  bgColor: null,
-  textColor: null,
-  accentColor: null,
+const getInitialState = (): HeroThemeState => {
+  if (
+    typeof window !== "undefined" &&
+    (window.location.pathname === "/" || window.location.pathname === "")
+  ) {
+    return {
+      inHero: true,
+      bgColor: "#F5C2CD",
+      textColor: "#3A1018",
+      accentColor: "#9B112D",
+    };
+  }
+  return {
+    inHero: false,
+    bgColor: null,
+    textColor: null,
+    accentColor: null,
+  };
 };
+
+let currentState: HeroThemeState = getInitialState();
 
 const listeners = new Set<() => void>();
 
