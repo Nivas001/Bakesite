@@ -13,9 +13,14 @@ import {
   Leaf,
   Layers,
   ChevronRight,
+  ChevronLeft,
   Eye,
   MousePointerClick,
   Info,
+  Clock,
+  BookOpen,
+  Award,
+  Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -155,16 +160,85 @@ const WELLNESS_DIETS = [
   { id: "dairyfree", label: "Lactose-Free & Vegan", count: "7 Bakes" },
 ];
 
+const STORY_CHAPTERS = [
+  {
+    id: 1,
+    chapter: "CHAPTER 01",
+    tag: "Our Story",
+    title: "INDULGENCE WITH A HEALTHY TWIST",
+    subtitle: "Re-imagining classic French baking for modern vitality.",
+    narrative:
+      "In 2024, our founder embarked on a mission to solve a glaring problem in pastry: bakery treats looked irresistible but were loaded with inflammatory refined sugars, artificial premixes, and industrial palm oils. We asked ourselves — what if a chocolate muffin had 14g of clean protein, zero refined sugars, and the velvety crumb of a Parisian boulangerie? After 300+ recipe iterations, Ani Bakes was born.",
+    badge: "100% Monkfruit & Dates",
+    icon: Sparkles,
+    themeColor: "from-[#FFE8F0] via-[#FFD8E6] to-[#FFC2DA]",
+    textColor: "text-[#E83181]",
+    borderColor: "border-[#2C1810]",
+    image: "/about/wellness-chocolate-muffin.jpg",
+    imageAlt: "Healthy Indulgence Chocolate Muffin",
+  },
+  {
+    id: 2,
+    chapter: "CHAPTER 02",
+    tag: "Our Mission",
+    title: "EXPERIENCE THE FULL TASTE OF WELLNESS",
+    subtitle: "Custom dietary nutrition meets artisan counter craftsmanship.",
+    narrative:
+      "We believe wellness is inclusive. Whether you are living diabetic-friendly, tracking macro protein, avoiding dairy lactose, or managing gluten sensitivities, our small-batch laboratory creates treats that celebrate your lifestyle rather than restrict it. Every single bake undergoes rigorous macro testing before arriving on the morning counter.",
+    badge: "Dietary Inclusion",
+    icon: Compass,
+    themeColor: "from-[#FEF9B5] via-[#FFF380] to-[#FFE655]",
+    textColor: "text-[#4A154B]",
+    borderColor: "border-[#2C1810]",
+    image: "/about/walnut-cupcake-trio.jpg",
+    imageAlt: "Brownies and Cupcakes Variety",
+  },
+  {
+    id: 3,
+    chapter: "CHAPTER 03",
+    tag: "Our Vision",
+    title: "A NEW TASTE OF WELLNESS",
+    subtitle: "Guiding mindful indulgence without a single compromise on taste.",
+    narrative:
+      "Our vision extends beyond Pondicherry. We are establishing the blueprint for the bakery of the future: low-glycemic natural sweeteners, sustainable unbleached local flours, and zero artificial shelf-life chemicals. When healthy snacking is this decadent, wellness becomes an effortless, daily joy.",
+    badge: "Future of Pastry",
+    icon: Award,
+    themeColor: "from-[#C8F6EC] via-[#A6EFE0] to-[#88E4D2]",
+    textColor: "text-[#2E1854]",
+    borderColor: "border-[#2C1810]",
+    image: "/about/salted-caramel-cupcake.jpg",
+    imageAlt: "Decadent Salted Caramel Cupcake",
+  },
+  {
+    id: 4,
+    chapter: "CHAPTER 04",
+    tag: "Our Values",
+    title: "FROM OUR OVEN TO YOUR HEART",
+    subtitle: "The 4:00 AM dawn bake ritual and 36-hour sourdough patience.",
+    narrative:
+      "We do not cut corners. We do not use commercial speed leaveners. Every sourdough loaf is slowly cold retarded for 36 hours so wild lactobacilli break down gluten and fructans. Every morning at 4:00 AM, our bakers ignite the hearth decks so your reserved morning slot is warm, fragrant, and fresh.",
+    badge: "Slow Fermentation",
+    icon: Flame,
+    themeColor: "from-[#FFF8EC] via-[#FDF0DE] to-[#F8E3C8]",
+    textColor: "text-[#5C3218]",
+    borderColor: "border-[#2C1810]",
+    image: "/about/hero-3d-caramel-cake.jpg",
+    imageAlt: "Artisan Dawn Bake Craft",
+  },
+];
+
 export function AboutUsPage() {
   const [activeMuffinHotspot, setActiveMuffinHotspot] = useState<number>(1);
   const [activeAngle, setActiveAngle] = useState<CakeAngle>("front");
   const [activeDietFilter, setActiveDietFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"collage" | "story">("collage");
+  const [activeStoryChapter, setActiveStoryChapter] = useState<number>(1);
   const [isRotating, setIsRotating] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
 
   const heroCardRef = useRef<HTMLDivElement>(null);
   const currentCakeSpec = CAKE_SPECS[activeAngle];
+  const currentChapter = STORY_CHAPTERS[activeStoryChapter - 1]!;
 
   function handleSpinClick() {
     setIsRotating(true);
@@ -194,31 +268,31 @@ export function AboutUsPage() {
             </p>
           </div>
 
-          {/* Interactive Mode Toggle */}
-          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-secondary/60 border border-border/70 self-start md:self-auto shrink-0">
+          {/* Interactive Mode Toggle with High Contrast & Visual distinction */}
+          <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-secondary/80 border-2 border-border/80 shadow-xs self-start md:self-auto shrink-0">
             <button
               type="button"
               onClick={() => setViewMode("collage")}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === "collage"
-                  ? "bg-cocoa text-background shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-cocoa text-background shadow-md ring-2 ring-cocoa/20 scale-[1.02]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
-              <Layers className="size-3.5" />
+              <Layers className="size-4" />
               <span>Collage Artboard</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode("story")}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === "story"
-                  ? "bg-cocoa text-background shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-cocoa text-background shadow-md ring-2 ring-cocoa/20 scale-[1.02]"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
-              <Eye className="size-3.5" />
-              <span>Guided Story</span>
+              <BookOpen className="size-4" />
+              <span>Guided Story Mode</span>
             </button>
           </div>
         </div>
@@ -383,349 +457,558 @@ export function AboutUsPage() {
         </div>
       </section>
 
-      {/* 3. The 4 Multi-Layered Floating Pastel Collage Cards */}
-      <section className="py-8 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 ${viewMode === "collage" ? "lg:gap-y-12" : "gap-6"}`}>
+      {/* 3. DUAL VIEW SYSTEM: EITHER COLLAGE ARTBOARD OR GUIDED STORY */}
+
+      {viewMode === "collage" ? (
+        /* ===================================================================== */
+        /* MODE A: 🎨 DYNAMIC MULTI-LAYERED OVERLAPPING COLLAGE ARTBOARD */
+        /* ===================================================================== */
+        <section className="py-8 px-4 sm:px-6 max-w-6xl mx-auto animate-in fade-in duration-300">
           
-          {/* ========================================================= */}
-          {/* CARD 1: 🌸 PINK CARD ("Our Story: Indulgence With a Healthy Twist") */}
-          {/* ========================================================= */}
-          <div
-            className={`rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#FFE8F0] via-[#FFD8E6] to-[#FFC2DA] text-[#2C1810] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#2C1810] transition-all duration-300 hover:shadow-[10px_10px_0px_0px_#2C1810] relative overflow-hidden flex flex-col justify-between ${
-              viewMode === "collage" ? "lg:-rotate-1 lg:translate-y-2" : ""
-            }`}
-          >
-            {/* Soft Wavy Watermark Contours */}
-            <div className="absolute -top-12 -right-12 size-60 rounded-full bg-white/40 blur-2xl pointer-events-none" />
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3 py-1 text-[11px] font-black uppercase text-[#E83181] shadow-[2px_2px_0px_#2C1810]">
-                  Our Story
-                </span>
-                <span className="font-mono text-xs font-black text-[#2C1810]/70">PILLAR #01</span>
-              </div>
-
-              {/* Header in Blogh Font */}
-              <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-[#E83181] uppercase leading-tight tracking-tight drop-shadow-xs">
-                Indulgence with a healthy twist
-              </h2>
-
-              <p className="text-xs sm:text-sm text-[#4A1D2B] font-medium leading-relaxed">
-                We believe you shouldn't have to choose between rich artisanal pleasure and holistic wellness. Tap the numbered pins on our signature chocolate muffin to explore its clean pantry architecture.
-              </p>
-            </div>
-
-            {/* Muffin Image with 4 Interactive Numbered Pins */}
-            <div className="my-6 relative flex items-center justify-center">
-              <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/60 shadow-md">
-                <img
-                  src="/about/wellness-chocolate-muffin.jpg"
-                  alt="Healthy Indulgence Chocolate Muffin"
-                  className="w-full h-full object-cover select-none"
-                />
-
-                {/* 4 Interactive Star Hot-Spots (1, 2, 3, 4) */}
-                {/* Pin 1: Top-Left */}
-                <button
-                  type="button"
-                  onClick={() => setActiveMuffinHotspot(1)}
-                  className={`absolute top-[28%] left-[28%] size-8 rounded-full border-2 border-[#2C1810] flex items-center justify-center font-black text-xs transition-transform cursor-pointer shadow-[2px_2px_0px_#2C1810] ${
-                    activeMuffinHotspot === 1
-                      ? "bg-yellow-300 text-[#2C1810] scale-125 ring-4 ring-rose-400"
-                      : "bg-yellow-300/90 text-[#2C1810] hover:scale-110"
-                  }`}
-                  aria-label="Dairy Free Ingredient"
-                >
-                  1
-                </button>
-
-                {/* Pin 2: Bottom-Left */}
-                <button
-                  type="button"
-                  onClick={() => setActiveMuffinHotspot(2)}
-                  className={`absolute bottom-[24%] left-[30%] size-8 rounded-full border-2 border-[#2C1810] flex items-center justify-center font-black text-xs transition-transform cursor-pointer shadow-[2px_2px_0px_#2C1810] ${
-                    activeMuffinHotspot === 2
-                      ? "bg-yellow-300 text-[#2C1810] scale-125 ring-4 ring-rose-400"
-                      : "bg-yellow-300/90 text-[#2C1810] hover:scale-110"
-                  }`}
-                  aria-label="Wheat Flour Ingredient"
-                >
-                  2
-                </button>
-
-                {/* Pin 3: Top-Right */}
-                <button
-                  type="button"
-                  onClick={() => setActiveMuffinHotspot(3)}
-                  className={`absolute top-[32%] right-[28%] size-8 rounded-full border-2 border-[#2C1810] flex items-center justify-center font-black text-xs transition-transform cursor-pointer shadow-[2px_2px_0px_#2C1810] ${
-                    activeMuffinHotspot === 3
-                      ? "bg-yellow-300 text-[#2C1810] scale-125 ring-4 ring-rose-400"
-                      : "bg-yellow-300/90 text-[#2C1810] hover:scale-110"
-                  }`}
-                  aria-label="High Protein Blend"
-                >
-                  3
-                </button>
-
-                {/* Pin 4: Bottom-Right */}
-                <button
-                  type="button"
-                  onClick={() => setActiveMuffinHotspot(4)}
-                  className={`absolute bottom-[24%] right-[30%] size-8 rounded-full border-2 border-[#2C1810] flex items-center justify-center font-black text-xs transition-transform cursor-pointer shadow-[2px_2px_0px_#2C1810] ${
-                    activeMuffinHotspot === 4
-                      ? "bg-yellow-300 text-[#2C1810] scale-125 ring-4 ring-rose-400"
-                      : "bg-yellow-300/90 text-[#2C1810] hover:scale-110"
-                  }`}
-                  aria-label="Sugar Free Sweeteners"
-                >
-                  4
-                </button>
-              </div>
-            </div>
-
-            {/* Active Pin Detailed Info Callout */}
-            <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-4 shadow-[3px_3px_0px_#2C1810] space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-sans font-black text-sm text-[#E83181] uppercase tracking-wide">
-                  Pin #{activeMuffinHotspot}: {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.badge}
-                </span>
-                <span className="text-[10px] font-black uppercase text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
-                  {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.tag}
-                </span>
-              </div>
-              <p className="text-xs text-[#4A1D2B] leading-relaxed">
-                {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.description}
-              </p>
-              <div className="text-[11px] font-bold text-[#2C1810] pt-1 border-t border-rose-200">
-                ✨ {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.benefit}
-              </div>
-            </div>
-          </div>
-
-          {/* ========================================================= */}
-          {/* CARD 2: 💛 YELLOW CARD ("Our Mission: Experience the Full Taste of Wellness") */}
-          {/* ========================================================= */}
-          <div
-            className={`rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#FEF9B5] via-[#FFF380] to-[#FFE655] text-[#2C1810] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#2C1810] transition-all duration-300 hover:shadow-[10px_10px_0px_0px_#2C1810] relative overflow-hidden flex flex-col justify-between ${
-              viewMode === "collage" ? "lg:rotate-1 lg:-translate-y-2" : ""
-            }`}
-          >
-            {/* Contour Glow */}
-            <div className="absolute -bottom-10 -left-10 size-60 rounded-full bg-white/40 blur-2xl pointer-events-none" />
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3 py-1 text-[11px] font-black uppercase text-[#4A154B] shadow-[2px_2px_0px_#2C1810]">
-                  Our Mission
-                </span>
-                <span className="font-mono text-xs font-black text-[#2C1810]/70">PILLAR #02</span>
-              </div>
-
-              {/* Header in Blogh Font */}
-              <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-[#4A154B] uppercase leading-tight tracking-tight drop-shadow-xs">
-                Experience the full taste of wellness
-              </h2>
-
-              <p className="text-xs sm:text-sm text-[#4A154B] font-medium leading-relaxed">
-                Browse our complete range of healthy bakery snacks — each product crafted to meet your lifestyle without sacrificing flavor, rich aroma, or texture.
-              </p>
-            </div>
-
-            {/* Visual Bakery Trio with Die-Cut Floating Stickers */}
-            <div className="my-6 relative flex items-center justify-center">
-              <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/70 shadow-md">
-                <img
-                  src="/about/walnut-cupcake-trio.jpg"
-                  alt="Gourmet Brownies and Cupcakes"
-                  className="w-full h-full object-cover select-none"
-                />
-
-                {/* Floating Die-Cut Badges (Matching Reference) */}
-                <div className="absolute top-3 right-3 pointer-events-none">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#5C3218] text-amber-200 border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000]">
-                    LACTOS-FREE
-                  </span>
-                </div>
-
-                <div className="absolute top-1/2 -left-1 -translate-y-1/2 pointer-events-none">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-yellow-300 text-yellow-950 border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] -rotate-6">
-                    SUGAR-FREE
-                  </span>
-                </div>
-
-                <div className="absolute bottom-3 right-4 pointer-events-none">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#FF1493] text-white border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] rotate-3">
-                    HIGH-PROTEIN
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Interactive Diet Filter Matrix */}
-            <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-3.5 shadow-[3px_3px_0px_#2C1810] space-y-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-[#4A154B] block">
-                Explore Recipes By Wellness Target
+          <div className="flex items-center justify-between mb-6 pb-2 border-b border-border/40">
+            <div className="flex items-center gap-2">
+              <span className="flex size-2 rounded-full bg-berry" />
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                Scrapbook Lookbook View · 4 Artisan Pillars
               </span>
-              <div className="grid grid-cols-2 gap-1.5">
-                {WELLNESS_DIETS.map((diet) => (
+            </div>
+            <span className="text-xs font-semibold text-muted-foreground">
+              Hover & click pins on cards to explore
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+            
+            {/* 🌸 PINK CARD ("Our Story: Indulgence With a Healthy Twist") */}
+            <div className="rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#FFE8F0] via-[#FFD8E6] to-[#FFC2DA] text-[#2C1810] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#2C1810] hover:shadow-[12px_12px_0px_0px_#2C1810] transition-all duration-300 relative overflow-hidden flex flex-col justify-between lg:-rotate-1 lg:translate-y-1">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3 py-1 text-[11px] font-black uppercase text-[#E83181] shadow-[2px_2px_0px_#2C1810]">
+                    Our Story
+                  </span>
+                  <span className="font-mono text-xs font-black text-[#2C1810]/70">PILLAR #01</span>
+                </div>
+
+                <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-[#E83181] uppercase leading-tight tracking-tight drop-shadow-xs">
+                  INDULGENCE WITH A HEALTHY TWIST
+                </h2>
+
+                <p className="text-xs sm:text-sm text-[#4A1D2B] font-medium leading-relaxed">
+                  We believe you shouldn't have to choose between rich artisanal pleasure and holistic wellness. Tap the numbered pins on our signature chocolate muffin to explore its clean pantry architecture.
+                </p>
+              </div>
+
+              {/* Muffin Image with 4 Interactive Numbered Pins */}
+              <div className="my-6 relative flex items-center justify-center">
+                <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/60 shadow-md">
+                  <img
+                    src="/about/wellness-chocolate-muffin.jpg"
+                    alt="Healthy Indulgence Chocolate Muffin"
+                    className="w-full h-full object-cover select-none"
+                  />
+
+                  {/* Pin 1 */}
                   <button
-                    key={diet.id}
                     type="button"
-                    onClick={() => setActiveDietFilter(diet.id)}
-                    className={`py-1.5 px-2 rounded-xl text-left border-2 text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
-                      activeDietFilter === diet.id
-                        ? "bg-[#4A154B] text-white border-[#2C1810] shadow-[2px_2px_0px_#2C1810]"
-                        : "bg-white/80 text-[#4A154B] border-[#2C1810]/40 hover:bg-yellow-200"
+                    onClick={() => setActiveMuffinHotspot(1)}
+                    className={`absolute top-[28%] left-[28%] size-8 rounded-full border-2 border-[#2C1810] flex items-center justify-center font-black text-xs transition-transform cursor-pointer shadow-[2px_2px_0px_#2C1810] ${
+                      activeMuffinHotspot === 1
+                        ? "bg-yellow-300 text-[#2C1810] scale-125 ring-4 ring-rose-400"
+                        : "bg-yellow-300/90 text-[#2C1810] hover:scale-110"
                     }`}
+                    aria-label="Dairy Free Ingredient"
                   >
-                    <span className="truncate text-[11px]">{diet.label}</span>
-                    <span className="text-[10px] opacity-80 shrink-0 font-mono ml-1">{diet.count}</span>
+                    1
                   </button>
-                ))}
+
+                  {/* Pin 2 */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveMuffinHotspot(2)}
+                    className={`absolute bottom-[24%] left-[30%] size-8 rounded-full border-2 border-[#2C1810] flex items-center justify-center font-black text-xs transition-transform cursor-pointer shadow-[2px_2px_0px_#2C1810] ${
+                      activeMuffinHotspot === 2
+                        ? "bg-yellow-300 text-[#2C1810] scale-125 ring-4 ring-rose-400"
+                        : "bg-yellow-300/90 text-[#2C1810] hover:scale-110"
+                    }`}
+                    aria-label="Wheat Flour Ingredient"
+                  >
+                    2
+                  </button>
+
+                  {/* Pin 3 */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveMuffinHotspot(3)}
+                    className={`absolute top-[32%] right-[28%] size-8 rounded-full border-2 border-[#2C1810] flex items-center justify-center font-black text-xs transition-transform cursor-pointer shadow-[2px_2px_0px_#2C1810] ${
+                      activeMuffinHotspot === 3
+                        ? "bg-yellow-300 text-[#2C1810] scale-125 ring-4 ring-rose-400"
+                        : "bg-yellow-300/90 text-[#2C1810] hover:scale-110"
+                    }`}
+                    aria-label="High Protein Blend"
+                  >
+                    3
+                  </button>
+
+                  {/* Pin 4 */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveMuffinHotspot(4)}
+                    className={`absolute bottom-[24%] right-[30%] size-8 rounded-full border-2 border-[#2C1810] flex items-center justify-center font-black text-xs transition-transform cursor-pointer shadow-[2px_2px_0px_#2C1810] ${
+                      activeMuffinHotspot === 4
+                        ? "bg-yellow-300 text-[#2C1810] scale-125 ring-4 ring-rose-400"
+                        : "bg-yellow-300/90 text-[#2C1810] hover:scale-110"
+                    }`}
+                    aria-label="Sugar Free Sweeteners"
+                  >
+                    4
+                  </button>
+                </div>
               </div>
+
+              {/* Active Pin Detailed Info Callout */}
+              <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-4 shadow-[3px_3px_0px_#2C1810] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-sans font-black text-sm text-[#E83181] uppercase tracking-wide">
+                    Pin #{activeMuffinHotspot}: {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.badge}
+                  </span>
+                  <span className="text-[10px] font-black uppercase text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                    {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.tag}
+                  </span>
+                </div>
+                <p className="text-xs text-[#4A1D2B] leading-relaxed">
+                  {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.description}
+                </p>
+                <div className="text-[11px] font-bold text-[#2C1810] pt-1 border-t border-rose-200">
+                  ✨ {MUFFIN_HOTSPOTS[activeMuffinHotspot - 1]?.benefit}
+                </div>
+              </div>
+            </div>
+
+            {/* 💛 YELLOW CARD ("Our Mission: Experience the Full Taste of Wellness") */}
+            <div className="rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#FEF9B5] via-[#FFF380] to-[#FFE655] text-[#2C1810] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#2C1810] hover:shadow-[12px_12px_0px_0px_#2C1810] transition-all duration-300 relative overflow-hidden flex flex-col justify-between lg:rotate-1 lg:-translate-y-1">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3 py-1 text-[11px] font-black uppercase text-[#4A154B] shadow-[2px_2px_0px_#2C1810]">
+                    Our Mission
+                  </span>
+                  <span className="font-mono text-xs font-black text-[#2C1810]/70">PILLAR #02</span>
+                </div>
+
+                <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-[#4A154B] uppercase leading-tight tracking-tight drop-shadow-xs">
+                  EXPERIENCE THE FULL TASTE OF WELLNESS
+                </h2>
+
+                <p className="text-xs sm:text-sm text-[#4A154B] font-medium leading-relaxed">
+                  Browse our complete range of healthy bakery snacks — each product crafted to meet your lifestyle without sacrificing flavor, rich aroma, or texture.
+                </p>
+              </div>
+
+              {/* Visual Bakery Trio with Die-Cut Floating Stickers */}
+              <div className="my-6 relative flex items-center justify-center">
+                <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/70 shadow-md">
+                  <img
+                    src="/about/walnut-cupcake-trio.jpg"
+                    alt="Gourmet Brownies and Cupcakes"
+                    className="w-full h-full object-cover select-none"
+                  />
+
+                  <div className="absolute top-3 right-3 pointer-events-none">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#5C3218] text-amber-200 border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000]">
+                      LACTOS-FREE
+                    </span>
+                  </div>
+
+                  <div className="absolute top-1/2 -left-1 -translate-y-1/2 pointer-events-none">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-yellow-300 text-yellow-950 border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] -rotate-6">
+                      SUGAR-FREE
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-3 right-4 pointer-events-none">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#FF1493] text-white border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] rotate-3">
+                      HIGH-PROTEIN
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Diet Filter Matrix */}
+              <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-3.5 shadow-[3px_3px_0px_#2C1810] space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#4A154B] block">
+                  Explore Recipes By Wellness Target
+                </span>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {WELLNESS_DIETS.map((diet) => (
+                    <button
+                      key={diet.id}
+                      type="button"
+                      onClick={() => setActiveDietFilter(diet.id)}
+                      className={`py-1.5 px-2 rounded-xl text-left border-2 text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
+                        activeDietFilter === diet.id
+                          ? "bg-[#4A154B] text-white border-[#2C1810] shadow-[2px_2px_0px_#2C1810]"
+                          : "bg-white/80 text-[#4A154B] border-[#2C1810]/40 hover:bg-yellow-200"
+                      }`}
+                    >
+                      <span className="truncate text-[11px]">{diet.label}</span>
+                      <span className="text-[10px] opacity-80 shrink-0 font-mono ml-1">{diet.count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 🌿 MINT GREEN CARD ("Our Vision: A New Taste of Wellness") */}
+            <div className="rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#C8F6EC] via-[#A6EFE0] to-[#88E4D2] text-[#2C1810] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#2C1810] hover:shadow-[12px_12px_0px_0px_#2C1810] transition-all duration-300 relative overflow-hidden flex flex-col justify-between lg:rotate-1 lg:translate-y-2">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3 py-1 text-[11px] font-black uppercase text-[#2E1854] shadow-[2px_2px_0px_#2C1810]">
+                    Our Vision
+                  </span>
+                  <span className="font-mono text-xs font-black text-[#2C1810]/70">PILLAR #03</span>
+                </div>
+
+                <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-[#2E1854] uppercase leading-tight tracking-tight drop-shadow-xs">
+                  A NEW TASTE OF WELLNESS
+                </h2>
+
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <span className="rounded-xl bg-white/80 border-2 border-[#2C1810] p-2.5 text-[10.5px] font-black text-[#2E1854] uppercase tracking-wide text-center shadow-[2px_2px_0px_#2C1810]">
+                    Healthy snacking has never been this delicious
+                  </span>
+                  <span className="rounded-xl bg-white/80 border-2 border-[#2C1810] p-2.5 text-[10.5px] font-black text-[#2E1854] uppercase tracking-wide text-center shadow-[2px_2px_0px_#2C1810]">
+                    Incredibly satisfying and fulfilling
+                  </span>
+                </div>
+              </div>
+
+              {/* Salted Caramel Cupcake Showcase with Floating Labels */}
+              <div className="my-6 relative flex items-center justify-center">
+                <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/70 shadow-md group">
+                  <img
+                    src="/about/salted-caramel-cupcake.jpg"
+                    alt="Decadent Salted Caramel Cupcake"
+                    className="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-105"
+                  />
+
+                  <div className="absolute top-4 left-3 pointer-events-none">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-yellow-300 text-yellow-950 border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] -rotate-12">
+                      SUGAR-FREE
+                    </span>
+                  </div>
+
+                  <div className="absolute top-6 right-3 pointer-events-none">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#5C3218] text-amber-200 border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] rotate-6">
+                      LACTOS-FREE
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-6 right-3 pointer-events-none">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#FF1493] text-white border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] -rotate-3">
+                      HIGH-PROTEIN
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-4 shadow-[3px_3px_0px_#2C1810] text-center">
+                <p className="font-nimbus text-xs sm:text-sm font-bold text-[#2E1854] uppercase tracking-wide">
+                  Guiding Healthy Indulgence with Zero Compromise on Flavor
+                </p>
+              </div>
+            </div>
+
+            {/* 🧁 CREAM-BEIGE CARD ("Our Values: From Our Oven to Your Heart") */}
+            <div className="rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#FFF8EC] via-[#FDF0DE] to-[#F8E3C8] text-[#2C1810] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#2C1810] hover:shadow-[12px_12px_0px_0px_#2C1810] transition-all duration-300 relative overflow-hidden flex flex-col justify-between lg:-rotate-1 lg:translate-y-1">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3 py-1 text-[11px] font-black uppercase text-[#5C3218] shadow-[2px_2px_0px_#2C1810]">
+                    Our Values
+                  </span>
+                  <span className="font-mono text-xs font-black text-[#2C1810]/70">PILLAR #04</span>
+                </div>
+
+                <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-[#5C3218] uppercase leading-tight tracking-tight drop-shadow-xs">
+                  FROM OUR OVEN TO YOUR HEART
+                </h2>
+
+                <p className="text-xs sm:text-sm text-[#5C3218] font-medium leading-relaxed">
+                  Experience muffins, celebration cakes, and sourdoughs that put health, purity, and honesty first.
+                </p>
+              </div>
+
+              {/* 4 Core Bakery Craft Value Pillars */}
+              <div className="grid grid-cols-2 gap-3 my-6">
+                <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
+                  <span className="text-xl">🔥</span>
+                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">4:00 AM Dawn Bake</h3>
+                  <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
+                    Baked fresh every single morning for your slot.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
+                  <span className="text-xl">🌾</span>
+                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">36-Hour Wild Ferment</h3>
+                  <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
+                    Slow cold proofing for gut health and open crumb.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
+                  <span className="text-xl">🧈</span>
+                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">100% French Butter</h3>
+                  <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
+                    84% butterfat dairy. Zero margarine or palm oil.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
+                  <span className="text-xl">🍫</span>
+                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">70% Belgian Couverture</h3>
+                  <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
+                    Real cocoa butter and pure Bourbon vanilla beans.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-3 shadow-[3px_3px_0px_#2C1810] flex items-center justify-between text-xs font-bold text-[#5C3218]">
+                <span>Zero Chemical Preservatives</span>
+                <span className="text-emerald-700 font-extrabold">✓ Guaranteed Purity</span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      ) : (
+        /* ===================================================================== */
+        /* MODE B: 📖 GUIDED STORY MODE (CHAPTER-BY-CHAPTER SPOTLIGHT IMMERSION) */
+        /* ===================================================================== */
+        <section className="py-8 px-4 sm:px-6 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-3 duration-400">
+          
+          {/* Chapter Timeline Navigation Stepper */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                The Bakery Chronicles · Chapter {activeStoryChapter} of 4
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={activeStoryChapter === 1}
+                  onClick={() => setActiveStoryChapter((prev) => Math.max(1, prev - 1))}
+                  className="size-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all"
+                  aria-label="Previous Chapter"
+                >
+                  <ChevronLeft className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  disabled={activeStoryChapter === 4}
+                  onClick={() => setActiveStoryChapter((prev) => Math.min(4, prev + 1))}
+                  className="size-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all"
+                  aria-label="Next Chapter"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Stepper Buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {STORY_CHAPTERS.map((ch) => (
+                <button
+                  key={ch.id}
+                  type="button"
+                  onClick={() => setActiveStoryChapter(ch.id)}
+                  className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+                    activeStoryChapter === ch.id
+                      ? "border-[#2C1810] bg-cocoa text-white shadow-md scale-[1.02]"
+                      : "border-border/60 bg-card hover:bg-secondary text-foreground"
+                  }`}
+                >
+                  <div className="flex items-center justify-between text-[10px] font-black uppercase opacity-80 mb-1">
+                    <span>{ch.chapter}</span>
+                    <span>{ch.tag}</span>
+                  </div>
+                  <p className="text-xs font-bold line-clamp-1">
+                    {ch.title}
+                  </p>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* ========================================================= */}
-          {/* CARD 3: 🌿 MINT GREEN CARD ("Our Vision: A New Taste of Wellness") */}
-          {/* ========================================================= */}
+          {/* Full-Width Spotlight Chapter Stage */}
           <div
-            className={`rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#C8F6EC] via-[#A6EFE0] to-[#88E4D2] text-[#2C1810] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#2C1810] transition-all duration-300 hover:shadow-[10px_10px_0px_0px_#2C1810] relative overflow-hidden flex flex-col justify-between ${
-              viewMode === "collage" ? "lg:rotate-1 lg:translate-y-4" : ""
-            }`}
+            className={`rounded-[2.5rem] border-[3.5px] ${currentChapter.borderColor} bg-gradient-to-br ${currentChapter.themeColor} text-[#2C1810] p-6 sm:p-10 shadow-[10px_10px_0px_0px_#2C1810] transition-all duration-500 relative overflow-hidden`}
           >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3 py-1 text-[11px] font-black uppercase text-[#2E1854] shadow-[2px_2px_0px_#2C1810]">
-                  Our Vision
-                </span>
-                <span className="font-mono text-xs font-black text-[#2C1810]/70">PILLAR #03</span>
-              </div>
-
-              {/* Header in Blogh Font */}
-              <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-[#2E1854] uppercase leading-tight tracking-tight drop-shadow-xs">
-                A new taste of wellness
-              </h2>
-
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                <span className="rounded-xl bg-white/80 border-2 border-[#2C1810] p-2.5 text-[10.5px] font-black text-[#2E1854] uppercase tracking-wide text-center shadow-[2px_2px_0px_#2C1810]">
-                  Healthy snacking has never been this delicious
-                </span>
-                <span className="rounded-xl bg-white/80 border-2 border-[#2C1810] p-2.5 text-[10.5px] font-black text-[#2E1854] uppercase tracking-wide text-center shadow-[2px_2px_0px_#2C1810]">
-                  Incredibly satisfying and fulfilling
-                </span>
-              </div>
-            </div>
-
-            {/* Salted Caramel Cupcake Showcase with Floating Labels */}
-            <div className="my-6 relative flex items-center justify-center">
-              <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/70 shadow-md group">
-                <img
-                  src="/about/salted-caramel-cupcake.jpg"
-                  alt="Decadent Salted Caramel Cupcake"
-                  className="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-105"
-                />
-
-                {/* Floating Die-Cut Labels */}
-                <div className="absolute top-4 left-3 pointer-events-none">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-yellow-300 text-yellow-950 border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] -rotate-12">
-                    SUGAR-FREE
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Narrative Story Column (7 Cols) */}
+              <div className="lg:col-span-7 space-y-5">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3.5 py-1 text-xs font-black uppercase shadow-[2px_2px_0px_#2C1810]">
+                    {currentChapter.chapter} · {currentChapter.tag}
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#2C1810] text-white text-[11px] font-black uppercase shadow-xs">
+                    {currentChapter.badge}
                   </span>
                 </div>
 
-                <div className="absolute top-6 right-3 pointer-events-none">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#5C3218] text-amber-200 border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] rotate-6">
-                    LACTOS-FREE
-                  </span>
+                <h2 className={`font-blogh text-3xl sm:text-5xl ${currentChapter.textColor} uppercase leading-tight drop-shadow-xs`}>
+                  {currentChapter.title}
+                </h2>
+
+                <p className="text-sm sm:text-base font-semibold text-[#2C1810]/90">
+                  {currentChapter.subtitle}
+                </p>
+
+                <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-5 shadow-[3px_3px_0px_#2C1810]">
+                  <p className="text-xs sm:text-sm text-[#2C1810] font-medium leading-relaxed">
+                    "{currentChapter.narrative}"
+                  </p>
                 </div>
 
-                <div className="absolute bottom-6 right-3 pointer-events-none">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full bg-[#FF1493] text-white border-2 border-[#2C1810] text-[10px] font-black uppercase shadow-[2px_2px_0px_#000] -rotate-3">
-                    HIGH-PROTEIN
-                  </span>
+                {/* Chapter Interactive Tooling */}
+                {activeStoryChapter === 1 && (
+                  <div className="rounded-2xl border-2 border-[#2C1810] bg-white/95 p-4 shadow-[3px_3px_0px_#2C1810] space-y-3">
+                    <span className="font-sans font-black text-xs uppercase text-[#E83181] block">
+                      Active Chapter Ingredient Hot-Spot Explorer:
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      {MUFFIN_HOTSPOTS.map((hs) => (
+                        <button
+                          key={hs.id}
+                          type="button"
+                          onClick={() => setActiveMuffinHotspot(hs.id)}
+                          className={`p-2 rounded-xl border text-left text-xs font-bold transition-all cursor-pointer ${
+                            activeMuffinHotspot === hs.id
+                              ? "bg-rose-50 border-rose-500 text-rose-950 font-black shadow-2xs"
+                              : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+                          }`}
+                        >
+                          <span className="block text-[10px] opacity-70">Pin #{hs.id}</span>
+                          <span className="truncate block">{hs.badge}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {activeStoryChapter === 2 && (
+                  <div className="rounded-2xl border-2 border-[#2C1810] bg-white/95 p-4 shadow-[3px_3px_0px_#2C1810] space-y-3">
+                    <span className="font-sans font-black text-xs uppercase text-[#4A154B] block">
+                      Mission Dietary Filter Testing:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {WELLNESS_DIETS.map((d) => (
+                        <button
+                          key={d.id}
+                          type="button"
+                          onClick={() => setActiveDietFilter(d.id)}
+                          className={`px-3 py-1.5 rounded-full border text-xs font-bold cursor-pointer transition-all ${
+                            activeDietFilter === d.id
+                              ? "bg-[#4A154B] text-white border-[#2C1810]"
+                              : "bg-white text-zinc-700 hover:bg-zinc-100"
+                          }`}
+                        >
+                          {d.label} ({d.count})
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {activeStoryChapter === 3 && (
+                  <div className="rounded-2xl border-2 border-[#2C1810] bg-white/95 p-4 shadow-[3px_3px_0px_#2C1810] grid grid-cols-2 gap-3">
+                    <div className="text-center p-2 rounded-xl bg-teal-50 border border-teal-200">
+                      <p className="text-[10px] font-bold text-teal-800 uppercase">Target Glycemic Index</p>
+                      <p className="font-sans font-black text-lg text-teal-950">&lt; 35 GI (Low)</p>
+                    </div>
+                    <div className="text-center p-2 rounded-xl bg-teal-50 border border-teal-200">
+                      <p className="text-[10px] font-bold text-teal-800 uppercase">Satiety Score</p>
+                      <p className="font-sans font-black text-lg text-teal-950">98% Satisfying</p>
+                    </div>
+                  </div>
+                )}
+
+                {activeStoryChapter === 4 && (
+                  <div className="rounded-2xl border-2 border-[#2C1810] bg-white/95 p-4 shadow-[3px_3px_0px_#2C1810] space-y-2">
+                    <span className="font-sans font-black text-xs uppercase text-[#5C3218] block">
+                      Our Morning Hearth Schedule:
+                    </span>
+                    <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-bold">
+                      <div className="p-2 rounded-xl bg-amber-50 border border-amber-200">
+                        <p className="text-amber-800">4:00 AM</p>
+                        <p className="text-amber-950">Deck Hearth Fire</p>
+                      </div>
+                      <div className="p-2 rounded-xl bg-amber-50 border border-amber-200">
+                        <p className="text-amber-800">6:30 AM</p>
+                        <p className="text-amber-950">First Sourdough Out</p>
+                      </div>
+                      <div className="p-2 rounded-xl bg-amber-50 border border-amber-200">
+                        <p className="text-amber-800">8:00 AM</p>
+                        <p className="text-amber-950">Counter Opens</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Chapter Next / Prev Step Controls */}
+                <div className="flex items-center justify-between pt-2">
+                  <Button
+                    variant="outline"
+                    disabled={activeStoryChapter === 1}
+                    onClick={() => setActiveStoryChapter((prev) => Math.max(1, prev - 1))}
+                    className="rounded-full border-[#2C1810] text-[#2C1810] hover:bg-white/50 font-bold text-xs cursor-pointer"
+                  >
+                    <ChevronLeft className="size-4 mr-1" />
+                    <span>Previous Chapter</span>
+                  </Button>
+
+                  {activeStoryChapter < 4 ? (
+                    <Button
+                      onClick={() => setActiveStoryChapter((prev) => Math.min(4, prev + 1))}
+                      className="rounded-full bg-[#2C1810] text-white hover:bg-[#2C1810]/90 font-bold text-xs cursor-pointer shadow-md"
+                    >
+                      <span>Next: Chapter {activeStoryChapter + 1}</span>
+                      <ChevronRight className="size-4 ml-1" />
+                    </Button>
+                  ) : (
+                    <Button
+                      asChild
+                      className="rounded-full bg-emerald-700 text-white hover:bg-emerald-600 font-bold text-xs cursor-pointer shadow-md"
+                    >
+                      <Link to="/shop">
+                        <span>Explore Our Counter Bakes</span>
+                        <ArrowRight className="size-4 ml-1" />
+                      </Link>
+                    </Button>
+                  )}
                 </div>
               </div>
-            </div>
 
-            {/* Vision Quote Footer */}
-            <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-4 shadow-[3px_3px_0px_#2C1810] text-center">
-              <p className="font-nimbus text-xs sm:text-sm font-bold text-[#2E1854] uppercase tracking-wide">
-                Guiding Healthy Indulgence with Zero Compromise on Flavor
-              </p>
+              {/* High-Resolution Chapter Visual Column (5 Cols) */}
+              <div className="lg:col-span-5 flex flex-col items-center justify-center">
+                <div className="relative size-72 sm:size-96 rounded-3xl overflow-hidden border-4 border-[#2C1810] bg-white shadow-2xl">
+                  <img
+                    src={currentChapter.image}
+                    alt={currentChapter.imageAlt}
+                    className="w-full h-full object-cover select-none animate-in fade-in zoom-in-95 duration-500"
+                  />
+                  <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md rounded-2xl border-2 border-[#2C1810] p-3 shadow-md">
+                    <p className="font-blogh text-xs sm:text-sm text-[#2C1810] uppercase text-center">
+                      Ani Bakes · Certified Artisan Standard
+                    </p>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          {/* ========================================================= */}
-          {/* CARD 4: 🧁 CREAM-BEIGE CARD ("Our Values: From Our Oven to Your Heart") */}
-          {/* ========================================================= */}
-          <div
-            className={`rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#FFF8EC] via-[#FDF0DE] to-[#F8E3C8] text-[#2C1810] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#2C1810] transition-all duration-300 hover:shadow-[10px_10px_0px_0px_#2C1810] relative overflow-hidden flex flex-col justify-between ${
-              viewMode === "collage" ? "lg:-rotate-1 lg:translate-y-2" : ""
-            }`}
-          >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border-2 border-[#2C1810] px-3 py-1 text-[11px] font-black uppercase text-[#5C3218] shadow-[2px_2px_0px_#2C1810]">
-                  Our Values
-                </span>
-                <span className="font-mono text-xs font-black text-[#2C1810]/70">PILLAR #04</span>
-              </div>
-
-              {/* Header in Blogh Font */}
-              <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-[#5C3218] uppercase leading-tight tracking-tight drop-shadow-xs">
-                From our oven to your heart
-              </h2>
-
-              <p className="text-xs sm:text-sm text-[#5C3218] font-medium leading-relaxed">
-                Experience muffins, celebration cakes, and sourdoughs that put health, purity, and honesty first.
-              </p>
-            </div>
-
-            {/* 4 Core Bakery Craft Value Pillars */}
-            <div className="grid grid-cols-2 gap-3 my-6">
-              <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
-                <span className="text-xl">🔥</span>
-                <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">4:00 AM Dawn Bake</h3>
-                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
-                  Baked fresh every single morning for your slot.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
-                <span className="text-xl">🌾</span>
-                <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">36-Hour Wild Ferment</h3>
-                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
-                  Slow cold proofing for gut health and open crumb.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
-                <span className="text-xl">🧈</span>
-                <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">100% French Butter</h3>
-                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
-                  84% butterfat dairy. Zero margarine or palm oil.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
-                <span className="text-xl">🍫</span>
-                <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">70% Belgian Couverture</h3>
-                <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
-                  Real cocoa butter and pure Bourbon vanilla beans.
-                </p>
-              </div>
-            </div>
-
-            {/* Bottom Value Guarantee Pill */}
-            <div className="rounded-2xl border-2 border-[#2C1810] bg-white/90 p-3 shadow-[3px_3px_0px_#2C1810] flex items-center justify-between text-xs font-bold text-[#5C3218]">
-              <span>Zero Chemical Preservatives</span>
-              <span className="text-emerald-700 font-extrabold">✓ Guaranteed Purity</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 4. Bottom Bakery Call-To-Action */}
       <section className="py-10 px-4 sm:px-6 max-w-4xl mx-auto text-center">
