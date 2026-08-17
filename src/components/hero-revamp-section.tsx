@@ -101,14 +101,14 @@ export function HeroRevampSection() {
         <div className="w-full max-w-[98vw] mx-auto text-center px-2 sm:px-4 overflow-hidden pt-1 sm:pt-2">
           <h1
             style={{ color: activeFlavor.headingText }}
-            className="font-blogh tracking-tight leading-none transition-colors duration-500 drop-shadow-xs text-center text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.25rem] 2xl:text-[5.75rem] lg:whitespace-nowrap"
+            className="font-blogh tracking-tight leading-[1.05] transition-colors duration-500 drop-shadow-xs text-center text-3xl sm:text-5xl lg:text-[clamp(2.5rem,4.1vw,4.6rem)] lg:whitespace-nowrap"
           >
             <span className="block lg:inline mr-0 lg:mr-3.5 opacity-90">
               PURE JOY IN
             </span>
             <span
               style={{ color: activeFlavor.highlightText }}
-              className="transition-colors duration-500 block lg:inline mt-1 lg:mt-0"
+              className="transition-colors duration-500 block lg:inline mt-0.5 lg:mt-0"
             >
               {activeFlavor.headlineHighlight}
             </span>
