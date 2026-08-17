@@ -7,7 +7,7 @@ import { getCatalog } from "@/lib/catalog.functions";
 import { getPublicOfferCodes } from "@/lib/offers.functions";
 import { ProductCard } from "@/components/product-card";
 import { hasDiscount } from "@/lib/pricing";
-import { Tag, Copy, Check, ShoppingBag, ArrowRight, Sparkles, Layers } from "lucide-react";
+import { Tag, Copy, Check, ShoppingBag, ArrowRight, Sparkles, Layers, Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFlag } from "@/lib/feature-flags";
 import { DriftWall } from "@/components/ui/drift-wall";
@@ -52,7 +52,7 @@ function Offers() {
   // Dynamic products array feeding into DriftWall (updates automatically when products are added)
   const driftItems = useMemo(() => {
     return data.products.map((p) => ({
-      image: p.image_url,
+      image: p.image_url || "/hero/hero-3d-cookie.jpg",
       title: p.name,
       href: `/product/${p.slug}`,
       price: p.price,
@@ -75,7 +75,7 @@ function Offers() {
       
       {/* 1. Offers Hero Header */}
       <div className="flex flex-col gap-1.5 sm:gap-2">
-        <h1 className="font-nimbus text-3xl sm:text-5xl font-bold text-cocoa leading-tight">
+        <h1 className="font-blogh text-3xl sm:text-5xl font-bold text-cocoa leading-tight">
           Special offers & coupons
         </h1>
         <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
@@ -84,13 +84,30 @@ function Offers() {
       </div>
 
       {/* 2. Collectible Bakery Ticket Coupons */}
-      {promoCodes && promoCodes.length > 0 && (
-        <section>
-          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+      <section>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 sm:mb-4">
+          <div className="flex items-center gap-2">
             <Tag className="size-4 text-berry" />
-            <h2 className="font-display text-sm sm:text-lg font-bold text-cocoa">Active Bakery Coupons</h2>
+            <h2 className="font-blogh text-base sm:text-xl font-bold text-cocoa uppercase tracking-wide">
+              Active Bakery Coupons
+            </h2>
           </div>
 
+          {/* Play & Get Bakery Coupons Button */}
+          <Button
+            asChild
+            size="sm"
+            className="rounded-full bg-gradient-to-r from-berry via-rose-500 to-amber-500 text-white font-bold text-xs shadow-soft hover:shadow-lift hover:scale-[1.02] active:scale-[0.98] transition-all h-8 px-3.5 sm:px-4 w-fit"
+          >
+            <Link to={"/play-coupons" as any}>
+              <Gamepad2 className="size-3.5 mr-1.5" />
+              <span>Play & Get Bakery Coupons</span>
+              <ArrowRight className="size-3.5 ml-1" />
+            </Link>
+          </Button>
+        </div>
+
+        {promoCodes && promoCodes.length > 0 && (
           <div className="flex gap-3 overflow-x-auto no-scrollbar snap-x pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
             {promoCodes.map((promo) => {
               const isCopied = copiedCode === promo.code;
@@ -168,13 +185,13 @@ function Offers() {
               );
             })}
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       {/* 3. Discounted Products Grid */}
       <section>
         <div className="flex items-center justify-between gap-2 mb-4">
-          <h2 className="font-display text-lg sm:text-2xl font-bold text-cocoa">
+          <h2 className="font-blogh text-lg sm:text-2xl font-bold text-cocoa uppercase tracking-wide">
             This week&apos;s bakes on discount
           </h2>
           <Button asChild variant="ghost" size="sm" className="text-xs font-semibold text-berry hover:text-berry/80">
@@ -187,7 +204,7 @@ function Offers() {
             <div className="flex size-12 items-center justify-center rounded-2xl bg-secondary text-berry mb-3">
               <ShoppingBag className="size-6" />
             </div>
-            <p className="font-display text-base font-semibold text-cocoa">All bakes currently at regular price</p>
+            <p className="font-blogh text-base font-semibold text-cocoa">All bakes currently at regular price</p>
             <p className="mt-1 text-xs text-muted-foreground max-w-sm">
               Use any of the active coupons above at checkout to save on your fresh order!
             </p>
@@ -212,7 +229,7 @@ function Offers() {
               <Sparkles className="size-4 text-berry" />
               <span className="text-xs font-bold uppercase tracking-wider text-berry">Fresh from the Counter</span>
             </div>
-            <h2 className="font-nimbus text-2xl sm:text-3xl lg:text-4xl font-bold text-cocoa">
+            <h2 className="font-blogh text-2xl sm:text-3xl lg:text-4xl font-bold text-cocoa uppercase tracking-wide">
               Explore our whole bakery atelier
             </h2>
             <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-xl">
