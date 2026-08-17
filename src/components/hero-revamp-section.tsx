@@ -14,6 +14,7 @@ const FLAVORS = [
     image: "/hero/mini-blueberry-donut.jpg",
     heroImage: "/hero/hero-3d-blueberry-donut.jpg",
     accentColor: "#9353D3",
+    canvasBg: "#CA8F8B",
     word: "DONUTING",
   },
   {
@@ -26,6 +27,7 @@ const FLAVORS = [
     image: "/hero/mini-caramel-donut.jpg",
     heroImage: "/hero/hero-3d-caramel-donut.jpg",
     accentColor: "#F5A524",
+    canvasBg: "#DDB1B8",
     word: "CRAFTING",
   },
   {
@@ -38,6 +40,7 @@ const FLAVORS = [
     image: "/hero/mini-strawberry-donut.jpg",
     heroImage: "/hero/hero-3d-donut-sprinkles.jpg",
     accentColor: "#F31260",
+    canvasBg: "#E3A9B8",
     word: "DONUTING",
   },
 ];
@@ -56,16 +59,17 @@ export function HeroRevampSection() {
   return (
     <div
       onMouseMove={handleMouseMove}
-      className="w-full min-h-[90vh] lg:min-h-[calc(100vh-4.5rem)] flex flex-col justify-center bg-[#F89DBE] bg-gradient-to-br from-[#FFA7CB] via-[#F89DBE] to-[#FFA1C5] text-[#3A1C14] overflow-hidden relative"
+      style={{ backgroundColor: activeFlavor.canvasBg }}
+      className="w-full min-h-[90vh] lg:min-h-[calc(100vh-4.5rem)] flex flex-col justify-center text-[#3A1C14] overflow-hidden relative transition-colors duration-500"
     >
       {/* Ambient Glows */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 -left-24 size-96 rounded-full bg-white/25 blur-3xl"
+        className="pointer-events-none absolute -top-24 -left-24 size-96 rounded-full bg-white/20 blur-3xl"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -bottom-24 -right-24 size-[32rem] rounded-full bg-[#DE1D72]/20 blur-3xl"
+        className="pointer-events-none absolute -bottom-24 -right-24 size-[32rem] rounded-full bg-[#DE1D72]/15 blur-3xl"
       />
 
       {/* Floating Decorative Sprinkle Particles */}
@@ -240,12 +244,16 @@ export function HeroRevampSection() {
               }}
             >
               <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full flex items-center justify-center">
-                {/* Edge-dissolving radial mask for seamless blend into canvas */}
+                {/* Seamlessly blended 3D donut matching canvas background */}
                 <img
                   key={activeFlavor.id}
                   src={activeFlavor.heroImage}
                   alt={activeFlavor.title}
-                  className="size-full object-cover transition-all duration-500 [mask-image:radial-gradient(ellipse_78%_78%_at_50%_50%,black_60%,transparent_100%)] pointer-events-none drop-shadow-2xl"
+                  className="size-full object-cover transition-all duration-500 pointer-events-none drop-shadow-2xl"
+                  style={{
+                    maskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black 50%, transparent 95%)",
+                    WebkitMaskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black 50%, transparent 95%)",
+                  }}
                 />
 
                 {/* Floating Telemetry Tooltip Badge */}
