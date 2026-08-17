@@ -167,8 +167,8 @@ export function HeroRevampSection() {
                 alt={activeFlavor.title}
                 className="size-full object-cover transition-all duration-700 pointer-events-none"
                 style={{
-                  maskImage: "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
-                  WebkitMaskImage: "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
+                  maskImage: "radial-gradient(ellipse 78% 78% at 50% 50%, black 45%, rgba(0,0,0,0.92) 70%, transparent 98%)",
+                  WebkitMaskImage: "radial-gradient(ellipse 78% 78% at 50% 50%, black 45%, rgba(0,0,0,0.92) 70%, transparent 98%)",
                 }}
               />
             </div>
