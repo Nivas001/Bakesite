@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireAppwriteAuth } from "@/integrations/appwrite/auth-middleware";
-import { offerCodeSchema, validateOfferCodeSchema } from "./offers.schema";
+import { claimGameCouponSchema, offerCodeSchema, validateOfferCodeSchema } from "./offers.schema";
 
 export const getAdminOfferCodes = createServerFn({ method: "GET" })
   .middleware([requireAppwriteAuth])
@@ -18,7 +18,7 @@ export const getPublicOfferCodes = createServerFn({ method: "GET" }).handler(asy
 
 export const saveAdminOfferCode = createServerFn({ method: "POST" })
   .middleware([requireAppwriteAuth])
-  .inputValidator((input: unknown) => offerCodeSchema.parse(input))
+  .validator((input: unknown) => offerCodeSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { assertAdmin } = await import("./roles.server");
     const { upsertOfferCode } = await import("./offers.server");
@@ -28,7 +28,7 @@ export const saveAdminOfferCode = createServerFn({ method: "POST" })
 
 export const deleteAdminOfferCode = createServerFn({ method: "POST" })
   .middleware([requireAppwriteAuth])
-  .inputValidator((id: string) => id)
+  .validator((id: string) => id)
   .handler(async ({ data, context }) => {
     const { assertAdmin } = await import("./roles.server");
     const { removeOfferCode } = await import("./offers.server");
@@ -37,8 +37,15 @@ export const deleteAdminOfferCode = createServerFn({ method: "POST" })
   });
 
 export const checkOfferCode = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => validateOfferCodeSchema.parse(input))
+  .validator((input: unknown) => validateOfferCodeSchema.parse(input))
   .handler(async ({ data }) => {
     const { validatePromoCode } = await import("./offers.server");
     return validatePromoCode(data);
+  });
+
+export const claimGameRewardCoupon = createServerFn({ method: "POST" })
+  .validator((input: unknown) => claimGameCouponSchema.parse(input))
+  .handler(async ({ data }) => {
+    const { generateGameWinnerVoucher } = await import("./offers.server");
+    return generateGameWinnerVoucher(data);
   });

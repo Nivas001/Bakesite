@@ -99,7 +99,7 @@ function Offers() {
             size="sm"
             className="rounded-full bg-gradient-to-r from-berry via-rose-500 to-amber-500 text-white font-bold text-xs shadow-soft hover:shadow-lift hover:scale-[1.02] active:scale-[0.98] transition-all h-8 px-3.5 sm:px-4 w-fit"
           >
-            <Link to={"/play-coupons" as any}>
+            <Link to="/play-coupons">
               <Gamepad2 className="size-3.5 mr-1.5" />
               <span>Play & Get Bakery Coupons</span>
               <ArrowRight className="size-3.5 ml-1" />

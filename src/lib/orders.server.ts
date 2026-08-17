@@ -254,6 +254,11 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     for (const row of rows) {
       await createDoc(COLLECTIONS.orderItems, { ...row, order_id: order.$id });
     }
+    // Increment used count for single-use / usage-limited promo codes
+    if (input.promoCode) {
+      const { markOfferCodeUsed } = await import("./offers.server");
+      await markOfferCodeUsed(input.promoCode).catch(() => {});
+    }
   } catch (error) {
     await deleteDoc(COLLECTIONS.orders, order.$id);
     throw error;

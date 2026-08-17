@@ -17,6 +17,7 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as OffersRouteImport } from './routes/offers'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as PlayCouponsRouteImport } from './routes/play-coupons'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ShopRouteImport } from './routes/shop'
@@ -65,6 +66,11 @@ const OrdersRoute = OrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayCouponsRoute = PlayCouponsRouteImport.update({
+  id: '/play-coupons',
+  path: '/play-coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/offers': typeof OffersRoute
   '/orders': typeof OrdersRoute
+  '/play-coupons': typeof PlayCouponsRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/offers': typeof OffersRoute
   '/orders': typeof OrdersRoute
+  '/play-coupons': typeof PlayCouponsRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/offers': typeof OffersRoute
   '/orders': typeof OrdersRoute
+  '/play-coupons': typeof PlayCouponsRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
   '/shop': typeof ShopRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/offers'
     | '/orders'
+    | '/play-coupons'
     | '/profile'
     | '/reset-password'
     | '/shop'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/offers'
     | '/orders'
+    | '/play-coupons'
     | '/profile'
     | '/reset-password'
     | '/shop'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/offers'
     | '/orders'
+    | '/play-coupons'
     | '/profile'
     | '/reset-password'
     | '/shop'
@@ -217,6 +229,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   OffersRoute: typeof OffersRoute
   OrdersRoute: typeof OrdersRoute
+  PlayCouponsRoute: typeof PlayCouponsRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ShopRoute: typeof ShopRoute
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/play-coupons': {
+      id: '/play-coupons'
+      path: '/play-coupons'
+      fullPath: '/play-coupons'
+      preLoaderRoute: typeof PlayCouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -345,6 +365,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   OffersRoute: OffersRoute,
   OrdersRoute: OrdersRoute,
+  PlayCouponsRoute: PlayCouponsRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ShopRoute: ShopRoute,
