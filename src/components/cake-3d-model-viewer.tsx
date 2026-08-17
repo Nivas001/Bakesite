@@ -13,8 +13,6 @@ import {
   Check,
   ChevronRight,
   Compass,
-  Eye,
-  Sliders,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -92,6 +90,34 @@ export const BAKERY_3D_MODELS: CakeModelItem[] = [
       "Slow-proofed brioche dough fried in cold-pressed coconut oil, finished with real strawberry puree glaze and natural crunchy nonpareils.",
   },
 ];
+
+/**
+ * Safely renders mixed alphanumeric text so numbers/symbols use clean Inter font
+ * and letters use the custom Blogh display font without broken tofu characters.
+ */
+export function SafeBloghText({ text, className = "" }: { text: string; className?: string }) {
+  // Split on numbers, 3D, %, °, &, and special digits
+  const parts = text.split(/(\d+[°%kK\w-]*|3D|&)/g);
+  return (
+    <span className={className}>
+      {parts.map((part, i) => {
+        if (!part) return null;
+        if (/^(\d|3D|&)/.test(part)) {
+          return (
+            <span key={i} className="font-sans font-black tracking-normal">
+              {part}
+            </span>
+          );
+        }
+        return (
+          <span key={i} className="font-blogh">
+            {part}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
 
 export function Cake3dModelViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -361,19 +387,19 @@ export function Cake3dModelViewer() {
         <div className="absolute -bottom-32 -right-32 size-[32rem] rounded-full bg-rose-500/15 blur-[100px] pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[40rem] rounded-full bg-amber-600/5 blur-[120px] pointer-events-none" />
 
-        {/* 1. Header Row in Blogh Typography */}
+        {/* 1. Header Row */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-white/10 pb-6 sm:pb-8 relative z-10">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-amber-400/15 border-2 border-amber-400/40 px-4 py-1.5 text-xs font-blogh uppercase tracking-wider text-amber-300 mb-3 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
+            <div className="inline-flex items-center gap-2 rounded-full bg-amber-400/15 border-2 border-amber-400/40 px-4 py-1.5 text-xs text-amber-300 mb-3 shadow-[0_0_15px_rgba(251,191,36,0.2)]">
               <Sparkles className="size-3.5 text-amber-400" />
-              <span>Real-Time WebGL 3D Studio</span>
+              <SafeBloghText text="Real-Time WebGL 3D Studio" className="uppercase tracking-wider font-bold" />
             </div>
             
-            <h2 className="font-blogh text-3xl sm:text-4xl lg:text-5xl text-white uppercase tracking-tight leading-tight drop-shadow-md">
-              3D Cake Model Atelier
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl text-white uppercase tracking-tight leading-tight drop-shadow-md">
+              <SafeBloghText text="3D Cake Model Atelier" className="font-bold" />
             </h2>
             
-            <p className="font-blogh text-xs sm:text-sm text-zinc-300 mt-2 max-w-2xl leading-relaxed uppercase tracking-wide opacity-90">
+            <p className="font-sans text-xs sm:text-sm text-zinc-300 mt-2 max-w-2xl leading-relaxed">
               Interactive 360° GLB model showroom. Drag to orbit freely, zoom in on caramel swirls, and examine every handcrafted pastry layer in real-time WebGL.
             </p>
           </div>
@@ -381,9 +407,7 @@ export function Cake3dModelViewer() {
           {/* Quick Stats Pill */}
           <div className="flex items-center gap-2.5 self-start lg:self-auto bg-black/60 backdrop-blur-xl px-5 py-2.5 rounded-full border-2 border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)]">
             <Compass className="size-4 text-amber-400 animate-spin" style={{ animationDuration: "12s" }} />
-            <span className="font-blogh text-xs uppercase tracking-wider text-amber-200">
-              360° Free Drag · Orbit & Pinch Zoom
-            </span>
+            <SafeBloghText text="360° Free Drag · Orbit & Pinch Zoom" className="text-xs uppercase tracking-wider text-amber-200 font-bold" />
           </div>
         </div>
 
@@ -403,10 +427,10 @@ export function Cake3dModelViewer() {
             {loading && (
               <div className="absolute inset-0 bg-[#180E08]/90 backdrop-blur-md flex flex-col items-center justify-center gap-3.5 z-30 pointer-events-none">
                 <div className="size-14 rounded-full border-4 border-amber-400 border-t-transparent animate-spin" />
-                <p className="font-blogh uppercase tracking-wider text-base font-bold text-amber-300 drop-shadow-md">
-                  Loading 3D Cake Model… {loadingProgress > 0 ? `${loadingProgress}%` : ""}
+                <p className="text-base font-bold text-amber-300 drop-shadow-md">
+                  <SafeBloghText text={`Loading 3D Cake Model… ${loadingProgress > 0 ? `${loadingProgress}%` : ""}`} className="uppercase tracking-wider font-bold" />
                 </p>
-                <p className="font-blogh text-xs text-zinc-400 uppercase tracking-wide">
+                <p className="font-sans text-xs text-zinc-400">
                   Rendering 3D Meshes, Chocolate Shading & Studio Rig
                 </p>
               </div>
@@ -416,8 +440,8 @@ export function Cake3dModelViewer() {
             {loadError && (
               <div className="absolute inset-0 bg-[#180E08]/95 flex flex-col items-center justify-center gap-3 z-30 p-6 text-center">
                 <Info className="size-9 text-amber-400" />
-                <p className="font-blogh text-sm uppercase tracking-wide text-white">{loadError}</p>
-                <Button size="sm" onClick={() => window.location.reload()} className="mt-2 rounded-full font-blogh uppercase tracking-wider">
+                <p className="font-sans text-sm text-white">{loadError}</p>
+                <Button size="sm" onClick={() => window.location.reload()} className="mt-2 rounded-full font-sans uppercase font-bold tracking-wider">
                   Retry Loading
                 </Button>
               </div>
@@ -425,9 +449,9 @@ export function Cake3dModelViewer() {
 
             {/* Top Interactive Overlay Controls */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-20">
-              <div className="pointer-events-auto flex items-center gap-2 bg-black/75 backdrop-blur-xl px-4 py-2 rounded-full border-2 border-white/20 text-xs font-blogh uppercase tracking-wider text-amber-200 shadow-xl">
+              <div className="pointer-events-auto flex items-center gap-2 bg-black/75 backdrop-blur-xl px-4 py-2 rounded-full border-2 border-white/20 text-xs text-amber-200 shadow-xl">
                 <span className="size-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>360° Drag & Pinch Zoom</span>
+                <SafeBloghText text="360° Drag & Pinch Zoom" className="uppercase tracking-wider font-bold" />
               </div>
 
               {/* Viewport Control Actions */}
@@ -495,7 +519,7 @@ export function Cake3dModelViewer() {
                 ))}
               </div>
 
-              <span className="text-xs text-amber-300/80 font-blogh uppercase tracking-wider hidden sm:inline-block pointer-events-none px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+              <span className="text-xs text-amber-300/80 font-sans uppercase font-bold tracking-wider hidden sm:inline-block pointer-events-none px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
                 WebGL 2.0 · Three.js PBR
               </span>
             </div>
@@ -508,19 +532,20 @@ export function Cake3dModelViewer() {
             {/* Active Model Description Card */}
             <div className="space-y-4 bg-white/5 border-[3px] border-amber-500/30 rounded-[2.5rem] p-6 sm:p-7 backdrop-blur-md shadow-xl">
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 text-amber-300 border-2 border-amber-400/40 px-3.5 py-1 text-xs font-blogh uppercase tracking-wider">
-                  {selectedModel.tag}
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 text-amber-300 border-2 border-amber-400/40 px-3.5 py-1 text-xs">
+                  <SafeBloghText text={selectedModel.tag} className="uppercase tracking-wider font-bold" />
                 </span>
-                <span className="text-xs font-blogh uppercase tracking-wider text-emerald-400 font-bold flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/30 px-3 py-0.5 rounded-full">
-                  <Check className="size-3.5" /> Live 3D Mesh
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/30 px-3 py-0.5 rounded-full">
+                  <Check className="size-3.5" />
+                  <SafeBloghText text="Live 3D Mesh" />
                 </span>
               </div>
 
-              <h3 className="font-blogh text-2xl sm:text-3xl text-white uppercase leading-tight tracking-tight drop-shadow-sm">
-                {selectedModel.name}
+              <h3 className="text-2xl sm:text-3xl text-white uppercase leading-tight tracking-tight drop-shadow-sm">
+                <SafeBloghText text={selectedModel.name} className="font-bold" />
               </h3>
 
-              <p className="font-blogh text-xs sm:text-sm text-zinc-300 uppercase tracking-wide leading-relaxed opacity-95">
+              <p className="font-sans text-xs sm:text-sm text-zinc-300 leading-relaxed opacity-95">
                 {selectedModel.description}
               </p>
 
@@ -556,12 +581,12 @@ export function Cake3dModelViewer() {
             {/* Model Library Selector (More 3D models to come) */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-blogh uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                <span className="text-xs uppercase tracking-wider text-amber-300 flex items-center gap-1.5 font-bold">
                   <Flame className="size-4 text-amber-400" />
-                  <span>3D Model Library (Upcoming Bakes)</span>
+                  <SafeBloghText text="3D Model Library (Upcoming Bakes)" />
                 </span>
-                <span className="text-xs font-blogh uppercase tracking-wider text-zinc-400">
-                  {BAKERY_3D_MODELS.length} Models
+                <span className="text-xs uppercase tracking-wider text-zinc-400 font-bold">
+                  <SafeBloghText text={`${BAKERY_3D_MODELS.length} Models`} />
                 </span>
               </div>
 
@@ -587,11 +612,11 @@ export function Cake3dModelViewer() {
                           <img src={item.thumbnail} alt={item.name} className="size-full object-cover" />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-blogh text-xs sm:text-sm uppercase tracking-tight truncate font-bold">
-                            {item.name}
+                          <p className="text-xs sm:text-sm uppercase tracking-tight truncate font-bold">
+                            <SafeBloghText text={item.name} />
                           </p>
-                          <p className={`font-blogh text-[10.5px] uppercase tracking-wider truncate mt-0.5 ${isCurrent ? "text-black/80 font-bold" : "text-zinc-400"}`}>
-                            {item.badge}
+                          <p className={`text-[10.5px] uppercase tracking-wider truncate mt-0.5 font-bold ${isCurrent ? "text-black/80" : "text-zinc-400"}`}>
+                            <SafeBloghText text={item.badge} />
                           </p>
                         </div>
                       </div>

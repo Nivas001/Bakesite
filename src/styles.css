@@ -17,6 +17,7 @@
   font-weight: 400 800;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0041-005A, U+0061-007A, U+0020;
 }
 
 @font-face {
@@ -151,7 +152,7 @@
   --matcha-foreground: oklch(0.34 0.048 25);
   --cocoa: oklch(0.31 0.045 28);
   --font-nimbus: "TAN NIMBUS", "Playfair Display", Georgia, serif;
-  --font-blogh: "Blogh", "Playfair Display", Georgia, serif;
+  --font-blogh: "Blogh", "Inter", "Playfair Display", ui-sans-serif, sans-serif;
   --font-recurso: "Recurso Sans", "Inter", sans-serif;
   --font-script: "Caveat", cursive;
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
