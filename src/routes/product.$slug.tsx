@@ -1,121 +1,102 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { getProductBySlug } from "@/lib/catalog.functions";
+import { useState, useRef, useEffect } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ShoppingBag,
+  Sparkles,
+  ShieldCheck,
+  Clock,
+  HeartHandshake,
+  Check,
+  Plus,
+  Minus,
+  Cake,
+  Croissant,
+  Cookie,
+  Flame,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ProductReviews } from "@/components/product-reviews";
-import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { discountLabel, finalPrice, formatCurrency, hasDiscount } from "@/lib/pricing";
+import { formatCurrency, finalPrice, hasDiscount, discountLabel } from "@/lib/pricing";
+import { getProductBySlug } from "@/lib/catalog.functions";
 import { useFlag } from "@/lib/feature-flags";
-import {
-  Minus,
-  Plus,
-  ArrowLeft,
-  ShoppingBag,
-  Leaf,
-  Flame,
-  Wheat,
-  Package,
-  Sparkles,
-  ArrowRight,
-  ShieldCheck,
-  Check,
-  Croissant,
-  Star,
-} from "lucide-react";
-
-const productQuery = (slug: string) =>
-  queryOptions({
-    queryKey: ["product", slug],
-    queryFn: () => getProductBySlug({ data: slug }),
-  });
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$slug")({
-  loader: async ({ context, params }) => {
-    const result = await context.queryClient.ensureQueryData(productQuery(params.slug));
-    if (!result) throw notFound();
-    return result;
+  loader: async ({ params }) => {
+    return getProductBySlug({ data: params.slug });
   },
   head: ({ loaderData }) => {
-    if (!loaderData) {
-      return { meta: [{ title: "Not found — Ani Bakes" }, { name: "robots", content: "noindex" }] };
-    }
-    const title = `${loaderData.product.name} — Ani Bakes Bakery`;
-    const description =
-      loaderData.product.description ?? "A small-batch bake from Ani Bakes Bakery.";
+    const p = loaderData?.product;
     return {
       meta: [
-        { title },
-        { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
+        { title: p ? `${p.name} | Ani Bakes Artisan Bakery` : "Product Details | Ani Bakes" },
+        {
+          name: "description",
+          content: p?.description ?? "Order artisan fresh-baked treats handcrafted in small batches.",
+        },
       ],
     };
   },
-  component: ProductPage,
+  component: ProductDetailPage,
 });
 
 const TRUST_BADGES = [
-  { icon: Leaf, label: "No Preservatives", color: "text-emerald-600" },
-  { icon: Flame, label: "Baked Same Day", color: "text-orange-500" },
-  { icon: Wheat, label: "Fresh Flour", color: "text-amber-600" },
-  { icon: Package, label: "Eco Packaging", color: "text-teal-600" },
+  { icon: Clock, label: "Baked Same Day", color: "text-amber-600" },
+  { icon: ShieldCheck, label: "Fresh Flour", color: "text-emerald-600" },
+  { icon: HeartHandshake, label: "Eco Packaging", color: "text-sky-600" },
 ];
 
 const HOW_STEPS = [
-  { emoji: "🗓️", title: "Choose a slot", desc: "Pick your delivery date & time window" },
-  { emoji: "👨‍🍳", title: "Baker prepares", desc: "Fresh-baked the morning of your slot" },
+  { emoji: "📅", title: "Choose a slot", desc: "Pick your delivery date & time window" },
+  { emoji: "🧑‍🍳", title: "Baker prepares", desc: "Fresh-baked the morning of your slot" },
   { emoji: "📦", title: "Delivered or Pickup", desc: "At your door or collect from counter" },
 ];
 
 const EXPLORE_CATEGORIES = [
   {
-    name: "Handcrafted Cakes",
     slug: "cakes",
+    name: "Handcrafted Cakes",
+    desc: "Bespoke celebration layers & velvet tea slices.",
     tag: "Pure Buttercream",
-    badge: "Korean Bento & Tiers",
-    desc: "Single-serve 4-inch lunchbox cakes & bespoke celebration layers.",
+    icon: Cake,
     image: "/cakes/pink-bento-cake.jpg",
-    accentGlow: "from-rose-500/20 via-pink-500/10 to-amber-500/5",
-    icon: Sparkles,
+    accentGlow: "from-pink-500/20 to-transparent",
   },
   {
-    name: "French Pastries",
     slug: "pastries",
+    name: "French Pastries",
+    desc: "Golden lamination & slow-churned butter.",
     tag: "27 Flaky Layers",
-    badge: "100% Pure Butter",
-    desc: "Golden morning croissants, pistachio danishes & morning cruffins.",
-    image: "/products/artisan-croissant.jpg",
-    accentGlow: "from-emerald-500/20 via-teal-500/10 to-amber-500/5",
     icon: Croissant,
+    image: "/products/artisan-croissant.jpg",
+    accentGlow: "from-amber-500/20 to-transparent",
   },
   {
-    name: "Artisanal Cookies",
     slug: "cookies",
+    name: "Artisanal Cookies",
+    desc: "Chewy molten centres & sea-salt flakes.",
     tag: "70% Couverture",
-    badge: "Brown Butter Dough",
-    desc: "Molten dark chocolate chunks & rich fudge walnut brownies.",
+    icon: Cookie,
     image: "/products/artisan-cookies.jpg",
-    accentGlow: "from-amber-500/20 via-orange-500/10 to-stone-500/5",
-    icon: Star,
+    accentGlow: "from-orange-500/20 to-transparent",
   },
   {
-    name: "Hearth Sourdough",
     slug: "breads",
+    name: "Hearth Sourdough",
+    desc: "Wild-fermented loaves with open airy crumb.",
     tag: "36h Ferment",
-    badge: "Wild Starter",
-    desc: "Crisp blistered crusts, airy crumb & rustic morning loaves.",
+    icon: Flame,
     image: "/products/artisan-sourdough.jpg",
-    accentGlow: "from-amber-600/20 via-yellow-500/10 to-orange-500/5",
-    icon: Wheat,
+    accentGlow: "from-yellow-500/20 to-transparent",
   },
 ];
 
-function ProductPage() {
-  const { slug } = Route.useParams();
-  const { data } = useSuspenseQuery(productQuery(slug));
+function ProductDetailPage() {
+  const data = Route.useLoaderData();
   const { add } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [ripple, setRipple] = useState(false);
@@ -160,7 +141,7 @@ function ProductPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10 pb-24 md:pb-12 space-y-12 sm:space-y-16">
+    <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:py-8 pb-24 md:pb-12 space-y-10 sm:space-y-14">
 
       {/* Back link */}
       <div>
@@ -173,12 +154,12 @@ function ProductPage() {
         </Link>
       </div>
 
-      {/* Hero: Image + Details Bento Grid */}
-      <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-start">
+      {/* 1. Hero: Image + Details Bento Grid (Aligined at same level on Desktop, Single Viewheight on Mobile) */}
+      <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
         
         {/* Left Column: Product Showcase Photo Frame */}
         <div className="relative group overflow-hidden rounded-3xl sm:rounded-4xl border border-border/80 bg-card p-2 sm:p-3 shadow-soft">
-          <div className="relative aspect-square w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-secondary/30">
+          <div className="relative aspect-[16/10] sm:aspect-square max-h-48 sm:max-h-none w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-secondary/30">
             <img
               src={product.image_url ?? "/products/artisan-croissant.jpg"}
               alt={product.name}
@@ -190,49 +171,49 @@ function ProductPage() {
 
             {/* Discount Badge */}
             {discounted && (
-              <span className="absolute left-3 sm:left-4 top-3 sm:top-4 rounded-full bg-berry px-3.5 py-1 text-xs font-bold text-berry-foreground shadow-lift">
+              <span className="absolute left-3 sm:left-4 top-3 sm:top-4 rounded-full bg-berry px-3 py-0.5 text-xs font-bold text-berry-foreground shadow-lift">
                 {discountLabel(product.discount_type, product.discount_value)}
               </span>
             )}
 
             {/* Kitchen Freshness Pill */}
-            <span className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-full bg-background/90 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+            <span className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
               ✨ Fresh Morning Bake
             </span>
           </div>
         </div>
 
         {/* Right Column: Details & Ordering Bento */}
-        <div className="flex flex-col justify-center space-y-5">
+        <div className="flex flex-col justify-center space-y-3 sm:space-y-4">
           
           <div>
             {/* Category Breadcrumb */}
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="rounded-full bg-secondary px-3 py-0.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground border border-border/60">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-muted-foreground border border-border/60">
                 {product.category_name ?? "Bakery Atelier"}
               </span>
-              <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
+              <span className="text-[11px] sm:text-xs text-emerald-600 font-bold flex items-center gap-1">
                 <Check className="size-3" /> In Small-Batch Queue
               </span>
             </div>
 
             {/* Product Title in Blogh font */}
-            <h1 className="font-blogh text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight tracking-wide">
+            <h1 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight tracking-wide">
               {product.name}
             </h1>
           </div>
 
           {/* Pricing Row */}
-          <div className="flex items-baseline gap-3 border-b border-border/60 pb-4">
-            <span className="font-sans text-3xl sm:text-4xl font-black text-cocoa tracking-tight">
+          <div className="flex items-baseline gap-2.5 sm:gap-3 border-b border-border/60 pb-3">
+            <span className="font-sans text-2xl sm:text-4xl font-black text-cocoa tracking-tight">
               {formatCurrency(price)}
             </span>
             {discounted && (
               <>
-                <span className="text-base sm:text-lg text-muted-foreground line-through font-medium">
+                <span className="text-sm sm:text-lg text-muted-foreground line-through font-medium">
                   {formatCurrency(product.price)}
                 </span>
-                <span className="rounded-full bg-berry/15 px-2.5 py-0.5 text-xs font-bold text-berry">
+                <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[11px] font-bold text-berry">
                   Save {formatCurrency(product.price - price)}
                 </span>
               </>
@@ -241,13 +222,13 @@ function ProductPage() {
 
           {/* Trust Badges */}
           {showTrustBadges && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {TRUST_BADGES.map(({ icon: Icon, label, color }) => (
                 <span
                   key={label}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-3 py-1 text-[11px] font-semibold text-cocoa shadow-2xs"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-semibold text-cocoa shadow-2xs"
                 >
-                  <Icon className={`size-3.5 ${color}`} />
+                  <Icon className={`size-3 sm:size-3.5 ${color}`} />
                   {label}
                 </span>
               ))}
@@ -261,30 +242,10 @@ function ProductPage() {
             </p>
           )}
 
-          {/* Artisan Quality & Dietary Badges */}
-          <div className="grid grid-cols-2 gap-2.5 rounded-2xl border border-border/70 bg-card p-3 sm:p-4 text-xs text-muted-foreground shadow-2xs">
-            <div className="flex items-center gap-2">
-              <span className="text-base">🌾</span>
-              <span className="font-medium text-cocoa">Slow Fermentation</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base">🧈</span>
-              <span className="font-medium text-cocoa">100% Pure Dairy Butter</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base">✨</span>
-              <span className="font-medium text-cocoa">Baked at 4 AM Dawn</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-base">🌿</span>
-              <span className="font-medium text-cocoa">Clean Pantry Ingredients</span>
-            </div>
-          </div>
-
           {/* "How it gets to you" Pipeline */}
           {showHowItWorks && (
-            <div className="rounded-2xl border border-border/60 bg-secondary/30 p-3.5 sm:p-4">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-3">
+            <div className="rounded-2xl border border-border/60 bg-secondary/30 p-3 sm:p-3.5">
+              <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
                 How It Gets To You
               </p>
               <div className="flex items-start gap-1 sm:gap-2">
@@ -292,13 +253,13 @@ function ProductPage() {
                   <div key={step.title} className="flex-1 flex flex-col items-center text-center relative">
                     {/* Connector line */}
                     {i < HOW_STEPS.length - 1 && (
-                      <div className="absolute top-4 left-1/2 w-full h-px bg-border/80" />
+                      <div className="absolute top-3.5 left-1/2 w-full h-px bg-border/80" />
                     )}
-                    <span className="relative z-10 flex size-8 items-center justify-center rounded-full bg-card border border-border/70 text-sm shadow-2xs">
+                    <span className="relative z-10 flex size-7 sm:size-8 items-center justify-center rounded-full bg-card border border-border/70 text-xs sm:text-sm shadow-2xs">
                       {step.emoji}
                     </span>
-                    <p className="mt-1.5 text-[11px] font-bold text-cocoa leading-tight">{step.title}</p>
-                    <p className="mt-0.5 text-[10px] text-muted-foreground leading-snug hidden sm:block">
+                    <p className="mt-1 text-[10px] sm:text-[11px] font-bold text-cocoa leading-tight">{step.title}</p>
+                    <p className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground leading-snug hidden sm:block">
                       {step.desc}
                     </p>
                   </div>
@@ -308,27 +269,27 @@ function ProductPage() {
           )}
 
           {/* Quantity Stepper + Add to Cart Action */}
-          <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3" ref={addBtnRef}>
+          <div className="pt-1 flex flex-row items-center gap-2 sm:gap-3" ref={addBtnRef}>
             {/* Pill Quantity Stepper */}
-            <div className="inline-flex h-11 items-center justify-between sm:justify-start gap-2 rounded-full border border-border bg-secondary/50 px-2 shadow-2xs">
+            <div className="inline-flex h-10 sm:h-11 items-center justify-between gap-1.5 sm:gap-2 rounded-full border border-border bg-secondary/50 px-1.5 sm:px-2 shadow-2xs shrink-0">
               <button
                 type="button"
                 aria-label="Decrease quantity"
-                className="flex size-7.5 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer font-bold"
+                className="flex size-6.5 sm:size-7.5 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer font-bold"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               >
-                <Minus className="size-3.5" />
+                <Minus className="size-3 sm:size-3.5" />
               </button>
-              <span className="min-w-8 text-center text-sm font-bold text-cocoa tabular-nums px-2">
+              <span className="min-w-6 sm:min-w-8 text-center text-xs sm:text-sm font-bold text-cocoa tabular-nums px-1">
                 {quantity}
               </span>
               <button
                 type="button"
                 aria-label="Increase quantity"
-                className="flex size-7.5 items-center justify-center rounded-full bg-berry text-berry-foreground transition-all hover:bg-berry/90 active:scale-90 shadow-2xs cursor-pointer"
+                className="flex size-6.5 sm:size-7.5 items-center justify-center rounded-full bg-berry text-berry-foreground transition-all hover:bg-berry/90 active:scale-90 shadow-2xs cursor-pointer"
                 onClick={() => setQuantity((q) => Math.min(50, q + 1))}
               >
-                <Plus className="size-3.5" />
+                <Plus className="size-3 sm:size-3.5" />
               </button>
             </div>
 
@@ -336,10 +297,10 @@ function ProductPage() {
             <div className="relative flex-1">
               <Button
                 size="lg"
-                className="relative w-full h-11 overflow-hidden rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-sm shadow-lift transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                className="relative w-full h-10 sm:h-11 overflow-hidden rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs sm:text-sm shadow-lift transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer px-3"
                 onClick={handleAddToCart}
               >
-                <ShoppingBag className="mr-2 size-4.5" />
+                <ShoppingBag className="mr-1.5 sm:mr-2 size-4" />
                 <span>Add {quantity > 1 ? `(${quantity})` : ""} to Cart • {formatCurrency(price * quantity)}</span>
               </Button>
               {ripple && (
@@ -348,28 +309,25 @@ function ProductPage() {
             </div>
           </div>
 
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-[10px] sm:text-[11px] text-muted-foreground">
             🕐 Fresh morning bake. Small-batch artisan orders require 24 hours advance notice.
           </p>
         </div>
 
       </div>
 
-      {/* 2. Reviews Bento Atelier */}
-      <ProductReviews productId={product.id} />
-
-      {/* 3. Related Products ("You Might Also Like") */}
+      {/* 2. Related Products ("You Might Also Like") */}
       {related.length > 0 && (
-        <section className="border-t border-border/60 pt-10 sm:pt-14 space-y-6">
+        <section className="border-t border-border/60 pt-8 sm:pt-12 space-y-5">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="size-4 text-berry" />
-                <span className="text-xs font-bold uppercase tracking-wider text-berry">
+                <Sparkles className="size-3.5 sm:size-4 text-berry" />
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry">
                   Paired Recommendations
                 </span>
               </div>
-              <h2 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
+              <h2 className="font-blogh text-xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
                 You Might Also Like
               </h2>
             </div>
@@ -390,34 +348,34 @@ function ProductPage() {
         </section>
       )}
 
-      {/* 4. [NEW]: "Explore Bakery Categories" Section */}
-      <section className="border-t border-border/60 pt-10 sm:pt-14 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+      {/* 3. "Explore Bakery Categories" Section (Compact 2-col on mobile, 4-col on desktop) */}
+      <section className="border-t border-border/60 pt-8 sm:pt-12 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Croissant className="size-4 text-berry" />
-              <span className="text-xs font-bold uppercase tracking-wider text-berry">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Croissant className="size-3.5 sm:size-4 text-berry" />
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry">
                 Artisan Collections
               </span>
             </div>
-            <h2 className="font-blogh text-2xl sm:text-3xl lg:text-4xl font-bold text-cocoa uppercase tracking-wide">
+            <h2 className="font-blogh text-xl sm:text-3xl lg:text-4xl font-bold text-cocoa uppercase tracking-wide">
               Explore Our Bakery Atelier
             </h2>
-            <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-xl">
+            <p className="mt-0.5 text-xs sm:text-sm text-muted-foreground max-w-xl">
               Browse our complete range of small-batch sweet and savory delights, made fresh daily.
             </p>
           </div>
 
-          <Button asChild className="rounded-full bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft w-fit">
+          <Button asChild size="sm" className="rounded-full bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft w-fit text-xs">
             <Link to="/shop">
-              <span>All Bakery Categories</span>
-              <ArrowRight className="size-4 ml-1.5" />
+              <span>All Categories</span>
+              <ArrowRight className="size-3.5 ml-1" />
             </Link>
           </Button>
         </div>
 
-        {/* Category Bento Cards Grid (Responsive: 1 col on xs, 2 on sm, 4 on lg) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Category Bento Cards Grid (2-columns on mobile, 4-columns on desktop) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {EXPLORE_CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             return (
@@ -425,10 +383,10 @@ function ProductPage() {
                 key={cat.slug}
                 to="/shop"
                 search={{ category: cat.slug } as any}
-                className="group relative overflow-hidden rounded-3xl border border-border/80 bg-card p-3 sm:p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-berry/60 hover:shadow-lift flex flex-col justify-between"
+                className="group relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-2.5 sm:p-3.5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-berry/60 hover:shadow-lift flex flex-col justify-between"
               >
                 {/* Photo showcase with gradient glow */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-secondary/40">
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl sm:rounded-2xl bg-secondary/40">
                   <img
                     src={cat.image}
                     alt={cat.name}
@@ -437,28 +395,28 @@ function ProductPage() {
                   <div className={`absolute inset-0 bg-gradient-to-t ${cat.accentGlow}`} />
 
                   {/* Badge pill */}
-                  <span className="absolute top-2.5 left-2.5 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                  <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 rounded-full bg-background/90 backdrop-blur-md px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-cocoa border border-border/60 shadow-2xs">
                     {cat.tag}
                   </span>
                 </div>
 
                 {/* Content */}
-                <div className="mt-3.5 space-y-1.5">
+                <div className="mt-2 sm:mt-3 space-y-1">
                   <div className="flex items-center justify-between gap-1">
-                    <h3 className="font-blogh text-lg font-bold text-cocoa group-hover:text-berry transition-colors">
+                    <h3 className="font-blogh text-sm sm:text-base lg:text-lg font-bold text-cocoa group-hover:text-berry transition-colors truncate">
                       {cat.name}
                     </h3>
-                    <Icon className="size-4 text-berry shrink-0" />
+                    <Icon className="size-3.5 text-berry shrink-0 hidden sm:block" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                  <p className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
                     {cat.desc}
                   </p>
                 </div>
 
                 {/* Footer Action Arrow */}
-                <div className="mt-3 pt-2.5 border-t border-border/50 flex items-center justify-between text-xs font-bold text-berry">
-                  <span>Explore Bakes</span>
-                  <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                <div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between text-[11px] sm:text-xs font-bold text-berry">
+                  <span>Explore</span>
+                  <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
                 </div>
               </Link>
             );
@@ -466,10 +424,13 @@ function ProductPage() {
         </div>
       </section>
 
+      {/* 4. Reviews Bento Atelier (Placed at the end of the page) */}
+      <ProductReviews productId={product.id} />
+
       {/* Sticky Mobile Add to Cart Bar */}
       {showStickyBar && (
         <div
-          className={`fixed bottom-0 left-0 right-0 z-40 md:hidden border-t border-border/80 bg-background/95 backdrop-blur-md px-4 py-3 flex items-center gap-3 transition-all duration-300 shadow-2xl ${
+          className={`fixed bottom-0 left-0 right-0 z-40 md:hidden border-t border-border/80 bg-background/95 backdrop-blur-md px-4 py-2.5 flex items-center gap-3 transition-all duration-300 shadow-2xl ${
             showSticky ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
           }`}
         >

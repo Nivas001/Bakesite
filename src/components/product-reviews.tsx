@@ -99,7 +99,7 @@ export function ProductReviews({ productId }: { productId: string }) {
   const reviewCount = data?.count ?? 0;
 
   return (
-    <section className="mt-16 sm:mt-20 border-t border-border/60 pt-10 sm:pt-14 space-y-8">
+    <section className="border-t border-border/60 pt-8 sm:pt-12 space-y-6">
       
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
