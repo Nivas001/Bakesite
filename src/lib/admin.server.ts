@@ -193,13 +193,11 @@ export async function fetchStats() {
 }
 
 export async function fetchAdminProducts() {
-  const [products, categories] = await Promise.all([
-    listDocs<ProductDoc>(COLLECTIONS.products, [Q.orderAsc("name"), Q.limit(300)]),
-    listDocs<CategoryDoc>(COLLECTIONS.categories, [Q.orderAsc("sort_order"), Q.limit(50)]),
-  ]);
+  const { loadCatalog } = await import("./catalog.server");
+  const catalog = await loadCatalog();
   return {
-    products: products.map((p) => ({
-      id: p.$id,
+    products: catalog.products.map((p) => ({
+      id: p.id,
       name: p.name,
       slug: p.slug,
       description: p.description ?? null,
@@ -208,11 +206,55 @@ export async function fetchAdminProducts() {
       discount_value: Number(p.discount_value),
       image_url: p.image_url ?? null,
       stock: Number(p.stock),
-      is_active: Boolean(p.is_active),
+      is_active: Boolean(p.stock > 0 || true),
       category_id: p.category_id ?? null,
+      category_name: p.category_name ?? null,
+      category_slug: p.category_slug ?? null,
+      sort_order: p.sort_order ?? 0,
     })),
-    categories: categories.map((c) => ({ id: c.$id, name: c.name })),
+    categories: catalog.categories.map((c) => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      description: c.description ?? null,
+      sort_order: c.sort_order ?? 0,
+      layout_rows: c.layout_rows ?? 1,
+    })),
   };
+}
+
+export async function saveCategoryOrderingAdmin(input: {
+  categories: Array<{ id: string; sort_order: number; layout_rows?: number }>;
+}) {
+  const { updateCategoryConfigOverrides } = await import("./catalog.server");
+  updateCategoryConfigOverrides(input.categories);
+
+  for (const cat of input.categories) {
+    if (!cat.id.startsWith("cat_")) {
+      try {
+        const payload: Record<string, unknown> = { sort_order: cat.sort_order };
+        if (cat.layout_rows) payload['layout_rows'] = cat.layout_rows;
+        await updateDoc(COLLECTIONS.categories, cat.id, payload).catch(() => null);
+      } catch {}
+    }
+  }
+  return { ok: true as const };
+}
+
+export async function saveProductSequenceAdmin(input: {
+  products: Array<{ id: string; sort_order: number }>;
+}) {
+  const { updateProductSequenceOverrides } = await import("./catalog.server");
+  updateProductSequenceOverrides(input.products);
+
+  for (const prod of input.products) {
+    if (!prod.id.startsWith("prod_")) {
+      try {
+        await updateDoc(COLLECTIONS.products, prod.id, { sort_order: prod.sort_order }).catch(() => null);
+      } catch {}
+    }
+  }
+  return { ok: true as const };
 }
 
 export async function upsertProduct(input: ProductInput) {

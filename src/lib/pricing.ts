@@ -13,6 +13,7 @@ export interface CatalogProduct {
   category_id: string | null;
   category_name?: string | null;
   category_slug?: string | null;
+  sort_order?: number | null;
 }
 
 export function finalPrice(

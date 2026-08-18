@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ import {
   setOrderStatus,
   rescheduleOrderAdmin,
   uploadProductImageAdmin,
+  saveCategoryOrder,
+  saveProductSequence,
 } from "@/lib/admin.functions";
 import {
   getAdminOfferCodes,
@@ -50,6 +52,13 @@ import {
   Unlock,
   ChefHat,
   Printer,
+  ArrowUp,
+  ArrowDown,
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  LayoutGrid,
+  Sliders,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -293,6 +302,375 @@ function ProductAdminRow({
   );
 }
 
+function AdminShopLayoutManager({
+  categories: initialCategories,
+  products: initialProducts,
+  onRefresh,
+}: {
+  categories: Array<{ id: string; name: string; slug: string; description: string | null; sort_order: number; layout_rows?: number | null }>;
+  products: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    price: number;
+    discount_type: "none" | "percent" | "flat";
+    discount_value: number;
+    image_url: string | null;
+    stock: number;
+    is_active: boolean;
+    category_id: string | null;
+    category_name?: string | null;
+    category_slug?: string | null;
+    sort_order?: number | null;
+  }>;
+  onRefresh: () => Promise<unknown>;
+}) {
+  const saveCategoryOrderFn = useServerFn(saveCategoryOrder);
+  const saveProductSequenceFn = useServerFn(saveProductSequence);
+
+  // Local state for categories ordering and layout
+  const [categoriesList, setCategoriesList] = useState(
+    [...initialCategories].sort((a, b) => a.sort_order - b.sort_order)
+  );
+
+  // Local state for products sequencing
+  const [productsList, setProductsList] = useState(
+    [...initialProducts].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name))
+  );
+
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Keep in sync with server data
+  useEffect(() => {
+    setCategoriesList([...initialCategories].sort((a, b) => a.sort_order - b.sort_order));
+    setProductsList([...initialProducts].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name)));
+  }, [initialCategories, initialProducts]);
+
+  // Reorder Category Up / Down
+  const moveCategory = async (index: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= categoriesList.length) return;
+
+    const updated = [...categoriesList];
+    const [moved] = updated.splice(index, 1);
+    updated.splice(targetIndex, 0, moved!);
+
+    // Reassign sequential sort_order
+    const withSortOrder = updated.map((cat, idx) => ({
+      ...cat,
+      sort_order: idx + 1,
+    }));
+
+    setCategoriesList(withSortOrder);
+
+    try {
+      setIsSaving(true);
+      await saveCategoryOrderFn({
+        data: {
+          categories: withSortOrder.map((c) => ({
+            id: c.id,
+            sort_order: c.sort_order,
+            layout_rows: c.layout_rows ?? 1,
+          })),
+        },
+      });
+      toast.success(`Category "${moved!.name}" moved ${direction}!`);
+      await onRefresh();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update category order");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Change Category Layout Rows
+  const changeCategoryRows = async (categoryId: string, rows: number) => {
+    const updated = categoriesList.map((cat) =>
+      cat.id === categoryId ? { ...cat, layout_rows: rows } : cat
+    );
+    setCategoriesList(updated);
+
+    try {
+      setIsSaving(true);
+      await saveCategoryOrderFn({
+        data: {
+          categories: updated.map((c) => ({
+            id: c.id,
+            sort_order: c.sort_order,
+            layout_rows: c.layout_rows ?? 1,
+          })),
+        },
+      });
+      toast.success(`Updated "${categoriesList.find((c) => c.id === categoryId)?.name}" layout to ${rows} ${rows === 1 ? "row" : "rows"}!`);
+      await onRefresh();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update category layout");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Reorder Product within category Up / Down
+  const moveProduct = async (categoryId: string, prodIndexInCat: number, direction: "up" | "down") => {
+    const cat = categoriesList.find((c) => c.id === categoryId);
+    const catSlug = cat?.slug;
+    const catProducts = productsList.filter(
+      (p) => p.category_id === categoryId || (catSlug && p.category_slug === catSlug) || (catSlug && p.category_id === `cat_${catSlug}`)
+    );
+    const targetIndex = direction === "up" ? prodIndexInCat - 1 : prodIndexInCat + 1;
+    if (targetIndex < 0 || targetIndex >= catProducts.length) return;
+
+    const updatedCatProducts = [...catProducts];
+    const [moved] = updatedCatProducts.splice(prodIndexInCat, 1);
+    updatedCatProducts.splice(targetIndex, 0, moved!);
+
+    // Reassign sequential sort_order for this category's products
+    const reorderedCategoryMap = new Map<string, number>();
+    updatedCatProducts.forEach((p, idx) => {
+      reorderedCategoryMap.set(p.id, idx + 1);
+    });
+
+    const updatedAllProducts = productsList.map((p) => {
+      if (reorderedCategoryMap.has(p.id)) {
+        return { ...p, sort_order: reorderedCategoryMap.get(p.id)! };
+      }
+      return p;
+    }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
+
+    setProductsList(updatedAllProducts);
+
+    try {
+      setIsSaving(true);
+      await saveProductSequenceFn({
+        data: {
+          products: updatedCatProducts.map((p, idx) => ({
+            id: p.id,
+            sort_order: idx + 1,
+          })),
+        },
+      });
+      toast.success(`Product "${moved!.name}" moved ${direction}!`);
+      await onRefresh();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update product sequence");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header Info Box */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 items-center justify-center rounded-xl bg-berry/10 text-berry">
+              <Sliders className="size-4" />
+            </span>
+            <h2 className="font-display text-xl font-bold text-cocoa">
+              Shop Category & Product Layout Controls
+            </h2>
+          </div>
+          <p className="text-xs text-muted-foreground max-w-xl leading-relaxed">
+            Control which category appears first on the shop page, configure whether each category renders 1, 2, 3, or 4 rows of 4 cards on desktop, and sequence products within each category.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[11px] font-semibold text-muted-foreground bg-secondary/80 px-3 py-1 rounded-full border border-border/60">
+            {categoriesList.length} Categories
+          </span>
+        </div>
+      </div>
+
+      {/* Categories Reordering & Row Controls List */}
+      <div className="space-y-3.5">
+        {categoriesList.map((cat, catIdx) => {
+          const catProducts = productsList.filter(
+            (p) => p.category_id === cat.id || p.category_slug === cat.slug || p.category_id === `cat_${cat.slug}`
+          );
+          const isExpanded = expandedCat === cat.id;
+          const currentRows = cat.layout_rows || 1;
+
+          return (
+            <div
+              key={cat.id}
+              className="rounded-3xl border border-border/70 bg-card p-4 sm:p-5 shadow-soft transition-all hover:border-berry/30 hover:shadow-lift space-y-4"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                {/* Category Identity & Sequence Rank */}
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="flex size-9 sm:size-10 shrink-0 items-center justify-center rounded-2xl bg-cocoa text-background font-mono text-xs sm:text-sm font-bold shadow-2xs">
+                    #{catIdx + 1}
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-display text-base sm:text-lg font-bold text-cocoa truncate">
+                        {cat.name}
+                      </h3>
+                      <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] sm:text-xs font-bold text-cocoa/80 border border-border/60">
+                        {catProducts.length} items
+                      </span>
+                    </div>
+                    {cat.description && (
+                      <p className="text-xs text-muted-foreground truncate max-w-md mt-0.5">
+                        {cat.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Layout Controls: Row Count & Move Up/Down */}
+                <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 self-end sm:self-auto shrink-0">
+                  {/* Desktop Row Count Selector */}
+                  <div className="flex items-center gap-1 bg-secondary/60 p-1 rounded-2xl border border-border/60">
+                    <span className="text-[10px] font-bold text-muted-foreground px-1.5 hidden sm:inline">
+                      Desktop Rows:
+                    </span>
+                    {[1, 2, 3, 4].map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => changeCategoryRows(cat.id, r)}
+                        className={`h-7 px-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          currentRows === r
+                            ? "bg-berry text-white shadow-2xs"
+                            : "text-muted-foreground hover:text-foreground hover:bg-background/60"
+                        }`}
+                        title={`${r} row (${r * 4} cards per view on desktop)`}
+                      >
+                        {r}R ({r * 4})
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Move Up & Move Down Category Order Buttons */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={catIdx === 0 || isSaving}
+                      onClick={() => moveCategory(catIdx, "up")}
+                      className="size-8 p-0 rounded-xl cursor-pointer hover:bg-secondary hover:text-berry"
+                      title="Move Category Up"
+                    >
+                      <ArrowUp className="size-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={catIdx === categoriesList.length - 1 || isSaving}
+                      onClick={() => moveCategory(catIdx, "down")}
+                      className="size-8 p-0 rounded-xl cursor-pointer hover:bg-secondary hover:text-berry"
+                      title="Move Category Down"
+                    >
+                      <ArrowDown className="size-4" />
+                    </Button>
+                  </div>
+
+                  {/* Toggle Products Sequence Accordion */}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setExpandedCat(isExpanded ? null : cat.id)}
+                    className="h-8 px-3 rounded-xl text-xs font-semibold hover:border-berry/40 flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>Sequence Products ({catProducts.length})</span>
+                    {isExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Product Sequencing List within this Category */}
+              {isExpanded && (
+                <div className="pt-3 border-t border-border/50 space-y-2.5 animate-in fade-in duration-200">
+                  <div className="flex items-center justify-between px-1">
+                    <p className="text-xs font-bold text-cocoa">
+                      Product Order in {cat.name} (Product #1 appears first in the lane):
+                    </p>
+                    <span className="text-[11px] text-muted-foreground hidden sm:inline">
+                      Use Up/Down arrows to sequence products
+                    </span>
+                  </div>
+
+                  {catProducts.length === 0 ? (
+                    <div className="text-center py-4 text-xs text-muted-foreground bg-secondary/30 rounded-2xl">
+                      No products assigned to this category yet.
+                    </div>
+                  ) : (
+                    <div className="grid gap-2">
+                      {catProducts.map((prod, prodIdx) => (
+                        <div
+                          key={prod.id}
+                          className="flex items-center justify-between gap-3 p-2.5 rounded-2xl bg-secondary/40 border border-border/60 hover:bg-secondary/70 transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-background text-[11px] font-mono font-bold text-cocoa shadow-2xs">
+                              {prodIdx + 1}
+                            </span>
+                            {prod.image_url ? (
+                              <img
+                                src={prod.image_url}
+                                alt={prod.name}
+                                className="size-9 rounded-xl object-cover border border-border/50 shrink-0"
+                              />
+                            ) : (
+                              <div className="size-9 rounded-xl bg-secondary flex items-center justify-center text-sm">
+                                🥖
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-cocoa truncate">{prod.name}</p>
+                              <p className="text-[10px] text-muted-foreground">
+                                {formatCurrency(prod.price)} &bull; {prod.stock} in stock
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1 shrink-0">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              disabled={prodIdx === 0 || isSaving}
+                              onClick={() => moveProduct(cat.id, prodIdx, "up")}
+                              className="size-7 p-0 rounded-lg hover:bg-background cursor-pointer"
+                              title="Move Product Up"
+                            >
+                              <ArrowUp className="size-3.5" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              disabled={prodIdx === catProducts.length - 1 || isSaving}
+                              onClick={() => moveProduct(cat.id, prodIdx, "down")}
+                              className="size-7 p-0 rounded-lg hover:bg-background cursor-pointer"
+                              title="Move Product Down"
+                            >
+                              <ArrowDown className="size-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function AdminDashboard() {
   const queryClient = useQueryClient();
   const loadData = useServerFn(getAdminData);
@@ -531,6 +909,7 @@ function AdminDashboard() {
             Users ({usersList.length})
           </TabsTrigger>
           <TabsTrigger value="inventory">Inventory</TabsTrigger>
+          <TabsTrigger value="shop_layout">Shop & Categories</TabsTrigger>
           <TabsTrigger value="reviews">Customer Reviews</TabsTrigger>
           <TabsTrigger value="offers">Offer codes</TabsTrigger>
           <TabsTrigger value="calendar">Closed dates</TabsTrigger>
@@ -1532,6 +1911,14 @@ function AdminDashboard() {
               </div>
             )}
           </div>
+        </TabsContent>
+
+        <TabsContent value="shop_layout" className="mt-6 space-y-6">
+          <AdminShopLayoutManager
+            categories={data.categories}
+            products={data.products}
+            onRefresh={refresh}
+          />
         </TabsContent>
 
         <TabsContent value="calendar" className="mt-6 max-w-xl space-y-4">

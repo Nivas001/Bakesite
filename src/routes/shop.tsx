@@ -27,36 +27,50 @@ export const Route = createFileRoute("/shop")({
 });
 
 /**
- * Horizontal Category Lane with Left/Right navigation and "View all products" button
+ * Horizontal Category Lane with responsive 4-cards-per-row layout, 1-4 row support, and 2-column mobile bento showcase
  */
 function CategoryHorizontalLane({
   categoryName,
   categorySlug,
   description,
   products,
+  layoutRows = 1,
   onViewAll,
 }: {
   categoryName: string;
   categorySlug: string;
   description: string | null;
   products: CatalogProduct[];
+  layoutRows?: number;
   onViewAll: (slug: string) => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = direction === "left" ? -320 : 320;
+      const containerWidth = scrollRef.current.clientWidth;
+      const scrollAmount = direction === "left" ? -containerWidth * 0.85 : containerWidth * 0.85;
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
   if (products.length === 0) return null;
 
+  const rows = Math.min(4, Math.max(1, layoutRows));
+
+  // Chunk into columns of `rows` items for desktop horizontal multi-row layout
+  const columns: CatalogProduct[][] = [];
+  for (let i = 0; i < products.length; i += rows) {
+    columns.push(products.slice(i, i + rows));
+  }
+
+  // On mobile: pick top 4 items for 2x2 bento showcase
+  const mobileTopProducts = products.slice(0, 4);
+
   return (
-    <section className="space-y-3.5 py-4 border-b border-border/40 last:border-b-0">
+    <section className="space-y-3.5 py-5 border-b border-border/40 last:border-b-0">
       {/* Category Row Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+      <div className="flex items-center justify-between gap-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="size-2 rounded-full bg-berry" />
@@ -68,21 +82,21 @@ function CategoryHorizontalLane({
             </span>
           </div>
           {description && (
-            <p className="text-xs text-muted-foreground max-w-lg leading-relaxed">
+            <p className="text-xs text-muted-foreground max-w-lg leading-relaxed hidden sm:block">
               {description}
             </p>
           )}
         </div>
 
         {/* Action Controls: View All Button & Arrow Buttons */}
-        <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-          {/* Scroll Arrows */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Desktop/Tablet Scroll Arrows */}
           <div className="hidden sm:flex items-center gap-1">
             <button
               type="button"
               onClick={() => scroll("left")}
               aria-label={`Scroll ${categoryName} left`}
-              className="flex size-7.5 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs"
+              className="flex size-8 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs"
             >
               <ChevronLeft className="size-4" />
             </button>
@@ -90,7 +104,7 @@ function CategoryHorizontalLane({
               type="button"
               onClick={() => scroll("right")}
               aria-label={`Scroll ${categoryName} right`}
-              className="flex size-7.5 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs"
+              className="flex size-8 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs"
             >
               <ChevronRight className="size-4" />
             </button>
@@ -110,17 +124,48 @@ function CategoryHorizontalLane({
         </div>
       </div>
 
-      {/* Horizontal Scrolling Axis */}
+      {description && (
+        <p className="text-xs text-muted-foreground leading-relaxed sm:hidden">
+          {description}
+        </p>
+      )}
+
+      {/* 📱 MOBILE VIEW: Clean 2-Column Grid (Shows 4 Featured Cards + View All Button) */}
+      <div className="sm:hidden space-y-3">
+        <div className="grid grid-cols-2 gap-2.5">
+          {mobileTopProducts.map((product) => (
+            <div key={product.id} className="min-w-0">
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+
+        {products.length > 4 && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onViewAll(categorySlug)}
+            className="w-full rounded-2xl border-berry/30 text-berry hover:bg-berry/10 font-bold text-xs h-10 shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <span>View all {products.length} {categoryName}</span>
+            <ArrowRight className="size-3.5" />
+          </Button>
+        )}
+      </div>
+
+      {/* 💻 DESKTOP & TABLET VIEW: Exact 4-Cards per Row Horizontal Lane (Supports 1, 2, 3, 4 Rows) */}
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto gap-3.5 sm:gap-4.5 pb-3 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar snap-x snap-mandatory scroll-smooth"
+        className="hidden sm:flex overflow-x-auto gap-4 pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
       >
-        {products.map((product) => (
+        {columns.map((column, colIdx) => (
           <div
-            key={product.id}
-            className="snap-start shrink-0 w-[230px] sm:w-[260px] md:w-[275px]"
+            key={colIdx}
+            className="snap-start shrink-0 sm:w-[calc(50%-8px)] md:w-[calc(33.333%-11px)] lg:w-[calc(25%-12px)] flex flex-col gap-4"
           >
-            <ProductCard product={product} />
+            {column.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         ))}
       </div>
@@ -279,6 +324,7 @@ function Shop() {
               categorySlug={category.slug}
               description={category.description}
               products={catProducts}
+              layoutRows={(category as any).layout_rows ?? 1}
               onViewAll={handleCategoryChange}
             />
           ))}

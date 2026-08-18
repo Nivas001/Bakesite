@@ -109,3 +109,27 @@ export const deleteBlackout = createServerFn({ method: "POST" })
     await assertAdmin(context.userId);
     return removeBlackout(data);
   });
+
+export const saveCategoryOrder = createServerFn({ method: "POST" })
+  .middleware([requireAppwriteAuth])
+  .inputValidator((input: unknown) => {
+    const { categoryOrderSchema } = require("./admin.schema");
+    return categoryOrderSchema.parse(input);
+  })
+  .handler(async ({ data, context }) => {
+    const { assertAdmin, saveCategoryOrderingAdmin } = await import("./admin.server");
+    await assertAdmin(context.userId);
+    return saveCategoryOrderingAdmin(data);
+  });
+
+export const saveProductSequence = createServerFn({ method: "POST" })
+  .middleware([requireAppwriteAuth])
+  .inputValidator((input: unknown) => {
+    const { productSequenceSchema } = require("./admin.schema");
+    return productSequenceSchema.parse(input);
+  })
+  .handler(async ({ data, context }) => {
+    const { assertAdmin, saveProductSequenceAdmin } = await import("./admin.server");
+    await assertAdmin(context.userId);
+    return saveProductSequenceAdmin(data);
+  });

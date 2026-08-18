@@ -19,6 +19,7 @@ export type ProductDoc = {
   stock: number;
   is_active: boolean;
   category_id: string | null;
+  sort_order?: number | null;
 };
 
 export type CategoryDoc = {
@@ -26,6 +27,7 @@ export type CategoryDoc = {
   slug: string;
   description: string | null;
   sort_order: number;
+  layout_rows?: number | null;
 };
 
 const SEED_CATEGORIES: CategoryDoc[] = [
@@ -526,11 +528,37 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
   },
 ];
 
+// In-memory / persistent config store for category and product layout overrides
+const categoryConfigOverrides = new Map<string, { sort_order?: number; layout_rows?: number }>();
+const productSequenceOverrides = new Map<string, number>();
+
+export function updateCategoryConfigOverrides(
+  categories: Array<{ id: string; sort_order: number; layout_rows?: number }>,
+) {
+  for (const c of categories) {
+    const existing = categoryConfigOverrides.get(c.id) ?? {};
+    categoryConfigOverrides.set(c.id, {
+      ...existing,
+      sort_order: c.sort_order,
+      layout_rows: c.layout_rows ?? existing.layout_rows ?? 1,
+    });
+  }
+}
+
+export function updateProductSequenceOverrides(
+  products: Array<{ id: string; sort_order: number }>,
+) {
+  for (const p of products) {
+    productSequenceOverrides.set(p.id, p.sort_order);
+  }
+}
+
 export function mapProduct(
   doc: Doc<ProductDoc>,
   categories: Doc<CategoryDoc>[] = [],
 ): CatalogProduct {
   const category = categories.find((c) => c.$id === doc.category_id) ?? null;
+  const customOrder = productSequenceOverrides.get(doc.$id);
   return {
     id: doc.$id,
     name: doc.name,
@@ -544,15 +572,19 @@ export function mapProduct(
     category_id: doc.category_id ?? null,
     category_name: category?.name ?? null,
     category_slug: category?.slug ?? null,
+    sort_order: customOrder !== undefined ? customOrder : (doc.sort_order ?? 0),
   };
 }
 
 export function mapCategory(doc: Doc<CategoryDoc>) {
+  const override = categoryConfigOverrides.get(doc.$id);
   return {
     id: doc.$id,
     name: doc.name,
     slug: doc.slug,
     description: doc.description ?? null,
+    sort_order: override?.sort_order ?? (doc.sort_order || 0),
+    layout_rows: override?.layout_rows ?? (doc.layout_rows || 1),
   };
 }
 
@@ -562,15 +594,22 @@ export async function loadCatalog() {
       const [products, categories] = await Promise.all([
         listDocs<ProductDoc>(COLLECTIONS.products, [
           Q.equal("is_active", true),
-          Q.orderAsc("name"),
           Q.limit(200),
         ]),
         listDocs<CategoryDoc>(COLLECTIONS.categories, [Q.orderAsc("sort_order"), Q.limit(50)]),
       ]);
       if (products.length > 0) {
+        const mappedCats = categories
+          .map(mapCategory)
+          .sort((a, b) => a.sort_order - b.sort_order);
+
+        const mappedProds = products
+          .map((p) => mapProduct(p, categories))
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
+
         return {
-          products: products.map((p) => mapProduct(p, categories)),
-          categories: categories.map(mapCategory),
+          products: mappedProds,
+          categories: mappedCats,
         };
       }
     }
@@ -578,9 +617,23 @@ export async function loadCatalog() {
     // Fall back to seed catalog
   }
 
-  // Seamless fallback
-  return {
-    products: SEED_PRODUCTS.map((p) => ({
+  // Seamless fallback with active overrides
+  const mappedSeedCats = SEED_CATEGORIES.map((c) => {
+    const id = `cat_${c.slug}`;
+    const override = categoryConfigOverrides.get(id);
+    return {
+      id,
+      name: c.name,
+      slug: c.slug,
+      description: c.description,
+      sort_order: override?.sort_order ?? c.sort_order,
+      layout_rows: override?.layout_rows ?? (c.layout_rows || 1),
+    };
+  }).sort((a, b) => a.sort_order - b.sort_order);
+
+  const mappedSeedProds = SEED_PRODUCTS.map((p, idx) => {
+    const customOrder = productSequenceOverrides.get(p.id);
+    return {
       id: p.id,
       name: p.name,
       slug: p.slug,
@@ -593,13 +646,13 @@ export async function loadCatalog() {
       category_id: p.category_id,
       category_name: SEED_CATEGORIES.find((c) => c.slug === p.category_slug)?.name ?? "Bakery",
       category_slug: p.category_slug,
-    })),
-    categories: SEED_CATEGORIES.map((c, i) => ({
-      id: `cat_${c.slug}`,
-      name: c.name,
-      slug: c.slug,
-      description: c.description,
-    })),
+      sort_order: customOrder !== undefined ? customOrder : idx,
+    };
+  }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
+
+  return {
+    products: mappedSeedProds,
+    categories: mappedSeedCats,
   };
 }
 

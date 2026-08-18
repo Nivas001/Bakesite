@@ -80,4 +80,30 @@ export const reviewSchema = z.object({
   comment: z.string().trim().max(600).optional(),
 });
 
+export const categoryOrderSchema = z.object({
+  categories: z.array(
+    z.object({
+      id: z.string().trim().min(1),
+      sort_order: z.number().int().min(0),
+      layout_rows: z.number().int().min(1).max(4).optional(),
+    }),
+  ),
+});
+
+export const categoryLayoutSchema = z.object({
+  categoryId: z.string().trim().min(1),
+  layout_rows: z.number().int().min(1).max(4),
+});
+
+export const productSequenceSchema = z.object({
+  products: z.array(
+    z.object({
+      id: z.string().trim().min(1),
+      sort_order: z.number().int().min(0),
+    }),
+  ),
+});
+
 export type ProductInput = z.infer<typeof productSchema>;
+export type CategoryOrderInput = z.infer<typeof categoryOrderSchema>;
+export type ProductSequenceInput = z.infer<typeof productSequenceSchema>;
