@@ -143,23 +143,6 @@ function ProductDetailPage() {
     setTimeout(() => setRipple(false), 600);
   }
 
-  function handleBuyNow() {
-    if (quantityInCart === 0) {
-      add(
-        {
-          productId: product.id,
-          slug: product.slug,
-          name: product.name,
-          unitPrice: price,
-          basePrice: product.price,
-          imageUrl: product.image_url,
-        },
-        1,
-      );
-    }
-    navigate({ to: "/cart" });
-  }
-
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:py-8 pb-24 md:pb-12 space-y-10 sm:space-y-14">
 
@@ -288,7 +271,7 @@ function ProductDetailPage() {
             </div>
           )}
 
-          {/* Interactive Dynamic Action: Add to Cart + Buy Now OR Stepper + View Cart */}
+          {/* Explicit Purchase Action: Add to Cart OR Stepper + View Cart */}
           <div className="pt-1" ref={addBtnRef}>
             {quantityInCart === 0 ? (
               <div className="flex flex-row items-center gap-2 sm:gap-3">
@@ -305,13 +288,13 @@ function ProductDetailPage() {
                   )}
                 </Button>
 
-                {/* Buy Now Button */}
+                {/* View Cart Button (Pure navigation — does NOT mutate or auto-add) */}
                 <Button
                   size="lg"
                   className="flex-1 h-10 sm:h-11 rounded-2xl bg-[#2C1810] text-white hover:bg-[#3D2217] font-bold text-xs sm:text-sm shadow-soft transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer px-3"
-                  onClick={handleBuyNow}
+                  onClick={() => navigate({ to: "/cart" })}
                 >
-                  <span>Buy Now</span>
+                  <span>View Cart</span>
                   <ArrowRight className="ml-1.5 size-4" />
                 </Button>
               </div>
@@ -477,7 +460,7 @@ function ProductDetailPage() {
       {/* 4. Reviews Bento Atelier (Placed at the end of the page) */}
       <ProductReviews productId={product.id} />
 
-      {/* Sticky Mobile Add to Cart & Buy Bar */}
+      {/* Sticky Mobile Add to Cart & View Cart Bar */}
       {showStickyBar && (
         <div
           className={`fixed bottom-0 left-0 right-0 z-40 md:hidden border-t border-border/80 bg-background/95 backdrop-blur-md px-4 py-2.5 flex items-center gap-2 transition-all duration-300 shadow-2xl ${
@@ -504,9 +487,9 @@ function ProductDetailPage() {
               <Button
                 size="sm"
                 className="rounded-xl bg-[#2C1810] text-white hover:bg-[#3D2217] font-bold text-xs px-3 h-9 shrink-0 cursor-pointer shadow-soft"
-                onClick={handleBuyNow}
+                onClick={() => navigate({ to: "/cart" })}
               >
-                Buy Now
+                View Cart
               </Button>
             </div>
           ) : (
