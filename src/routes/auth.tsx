@@ -262,64 +262,25 @@ function AuthPage() {
     <div className="flex min-h-[calc(100svh-7.5rem)] flex-col justify-center px-4 py-6 sm:py-10">
       <div className="mx-auto w-full max-w-sm sm:max-w-md lg:max-w-4xl lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center">
         
-        {/* Left Side 3D Illustration & Benefits Banner (Desktop & Tablet) */}
-        <div className="hidden lg:flex flex-col items-center justify-center text-center space-y-5 p-8 rounded-3xl bg-secondary/30 border border-border/60 shadow-inner">
-          <div className="relative size-52 xl:size-60 flex items-center justify-center">
+        {/* Left Side 3D Illustration (Clean Pure Visual, No Extra Text) */}
+        <div className="hidden lg:flex items-center justify-center p-4">
+          <div className="relative size-64 xl:size-72 flex items-center justify-center">
             <video
-              key={authMode}
               autoPlay
               loop
               muted
               playsInline
-              className="size-full object-contain pointer-events-none drop-shadow-xl animate-in fade-in zoom-in-95 duration-500"
+              className="size-full object-contain pointer-events-none drop-shadow-2xl"
             >
-              {authMode === "signup" ? (
-                <>
-                  <source
-                    src="/illustration/shopping-bag-with-sale-tag-and-sneaker-box-online-order-confirmation-and-discount-shopping.webm"
-                    type="video/webm"
-                  />
-                  <source
-                    src="/illustration/shopping-bag-with-sale-tag-and-sneaker-box-online-order-confirmation-and-discount-shopping.mp4"
-                    type="video/mp4"
-                  />
-                </>
-              ) : (
-                <>
-                  <source
-                    src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.webm"
-                    type="video/webm"
-                  />
-                  <source
-                    src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.mp4"
-                    type="video/mp4"
-                  />
-                </>
-              )}
+              <source
+                src="/illustration/shopping-bag-with-sale-tag-and-sneaker-box-online-order-confirmation-and-discount-shopping.webm"
+                type="video/webm"
+              />
+              <source
+                src="/illustration/shopping-bag-with-sale-tag-and-sneaker-box-online-order-confirmation-and-discount-shopping.mp4"
+                type="video/mp4"
+              />
             </video>
-          </div>
-
-          <div className="space-y-2 max-w-xs">
-            <h2 className="font-blogh text-2xl font-bold text-cocoa uppercase tracking-wide">
-              {authMode === "signup" ? "Fresh Morning Bake Slots" : "Handcrafted In Pondicherry"}
-            </h2>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {authMode === "signup"
-                ? "Join our bakery membership to unlock priority morning bake slots, seasonal sourdough drops, and exclusive offers."
-                : "Sign in to track your oven queue in real time, view past artisan orders, and reorder in one tap."}
-            </p>
-          </div>
-
-          {/* Quick Perks Pill List */}
-          <div className="space-y-2 w-full max-w-xs text-left text-xs font-semibold text-cocoa">
-            <div className="flex items-center gap-2 rounded-xl bg-card/80 p-2.5 border border-border/70 shadow-2xs">
-              <span className="text-base">🥐</span>
-              <span>Baked fresh daily at 4:00 AM</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-xl bg-card/80 p-2.5 border border-border/70 shadow-2xs">
-              <span className="text-base">🎁</span>
-              <span>15% Welcome discount on 1st order</span>
-            </div>
           </div>
         </div>
 
