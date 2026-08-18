@@ -21,9 +21,12 @@ import {
   BookOpen,
   Award,
   Compass,
+  Box,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Cake3dModelViewer } from "@/components/cake-3d-model-viewer";
+import { DeliverySecurityShowcase } from "@/components/delivery-security-showcase";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -247,6 +250,8 @@ export function AboutUsPage() {
   const [viewMode, setViewMode] = useState<"collage" | "story">("collage");
   const [activeStoryChapter, setActiveStoryChapter] = useState<number>(1);
   const [showTooltip, setShowTooltip] = useState(true);
+  const [is3dStudioOpen, setIs3dStudioOpen] = useState(false);
+  const studio3dRef = useRef<HTMLDivElement>(null);
 
   // 360° Drag-to-Rotate State
   const [rotationY, setRotationY] = useState(0);
@@ -680,13 +685,17 @@ export function AboutUsPage() {
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <a
-                  href="#3d-cake-studio"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIs3dStudioOpen(true);
+                    studio3dRef.current?.scrollIntoView({ behavior: "smooth" });
+                  }}
                   className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-amber-300 font-bold text-xs sm:text-sm h-11 transition-all cursor-pointer"
                 >
                   <Compass className="size-4" />
-                  <span>View 3D GLB Studio ↓</span>
-                </a>
+                  <span>Launch 3D Real Studio ↓</span>
+                </button>
               </div>
             </div>
 
@@ -1247,10 +1256,67 @@ export function AboutUsPage() {
         </section>
       )}
 
-      {/* 4. Real-Time WebGL 3D GLB Model Atelier (Supports 360 Free Orbit & Multiple Models) */}
-      <section className="py-8 px-4 sm:px-6 max-w-6xl mx-auto">
-        <Cake3dModelViewer />
+      {/* 4. Real-Time WebGL 3D GLB Model Atelier (Accessible via center button) */}
+      <section ref={studio3dRef} id="3d-cake-studio" className="py-8 px-4 sm:px-6 max-w-6xl mx-auto space-y-6">
+        {!is3dStudioOpen ? (
+          <div className="relative overflow-hidden rounded-3xl sm:rounded-4xl border-2 border-border/80 bg-gradient-to-br from-[#2C1810] via-[#1D0F0A] to-[#120704] text-white p-8 sm:p-14 shadow-2xl text-center">
+            {/* Ambient glows */}
+            <div className="pointer-events-none absolute -top-20 -left-20 size-72 rounded-full bg-amber-500/20 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-20 -right-20 size-72 rounded-full bg-berry/25 blur-3xl" />
+
+            <div className="relative mx-auto max-w-2xl space-y-4">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 px-3.5 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-300 shadow-xs">
+                <Sparkles className="size-3.5 text-amber-300" />
+                <span>Interactive WebGL 3D Experience</span>
+              </span>
+
+              <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-white uppercase tracking-wide leading-tight">
+                See how our cakes look in real world 3D
+              </h2>
+
+              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-lg mx-auto">
+                Rotate, orbit, zoom, and inspect every hand-piped caramel rosette, 24K gold foil crumb, and dietary macro telemetry in our real-time 3D studio.
+              </p>
+
+              {/* Center Launch Button */}
+              <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={() => setIs3dStudioOpen(true)}
+                  className="rounded-2xl bg-amber-400 text-black hover:bg-amber-300 font-extrabold text-xs sm:text-sm h-12 px-8 shadow-lift transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
+                >
+                  <Sparkles className="size-4 text-black" />
+                  <span>Launch 3D Real-World Studio (360° Free Orbit)</span>
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 animate-in fade-in zoom-in-95 duration-500">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-2">
+                <span className="flex size-2 rounded-full bg-emerald-500 animate-ping" />
+                <span className="text-xs font-bold text-cocoa uppercase tracking-wider">
+                  Live WebGL 3D Studio Active
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIs3dStudioOpen(false)}
+                className="rounded-xl border-border text-xs font-semibold text-muted-foreground hover:text-cocoa cursor-pointer"
+              >
+                Collapse 3D Studio ↑
+              </Button>
+            </div>
+            <Cake3dModelViewer />
+          </div>
+        )}
       </section>
+
+      {/* 5. Safe & Secure Delivery Packaging Showcase */}
+      <DeliverySecurityShowcase />
 
       {/* 5. Bottom Bakery Call-To-Action */}
       <section className="py-10 px-4 sm:px-6 max-w-4xl mx-auto text-center">
