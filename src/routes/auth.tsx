@@ -259,53 +259,29 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100svh-7.5rem)] flex-col justify-center px-4 py-6 sm:py-10">
-      <div className="mx-auto w-full max-w-sm sm:max-w-md lg:max-w-4xl lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center">
+    <div className="flex min-h-[calc(100svh-7.5rem)] flex-col justify-center px-4 py-4 sm:py-8">
+      <div className="mx-auto w-full max-w-sm sm:max-w-md">
         
-        {/* Left Side 3D Illustration (Clean Pure Visual, No Extra Text) */}
-        <div className="hidden lg:flex items-center justify-center p-4">
-          <div className="relative size-64 xl:size-72 flex items-center justify-center">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="size-full object-contain pointer-events-none drop-shadow-2xl"
-            >
-              <source
-                src="/illustration/shopping-bag-with-sale-tag-and-sneaker-box-online-order-confirmation-and-discount-shopping.webm"
-                type="video/webm"
-              />
-              <source
-                src="/illustration/shopping-bag-with-sale-tag-and-sneaker-box-online-order-confirmation-and-discount-shopping.mp4"
-                type="video/mp4"
-              />
-            </video>
-          </div>
+        {/* Header Block: Compact & Well Spaced */}
+        <div className="text-center">
+          <h1 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
+            {verificationSentEmail
+              ? "Check your email"
+              : authMode === "signin"
+              ? "Welcome back"
+              : "Create your account"}
+          </h1>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {verificationSentEmail
+              ? "We sent a verification link to confirm your account."
+              : authMode === "signin"
+              ? "Sign in with your email or Google account."
+              : "Register with your email to start ordering handcrafted bakes."}
+          </p>
         </div>
 
-        {/* Right Side / Form Container */}
-        <div className="w-full">
-          {/* Header Block: Compact & Well Spaced */}
-          <div className="text-center lg:text-left">
-            <h1 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
-              {verificationSentEmail
-                ? "Check your email"
-                : authMode === "signin"
-                ? "Welcome back"
-                : "Create your account"}
-            </h1>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {verificationSentEmail
-                ? "We sent a verification link to confirm your account."
-                : authMode === "signin"
-                ? "Sign in with your email or Google account."
-                : "Register with your email to start ordering handcrafted bakes."}
-            </p>
-          </div>
-
-          {/* Card Container: Compact Padding */}
-          <div className="mt-3.5 sm:mt-6 rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-4.5 sm:p-7 shadow-soft">
+        {/* Card Container: Compact Padding */}
+        <div className="mt-3.5 sm:mt-6 rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-4.5 sm:p-7 shadow-soft">
           
           {/* EMAIL VERIFICATION SENT SCREEN */}
           {verificationSentEmail ? (
@@ -616,6 +592,5 @@ function AuthPage() {
             </div>
           </div>
         </div>
-      </div>
-    );
+      );
 }
