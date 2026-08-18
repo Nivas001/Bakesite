@@ -226,9 +226,9 @@ export async function upsertProduct(input: ProductInput) {
     is_active: input.is_active,
   };
 
-  if (input.description) row.description = input.description.trim();
-  if (input.image_url) row.image_url = input.image_url.trim();
-  if (input.category_id) row.category_id = input.category_id.trim();
+  if (input.description) row['description'] = input.description.trim();
+  if (input.image_url) row['image_url'] = input.image_url.trim();
+  if (input.category_id) row['category_id'] = input.category_id.trim();
 
   try {
     if (input.id) {
