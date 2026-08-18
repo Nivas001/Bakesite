@@ -12,7 +12,10 @@ import {
 
 export function ProductCard({ product }: { product: CatalogProduct }) {
   const { lines, add, setQuantity } = useCart();
-  const price = finalPrice(product.price, product.discount_type, product.discount_value);
+  const hasVariants = Boolean(product.weight_variants && product.weight_variants.length > 0);
+  const defaultVariant = hasVariants ? product.weight_variants![0] : null;
+  const displayBasePrice = defaultVariant ? defaultVariant.price : product.price;
+  const price = finalPrice(displayBasePrice, product.discount_type, product.discount_value);
   const discounted = hasDiscount(product.discount_type, product.discount_value);
 
   const cartLine = lines.find((l) => l.productId === product.id);
@@ -41,28 +44,55 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
         <div className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 flex flex-col items-end">
           {discounted && (
             <span className="text-[10px] sm:text-[11px] font-semibold text-foreground/90 line-through drop-shadow-xs mb-0.5">
-              {formatCurrency(product.price)}
+              {formatCurrency(displayBasePrice)}
             </span>
           )}
           <span className="rounded-full bg-card/90 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs md:text-sm font-bold text-cocoa shadow-soft backdrop-blur">
-            {formatCurrency(price)}
+            {hasVariants ? `From ` : ""}{formatCurrency(price)}
           </span>
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-1.5 sm:gap-2.5 px-1 sm:px-2 pb-0.5 pt-3 sm:pt-4">
+      <div className="flex flex-1 flex-col gap-1.5 sm:gap-2 px-1 sm:px-2 pb-0.5 pt-2.5 sm:pt-3">
         <div>
-          <p className="text-[9px] sm:text-[11px] uppercase tracking-wider font-semibold text-muted-foreground/90 line-clamp-1">
-            {product.category_name}
-          </p>
-          <h3 className="font-blogh uppercase tracking-wide text-xs sm:text-base font-bold leading-snug line-clamp-1 sm:line-clamp-2 mt-0.5 text-cocoa">
+          <div className="flex items-center justify-between gap-1">
+            <p className="text-[9px] sm:text-[10px] uppercase tracking-wider font-bold text-muted-foreground/90 line-clamp-1">
+              {product.category_name}
+            </p>
+            {(product.serving_yield || product.unit_weight_grams) && (
+              <span className="text-[9px] sm:text-[10px] font-semibold text-berry line-clamp-1">
+                {product.unit_weight_grams ? `${product.unit_weight_grams}g` : product.serving_yield}
+              </span>
+            )}
+          </div>
+          <h3 className="font-blogh uppercase tracking-wide text-xs sm:text-sm md:text-base font-bold leading-snug line-clamp-1 sm:line-clamp-2 mt-0.5 text-cocoa">
             <Link to="/product/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
               {product.name}
             </Link>
           </h3>
         </div>
-        {product.description && (
-          <p className="line-clamp-2 text-[10px] sm:text-xs text-muted-foreground leading-relaxed hidden xs:block">
+
+        {/* Weight Variants Pills on Card */}
+        {hasVariants && (
+          <div className="flex flex-wrap gap-1 mt-0.5">
+            {product.weight_variants!.slice(0, 3).map((v) => (
+              <span
+                key={v.id}
+                className="inline-block rounded-md bg-secondary/80 px-1.5 py-0.2 text-[9px] sm:text-[10px] font-bold text-muted-foreground border border-border/50"
+              >
+                {v.label.split(" ")[0]}
+              </span>
+            ))}
+            {product.weight_variants!.length > 3 && (
+              <span className="text-[9px] text-muted-foreground font-bold self-center">
+                +{product.weight_variants!.length - 3} more
+              </span>
+            )}
+          </div>
+        )}
+
+        {product.description && !hasVariants && (
+          <p className="line-clamp-1 sm:line-clamp-2 text-[10px] sm:text-xs text-muted-foreground leading-relaxed hidden xs:block">
             {product.description}
           </p>
         )}

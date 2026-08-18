@@ -40,6 +40,22 @@ export const productSchema = z.object({
   stock: z.number().int().min(0).max(10000),
   is_active: z.boolean(),
   category_id: id.nullable().optional(),
+  item_type: z.enum(["weight", "unit", "pack"]).optional().nullable(),
+  unit_weight_grams: z.number().min(0).max(50000).optional().nullable(),
+  serving_yield: z.string().trim().max(200).optional().nullable(),
+  weight_variants: z
+    .array(
+      z.object({
+        id: z.string().trim().min(1),
+        label: z.string().trim().min(1),
+        weight_grams: z.number().min(0),
+        price: z.number().min(0),
+        serves: z.string().trim().optional().nullable(),
+        savings_label: z.string().trim().optional().nullable(),
+      }),
+    )
+    .optional()
+    .nullable(),
 });
 
 export const blackoutSchema = z.object({

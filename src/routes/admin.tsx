@@ -27,7 +27,11 @@ import {
   saveAdminOfferCode,
   deleteAdminOfferCode,
 } from "@/lib/offers.functions";
-import { formatCurrency } from "@/lib/pricing";
+import {
+  formatCurrency,
+  generateSmartCakeWeightVariants,
+  type ProductWeightVariant,
+} from "@/lib/pricing";
 import { TIME_SLOTS, toISODate } from "@/lib/slots";
 import {
   Dialog,
@@ -117,19 +121,27 @@ type ProductForm = {
   stock: string;
   is_active: boolean;
   category_id: string;
+  item_type: "weight" | "unit" | "pack";
+  unit_weight_grams: string;
+  serving_yield: string;
+  weight_variants: ProductWeightVariant[];
 };
 
 const EMPTY_FORM: ProductForm = {
   name: "",
   slug: "",
   description: "",
-  price: "0",
+  price: "300",
   discount_type: "none",
   discount_value: "0",
   image_url: "",
-  stock: "0",
+  stock: "10",
   is_active: true,
   category_id: "",
+  item_type: "weight",
+  unit_weight_grams: "250",
+  serving_yield: "250g (Serves 2–3 Guests)",
+  weight_variants: generateSmartCakeWeightVariants(300, 250),
 };
 
 type OfferCodeForm = {
@@ -265,6 +277,16 @@ function ProductAdminRow({
                 📁 {categoryName}
               </span>
             )}
+
+            {(product as any).item_type === "weight" ? (
+              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[10px] font-bold text-berry">
+                🎂 Weight-Scaled (250g–2kg)
+              </span>
+            ) : (product as any).unit_weight_grams || (product as any).serving_yield ? (
+              <span className="rounded-md bg-secondary/80 border border-border/50 px-1.5 py-0.5 text-[10px] font-bold text-cocoa">
+                ⚖️ {(product as any).serving_yield ?? `${(product as any).unit_weight_grams}g`}
+              </span>
+            ) : null}
 
             <span className="font-mono text-[11px] text-muted-foreground/70 truncate max-w-[150px]">
               /{product.slug}
@@ -1390,7 +1412,29 @@ function AdminDashboard() {
                   id="p-cat"
                   className="h-9 w-full rounded-xl border border-input bg-background px-3 text-xs mt-1 cursor-pointer"
                   value={form.category_id}
-                  onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value }))}
+                  onChange={(e) => {
+                    const catId = e.target.value;
+                    const catObj = data.categories.find((c) => c.id === catId);
+                    const catSlug = catObj?.slug?.toLowerCase() || "";
+                    const isCake = catSlug === "cakes" || catSlug === "cheesecakes";
+
+                    setForm((f) => ({
+                      ...f,
+                      category_id: catId,
+                      item_type: isCake ? "weight" : "unit",
+                      unit_weight_grams: isCake ? "250" : catSlug === "tea-cakes" ? "300" : catSlug === "breads" ? "650" : "85",
+                      serving_yield: isCake
+                        ? "250g (Serves 2–3 Guests)"
+                        : catSlug === "tea-cakes"
+                          ? "300g (16–18 Pieces)"
+                          : catSlug === "breads"
+                            ? "Approx. 650g artisan loaf"
+                            : "Approx. 85g each",
+                      weight_variants: isCake
+                        ? generateSmartCakeWeightVariants(Number(f.price) || 300, 250)
+                        : [],
+                    }));
+                  }}
                 >
                   <option value="">Uncategorised</option>
                   {data.categories.map((category) => (
@@ -1399,6 +1443,159 @@ function AdminDashboard() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* Sizing & Weight Pricing Controls */}
+              <div className="rounded-2xl border border-border/80 bg-secondary/30 p-3 sm:p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold text-cocoa uppercase tracking-wider flex items-center gap-1.5">
+                    <span>⚖️ Portion & Sizing Mode</span>
+                  </Label>
+                  <span className="text-[11px] text-muted-foreground">
+                    {form.item_type === "weight" ? "Tiered cake weights" : "Piece / batch weight"}
+                  </span>
+                </div>
+
+                {/* Mode Selector Buttons */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newVariants =
+                        form.weight_variants.length > 0
+                          ? form.weight_variants
+                          : generateSmartCakeWeightVariants(Number(form.price) || 300, 250);
+                      setForm((f) => ({
+                        ...f,
+                        item_type: "weight",
+                        weight_variants: newVariants,
+                        unit_weight_grams: "250",
+                        serving_yield: "250g (Serves 2–3 Guests)",
+                      }));
+                    }}
+                    className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      form.item_type === "weight"
+                        ? "border-berry bg-berry/15 text-berry ring-1 ring-berry"
+                        : "border-border/70 bg-card text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    <span>🎂 Weight-Scaled (Cakes)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm((f) => ({
+                        ...f,
+                        item_type: "unit",
+                        unit_weight_grams: f.unit_weight_grams || "85",
+                        serving_yield: f.serving_yield || "Approx. 85g / piece",
+                      }));
+                    }}
+                    className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      form.item_type !== "weight"
+                        ? "border-berry bg-berry/15 text-berry ring-1 ring-berry"
+                        : "border-border/70 bg-card text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    <span>🍩 Unit / Piece (Donuts, Tea Cakes, Breads)</span>
+                  </button>
+                </div>
+
+                {/* Sub-section: Weight-Scaled Mode Controls */}
+                {form.item_type === "weight" ? (
+                  <div className="space-y-2.5 pt-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[11px] text-muted-foreground">
+                        Volume discounts: <strong>500g is ~5% off</strong>, <strong>1kg is 10% off</strong>, <strong>2kg is 15% off</strong>
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const base = Number(form.price) || 300;
+                          const calculated = generateSmartCakeWeightVariants(base, 250);
+                          setForm((f) => ({ ...f, weight_variants: calculated }));
+                          toast.success(`Generated smart tiers from ₹${base} base (250g)!`);
+                        }}
+                        className="text-[11px] font-bold text-berry hover:underline cursor-pointer"
+                      >
+                        ⚡ Re-calculate Tiers
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5 overflow-x-auto">
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="border-b border-border/60 text-muted-foreground text-[10px] uppercase">
+                            <th className="py-1">Size / Weight</th>
+                            <th className="py-1">Servings</th>
+                            <th className="py-1">Price (₹)</th>
+                            <th className="py-1 text-right">Savings Tag</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border/40">
+                          {form.weight_variants.map((v, vIdx) => (
+                            <tr key={v.id}>
+                              <td className="py-1.5 font-bold text-cocoa">{v.label}</td>
+                              <td className="py-1.5 text-muted-foreground text-[11px]">{v.serves ?? "—"}</td>
+                              <td className="py-1.5">
+                                <Input
+                                  type="number"
+                                  value={v.price}
+                                  className="h-7 w-20 text-xs font-bold rounded-lg"
+                                  onChange={(e) => {
+                                    const val = Number(e.target.value) || 0;
+                                    const updated = [...form.weight_variants];
+                                    updated[vIdx] = { ...v, price: val };
+                                    setForm((f) => ({ ...f, weight_variants: updated }));
+                                  }}
+                                />
+                              </td>
+                              <td className="py-1.5 text-right">
+                                {v.savings_label ? (
+                                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                                    {v.savings_label}
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-muted-foreground">Base</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : (
+                  /* Sub-section: Unit / Piece Mode Controls */
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <Label htmlFor="p-unit-wt" className="text-xs font-semibold">
+                        Unit / Loaf Weight (Grams)
+                      </Label>
+                      <Input
+                        id="p-unit-wt"
+                        type="number"
+                        placeholder="85 (donut), 300 (tea cake), 650 (bread)"
+                        value={form.unit_weight_grams}
+                        className="rounded-xl h-9 text-xs mt-1"
+                        onChange={(e) => setForm((f) => ({ ...f, unit_weight_grams: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="p-serv-yield" className="text-xs font-semibold">
+                        Portion / Slice Yield Note
+                      </Label>
+                      <Input
+                        id="p-serv-yield"
+                        placeholder="e.g. 16–18 Pieces or Approx. 85g each"
+                        value={form.serving_yield}
+                        className="rounded-xl h-9 text-xs mt-1"
+                        onChange={(e) => setForm((f) => ({ ...f, serving_yield: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
@@ -1586,6 +1783,13 @@ function AdminDashboard() {
                           stock: Math.max(0, Math.floor(Number(form.stock) || 0)),
                           is_active: form.is_active,
                           category_id: form.category_id?.trim() || null,
+                          item_type: form.item_type,
+                          unit_weight_grams: form.unit_weight_grams ? Number(form.unit_weight_grams) : null,
+                          serving_yield: form.serving_yield?.trim() || null,
+                          weight_variants:
+                            form.item_type === "weight" && form.weight_variants.length > 0
+                              ? form.weight_variants
+                              : null,
                         },
                       });
                       setForm(EMPTY_FORM);
@@ -1789,6 +1993,17 @@ function AdminDashboard() {
                       product={product}
                       categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
                       onEdit={() => {
+                        const isCake =
+                          product.name.toLowerCase().includes("cake") ||
+                          product.name.toLowerCase().includes("cheesecake");
+                        const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
+                        const variants =
+                          (product as any).weight_variants && (product as any).weight_variants.length > 0
+                            ? (product as any).weight_variants
+                            : itemType === "weight"
+                              ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
+                              : [];
+
                         setForm({
                           id: product.id,
                           name: product.name,
@@ -1801,6 +2016,10 @@ function AdminDashboard() {
                           stock: String(product.stock),
                           is_active: product.is_active,
                           category_id: product.category_id ?? "",
+                          item_type: itemType,
+                          unit_weight_grams: String((product as any).unit_weight_grams || ""),
+                          serving_yield: (product as any).serving_yield || "",
+                          weight_variants: variants,
                         });
                         window.scrollTo({ top: 180, behavior: "smooth" });
                       }}
@@ -1840,6 +2059,18 @@ function AdminDashboard() {
                             product={product}
                             categoryName={cat.name}
                             onEdit={() => {
+                              const isCake =
+                                cat.slug === "cakes" ||
+                                cat.slug === "cheesecakes" ||
+                                product.name.toLowerCase().includes("cake");
+                              const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
+                              const variants =
+                                (product as any).weight_variants && (product as any).weight_variants.length > 0
+                                  ? (product as any).weight_variants
+                                  : itemType === "weight"
+                                    ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
+                                    : [];
+
                               setForm({
                                 id: product.id,
                                 name: product.name,
@@ -1852,6 +2083,10 @@ function AdminDashboard() {
                                 stock: String(product.stock),
                                 is_active: product.is_active,
                                 category_id: product.category_id ?? "",
+                                item_type: itemType,
+                                unit_weight_grams: String((product as any).unit_weight_grams || ""),
+                                serving_yield: (product as any).serving_yield || "",
+                                weight_variants: variants,
                               });
                               window.scrollTo({ top: 180, behavior: "smooth" });
                             }}
@@ -1885,6 +2120,17 @@ function AdminDashboard() {
                             key={product.id}
                             product={product}
                             onEdit={() => {
+                              const isCake =
+                                product.name.toLowerCase().includes("cake") ||
+                                product.name.toLowerCase().includes("cheesecake");
+                              const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
+                              const variants =
+                                (product as any).weight_variants && (product as any).weight_variants.length > 0
+                                  ? (product as any).weight_variants
+                                  : itemType === "weight"
+                                    ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
+                                    : [];
+
                               setForm({
                                 id: product.id,
                                 name: product.name,
@@ -1897,6 +2143,10 @@ function AdminDashboard() {
                                 stock: String(product.stock),
                                 is_active: product.is_active,
                                 category_id: product.category_id ?? "",
+                                item_type: itemType,
+                                unit_weight_grams: String((product as any).unit_weight_grams || ""),
+                                serving_yield: (product as any).serving_yield || "",
+                                weight_variants: variants,
                               });
                               window.scrollTo({ top: 180, behavior: "smooth" });
                             }}

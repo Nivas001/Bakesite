@@ -87,7 +87,7 @@ function CartPage() {
 
             return (
               <div
-                key={line.productId}
+                key={`${line.productId}__${line.variantLabel || "default"}`}
                 className="flex items-start gap-3 p-3.5 sm:p-4 transition-colors hover:bg-secondary/20"
               >
                 {/* 1. Product Thumbnail */}
@@ -116,6 +116,16 @@ function CartPage() {
                       >
                         {line.name}
                       </Link>
+                      
+                      {/* Variant & Portion Label Badge */}
+                      {line.variantLabel && (
+                        <div className="mt-0.5">
+                          <span className="inline-flex items-center gap-1 rounded-md bg-berry/10 border border-berry/25 px-1.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-berry">
+                            ⚖️ {line.variantLabel}
+                          </span>
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                         {hasBaseDiscount && (
                           <span className="line-through text-muted-foreground/60">
@@ -132,7 +142,7 @@ function CartPage() {
                     <button
                       type="button"
                       aria-label={`Remove ${line.name} from tray`}
-                      onClick={() => remove(line.productId)}
+                      onClick={() => remove(line.productId, line.variantLabel)}
                       className="text-muted-foreground/60 hover:text-destructive transition-colors p-1 -mr-1 -mt-1 cursor-pointer shrink-0"
                     >
                       <Trash2 className="size-3.5 sm:size-4" />
@@ -148,7 +158,7 @@ function CartPage() {
                         type="button"
                         aria-label={`Decrease ${line.name} quantity`}
                         className="flex size-5.5 sm:size-6 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer text-xs font-bold"
-                        onClick={() => setQuantity(line.productId, line.quantity - 1)}
+                        onClick={() => setQuantity(line.productId, line.quantity - 1, line.variantLabel)}
                       >
                         −
                       </button>
@@ -160,8 +170,8 @@ function CartPage() {
                       <button
                         type="button"
                         aria-label={`Increase ${line.name} quantity`}
-                        className="flex size-5.5 sm:size-6 items-center justify-center rounded-full bg-berry text-berry-foreground transition-all hover:bg-berry/90 active:scale-90 shadow-2xs cursor-pointer text-xs font-bold"
-                        onClick={() => setQuantity(line.productId, Math.min(30, line.quantity + 1))}
+                        className="flex size-5.5 sm:size-6 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer text-xs font-bold"
+                        onClick={() => setQuantity(line.productId, line.quantity + 1, line.variantLabel)}
                       >
                         +
                       </button>
@@ -169,7 +179,7 @@ function CartPage() {
 
                     {/* Line Total */}
                     <div className="text-right">
-                      <span className="font-sans text-xs sm:text-base font-bold text-cocoa tracking-tight">
+                      <span className="font-display text-sm sm:text-base font-bold text-cocoa">
                         {formatCurrency(lineTotal)}
                       </span>
                     </div>

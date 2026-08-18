@@ -6,7 +6,12 @@ import {
   isAppwriteConfigured,
   listDocs,
 } from "@/integrations/appwrite/admin.server";
-import type { CatalogProduct, DiscountType } from "./pricing";
+import {
+  type CatalogProduct,
+  type DiscountType,
+  type ProductWeightVariant,
+  generateSmartCakeWeightVariants,
+} from "./pricing";
 
 export type ProductDoc = {
   name: string;
@@ -20,6 +25,10 @@ export type ProductDoc = {
   is_active: boolean;
   category_id: string | null;
   sort_order?: number | null;
+  item_type?: "weight" | "unit" | "pack" | null;
+  unit_weight_grams?: number | null;
+  serving_yield?: string | null;
+  weight_variants_json?: string | null;
 };
 
 export type CategoryDoc = {
@@ -553,12 +562,77 @@ export function updateProductSequenceOverrides(
   }
 }
 
+const productWeightConfigOverrides = new Map<string, {
+  item_type?: "weight" | "unit" | "pack" | null;
+  unit_weight_grams?: number | null;
+  serving_yield?: string | null;
+  weight_variants?: ProductWeightVariant[] | null;
+}>();
+
+export function updateProductWeightOverrides(
+  productId: string,
+  config: {
+    item_type?: "weight" | "unit" | "pack" | null;
+    unit_weight_grams?: number | null;
+    serving_yield?: string | null;
+    weight_variants?: ProductWeightVariant[] | null;
+  },
+) {
+  productWeightConfigOverrides.set(productId, config);
+}
+
 export function mapProduct(
   doc: Doc<ProductDoc>,
   categories: Doc<CategoryDoc>[] = [],
 ): CatalogProduct {
   const category = categories.find((c) => c.$id === doc.category_id) ?? null;
   const customOrder = productSequenceOverrides.get(doc.$id);
+  const weightOverride = productWeightConfigOverrides.get(doc.$id);
+
+  const catSlug = (category?.slug || "").toLowerCase();
+  const prodName = (doc.name || "").toLowerCase();
+  const isCakeOrCheesecake =
+    catSlug === "cakes" ||
+    catSlug === "cheesecakes" ||
+    prodName.includes("cake") ||
+    prodName.includes("cheesecake");
+
+  let itemType: "weight" | "unit" | "pack" = weightOverride?.item_type || doc.item_type || (isCakeOrCheesecake ? "weight" : "unit");
+  let unitWeightGrams = weightOverride?.unit_weight_grams ?? doc.unit_weight_grams ?? null;
+  let servingYield = weightOverride?.serving_yield ?? doc.serving_yield ?? null;
+  let weightVariants: ProductWeightVariant[] | null = weightOverride?.weight_variants ?? null;
+
+  if (!weightVariants && doc.weight_variants_json) {
+    try {
+      weightVariants = JSON.parse(doc.weight_variants_json);
+    } catch {}
+  }
+
+  // Default portion & weight logic if not custom set
+  if (isCakeOrCheesecake) {
+    itemType = "weight";
+    if (!weightVariants || weightVariants.length === 0) {
+      weightVariants = generateSmartCakeWeightVariants(Number(doc.price), 250);
+    }
+    if (!unitWeightGrams) unitWeightGrams = 500;
+    if (!servingYield) servingYield = "500g (Serves 5–7 Guests)";
+  } else if (catSlug === "tea-cakes") {
+    if (!unitWeightGrams) unitWeightGrams = 300;
+    if (!servingYield) servingYield = "300g (16–18 Pieces / Serves 6–8)";
+  } else if (catSlug === "breads") {
+    if (!unitWeightGrams) unitWeightGrams = 650;
+    if (!servingYield) servingYield = "Approx. 650g artisan loaf · 36h ferment";
+  } else if (catSlug === "brownies") {
+    if (!unitWeightGrams) unitWeightGrams = 90;
+    if (!servingYield) servingYield = "Approx. 90g fudgy square";
+  } else if (catSlug === "cookies") {
+    if (!unitWeightGrams) unitWeightGrams = 270;
+    if (!servingYield) servingYield = "Box of 6 (approx. 270g total)";
+  } else if (catSlug === "pastries") {
+    if (!unitWeightGrams) unitWeightGrams = 95;
+    if (!servingYield) servingYield = "Approx. 95g (72 butter layers)";
+  }
+
   return {
     id: doc.$id,
     name: doc.name,
@@ -573,6 +647,10 @@ export function mapProduct(
     category_name: category?.name ?? null,
     category_slug: category?.slug ?? null,
     sort_order: customOrder !== undefined ? customOrder : (doc.sort_order ?? 0),
+    item_type: itemType,
+    unit_weight_grams: unitWeightGrams,
+    serving_yield: servingYield,
+    weight_variants: weightVariants,
   };
 }
 
@@ -633,6 +711,38 @@ export async function loadCatalog() {
 
   const mappedSeedProds = SEED_PRODUCTS.map((p, idx) => {
     const customOrder = productSequenceOverrides.get(p.id);
+    const weightOverride = productWeightConfigOverrides.get(p.id);
+    const isCake = p.category_slug === "cakes" || p.category_slug === "cheesecakes";
+
+    let itemType: "weight" | "unit" | "pack" = weightOverride?.item_type || (isCake ? "weight" : "unit");
+    let unitWeightGrams = weightOverride?.unit_weight_grams ?? null;
+    let servingYield = weightOverride?.serving_yield ?? null;
+    let weightVariants: ProductWeightVariant[] | null = weightOverride?.weight_variants ?? null;
+
+    if (isCake) {
+      itemType = "weight";
+      if (!weightVariants || weightVariants.length === 0) {
+        weightVariants = generateSmartCakeWeightVariants(p.price, 250);
+      }
+      if (!unitWeightGrams) unitWeightGrams = 500;
+      if (!servingYield) servingYield = "500g (Serves 5–7 Guests)";
+    } else if (p.category_slug === "tea-cakes") {
+      if (!unitWeightGrams) unitWeightGrams = 300;
+      if (!servingYield) servingYield = "300g (16–18 Pieces)";
+    } else if (p.category_slug === "breads") {
+      if (!unitWeightGrams) unitWeightGrams = 650;
+      if (!servingYield) servingYield = "Approx. 650g artisan loaf · 36h ferment";
+    } else if (p.category_slug === "brownies") {
+      if (!unitWeightGrams) unitWeightGrams = 90;
+      if (!servingYield) servingYield = "Approx. 90g fudgy square";
+    } else if (p.category_slug === "cookies") {
+      if (!unitWeightGrams) unitWeightGrams = 270;
+      if (!servingYield) servingYield = "Box of 6 (approx. 270g total)";
+    } else if (p.category_slug === "pastries") {
+      if (!unitWeightGrams) unitWeightGrams = 95;
+      if (!servingYield) servingYield = "Approx. 95g (72 butter layers)";
+    }
+
     return {
       id: p.id,
       name: p.name,
@@ -647,6 +757,10 @@ export async function loadCatalog() {
       category_name: SEED_CATEGORIES.find((c) => c.slug === p.category_slug)?.name ?? "Bakery",
       category_slug: p.category_slug,
       sort_order: customOrder !== undefined ? customOrder : idx,
+      item_type: itemType,
+      unit_weight_grams: unitWeightGrams,
+      serving_yield: servingYield,
+      weight_variants: weightVariants,
     };
   }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
 
@@ -657,107 +771,19 @@ export async function loadCatalog() {
 }
 
 export async function loadProductBySlug(slug: string) {
-  try {
-    if (isAppwriteConfigured()) {
-      const doc = await findDoc<ProductDoc>(COLLECTIONS.products, [
-        Q.equal("slug", slug),
-        Q.equal("is_active", true),
-      ]);
-      if (doc) {
-        const categories = await listDocs<CategoryDoc>(COLLECTIONS.categories, [Q.limit(50)]);
-        const product = mapProduct(doc, categories);
-
-        const related = doc.category_id
-          ? await listDocs<ProductDoc>(COLLECTIONS.products, [
-              Q.equal("category_id", doc.category_id),
-              Q.equal("is_active", true),
-              Q.limit(4),
-            ])
-          : [];
-
-        return {
-          product,
-          related: related
-            .filter((r) => r.slug !== slug)
-            .slice(0, 3)
-            .map((r) => mapProduct(r, categories)),
-        };
-      }
-    }
-  } catch {
-    // Fall back to seed product
-  }
-
-  const found = SEED_PRODUCTS.find((p) => p.slug === slug);
-  if (!found) {
-    // If exact slug not matched, pick first seed product as fallback
-    const fallback = SEED_PRODUCTS[0]!;
-    const related = SEED_PRODUCTS.filter((p) => p.slug !== fallback.slug).slice(0, 3);
-    return {
-      product: {
-        id: fallback.id,
-        name: fallback.name,
-        slug: fallback.slug,
-        description: fallback.description,
-        price: fallback.price,
-        discount_type: fallback.discount_type,
-        discount_value: fallback.discount_value,
-        image_url: fallback.image_url,
-        stock: fallback.stock,
-        category_id: fallback.category_id,
-        category_name: SEED_CATEGORIES.find((c) => c.slug === fallback.category_slug)?.name ?? "Bakery",
-        category_slug: fallback.category_slug,
-      },
-      related: related.map((p) => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        description: p.description,
-        price: p.price,
-        discount_type: p.discount_type,
-        discount_value: p.discount_value,
-        image_url: p.image_url,
-        stock: p.stock,
-        category_id: p.category_id,
-        category_name: SEED_CATEGORIES.find((c) => c.slug === p.category_slug)?.name ?? "Bakery",
-        category_slug: p.category_slug,
-      })),
-    };
-  }
-
-  const related = SEED_PRODUCTS.filter((p) => p.slug !== found.slug && p.category_slug === found.category_slug);
-  const otherRelated = SEED_PRODUCTS.filter((p) => p.slug !== found.slug && p.category_slug !== found.category_slug);
-  const combinedRelated = [...related, ...otherRelated].slice(0, 3);
+  const catalog = await loadCatalog();
+  const product = catalog.products.find((p) => p.slug === slug) || catalog.products[0]!;
+  const sameCat = catalog.products.filter(
+    (p) => p.slug !== product.slug && p.category_id === product.category_id,
+  );
+  const otherCat = catalog.products.filter(
+    (p) => p.slug !== product.slug && p.category_id !== product.category_id,
+  );
+  const related = [...sameCat, ...otherCat].slice(0, 3);
 
   return {
-    product: {
-      id: found.id,
-      name: found.name,
-      slug: found.slug,
-      description: found.description,
-      price: found.price,
-      discount_type: found.discount_type,
-      discount_value: found.discount_value,
-      image_url: found.image_url,
-      stock: found.stock,
-      category_id: found.category_id,
-      category_name: SEED_CATEGORIES.find((c) => c.slug === found.category_slug)?.name ?? "Bakery",
-      category_slug: found.category_slug,
-    },
-    related: combinedRelated.map((p) => ({
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      description: p.description,
-      price: p.price,
-      discount_type: p.discount_type,
-      discount_value: p.discount_value,
-      image_url: p.image_url,
-      stock: p.stock,
-      category_id: p.category_id,
-      category_name: SEED_CATEGORIES.find((c) => c.slug === p.category_slug)?.name ?? "Bakery",
-      category_slug: p.category_slug,
-    })),
+    product,
+    related,
   };
 }
 

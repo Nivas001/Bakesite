@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ProductReviews } from "@/components/product-reviews";
 import { useCart } from "@/lib/cart";
-import { formatCurrency, finalPrice, hasDiscount, discountLabel } from "@/lib/pricing";
+import { formatCurrency, finalPrice, hasDiscount, discountLabel, type ProductWeightVariant } from "@/lib/pricing";
 import { getProductBySlug } from "@/lib/catalog.functions";
 import { useFlag } from "@/lib/feature-flags";
 import { toast } from "sonner";
@@ -120,10 +120,18 @@ function ProductDetailPage() {
 
   if (!data) return null;
   const { product, related } = data;
-  const price = finalPrice(product.price, product.discount_type, product.discount_value);
+
+  const variants = product.weight_variants && product.weight_variants.length > 0 ? product.weight_variants : null;
+  const [selectedVariant, setSelectedVariant] = useState<ProductWeightVariant | null>(
+    variants ? variants[0] ?? null : null
+  );
+
+  const activeBasePrice = selectedVariant ? selectedVariant.price : product.price;
+  const price = finalPrice(activeBasePrice, product.discount_type, product.discount_value);
   const discounted = hasDiscount(product.discount_type, product.discount_value);
 
-  const cartLine = lines.find((l) => l.productId === product.id);
+  const variantKey = selectedVariant ? `${selectedVariant.label}${selectedVariant.serves ? ` (${selectedVariant.serves})` : ""}` : null;
+  const cartLine = lines.find((l) => l.productId === product.id && (variantKey ? l.variantLabel === variantKey : true));
   const quantityInCart = cartLine?.quantity ?? 0;
 
   function handleAddToCart() {
@@ -133,12 +141,14 @@ function ProductDetailPage() {
         slug: product.slug,
         name: product.name,
         unitPrice: price,
-        basePrice: product.price,
+        basePrice: activeBasePrice,
         imageUrl: product.image_url,
+        variantLabel: variantKey,
+        variantWeightGrams: selectedVariant?.weight_grams ?? product.unit_weight_grams ?? null,
       },
       1,
     );
-    toast.success(`${product.name} added to your cart!`);
+    toast.success(`${product.name}${selectedVariant ? ` (${selectedVariant.label})` : ""} added to your cart!`);
     setRipple(true);
     setTimeout(() => setRipple(false), 600);
   }
@@ -157,7 +167,7 @@ function ProductDetailPage() {
         </Link>
       </div>
 
-      {/* 1. Hero: Image + Details Bento Grid (Aligined at same level on Desktop, Single Viewheight on Mobile) */}
+      {/* 1. Hero: Image + Details Bento Grid */}
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
         
         {/* Left Column: Product Showcase Photo Frame */}
@@ -181,7 +191,7 @@ function ProductDetailPage() {
 
             {/* Kitchen Freshness Pill */}
             <span className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
-              ✨ Fresh Morning Bake
+              ✨ Fresh Small-Batch
             </span>
           </div>
         </div>
@@ -190,14 +200,16 @@ function ProductDetailPage() {
         <div className="flex flex-col justify-center space-y-3 sm:space-y-4">
           
           <div>
-            {/* Category Breadcrumb */}
-            <div className="flex items-center gap-2 mb-1">
+            {/* Category Breadcrumb & Portion Tag */}
+            <div className="flex flex-wrap items-center gap-2 mb-1">
               <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-muted-foreground border border-border/60">
                 {product.category_name ?? "Bakery Atelier"}
               </span>
-              <span className="text-[11px] sm:text-xs text-emerald-600 font-bold flex items-center gap-1">
-                <Check className="size-3" /> In Small-Batch Queue
-              </span>
+              {(product.serving_yield || product.unit_weight_grams) && (
+                <span className="rounded-full bg-berry/10 border border-berry/25 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-berry">
+                  ⚖️ {product.serving_yield ?? `${product.unit_weight_grams}g`}
+                </span>
+              )}
             </div>
 
             {/* Product Title in Blogh font */}
@@ -214,14 +226,69 @@ function ProductDetailPage() {
             {discounted && (
               <>
                 <span className="text-sm sm:text-lg text-muted-foreground line-through font-medium">
-                  {formatCurrency(product.price)}
+                  {formatCurrency(activeBasePrice)}
                 </span>
                 <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[11px] font-bold text-berry">
-                  Save {formatCurrency(product.price - price)}
+                  Save {formatCurrency(activeBasePrice - price)}
                 </span>
               </>
             )}
+            {selectedVariant?.serves && (
+              <span className="text-xs sm:text-sm font-semibold text-muted-foreground ml-auto bg-secondary/80 px-2.5 py-1 rounded-xl border border-border/50">
+                🍽️ {selectedVariant.serves}
+              </span>
+            )}
           </div>
+
+          {/* Interactive Weight / Size Variant Selector (For Cakes & Tiered Items) */}
+          {variants && variants.length > 0 && (
+            <div className="space-y-2 rounded-2xl sm:rounded-3xl border border-border/80 bg-secondary/20 p-3 sm:p-3.5 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-cocoa uppercase tracking-wider">
+                  🎂 Choose Cake Weight / Size
+                </span>
+                <span className="text-[10px] sm:text-[11px] text-muted-foreground">
+                  Tiered volume discounts applied
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                {variants.map((v: ProductWeightVariant) => {
+                  const isSelected = selectedVariant?.id === v.id;
+                  const vPrice = finalPrice(v.price, product.discount_type, product.discount_value);
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => setSelectedVariant(v)}
+                      className={`flex flex-col items-start p-2 sm:p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? "border-berry bg-berry/15 ring-2 ring-berry/40 text-cocoa shadow-2xs scale-[1.02]"
+                          : "border-border/70 bg-card hover:bg-secondary/60 text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span className="font-bold text-xs sm:text-[13px] text-cocoa">{v.label}</span>
+                        {v.savings_label && (
+                          <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 px-1 py-0.5 rounded">
+                            {v.savings_label.split(" ")[0]} {v.savings_label.split(" ")[1]}
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-sans font-black text-sm text-cocoa mt-1">
+                        {formatCurrency(vPrice)}
+                      </span>
+                      {v.serves && (
+                        <span className="text-[10px] text-muted-foreground mt-0.5">
+                          {v.serves}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Trust Badges */}
           {showTrustBadges && (

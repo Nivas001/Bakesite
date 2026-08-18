@@ -211,6 +211,10 @@ export async function fetchAdminProducts() {
       category_name: p.category_name ?? null,
       category_slug: p.category_slug ?? null,
       sort_order: p.sort_order ?? 0,
+      item_type: p.item_type ?? null,
+      unit_weight_grams: p.unit_weight_grams ?? null,
+      serving_yield: p.serving_yield ?? null,
+      weight_variants: p.weight_variants ?? null,
     })),
     categories: catalog.categories.map((c) => ({
       id: c.id,
@@ -258,6 +262,8 @@ export async function saveProductSequenceAdmin(input: {
 }
 
 export async function upsertProduct(input: ProductInput) {
+  const { updateProductWeightOverrides } = await import("./catalog.server");
+
   const row: Record<string, unknown> = {
     name: input.name.trim(),
     slug: input.slug.trim(),
@@ -271,8 +277,17 @@ export async function upsertProduct(input: ProductInput) {
   if (input.description) row['description'] = input.description.trim();
   if (input.image_url) row['image_url'] = input.image_url.trim();
   if (input.category_id) row['category_id'] = input.category_id.trim();
+  if (input.item_type) row['item_type'] = input.item_type;
+  if (input.unit_weight_grams !== undefined && input.unit_weight_grams !== null) {
+    row['unit_weight_grams'] = input.unit_weight_grams;
+  }
+  if (input.serving_yield) row['serving_yield'] = input.serving_yield.trim();
+  if (input.weight_variants && input.weight_variants.length > 0) {
+    row['weight_variants_json'] = JSON.stringify(input.weight_variants);
+  }
 
   try {
+    let savedId = input.id;
     if (input.id) {
       await updateDoc(COLLECTIONS.products, input.id, {
         ...row,
@@ -281,8 +296,19 @@ export async function upsertProduct(input: ProductInput) {
         category_id: input.category_id?.trim() || "",
       });
     } else {
-      await createDoc(COLLECTIONS.products, row);
+      const created = await createDoc(COLLECTIONS.products, row);
+      savedId = created.$id;
     }
+
+    if (savedId) {
+      updateProductWeightOverrides(savedId, {
+        item_type: input.item_type ?? null,
+        unit_weight_grams: input.unit_weight_grams ?? null,
+        serving_yield: input.serving_yield ?? null,
+        weight_variants: (input.weight_variants as any) ?? null,
+      });
+    }
+
     return { ok: true as const };
   } catch (err: any) {
     console.error("Appwrite upsertProduct failed:", err);
