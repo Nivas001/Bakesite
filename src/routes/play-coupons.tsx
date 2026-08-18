@@ -49,8 +49,8 @@ function PlayCouponsPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10 space-y-8 sm:space-y-12">
       
       {/* 1. Hero Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/60 pb-6 sm:pb-8">
-        <div className="space-y-2 flex-1">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8 border-b border-border/60 pb-6 sm:pb-8">
+        <div className="space-y-3 flex-1">
           <div className="flex items-center gap-2">
             <span className="flex size-7 items-center justify-center rounded-xl bg-berry/15 text-berry">
               <Gamepad2 className="size-4" />
@@ -64,31 +64,18 @@ function PlayCouponsPage() {
             Play & Win Bakery Coupons
           </h1>
 
-          <p className="max-w-2xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
+          <p className="max-w-2xl text-xs sm:text-base text-muted-foreground leading-relaxed">
             Test your craft knowledge, challenge your memory, or spin the sweets wheel. Conquer any game to unlock an exclusive <strong className="text-cocoa font-bold">15% single-use discount voucher</strong> for your next artisan order!
           </p>
         </div>
 
-        {/* 3D Celebration Gift Box & Perks */}
-        <div className="flex items-center gap-4 shrink-0">
-          <div className="hidden sm:flex size-24 md:size-28 shrink-0 rounded-3xl overflow-hidden bg-secondary/30 border border-border/60 p-1 shadow-inner items-center justify-center">
-            <img
-              src="/illustration/open-gift-box-with-candy-cane-and-christmas-ornament-holiday-celebration-and-party.png"
-              alt="Celebration reward gift box"
-              className="size-full object-contain drop-shadow-md select-none pointer-events-none"
-            />
-          </div>
-
-          <div className="flex flex-wrap sm:flex-col gap-2">
-            <div className="flex items-center gap-1.5 rounded-full bg-secondary/90 px-3.5 py-1.5 text-xs font-semibold text-cocoa border border-border/60 shadow-2xs">
-              <ShieldCheck className="size-3.5 text-emerald-500" />
-              <span>1-Time Single-Use Vouchers</span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-berry/10 px-3.5 py-1.5 text-xs font-bold text-berry border border-berry/20 shadow-2xs">
-              <Sparkles className="size-3.5 text-amber-500" />
-              <span>15% Flat Discount</span>
-            </div>
-          </div>
+        {/* Prominent 3D Celebration Gift Box (Unboxed & Generously Sized) */}
+        <div className="flex items-center justify-center shrink-0 self-center md:self-auto">
+          <img
+            src="/illustration/open-gift-box-with-candy-cane-and-christmas-ornament-holiday-celebration-and-party.png"
+            alt="Celebration reward gift box"
+            className="size-36 sm:size-48 md:size-56 lg:size-60 object-contain drop-shadow-xl select-none pointer-events-none transition-transform hover:scale-105 duration-300"
+          />
         </div>
       </div>
 

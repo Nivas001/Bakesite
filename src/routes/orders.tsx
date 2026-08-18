@@ -615,22 +615,22 @@ function OrdersPage() {
   if (orders.length === 0) {
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:py-20 text-center">
-        <div className="relative mx-auto flex size-36 sm:size-44 items-center justify-center mb-4">
+        <div className="relative mx-auto flex size-44 sm:size-56 md:size-64 items-center justify-center mb-6">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="size-full object-contain pointer-events-none"
+            className="size-full object-contain pointer-events-none drop-shadow-xl"
           >
             <source src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.webm" type="video/webm" />
             <source src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.mp4" type="video/mp4" />
           </video>
         </div>
-        <h1 className="font-blogh uppercase tracking-wide text-3xl sm:text-4xl font-bold text-cocoa">
+        <h1 className="font-blogh uppercase tracking-wide text-3xl sm:text-5xl font-bold text-cocoa">
           No Orders Yet
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+        <p className="mt-3 text-xs sm:text-base text-muted-foreground max-w-md mx-auto leading-relaxed">
           Your morning slot is waiting. Explore our stone-hearth wild sourdoughs, French butter croissants, and custom celebration cakes.
         </p>
         <Button asChild className="mt-6 rounded-full bg-cocoa text-background hover:bg-cocoa/90 px-8 py-5 font-bold text-sm shadow-lift cursor-pointer">

@@ -1180,17 +1180,17 @@ export function AboutUsPage() {
 
                 {activeStoryChapter === 4 && (
                   <div className="rounded-2xl border-2 border-[#2C1810] bg-white/95 p-4 shadow-[3px_3px_0px_#2C1810] space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <span className="font-sans font-black text-xs uppercase text-[#5C3218] block">
                         Our Morning Hearth Schedule:
                       </span>
-                      <div className="size-8 shrink-0 rounded-xl overflow-hidden bg-amber-100 border border-[#2C1810]/30 flex items-center justify-center">
+                      <div className="size-14 sm:size-16 shrink-0 flex items-center justify-center">
                         <video
                           autoPlay
                           loop
                           muted
                           playsInline
-                          className="size-full object-contain pointer-events-none"
+                          className="size-full object-contain pointer-events-none drop-shadow-sm"
                         >
                           <source
                             src="/illustration/people-walking-together-outdoors-urban-lifestyle-and-daily-routine.webm"

@@ -108,16 +108,16 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[65vh] w-full max-w-md items-center justify-center px-4 py-12">
+    <div className="mx-auto flex min-h-[65vh] w-full max-w-lg items-center justify-center px-4 py-12">
       <div className="w-full rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8 space-y-6">
         <div className="text-center">
-          <div className="relative mx-auto flex size-28 sm:size-32 items-center justify-center mb-3">
+          <div className="relative mx-auto flex size-36 sm:size-44 md:size-48 items-center justify-center mb-4">
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="size-full object-contain pointer-events-none"
+              className="size-full object-contain pointer-events-none drop-shadow-xl"
             >
               <source
                 src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.webm"
@@ -129,7 +129,7 @@ function ResetPasswordPage() {
               />
             </video>
           </div>
-          <h1 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
+          <h1 className="font-blogh text-2xl sm:text-4xl font-bold text-cocoa uppercase tracking-wide">
             Set New Password
           </h1>
           <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground">

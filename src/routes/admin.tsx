@@ -503,14 +503,14 @@ function AdminDashboard() {
           </p>
         </div>
 
-        {/* 3D Analytics Clipboard Illustration */}
-        <div className="hidden sm:flex size-16 md:size-20 shrink-0 rounded-2xl overflow-hidden bg-secondary/40 border border-border/60 p-1 shadow-2xs items-center justify-center">
+        {/* 3D Analytics Clipboard Illustration (Unboxed & Generously Sized) */}
+        <div className="hidden sm:flex size-24 md:size-28 shrink-0 items-center justify-center">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="size-full object-contain pointer-events-none"
+            className="size-full object-contain pointer-events-none drop-shadow-md"
           >
             <source
               src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.webm"

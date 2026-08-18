@@ -249,20 +249,20 @@ function CheckoutPage() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* Delivery or pickup (50%) */}
             <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between relative overflow-hidden">
-              <div className="flex items-start justify-between gap-2">
+              <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="font-display text-lg font-semibold">Delivery or pickup</h2>
                   <p className="mt-1 text-xs text-muted-foreground">
                     Select how you want to receive your bakes
                   </p>
                 </div>
-                <div className="size-12 shrink-0 rounded-2xl overflow-hidden bg-secondary/40 border border-border/60 flex items-center justify-center">
+                <div className="size-20 sm:size-24 shrink-0 flex items-center justify-center -mt-2 -mr-2">
                   <video
                     autoPlay
                     loop
                     muted
                     playsInline
-                    className="size-full object-contain pointer-events-none"
+                    className="size-full object-contain pointer-events-none drop-shadow-md"
                   >
                     <source src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1.webm" type="video/webm" />
                     <source src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1.mp4" type="video/mp4" />
@@ -900,23 +900,23 @@ function CheckoutPage() {
             </dl>
 
             {/* Freshness & Trust Guarantee */}
-            <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/50 space-y-2.5">
-              <div className="flex items-center gap-2.5">
-                <div className="size-8 shrink-0 rounded-xl overflow-hidden bg-background/80 border border-border/60 flex items-center justify-center">
+            <div className="rounded-2xl bg-secondary/40 p-4 border border-border/50 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="size-12 shrink-0 flex items-center justify-center">
                   <video
                     autoPlay
                     loop
                     muted
                     playsInline
-                    className="size-full object-contain pointer-events-none"
+                    className="size-full object-contain pointer-events-none drop-shadow-sm"
                   >
                     <source src="/illustration/3d-stickle-credit-card-terminal-pay.webm" type="video/webm" />
                     <source src="/illustration/3d-stickle-credit-card-terminal-pay.mp4" type="video/mp4" />
                   </video>
                 </div>
                 <div>
-                  <p className="font-bold text-cocoa text-xs">Instant Encrypted Payment</p>
-                  <p className="text-[10px] text-muted-foreground">Secures your morning oven slot</p>
+                  <p className="font-bold text-cocoa text-xs sm:text-sm">Instant Encrypted Payment</p>
+                  <p className="text-[11px] text-muted-foreground">Secures your morning oven slot</p>
                 </div>
               </div>
               <div className="flex items-start gap-2.5 pt-1.5 border-t border-border/40">
