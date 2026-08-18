@@ -27,45 +27,59 @@ export function SiteFooter() {
   }, []);
 
   const socialLinksRow = (
-    <div className="flex flex-wrap items-center gap-2">
-      {social.instagram && (
-        <a
-          href={social.instagram}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Instagram"
-          title="Instagram"
-          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-pink-400/60 hover:bg-pink-50 hover:text-pink-500 dark:hover:bg-pink-500/10"
-        >
-          <Instagram className="size-4" />
-        </a>
-      )}
-      {social.whatsapp && (
-        <a
-          href={
-            social.whatsapp.startsWith("http")
-              ? social.whatsapp
-              : `https://wa.me/${social.whatsapp.replace(/\D/g, "")}`
-          }
-          target="_blank"
-          rel="noreferrer"
-          aria-label="WhatsApp"
-          title="WhatsApp"
-          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-emerald-400/60 hover:bg-emerald-50 hover:text-emerald-500 dark:hover:bg-emerald-500/10"
-        >
-          <MessageCircle className="size-4" />
-        </a>
-      )}
-      {social.email && (
-        <a
-          href={`mailto:${social.email}`}
-          aria-label="Gmail / Email Us"
-          title={`Email: ${social.email}`}
-          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-red-400/60 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
-        >
-          <Mail className="size-4" />
-        </a>
-      )}
+    <div className="flex flex-wrap items-center gap-3">
+      {/* Instagram */}
+      <a
+        href={social.instagram || "https://www.instagram.com/aniiibakes_.__"}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Instagram"
+        title="Follow Ani Bakes on Instagram"
+        className="group flex size-10 items-center justify-center rounded-2xl border border-border/80 bg-card/80 shadow-2xs transition-all duration-200 hover:scale-110 hover:shadow-soft hover:border-pink-300 dark:hover:border-pink-500/50"
+      >
+        <img
+          src="/icons/icons8-instagram.svg"
+          alt="Instagram"
+          className="size-6 object-contain transition-transform group-hover:scale-105"
+        />
+      </a>
+
+      {/* WhatsApp */}
+      <a
+        href={
+          social.whatsapp
+            ? (social.whatsapp.startsWith("http")
+                ? social.whatsapp
+                : `https://wa.me/${social.whatsapp.replace(/\D/g, "")}`)
+            : "https://wa.me/919944000000"
+        }
+        target="_blank"
+        rel="noreferrer"
+        aria-label="WhatsApp"
+        title="Chat with Ani Bakes on WhatsApp"
+        className="group flex size-10 items-center justify-center rounded-2xl border border-border/80 bg-card/80 shadow-2xs transition-all duration-200 hover:scale-110 hover:shadow-soft hover:border-emerald-300 dark:hover:border-emerald-500/50"
+      >
+        <img
+          src="/icons/icons8-whatsapp.svg"
+          alt="WhatsApp"
+          className="size-6 object-contain transition-transform group-hover:scale-105"
+        />
+      </a>
+
+      {/* Gmail */}
+      <a
+        href={`mailto:${social.email || "orders@anibakes.app"}`}
+        aria-label="Gmail / Email Us"
+        title={`Email Us: ${social.email || "orders@anibakes.app"}`}
+        className="group flex size-10 items-center justify-center rounded-2xl border border-border/80 bg-card/80 shadow-2xs transition-all duration-200 hover:scale-110 hover:shadow-soft hover:border-red-300 dark:hover:border-red-500/50"
+      >
+        <img
+          src="/icons/icons8-gmail.svg"
+          alt="Gmail"
+          className="size-6 object-contain transition-transform group-hover:scale-105"
+        />
+      </a>
+
       {social.facebook && (
         <a
           href={social.facebook}
@@ -73,9 +87,9 @@ export function SiteFooter() {
           rel="noreferrer"
           aria-label="Facebook"
           title="Facebook Page"
-          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-blue-500/60 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10"
+          className="flex size-10 items-center justify-center rounded-2xl border border-border/80 bg-card/80 text-muted-foreground transition-all hover:scale-110 hover:border-blue-500/60 hover:text-blue-600"
         >
-          <Facebook className="size-4" />
+          <Facebook className="size-5" />
         </a>
       )}
       {social.x && (
@@ -85,9 +99,9 @@ export function SiteFooter() {
           rel="noreferrer"
           aria-label="X (Twitter)"
           title="X (Twitter)"
-          className="flex size-8 items-center justify-center rounded-full border border-border/60 bg-card/60 text-muted-foreground transition-all hover:border-foreground/60 hover:bg-foreground/10 hover:text-foreground"
+          className="flex size-10 items-center justify-center rounded-2xl border border-border/80 bg-card/80 text-muted-foreground transition-all hover:scale-110 hover:border-foreground/60 hover:text-foreground"
         >
-          <XIcon className="size-3.5" />
+          <XIcon className="size-4.5" />
         </a>
       )}
     </div>
