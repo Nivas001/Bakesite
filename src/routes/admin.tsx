@@ -345,8 +345,14 @@ function AdminDashboard() {
       await action();
       toast.success(message);
       await refresh();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } catch (err: any) {
+      console.error("Admin action failed:", err);
+      const errMsg =
+        err?.message ||
+        err?.data?.message ||
+        (typeof err === "string" ? err : null) ||
+        "Something went wrong";
+      toast.error(errMsg);
     }
   }
 
@@ -1027,9 +1033,6 @@ function AdminDashboard() {
                             const commaIndex = result.indexOf(",");
                             const base64 = commaIndex !== -1 ? result.slice(commaIndex + 1) : result;
 
-                            // Local preview
-                            setForm((f) => ({ ...f, image_url: result }));
-
                             // Appwrite Storage upload
                             const uploadRes = await uploadImageFn({
                               data: {
@@ -1042,9 +1045,12 @@ function AdminDashboard() {
                             if (uploadRes?.imageUrl) {
                               setForm((f) => ({ ...f, image_url: uploadRes.imageUrl }));
                               toast.success("Picture stored in Bakery Database!");
+                            } else {
+                              toast.error("Failed to retrieve image URL from storage.");
                             }
-                          } catch (err) {
-                            toast.error(err instanceof Error ? err.message : "Failed to upload image");
+                          } catch (err: any) {
+                            console.error("Image upload failed:", err);
+                            toast.error(err?.message || "Failed to upload image to storage");
                           } finally {
                             setUploadingImage(false);
                           }
@@ -1145,29 +1151,44 @@ function AdminDashboard() {
 
               <div className="flex gap-2 pt-3">
                 <Button
-                  className="flex-1 rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 h-10 font-semibold text-xs"
+                  disabled={uploadingImage}
+                  className="flex-1 rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 h-10 font-semibold text-xs cursor-pointer"
                   onClick={() =>
                     run(async () => {
+                      if (!form.name || form.name.trim().length < 2) {
+                        throw new Error("Product name must be at least 2 characters.");
+                      }
+                      if (!form.slug || form.slug.trim().length < 2) {
+                        throw new Error("URL slug must be at least 2 characters.");
+                      }
+                      if (uploadingImage) {
+                        throw new Error("Please wait for the picture upload to complete.");
+                      }
+                      if (form.image_url && form.image_url.startsWith("data:")) {
+                        throw new Error("Image is still processing. Please wait or re-upload.");
+                      }
+
                       await persistProduct({
                         data: {
                           ...(form.id ? { id: form.id } : {}),
-                          name: form.name,
-                          slug: form.slug,
-                          description: form.description || null,
-                          price: Number(form.price),
+                          name: form.name.trim(),
+                          slug: form.slug.trim(),
+                          description: form.description?.trim() || null,
+                          price: Math.max(0, Number(form.price) || 0),
                           discount_type: form.discount_type,
-                          discount_value: Number(form.discount_value),
-                          image_url: form.image_url || null,
-                          stock: Number(form.stock),
+                          discount_value: Math.max(0, Number(form.discount_value) || 0),
+                          image_url: form.image_url?.trim() || null,
+                          stock: Math.max(0, Math.floor(Number(form.stock) || 0)),
                           is_active: form.is_active,
-                          category_id: form.category_id || null,
+                          category_id: form.category_id?.trim() || null,
                         },
                       });
                       setForm(EMPTY_FORM);
-                    }, "Product saved")
+                      if (productImageInputRef.current) productImageInputRef.current.value = "";
+                    }, form.id ? "Product updated" : "Product created")
                   }
                 >
-                  {form.id ? "Update Product" : "Create Product"}
+                  {uploadingImage ? "Uploading image…" : form.id ? "Update Product" : "Create Product"}
                 </Button>
                 {form.id && (
                   <Button

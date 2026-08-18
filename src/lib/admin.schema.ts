@@ -25,18 +25,18 @@ export const rescheduleOrderSchema = z.object({
 
 export const productSchema = z.object({
   id: id.optional(),
-  name: z.string().trim().min(2).max(120),
+  name: z.string().trim().min(2, "Product name must be at least 2 characters").max(120),
   slug: z
     .string()
     .trim()
-    .min(2)
+    .min(2, "URL slug must be at least 2 characters")
     .max(120)
     .regex(/^[a-z0-9-]+$/, "Use lowercase letters, numbers and dashes only"),
-  description: z.string().trim().max(600).optional().nullable(),
-  price: z.number().min(0).max(100000),
+  description: z.string().trim().max(600, "Description must be under 600 characters").optional().nullable(),
+  price: z.number().min(0, "Price must be greater than or equal to 0").max(100000),
   discount_type: z.enum(["none", "percent", "flat"]),
   discount_value: z.number().min(0).max(100000),
-  image_url: z.string().trim().max(500).nullable().optional(),
+  image_url: z.string().trim().max(1500).nullable().optional(),
   stock: z.number().int().min(0).max(10000),
   is_active: z.boolean(),
   category_id: id.nullable().optional(),

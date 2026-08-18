@@ -104,9 +104,16 @@ export async function createDoc<T>(
   data: Record<string, unknown>,
   documentId = 'unique()',
 ): Promise<Doc<T>> {
+  // Strip null and undefined values to prevent Appwrite non-nullable attribute rejection
+  const cleanData: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined && value !== null) {
+      cleanData[key] = value;
+    }
+  }
   return request<Doc<T>>(docPath(collection), {
     method: 'POST',
-    body: { documentId, data },
+    body: { documentId, data: cleanData },
   });
 }
 
@@ -115,7 +122,14 @@ export async function updateDoc<T>(
   id: string,
   data: Record<string, unknown>,
 ): Promise<Doc<T>> {
-  return request<Doc<T>>(docPath(collection, id), { method: 'PATCH', body: { data } });
+  // Strip undefined values
+  const cleanData: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined) {
+      cleanData[key] = value;
+    }
+  }
+  return request<Doc<T>>(docPath(collection, id), { method: 'PATCH', body: { data: cleanData } });
 }
 
 export async function upsertDoc<T>(
@@ -245,7 +259,7 @@ export async function uploadProductImage(input: {
   const formData = new FormData();
   formData.append('fileId', 'unique()');
   formData.append('file', blob, input.filename || 'product.jpg');
-  formData.append('permissions', JSON.stringify(['read("any")']));
+  formData.append('permissions[]', 'read("any")');
 
   const response = await fetch(`${endpoint()}/storage/buckets/${bucket}/files`, {
     method: 'POST',
@@ -258,6 +272,7 @@ export async function uploadProductImage(input: {
 
   if (!response.ok) {
     const errorText = await response.text();
+    console.error("Appwrite Storage upload failed:", errorText);
     throw new Error(`Failed to upload image to Appwrite Storage: ${errorText}`);
   }
 

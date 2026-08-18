@@ -216,21 +216,43 @@ export async function fetchAdminProducts() {
 }
 
 export async function upsertProduct(input: ProductInput) {
-  const row = {
-    name: input.name,
-    slug: input.slug,
-    description: input.description ?? null,
+  const row: Record<string, unknown> = {
+    name: input.name.trim(),
+    slug: input.slug.trim(),
     price: input.price,
     discount_type: input.discount_type,
     discount_value: input.discount_value,
-    image_url: input.image_url || null,
     stock: input.stock,
     is_active: input.is_active,
-    category_id: input.category_id ?? null,
   };
-  if (input.id) await updateDoc(COLLECTIONS.products, input.id, row);
-  else await createDoc(COLLECTIONS.products, row);
-  return { ok: true as const };
+
+  if (input.description) row.description = input.description.trim();
+  if (input.image_url) row.image_url = input.image_url.trim();
+  if (input.category_id) row.category_id = input.category_id.trim();
+
+  try {
+    if (input.id) {
+      await updateDoc(COLLECTIONS.products, input.id, {
+        ...row,
+        description: input.description?.trim() || "",
+        image_url: input.image_url?.trim() || "",
+        category_id: input.category_id?.trim() || "",
+      });
+    } else {
+      await createDoc(COLLECTIONS.products, row);
+    }
+    return { ok: true as const };
+  } catch (err: any) {
+    console.error("Appwrite upsertProduct failed:", err);
+    const msg = err?.message || String(err);
+    if (msg.includes("409") || msg.toLowerCase().includes("already exists") || msg.includes("duplicate")) {
+      throw new Error(`A product with the slug "${input.slug}" already exists. Please choose a different URL slug.`);
+    }
+    if (msg.includes("Invalid document structure")) {
+      throw new Error(`Database error: Please check that all product fields have valid values.`);
+    }
+    throw new Error(msg || "Failed to save product to database.");
+  }
 }
 
 export async function removeProduct(id: string) {
