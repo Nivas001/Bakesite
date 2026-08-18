@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ArrowRight,
@@ -97,8 +97,8 @@ const EXPLORE_CATEGORIES = [
 
 function ProductDetailPage() {
   const data = Route.useLoaderData();
-  const { add } = useCart();
-  const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
+  const { lines, add, setQuantity } = useCart();
   const [ripple, setRipple] = useState(false);
   const addBtnRef = useRef<HTMLDivElement | null>(null);
 
@@ -123,6 +123,9 @@ function ProductDetailPage() {
   const price = finalPrice(product.price, product.discount_type, product.discount_value);
   const discounted = hasDiscount(product.discount_type, product.discount_value);
 
+  const cartLine = lines.find((l) => l.productId === product.id);
+  const quantityInCart = cartLine?.quantity ?? 0;
+
   function handleAddToCart() {
     add(
       {
@@ -133,11 +136,28 @@ function ProductDetailPage() {
         basePrice: product.price,
         imageUrl: product.image_url,
       },
-      quantity,
+      1,
     );
-    toast.success(`${product.name} (${quantity}) added to your counter cart!`);
+    toast.success(`${product.name} added to your cart!`);
     setRipple(true);
     setTimeout(() => setRipple(false), 600);
+  }
+
+  function handleBuyNow() {
+    if (quantityInCart === 0) {
+      add(
+        {
+          productId: product.id,
+          slug: product.slug,
+          name: product.name,
+          unitPrice: price,
+          basePrice: product.price,
+          imageUrl: product.image_url,
+        },
+        1,
+      );
+    }
+    navigate({ to: "/cart" });
   }
 
   return (
@@ -268,45 +288,75 @@ function ProductDetailPage() {
             </div>
           )}
 
-          {/* Quantity Stepper + Add to Cart Action */}
-          <div className="pt-1 flex flex-row items-center gap-2 sm:gap-3" ref={addBtnRef}>
-            {/* Pill Quantity Stepper */}
-            <div className="inline-flex h-10 sm:h-11 items-center justify-between gap-1.5 sm:gap-2 rounded-full border border-border bg-secondary/50 px-1.5 sm:px-2 shadow-2xs shrink-0">
-              <button
-                type="button"
-                aria-label="Decrease quantity"
-                className="flex size-6.5 sm:size-7.5 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer font-bold"
-                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              >
-                <Minus className="size-3 sm:size-3.5" />
-              </button>
-              <span className="min-w-6 sm:min-w-8 text-center text-xs sm:text-sm font-bold text-cocoa tabular-nums px-1">
-                {quantity}
-              </span>
-              <button
-                type="button"
-                aria-label="Increase quantity"
-                className="flex size-6.5 sm:size-7.5 items-center justify-center rounded-full bg-berry text-berry-foreground transition-all hover:bg-berry/90 active:scale-90 shadow-2xs cursor-pointer"
-                onClick={() => setQuantity((q) => Math.min(50, q + 1))}
-              >
-                <Plus className="size-3 sm:size-3.5" />
-              </button>
-            </div>
+          {/* Interactive Dynamic Action: Add to Cart + Buy Now OR Stepper + View Cart */}
+          <div className="pt-1" ref={addBtnRef}>
+            {quantityInCart === 0 ? (
+              <div className="flex flex-row items-center gap-2 sm:gap-3">
+                {/* Add to Cart Button */}
+                <Button
+                  size="lg"
+                  className="relative flex-1 h-10 sm:h-11 overflow-hidden rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs sm:text-sm shadow-lift transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer px-3"
+                  onClick={handleAddToCart}
+                >
+                  <ShoppingBag className="mr-1.5 size-4" />
+                  <span>Add to Cart • {formatCurrency(price)}</span>
+                  {ripple && (
+                    <span className="absolute inset-0 rounded-2xl bg-berry/30 animate-ripple-out pointer-events-none" />
+                  )}
+                </Button>
 
-            {/* Add to Cart Button */}
-            <div className="relative flex-1">
-              <Button
-                size="lg"
-                className="relative w-full h-10 sm:h-11 overflow-hidden rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs sm:text-sm shadow-lift transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer px-3"
-                onClick={handleAddToCart}
-              >
-                <ShoppingBag className="mr-1.5 sm:mr-2 size-4" />
-                <span>Add {quantity > 1 ? `(${quantity})` : ""} to Cart • {formatCurrency(price * quantity)}</span>
-              </Button>
-              {ripple && (
-                <span className="absolute inset-0 rounded-2xl bg-berry/30 animate-ripple-out pointer-events-none" />
-              )}
-            </div>
+                {/* Buy Now Button */}
+                <Button
+                  size="lg"
+                  className="flex-1 h-10 sm:h-11 rounded-2xl bg-[#2C1810] text-white hover:bg-[#3D2217] font-bold text-xs sm:text-sm shadow-soft transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer px-3"
+                  onClick={handleBuyNow}
+                >
+                  <span>Buy Now</span>
+                  <ArrowRight className="ml-1.5 size-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-row items-center gap-2 sm:gap-3">
+                {/* Quantity Stepper when already in cart */}
+                <div className="inline-flex h-10 sm:h-11 items-center justify-between gap-1 sm:gap-2 rounded-2xl border-2 border-berry/40 bg-secondary/80 px-2 sm:px-3 shadow-2xs shrink-0">
+                  <button
+                    type="button"
+                    aria-label="Decrease quantity in cart"
+                    className="flex size-6.5 sm:size-7.5 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer font-bold"
+                    onClick={() => {
+                      setQuantity(product.id, quantityInCart - 1);
+                      if (quantityInCart - 1 === 0) {
+                        toast.info(`Removed ${product.name} from cart`);
+                      }
+                    }}
+                  >
+                    <Minus className="size-3 sm:size-3.5" />
+                  </button>
+                  <span className="min-w-12 sm:min-w-16 text-center text-xs sm:text-sm font-bold text-cocoa tabular-nums px-1">
+                    {quantityInCart} in Cart
+                  </span>
+                  <button
+                    type="button"
+                    aria-label="Increase quantity in cart"
+                    className="flex size-6.5 sm:size-7.5 items-center justify-center rounded-full bg-berry text-berry-foreground transition-all hover:bg-berry/90 active:scale-90 shadow-2xs cursor-pointer"
+                    onClick={() => setQuantity(product.id, Math.min(50, quantityInCart + 1))}
+                  >
+                    <Plus className="size-3 sm:size-3.5" />
+                  </button>
+                </div>
+
+                {/* View Cart & Checkout Button */}
+                <Button
+                  size="lg"
+                  className="flex-1 h-10 sm:h-11 rounded-2xl bg-[#2C1810] text-white hover:bg-[#3D2217] font-bold text-xs sm:text-sm shadow-lift transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer px-3"
+                  onClick={() => navigate({ to: "/cart" })}
+                >
+                  <ShoppingBag className="mr-1.5 size-4" />
+                  <span>View Cart • {formatCurrency(price * quantityInCart)}</span>
+                  <ArrowRight className="ml-1.5 size-4" />
+                </Button>
+              </div>
+            )}
           </div>
 
           <p className="text-[10px] sm:text-[11px] text-muted-foreground">
@@ -427,25 +477,70 @@ function ProductDetailPage() {
       {/* 4. Reviews Bento Atelier (Placed at the end of the page) */}
       <ProductReviews productId={product.id} />
 
-      {/* Sticky Mobile Add to Cart Bar */}
+      {/* Sticky Mobile Add to Cart & Buy Bar */}
       {showStickyBar && (
         <div
-          className={`fixed bottom-0 left-0 right-0 z-40 md:hidden border-t border-border/80 bg-background/95 backdrop-blur-md px-4 py-2.5 flex items-center gap-3 transition-all duration-300 shadow-2xl ${
+          className={`fixed bottom-0 left-0 right-0 z-40 md:hidden border-t border-border/80 bg-background/95 backdrop-blur-md px-4 py-2.5 flex items-center gap-2 transition-all duration-300 shadow-2xl ${
             showSticky ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
           }`}
         >
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-cocoa truncate">{product.name}</p>
-            <p className="text-sm font-black text-foreground">{formatCurrency(price)}</p>
+            <p className="text-sm font-black text-foreground">
+              {formatCurrency(price * (quantityInCart || 1))}
+            </p>
           </div>
-          <Button
-            size="sm"
-            className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs px-4 h-9 shrink-0 cursor-pointer shadow-soft"
-            onClick={handleAddToCart}
-          >
-            <ShoppingBag className="mr-1.5 size-3.5" />
-            Add to cart
-          </Button>
+
+          {quantityInCart === 0 ? (
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                size="sm"
+                className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs px-3 h-9 shrink-0 cursor-pointer shadow-soft"
+                onClick={handleAddToCart}
+              >
+                <ShoppingBag className="mr-1 size-3.5" />
+                Add
+              </Button>
+              <Button
+                size="sm"
+                className="rounded-xl bg-[#2C1810] text-white hover:bg-[#3D2217] font-bold text-xs px-3 h-9 shrink-0 cursor-pointer shadow-soft"
+                onClick={handleBuyNow}
+              >
+                Buy Now
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 shrink-0">
+              <div className="inline-flex h-9 items-center gap-1 rounded-xl bg-secondary/90 px-1.5 border border-border">
+                <button
+                  type="button"
+                  aria-label="Decrease quantity in cart"
+                  className="flex size-6 items-center justify-center rounded-lg bg-card text-foreground text-xs"
+                  onClick={() => setQuantity(product.id, quantityInCart - 1)}
+                >
+                  <Minus className="size-3" />
+                </button>
+                <span className="min-w-5 text-center text-xs font-bold tabular-nums">
+                  {quantityInCart}
+                </span>
+                <button
+                  type="button"
+                  aria-label="Increase quantity in cart"
+                  className="flex size-6 items-center justify-center rounded-lg bg-berry text-berry-foreground text-xs"
+                  onClick={() => setQuantity(product.id, quantityInCart + 1)}
+                >
+                  <Plus className="size-3" />
+                </button>
+              </div>
+              <Button
+                size="sm"
+                className="rounded-xl bg-[#2C1810] text-white hover:bg-[#3D2217] font-bold text-xs px-3 h-9 shrink-0 cursor-pointer shadow-soft"
+                onClick={() => navigate({ to: "/cart" })}
+              >
+                Cart →
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
