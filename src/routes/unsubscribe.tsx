@@ -82,14 +82,6 @@ function UnsubscribePage() {
                     <MailOpen className="size-16 text-berry/70" />
                   </video>
                 </div>
-
-                {/* Floating micro-badge */}
-                <div className="absolute -bottom-2 -right-1 sm:bottom-0 sm:right-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-background/95 border border-border/80 px-2.5 py-0.5 text-[10px] sm:text-xs font-bold text-cocoa shadow-2xs">
-                    <Sparkles className="size-3 text-amber-500" />
-                    <span>Inbox Pause</span>
-                  </span>
-                </div>
               </div>
 
               {/* Title & Subtitle with Blogh Display Font */}
