@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import { saveMyProfile } from "@/lib/orders.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, Lock, User, Phone, Send } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 
 export type AuthSearch = {
   redirect?: string | undefined;
@@ -259,48 +259,13 @@ function AuthPage() {
   }
 
   return (
-    <div className="relative min-h-[calc(100svh-6.5rem)] flex flex-col justify-between p-4 sm:p-6 lg:p-8 bg-[#FAF8F5] dark:bg-[#151210] rounded-3xl sm:rounded-[2.5rem] border border-border/60 my-2 sm:my-4 shadow-sm overflow-hidden">
+    <div className="relative min-h-[calc(100svh-7.5rem)] flex flex-col justify-center px-4 py-8 sm:py-12 bg-background overflow-hidden">
       
-      {/* Top Header Inside Canvas */}
-      <div className="flex items-center justify-between w-full max-w-5xl mx-auto z-10">
-        {/* Brand Logo & Name */}
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="size-9 sm:size-10 rounded-full bg-gradient-to-tr from-[#E86033] to-[#FF8A50] p-2 flex items-center justify-center shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform">
-            <span className="text-white text-lg leading-none">🥐</span>
-          </div>
-          <span className="font-blogh text-xl sm:text-2xl font-bold tracking-tight text-cocoa">
-            Ani Bakes<span className="text-[#E86033]">.</span>
-          </span>
-        </Link>
-
-        {/* Action / Social Quick Circles */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <a
-            href="https://instagram.com/aniiibakes_.__"
-            target="_blank"
-            rel="noreferrer"
-            className="size-9 sm:size-10 rounded-full bg-white dark:bg-card border border-border/80 flex items-center justify-center p-2 hover:scale-110 hover:border-[#E86033]/50 hover:shadow-soft transition-all"
-            aria-label="Instagram"
-          >
-            <img src="/icons/icons8-instagram.svg" alt="Instagram" className="size-5 object-contain" />
-          </a>
-          <a
-            href="https://wa.me/919944733737"
-            target="_blank"
-            rel="noreferrer"
-            className="size-9 sm:size-10 rounded-full bg-cocoa text-white flex items-center justify-center p-2 hover:scale-110 hover:bg-[#E86033] hover:shadow-soft transition-all"
-            aria-label="WhatsApp Contact"
-          >
-            <Send className="size-4" />
-          </a>
-        </div>
-      </div>
-
       {/* Center Section: Floating Card & Flanking Geometric Elements */}
-      <div className="relative my-auto py-6 sm:py-10 flex items-center justify-center w-full max-w-5xl mx-auto">
+      <div className="relative my-auto flex items-center justify-center w-full max-w-4xl mx-auto">
         
         {/* Bottom-Left Character & Geometric Pedestals (Desktop & Tablet) */}
-        <div className="hidden md:flex absolute -left-2 sm:left-4 lg:left-12 bottom-0 z-10 flex-col items-start pointer-events-none select-none">
+        <div className="hidden md:flex absolute -left-2 sm:left-2 lg:left-6 bottom-0 z-10 flex-col items-start pointer-events-none select-none">
           <div className="relative">
             {/* Doodled Sparkles */}
             <div className="absolute -top-6 left-6 text-cocoa/50 font-mono text-sm select-none tracking-widest">
@@ -698,7 +663,7 @@ function AuthPage() {
         </div>
 
         {/* Bottom-Right Geometric Pedestals & Doodles (Desktop & Tablet) */}
-        <div className="hidden md:flex absolute -right-2 sm:right-4 lg:right-12 bottom-0 z-10 flex-col items-end pointer-events-none select-none">
+        <div className="hidden md:flex absolute -right-2 sm:right-2 lg:right-6 bottom-0 z-10 flex-col items-end pointer-events-none select-none">
           <svg viewBox="0 0 180 180" className="w-32 sm:w-40 lg:w-48 h-32 sm:h-40 lg:h-48 drop-shadow-md">
             {/* Rising Steam Puff / Doodles */}
             <path
