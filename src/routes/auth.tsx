@@ -259,29 +259,92 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100svh-7.5rem)] flex-col justify-center px-4 py-4 sm:py-8">
-      <div className="mx-auto w-full max-w-sm sm:max-w-md">
+    <div className="flex min-h-[calc(100svh-7.5rem)] flex-col justify-center px-4 py-6 sm:py-10">
+      <div className="mx-auto w-full max-w-sm sm:max-w-md lg:max-w-4xl lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center">
         
-        {/* Header Block: Compact & Well Spaced */}
-        <div className="text-center">
-          <h1 className="font-display text-xl sm:text-3xl font-bold text-cocoa">
-            {verificationSentEmail
-              ? "Check your email"
-              : authMode === "signin"
-              ? "Welcome back"
-              : "Create your account"}
-          </h1>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {verificationSentEmail
-              ? "We sent a verification link to confirm your account."
-              : authMode === "signin"
-              ? "Sign in with your email or Google account."
-              : "Register with your email to start ordering handcrafted bakes."}
-          </p>
+        {/* Left Side 3D Illustration & Benefits Banner (Desktop & Tablet) */}
+        <div className="hidden lg:flex flex-col items-center justify-center text-center space-y-5 p-8 rounded-3xl bg-secondary/30 border border-border/60 shadow-inner">
+          <div className="relative size-52 xl:size-60 flex items-center justify-center">
+            <video
+              key={authMode}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="size-full object-contain pointer-events-none drop-shadow-xl animate-in fade-in zoom-in-95 duration-500"
+            >
+              {authMode === "signup" ? (
+                <>
+                  <source
+                    src="/illustration/shopping-bag-with-sale-tag-and-sneaker-box-online-order-confirmation-and-discount-shopping.webm"
+                    type="video/webm"
+                  />
+                  <source
+                    src="/illustration/shopping-bag-with-sale-tag-and-sneaker-box-online-order-confirmation-and-discount-shopping.mp4"
+                    type="video/mp4"
+                  />
+                </>
+              ) : (
+                <>
+                  <source
+                    src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.webm"
+                    type="video/webm"
+                  />
+                  <source
+                    src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.mp4"
+                    type="video/mp4"
+                  />
+                </>
+              )}
+            </video>
+          </div>
+
+          <div className="space-y-2 max-w-xs">
+            <h2 className="font-blogh text-2xl font-bold text-cocoa uppercase tracking-wide">
+              {authMode === "signup" ? "Fresh Morning Bake Slots" : "Handcrafted In Pondicherry"}
+            </h2>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {authMode === "signup"
+                ? "Join our bakery membership to unlock priority morning bake slots, seasonal sourdough drops, and exclusive offers."
+                : "Sign in to track your oven queue in real time, view past artisan orders, and reorder in one tap."}
+            </p>
+          </div>
+
+          {/* Quick Perks Pill List */}
+          <div className="space-y-2 w-full max-w-xs text-left text-xs font-semibold text-cocoa">
+            <div className="flex items-center gap-2 rounded-xl bg-card/80 p-2.5 border border-border/70 shadow-2xs">
+              <span className="text-base">🥐</span>
+              <span>Baked fresh daily at 4:00 AM</span>
+            </div>
+            <div className="flex items-center gap-2 rounded-xl bg-card/80 p-2.5 border border-border/70 shadow-2xs">
+              <span className="text-base">🎁</span>
+              <span>15% Welcome discount on 1st order</span>
+            </div>
+          </div>
         </div>
 
-        {/* Card Container: Compact Padding */}
-        <div className="mt-3.5 sm:mt-6 rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-4.5 sm:p-7 shadow-soft">
+        {/* Right Side / Form Container */}
+        <div className="w-full">
+          {/* Header Block: Compact & Well Spaced */}
+          <div className="text-center lg:text-left">
+            <h1 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
+              {verificationSentEmail
+                ? "Check your email"
+                : authMode === "signin"
+                ? "Welcome back"
+                : "Create your account"}
+            </h1>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {verificationSentEmail
+                ? "We sent a verification link to confirm your account."
+                : authMode === "signin"
+                ? "Sign in with your email or Google account."
+                : "Register with your email to start ordering handcrafted bakes."}
+            </p>
+          </div>
+
+          {/* Card Container: Compact Padding */}
+          <div className="mt-3.5 sm:mt-6 rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-4.5 sm:p-7 shadow-soft">
           
           {/* EMAIL VERIFICATION SENT SCREEN */}
           {verificationSentEmail ? (
@@ -572,25 +635,26 @@ function AuthPage() {
                     </Button>
                   </form>
 
-                  {/* Switch to Sign In */}
-                  <div className="mt-3.5 pt-2.5 sm:mt-5 sm:pt-3.5 text-center border-t border-border/60">
-                    <p className="text-xs text-muted-foreground">
-                      Already have an account?{" "}
-                      <button
-                        type="button"
-                        onClick={() => setAuthMode("signin")}
-                        className="font-bold text-berry hover:underline cursor-pointer"
-                      >
-                        Sign in
-                      </button>
-                    </p>
-                  </div>
-                </div>
+                      {/* Switch to Sign In */}
+                      <div className="mt-3.5 pt-2.5 sm:mt-5 sm:pt-3.5 text-center border-t border-border/60">
+                        <p className="text-xs text-muted-foreground">
+                          Already have an account?{" "}
+                          <button
+                            type="button"
+                            onClick={() => setAuthMode("signin")}
+                            className="font-bold text-berry hover:underline cursor-pointer"
+                          >
+                            Sign in
+                          </button>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
 }
