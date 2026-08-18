@@ -248,12 +248,26 @@ function CheckoutPage() {
           {/* 50/50 Top Row: Delivery or Pickup & Offer Code Card */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Delivery or pickup (50%) */}
-            <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
-              <div>
-                <h2 className="font-display text-lg font-semibold">Delivery or pickup</h2>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Select how you want to receive your bakes
-                </p>
+            <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between relative overflow-hidden">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Delivery or pickup</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Select how you want to receive your bakes
+                  </p>
+                </div>
+                <div className="size-12 shrink-0 rounded-2xl overflow-hidden bg-secondary/40 border border-border/60 flex items-center justify-center">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="size-full object-contain pointer-events-none"
+                  >
+                    <source src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1.webm" type="video/webm" />
+                    <source src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1.mp4" type="video/mp4" />
+                  </video>
+                </div>
               </div>
               <div className="mt-4 flex gap-2">
                 {(["delivery", "pickup"] as const).map((option) => (
@@ -886,12 +900,30 @@ function CheckoutPage() {
             </dl>
 
             {/* Freshness & Trust Guarantee */}
-            <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/50">
-              <div className="flex items-start gap-2.5">
-                <ShieldCheck className="h-4 w-4 shrink-0 text-berry mt-0.5" />
+            <div className="rounded-2xl bg-secondary/40 p-3.5 border border-border/50 space-y-2.5">
+              <div className="flex items-center gap-2.5">
+                <div className="size-8 shrink-0 rounded-xl overflow-hidden bg-background/80 border border-border/60 flex items-center justify-center">
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="size-full object-contain pointer-events-none"
+                  >
+                    <source src="/illustration/3d-stickle-credit-card-terminal-pay.webm" type="video/webm" />
+                    <source src="/illustration/3d-stickle-credit-card-terminal-pay.mp4" type="video/mp4" />
+                  </video>
+                </div>
+                <div>
+                  <p className="font-bold text-cocoa text-xs">Instant Encrypted Payment</p>
+                  <p className="text-[10px] text-muted-foreground">Secures your morning oven slot</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2.5 pt-1.5 border-t border-border/40">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400 mt-0.5" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   <span className="font-semibold text-foreground">Bake-to-order notice:</span>{" "}
-                  Everything is baked fresh on your delivery day. Payment is secured and entered directly into the head baker's schedule.
+                  Everything is baked fresh at 4:00 AM on your delivery date.
                 </p>
               </div>
             </div>

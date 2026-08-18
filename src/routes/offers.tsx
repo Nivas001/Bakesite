@@ -74,13 +74,35 @@ function Offers() {
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10 space-y-10 sm:space-y-16">
       
       {/* 1. Offers Hero Header */}
-      <div className="flex flex-col gap-1.5 sm:gap-2">
-        <h1 className="font-blogh text-3xl sm:text-5xl font-bold text-cocoa leading-tight">
-          Special offers & coupons
-        </h1>
-        <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
-          A rotating handful of fresh morning bakes at a friendlier price, plus exclusive checkout coupon codes.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex flex-col gap-1.5 sm:gap-2">
+          <h1 className="font-blogh text-3xl sm:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide">
+            Special offers & coupons
+          </h1>
+          <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            A rotating handful of fresh morning bakes at a friendlier price, plus exclusive checkout coupon codes.
+          </p>
+        </div>
+
+        {/* 3D Animated Coupons Blueprint */}
+        <div className="hidden sm:flex items-center justify-center shrink-0 size-24 md:size-28 rounded-2xl overflow-hidden bg-secondary/30 border border-border/60 shadow-inner">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="size-full object-contain pointer-events-none"
+          >
+            <source
+              src="/illustration/3d-blueprint-blue-coupons-with-percent-symbol-retail-discount-marketing.webm"
+              type="video/webm"
+            />
+            <source
+              src="/illustration/3d-blueprint-blue-coupons-with-percent-symbol-retail-discount-marketing.mov"
+              type="video/quicktime"
+            />
+          </video>
+        </div>
       </div>
 
       {/* 2. Collectible Bakery Ticket Coupons */}

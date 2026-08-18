@@ -614,9 +614,18 @@ function OrdersPage() {
 
   if (orders.length === 0) {
     return (
-      <div className="mx-auto w-full max-w-2xl px-4 py-16 sm:py-24 text-center">
-        <div className="mx-auto flex size-20 items-center justify-center rounded-3xl bg-secondary/80 text-berry mb-5 shadow-soft border border-border/60">
-          <ShoppingBag className="size-10" />
+      <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:py-20 text-center">
+        <div className="relative mx-auto flex size-36 sm:size-44 items-center justify-center mb-4">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="size-full object-contain pointer-events-none"
+          >
+            <source src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.webm" type="video/webm" />
+            <source src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.mp4" type="video/mp4" />
+          </video>
         </div>
         <h1 className="font-blogh uppercase tracking-wide text-3xl sm:text-4xl font-bold text-cocoa">
           No Orders Yet
@@ -624,7 +633,7 @@ function OrdersPage() {
         <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
           Your morning slot is waiting. Explore our stone-hearth wild sourdoughs, French butter croissants, and custom celebration cakes.
         </p>
-        <Button asChild className="mt-6 rounded-full bg-cocoa text-background hover:bg-cocoa/90 px-7 py-5 font-bold text-sm shadow-lift cursor-pointer">
+        <Button asChild className="mt-6 rounded-full bg-cocoa text-background hover:bg-cocoa/90 px-8 py-5 font-bold text-sm shadow-lift cursor-pointer">
           <Link to="/shop" className="flex items-center gap-2">
             <span>Browse Daily Counter Bakes</span>
             <ArrowRight className="size-4" />

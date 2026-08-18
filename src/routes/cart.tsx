@@ -21,16 +21,22 @@ function CartPage() {
 
   if (lines.length === 0) {
     return (
-      <div className="mx-auto w-full max-w-2xl px-4 py-16 sm:py-24 text-center">
-        <div className="mx-auto flex size-16 items-center justify-center rounded-3xl bg-secondary/80 text-berry shadow-soft mb-4">
-          <ShoppingBag className="size-8" />
+      <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:py-20 text-center">
+        <div className="relative mx-auto flex size-40 sm:size-52 items-center justify-center mb-4">
+          <img
+            src="/illustration/business-3d-red-shopping-cart.png"
+            alt="Empty bakery shopping cart"
+            className="size-full object-contain drop-shadow-md select-none pointer-events-none"
+          />
         </div>
-        <h1 className="font-display text-2xl sm:text-3xl font-bold text-cocoa">Your bake tray is empty</h1>
-        <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto">
-          Fresh pastries, crusty sourdough, and celebratory layer cakes are waiting at the counter.
+        <h1 className="font-blogh text-2xl sm:text-3xl md:text-4xl font-bold text-cocoa uppercase tracking-wide">
+          Your bake tray is empty
+        </h1>
+        <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+          Fresh morning pastries, crusty country sourdough, and celebration layer cakes are fresh from the oven.
         </p>
-        <Button asChild className="mt-6 rounded-2xl bg-berry px-6 text-xs sm:text-sm font-semibold text-berry-foreground hover:bg-berry/90 shadow-soft">
-          <Link to="/shop">Browse the Bakery Counter</Link>
+        <Button asChild className="mt-6 rounded-2xl bg-berry px-8 h-11 text-xs sm:text-sm font-bold text-berry-foreground hover:bg-berry/90 shadow-soft cursor-pointer">
+          <Link to="/shop">Browse Bakery Counter</Link>
         </Button>
       </div>
     );
@@ -219,14 +225,28 @@ function CartPage() {
           </Button>
 
           {/* Bakery Assurance Trust Chips */}
-          <div className="space-y-2 rounded-2xl bg-secondary/40 p-3 text-[11px] text-muted-foreground border border-border/50">
-            <div className="flex items-start gap-2">
+          <div className="space-y-2.5 rounded-2xl bg-secondary/40 p-3 text-[11px] text-muted-foreground border border-border/50">
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 shrink-0 rounded-xl overflow-hidden bg-background/80 border border-border/60 flex items-center justify-center">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="size-full object-contain pointer-events-none"
+                >
+                  <source src="/illustration/3d-stickle-credit-card-terminal-pay.webm" type="video/webm" />
+                  <source src="/illustration/3d-stickle-credit-card-terminal-pay.mp4" type="video/mp4" />
+                </video>
+              </div>
+              <div>
+                <p className="font-bold text-cocoa text-xs">Instant UPI & Card Payment</p>
+                <p className="text-[10px] text-muted-foreground">Secures your morning bake slot</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2 pt-1 border-t border-border/40">
               <Clock className="size-3.5 text-berry shrink-0 mt-0.5" />
               <span>Baked fresh at 4:00 AM on your chosen delivery date</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-              <span>Instant payment secures your morning oven capacity</span>
             </div>
           </div>
         </aside>

@@ -492,11 +492,37 @@ function AdminDashboard() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-12">
-      <h1 className="font-display text-4xl font-bold text-cocoa">Bakery admin</h1>
-      <p className="mt-2 text-muted-foreground">
-        {pending} order{pending === 1 ? "" : "s"} waiting for approval · {data.products.length} products
-      </p>
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-blogh text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa uppercase tracking-wide">
+            Bakery Admin
+          </h1>
+          <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground">
+            {pending} order{pending === 1 ? "" : "s"} waiting for approval · {data.products.length} catalog items
+          </p>
+        </div>
+
+        {/* 3D Analytics Clipboard Illustration */}
+        <div className="hidden sm:flex size-16 md:size-20 shrink-0 rounded-2xl overflow-hidden bg-secondary/40 border border-border/60 p-1 shadow-2xs items-center justify-center">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="size-full object-contain pointer-events-none"
+          >
+            <source
+              src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.webm"
+              type="video/webm"
+            />
+            <source
+              src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.mp4"
+              type="video/mp4"
+            />
+          </video>
+        </div>
+      </div>
 
       <Tabs defaultValue="orders" className="mt-8">
         <TabsList className="flex flex-wrap h-auto gap-1">

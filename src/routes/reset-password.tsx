@@ -108,12 +108,32 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[60vh] w-full max-w-md items-center justify-center px-4 py-16">
+    <div className="mx-auto flex min-h-[65vh] w-full max-w-md items-center justify-center px-4 py-12">
       <div className="w-full rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8 space-y-6">
         <div className="text-center">
-          <h1 className="font-display text-3xl font-bold text-cocoa">Set New Password</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enter your new secure password below.
+          <div className="relative mx-auto flex size-28 sm:size-32 items-center justify-center mb-3">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="size-full object-contain pointer-events-none"
+            >
+              <source
+                src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.webm"
+                type="video/webm"
+              />
+              <source
+                src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.mp4"
+                type="video/mp4"
+              />
+            </video>
+          </div>
+          <h1 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
+            Set New Password
+          </h1>
+          <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground">
+            Enter your new secure password below to protect your bakery account.
           </p>
         </div>
 

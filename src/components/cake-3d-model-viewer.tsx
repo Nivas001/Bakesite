@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { FBXLoader } from "three/addons/loaders/FBXLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import {
   Sparkles,
@@ -46,6 +47,21 @@ export const BAKERY_3D_MODELS: CakeModelItem[] = [
     butter: "84% French",
     description:
       "A 3-tier celebration cake rendered in full 3D. Features 70% dark Belgian cocoa sponge, hand-piped salted caramel swirls, slow-dripping couverture ganache, and edible 24K gold-dusted truffle spheres.",
+  },
+  {
+    id: "birthday-cake",
+    name: "Royal Celebration Birthday Cake",
+    tag: "Celebration 3D Masterpiece",
+    badge: "Interactive 3D FBX Model",
+    status: "available",
+    modelUrl: "/models/birthday-cake/3d-casual-life-birthday-cake.fbx",
+    thumbnail: "/illustration/open-gift-box-with-candy-cane-and-christmas-ornament-holiday-celebration-and-party.png",
+    calories: "175 kcal",
+    protein: "12g",
+    sugar: "Organic Monkfruit",
+    butter: "Pure Dairy Butter",
+    description:
+      "Festive celebration birthday cake rendered in 3D. Layered with vanilla bean sponge, strawberry glaze rosettes, and edible sugar pearls.",
   },
   {
     id: "sourdough-boule",
@@ -131,7 +147,7 @@ export function Cake3dModelViewer() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const controlsRef = useRef<OrbitControls | null>(null);
-  const modelGroupRef = useRef<THREE.Group | null>(null);
+  const modelGroupRef = useRef<THREE.Object3D | null>(null);
   const lightsGroupRef = useRef<THREE.Group | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
 
@@ -230,71 +246,106 @@ export function Cake3dModelViewer() {
     ring.position.y = 0;
     scene.add(ring);
 
-    // 7. Load GLB Model
+    // 7. Load 3D Model (GLTF/GLB or FBX)
     if (selectedModel.modelUrl) {
       setLoading(true);
       setLoadError(null);
-      const loader = new GLTFLoader();
 
-      loader.load(
-        selectedModel.modelUrl,
-        (gltf) => {
-          // Remove old model if present
-          if (modelGroupRef.current) {
-            scene.remove(modelGroupRef.current);
-          }
+      const onModelLoaded = (model: THREE.Group | THREE.Object3D) => {
+        // Remove old model if present
+        if (modelGroupRef.current) {
+          scene.remove(modelGroupRef.current);
+        }
 
-          const model = gltf.scene;
-          modelGroupRef.current = model;
+        modelGroupRef.current = model;
 
-          // Auto-center and normalize size
-          const box = new THREE.Box3().setFromObject(model);
-          const size = box.getSize(new THREE.Vector3());
-          const center = box.getCenter(new THREE.Vector3());
+        // Auto-center and normalize size
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
 
-          // Scale to fit nicely inside ~1.6 units
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const targetScale = 1.6 / (maxDim || 1);
-          model.scale.setScalar(targetScale);
+        // Scale to fit nicely inside ~1.6 units
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const targetScale = 1.6 / (maxDim || 1);
+        model.scale.setScalar(targetScale);
 
-          // Center model on pedestal
-          model.position.x = -center.x * targetScale;
-          model.position.y = -box.min.y * targetScale; // Sit on pedestal top
-          model.position.z = -center.z * targetScale;
+        // Center model on pedestal
+        model.position.x = -center.x * targetScale;
+        model.position.y = -box.min.y * targetScale; // Sit on pedestal top
+        model.position.z = -center.z * targetScale;
 
-          // Enable shadow casting on all meshes
-          model.traverse((child) => {
-            if ((child as THREE.Mesh).isMesh) {
-              const mesh = child as THREE.Mesh;
-              mesh.castShadow = true;
-              mesh.receiveShadow = true;
-              if (mesh.material) {
-                if (Array.isArray(mesh.material)) {
-                  mesh.material.forEach((m) => {
-                    if ("wireframe" in m) (m as any).wireframe = wireframe;
-                  });
-                } else {
-                  if ("wireframe" in mesh.material) (mesh.material as any).wireframe = wireframe;
-                }
+        // Enable shadow casting on all meshes
+        model.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) {
+            const mesh = child as THREE.Mesh;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            if (mesh.material) {
+              if (Array.isArray(mesh.material)) {
+                mesh.material.forEach((m) => {
+                  if ("wireframe" in m) (m as any).wireframe = wireframe;
+                });
+              } else {
+                if ("wireframe" in mesh.material) (mesh.material as any).wireframe = wireframe;
               }
             }
-          });
-
-          scene.add(model);
-          setLoading(false);
-          controls.reset();
-        },
-        (xhr) => {
-          if (xhr.total > 0) {
-            setLoadingProgress(Math.round((xhr.loaded / xhr.total) * 100));
           }
-        },
-        (err) => {
-          console.error("Error loading 3D GLB cake model:", err);
-          setLoading(false);
-          setLoadError("Failed to render 3D model. Please refresh.");
+        });
+
+        scene.add(model);
+        setLoading(false);
+        controls.reset();
+      };
+
+      const onProgress = (xhr: ProgressEvent<EventTarget>) => {
+        if (xhr.total > 0) {
+          setLoadingProgress(Math.round((xhr.loaded / xhr.total) * 100));
         }
-      );
+      };
+
+      const onError = (err: unknown) => {
+        console.error("Error loading 3D cake model:", err);
+        setLoading(false);
+        setLoadError("Failed to render 3D model. Please refresh.");
+      };
+
+      if (selectedModel.modelUrl.endsWith(".fbx")) {
+        const fbxLoader = new FBXLoader();
+        fbxLoader.load(
+          selectedModel.modelUrl,
+          (fbx) => {
+            // Load and apply diffuse texture if in birthday-cake directory
+            const textureLoader = new THREE.TextureLoader();
+            const baseColor = textureLoader.load("/models/birthday-cake/birthday_cake_base_color.jpg");
+            const roughness = textureLoader.load("/models/birthday-cake/birthday_cake_roughness.jpg");
+            const metallic = textureLoader.load("/models/birthday-cake/birthday_cake_metallic.jpg");
+
+            fbx.traverse((child) => {
+              if ((child as THREE.Mesh).isMesh) {
+                const mesh = child as THREE.Mesh;
+                mesh.material = new THREE.MeshStandardMaterial({
+                  map: baseColor,
+                  roughnessMap: roughness,
+                  metalnessMap: metallic,
+                  roughness: 0.5,
+                  metalness: 0.2,
+                });
+              }
+            });
+            onModelLoaded(fbx);
+          },
+          onProgress,
+          onError
+        );
+      } else {
+        const gltfLoader = new GLTFLoader();
+        gltfLoader.load(
+          selectedModel.modelUrl,
+          (gltf) => onModelLoaded(gltf.scene),
+          onProgress,
+          onError
+        );
+      }
     }
 
     // 8. Animation & Render Loop

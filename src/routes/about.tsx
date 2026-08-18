@@ -1179,10 +1179,30 @@ export function AboutUsPage() {
                 )}
 
                 {activeStoryChapter === 4 && (
-                  <div className="rounded-2xl border-2 border-[#2C1810] bg-white/95 p-4 shadow-[3px_3px_0px_#2C1810] space-y-2">
-                    <span className="font-sans font-black text-xs uppercase text-[#5C3218] block">
-                      Our Morning Hearth Schedule:
-                    </span>
+                  <div className="rounded-2xl border-2 border-[#2C1810] bg-white/95 p-4 shadow-[3px_3px_0px_#2C1810] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-sans font-black text-xs uppercase text-[#5C3218] block">
+                        Our Morning Hearth Schedule:
+                      </span>
+                      <div className="size-8 shrink-0 rounded-xl overflow-hidden bg-amber-100 border border-[#2C1810]/30 flex items-center justify-center">
+                        <video
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="size-full object-contain pointer-events-none"
+                        >
+                          <source
+                            src="/illustration/people-walking-together-outdoors-urban-lifestyle-and-daily-routine.webm"
+                            type="video/webm"
+                          />
+                          <source
+                            src="/illustration/people-walking-together-outdoors-urban-lifestyle-and-daily-routine.mp4"
+                            type="video/mp4"
+                          />
+                        </video>
+                      </div>
+                    </div>
                     <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-bold">
                       <div className="p-2 rounded-xl bg-amber-50 border border-amber-200">
                         <p className="text-amber-800">4:00 AM</p>
