@@ -218,43 +218,59 @@ function Home() {
       </div>
 
       {/* 9. Closing Call-To-Action Banner */}
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10 pb-4">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10 pb-6">
         <section className="mb-2">
-          <div className="glass-panel relative overflow-hidden rounded-2xl sm:rounded-[2.25rem] px-5 py-10 text-center sm:px-12 sm:py-14 shadow-lift">
+          <div className="glass-panel relative overflow-hidden rounded-3xl sm:rounded-4xl border border-border/80 bg-gradient-to-br from-card via-[#FFF9F4] to-secondary/40 px-5 py-9 text-center sm:px-12 sm:py-14 shadow-lift">
             <div
               aria-hidden
-              className="pointer-events-none absolute -bottom-16 -left-16 size-60 rounded-full bg-berry/15 blur-2xl"
+              className="pointer-events-none absolute -bottom-16 -left-16 size-60 rounded-full bg-berry/15 blur-3xl"
             />
             <div
               aria-hidden
-              className="pointer-events-none absolute -top-16 -right-16 size-60 rounded-full bg-secondary/50 blur-2xl"
+              className="pointer-events-none absolute -top-16 -right-16 size-60 rounded-full bg-amber-500/15 blur-3xl"
             />
 
-            <div className="relative mx-auto max-w-xl">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/80 px-3 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.16em] text-secondary-foreground mb-3">
+            <div className="relative mx-auto max-w-2xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] text-berry mb-3 shadow-2xs">
                 <Sparkles className="size-3 text-berry" /> Fresh Mornings
               </span>
-              <h2 className="font-display text-xl sm:text-4xl font-bold leading-tight text-cocoa">
+              <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold leading-[1.15] text-cocoa uppercase tracking-wide">
                 Tomorrow morning could smell a lot better.
               </h2>
-              <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-lg mx-auto">
                 Reserve your next-day slot now. We mix and bake fresh at dawn for your chosen arrival window.
               </p>
-              <div className="mt-6 flex flex-col xs:flex-row items-center justify-center gap-2.5 sm:gap-3">
+
+              {/* Micro Perks Pills */}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                  🥐 4:00 AM Dawn Oven
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                  🛵 Pondicherry Doorstep
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                  🧈 100% French Butter
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3">
                 <Button
                   asChild
                   size="default"
-                  className="w-full xs:w-auto rounded-xl sm:rounded-2xl bg-berry px-6 py-5 text-xs sm:text-sm font-semibold text-berry-foreground shadow-lift transition-transform duration-200 hover:scale-[1.02] hover:bg-berry/90 active:scale-95 cursor-pointer"
+                  className="w-full sm:w-auto rounded-2xl bg-[#2C1810] text-white hover:bg-[#3D2217] px-6 py-5 text-xs sm:text-sm font-bold shadow-lift transition-transform duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer"
                 >
                   <Link to="/shop">
-                    Start your bake box <ArrowRight className="ml-1.5 size-3.5" />
+                    <span>Start your bake box</span>
+                    <ArrowRight className="ml-1.5 size-4" />
                   </Link>
                 </Button>
                 <Button
                   asChild
                   size="default"
                   variant="outline"
-                  className="w-full xs:w-auto rounded-xl sm:rounded-2xl px-6 py-5 text-xs sm:text-sm font-semibold border-border bg-card/60 backdrop-blur hover:bg-secondary/60 cursor-pointer"
+                  className="w-full sm:w-auto rounded-2xl px-6 py-5 text-xs sm:text-sm font-bold border-border/80 bg-card/80 text-cocoa backdrop-blur hover:bg-secondary/60 cursor-pointer shadow-2xs"
                 >
                   <Link to="/offers">View offers</Link>
                 </Button>
