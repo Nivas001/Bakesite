@@ -132,9 +132,9 @@ function CategoryHorizontalLane({
 
       {/* 📱 MOBILE VIEW: Clean 2-Column Grid (Shows 4 Featured Cards + View All Button) */}
       <div className="sm:hidden space-y-3">
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5 pt-2 pb-2">
           {mobileTopProducts.map((product) => (
-            <div key={product.id} className="min-w-0">
+            <div key={product.id} className="min-w-0 h-full flex flex-col">
               <ProductCard product={product} />
             </div>
           ))}
@@ -156,7 +156,7 @@ function CategoryHorizontalLane({
       {/* 💻 DESKTOP & TABLET VIEW: Exact 4-Cards per Row Horizontal Lane (Supports 1, 2, 3, 4 Rows) */}
       <div
         ref={scrollRef}
-        className="hidden sm:flex overflow-x-auto gap-4 pb-2 pt-1 no-scrollbar snap-x snap-mandatory scroll-smooth"
+        className="hidden sm:flex overflow-x-auto gap-4 pb-4 pt-3.5 -mt-2 no-scrollbar snap-x snap-mandatory scroll-smooth"
       >
         {columns.map((column, colIdx) => (
           <div
@@ -164,7 +164,9 @@ function CategoryHorizontalLane({
             className="snap-start shrink-0 sm:w-[calc(50%-8px)] md:w-[calc(33.333%-11px)] lg:w-[calc(25%-12px)] flex flex-col gap-4"
           >
             {column.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <div key={product.id} className="h-full flex flex-col">
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
         ))}
@@ -371,12 +373,12 @@ function Shop() {
           ) : (
             <div
               key={showStagger ? filterKey : undefined}
-              className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 lg:gap-6"
+              className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 lg:gap-6 pt-2 pb-2"
             >
               {products.map((product, index) => (
                 <div
                   key={product.id}
-                  className={showStagger ? "animate-scale-in" : ""}
+                  className={`h-full flex flex-col ${showStagger ? "animate-scale-in" : ""}`}
                   style={showStagger ? { animationDelay: `${index * 30}ms` } : undefined}
                 >
                   <ProductCard product={product} />

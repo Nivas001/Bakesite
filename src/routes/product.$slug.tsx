@@ -523,9 +523,11 @@ function ProductDetailPage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-3 lg:gap-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-3 lg:gap-5 pt-2 pb-2">
             {related.map((item) => (
-              <ProductCard key={item.id} product={item} />
+              <div key={item.id} className="h-full flex flex-col">
+                <ProductCard product={item} />
+              </div>
             ))}
           </div>
         </section>

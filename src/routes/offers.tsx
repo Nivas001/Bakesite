@@ -235,9 +235,11 @@ function Offers() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5 pt-2 pb-2">
             {offers.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <div key={product.id} className="h-full flex flex-col">
+                <ProductCard product={product} />
+              </div>
             ))}
           </div>
         )}
