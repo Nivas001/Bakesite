@@ -193,8 +193,8 @@ export async function fetchStats() {
 }
 
 export async function fetchAdminProducts() {
-  const { loadCatalog } = await import("./catalog.server");
-  const catalog = await loadCatalog();
+  const { loadCatalogForAdmin } = await import("./catalog.server");
+  const catalog = await loadCatalogForAdmin();
   return {
     products: catalog.products.map((p) => ({
       id: p.id,

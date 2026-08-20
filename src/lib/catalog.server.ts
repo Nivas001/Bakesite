@@ -918,6 +918,33 @@ export async function loadCatalog() {
   };
 }
 
+/**
+ * Admin-only catalog loader: returns ONLY real Appwrite DB records.
+ * NO seed data is merged. This ensures admin CRUD operations (edit/delete)
+ * only target documents that actually exist in Appwrite.
+ */
+export async function loadCatalogForAdmin() {
+  if (!isAppwriteConfigured()) {
+    // No DB configured — return empty so admin shows nothing to prevent phantom deletes
+    return { products: [] as ReturnType<typeof mapProduct>[], categories: [] as ReturnType<typeof mapCategory>[] };
+  }
+
+  const [products, categories] = await Promise.all([
+    listDocs<ProductDoc>(COLLECTIONS.products, [Q.limit(200)]),
+    listDocs<CategoryDoc>(COLLECTIONS.categories, [Q.orderAsc("sort_order"), Q.limit(50)]),
+  ]);
+
+  const mappedCats = categories
+    .map(mapCategory)
+    .sort((a, b) => a.sort_order - b.sort_order);
+
+  const mappedProds = products
+    .map((p) => mapProduct(p, categories))
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
+
+  return { products: mappedProds, categories: mappedCats };
+}
+
 export async function loadProductBySlug(slug: string) {
   const catalog = await loadCatalog();
   const product = catalog.products.find((p) => p.slug === slug) || catalog.products[0]!;
