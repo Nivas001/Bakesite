@@ -195,7 +195,6 @@ function ProductAdminRow({
   onEdit,
   onDelete,
   onDuplicate,
-  onAdjustStock,
 }: {
   product: {
     id: string;
@@ -215,9 +214,7 @@ function ProductAdminRow({
   onEdit: () => void;
   onDelete: () => void;
   onDuplicate?: () => void;
-  onAdjustStock?: (delta: number) => void;
 }) {
-  const stock = Number(product.stock);
   const price = Number(product.price);
   const discountType = product.discount_type;
   const discountVal = Number(product.discount_value);
@@ -260,29 +257,14 @@ function ProductAdminRow({
               {product.name}
             </h4>
 
-            {/* Visibility Badge */}
+            {/* Fresh to Order / Visibility Badge */}
             {product.is_active ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                ● Visible
+                🌿 Baked Fresh to Order
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 rounded-full bg-muted border border-border px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                Hidden
-              </span>
-            )}
-
-            {/* Stock Level Badge */}
-            {stock === 0 ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-destructive/15 border border-destructive/30 px-2 py-0.5 text-[10px] font-bold text-destructive">
-                ❌ Out of stock
-              </span>
-            ) : stock <= 5 ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
-                ⚠️ Low stock ({stock})
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-secondary/80 border border-border/50 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                Stock: {stock}
+                ⏸️ Paused from Menu
               </span>
             )}
           </div>
@@ -340,33 +322,8 @@ function ProductAdminRow({
         </div>
       </div>
 
-      {/* Quick Stock Controls & Action Buttons */}
+      {/* Action Buttons */}
       <div className="flex flex-wrap items-center gap-2 border-t border-border/40 pt-2 sm:border-t-0 sm:pt-0 shrink-0">
-        {onAdjustStock && (
-          <div className="flex items-center gap-1 rounded-xl border border-border/70 bg-secondary/30 p-1">
-            <button
-              type="button"
-              title="Decrease stock by 1"
-              disabled={stock <= 0}
-              onClick={() => onAdjustStock(-1)}
-              className="size-6 rounded-lg bg-background hover:bg-secondary flex items-center justify-center text-xs font-bold text-cocoa border border-border/50 disabled:opacity-40 cursor-pointer shadow-2xs"
-            >
-              -
-            </button>
-            <span className="px-1.5 text-xs font-mono font-bold text-cocoa min-w-[20px] text-center">
-              {stock}
-            </span>
-            <button
-              type="button"
-              title="Increase stock by 1"
-              onClick={() => onAdjustStock(1)}
-              className="size-6 rounded-lg bg-background hover:bg-secondary flex items-center justify-center text-xs font-bold text-cocoa border border-border/50 cursor-pointer shadow-2xs"
-            >
-              +
-            </button>
-          </div>
-        )}
-
         {onDuplicate && (
           <Button
             size="sm"
@@ -727,7 +684,7 @@ function AdminShopLayoutManager({
                             <div className="min-w-0">
                               <p className="text-xs font-bold text-cocoa truncate">{prod.name}</p>
                               <p className="text-[10px] text-muted-foreground">
-                                {formatCurrency(prod.price)} &bull; {prod.stock} in stock
+                                {formatCurrency(prod.price)} &bull; 🌿 Baked Fresh
                               </p>
                             </div>
                           </div>
@@ -929,7 +886,7 @@ function AdminDashboard() {
   const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState<string>("all");
   const [inventorySortBy, setInventorySortBy] = useState<string>("name_asc");
   const [inventorySearchQuery, setInventorySearchQuery] = useState<string>("");
-  const [inventoryStockFilter, setInventoryStockFilter] = useState<string>("all");
+  const [inventoryStatusFilter, setInventoryStatusFilter] = useState<string>("all");
 
   const categoryMap = new Map<string, string>();
   for (const c of data.categories) {
@@ -944,11 +901,8 @@ function AdminDashboard() {
         return false;
       }
     }
-    if (inventoryStockFilter === "in_stock" && p.stock <= 0) return false;
-    if (inventoryStockFilter === "low" && (p.stock <= 0 || p.stock > 5)) return false;
-    if (inventoryStockFilter === "out" && p.stock > 0) return false;
-    if (inventoryStockFilter === "active" && !p.is_active) return false;
-    if (inventoryStockFilter === "hidden" && p.is_active) return false;
+    if (inventoryStatusFilter === "active" && !p.is_active) return false;
+    if (inventoryStatusFilter === "hidden" && p.is_active) return false;
 
     if (inventorySearchQuery.trim()) {
       const q = inventorySearchQuery.toLowerCase();
@@ -966,8 +920,6 @@ function AdminDashboard() {
     if (inventorySortBy === "name_desc") return b.name.localeCompare(a.name);
     if (inventorySortBy === "price_asc") return Number(a.price) - Number(b.price);
     if (inventorySortBy === "price_desc") return Number(b.price) - Number(a.price);
-    if (inventorySortBy === "stock_asc") return Number(a.stock) - Number(b.stock);
-    if (inventorySortBy === "stock_desc") return Number(b.stock) - Number(a.stock);
     if (inventorySortBy === "active_first") return (b.is_active ? 1 : 0) - (a.is_active ? 1 : 0);
     return 0;
   });
@@ -977,7 +929,7 @@ function AdminDashboard() {
     .reduce((sum, o) => sum + Number(o.total || 0), 0);
 
   const todayOrders = data.orders.filter((o) => o.slot_date === todayISO && o.status !== "rejected");
-  const lowStockProducts = data.products.filter((p) => p.stock <= 5);
+  const activeProducts = data.products.filter((p) => p.is_active);
 
   const handleEditProduct = (product: any) => {
     const isCake =
@@ -1007,7 +959,7 @@ function AdminDashboard() {
       discount_value: String(product.discount_value),
       image_url: product.image_url ?? (imagesList[0] || ""),
       images: imagesList,
-      stock: String(product.stock),
+      stock: "100",
       is_active: product.is_active,
       category_id: product.category_id ?? "",
       item_type: itemType,
@@ -1047,7 +999,7 @@ function AdminDashboard() {
       discount_value: String(product.discount_value),
       image_url: product.image_url ?? (imagesList[0] || ""),
       images: imagesList,
-      stock: String(product.stock),
+      stock: "100",
       is_active: true,
       category_id: product.category_id ?? "",
       item_type: itemType,
@@ -1058,36 +1010,6 @@ function AdminDashboard() {
     setActiveTab("inventory");
     toast.info(`Cloned "${product.name}". Adjust details and save.`);
     window.scrollTo({ top: 120, behavior: "smooth" });
-  };
-
-  const handleQuickStockAdjust = async (product: any, delta: number) => {
-    const newStock = Math.max(0, Number(product.stock) + delta);
-    try {
-      await persistProduct({
-        data: {
-          id: product.id,
-          name: product.name,
-          slug: product.slug,
-          description: product.description ?? undefined,
-          price: Number(product.price),
-          discount_type: product.discount_type,
-          discount_value: Number(product.discount_value),
-          image_url: product.image_url ?? undefined,
-          images: (product as any).images || undefined,
-          stock: newStock,
-          is_active: product.is_active,
-          category_id: product.category_id ?? undefined,
-          item_type: (product as any).item_type ?? undefined,
-          unit_weight_grams: (product as any).unit_weight_grams ? Number((product as any).unit_weight_grams) : undefined,
-          serving_yield: (product as any).serving_yield ?? undefined,
-          weight_variants: (product as any).weight_variants ?? undefined,
-        },
-      });
-      toast.success(`Stock for "${product.name}" updated to ${newStock}!`);
-      await refresh();
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to adjust stock");
-    }
   };
 
   const NAV_GROUPS = [
@@ -1104,7 +1026,7 @@ function AdminDashboard() {
         },
         {
           id: "inventory",
-          label: "Products & Stock",
+          label: "Products & Menu",
           icon: Package,
           badge: data.products.length,
           badgeColor: "bg-secondary text-muted-foreground",
@@ -1285,7 +1207,7 @@ function AdminDashboard() {
                 <h1 className="font-blogh text-lg sm:text-xl font-bold text-cocoa uppercase tracking-wide truncate">
                   {activeTab === "overview" && "Atelier Overview"}
                   {activeTab === "orders" && "Orders & Kitchen Slots"}
-                  {activeTab === "inventory" && "Bakery Catalog & Inventory"}
+                  {activeTab === "inventory" && "Bakery Menu & Catalog"}
                   {activeTab === "shop_layout" && "Shop Page & Category Arrangement"}
                   {activeTab === "users" && "Customer Accounts & Loyalty"}
                   {activeTab === "offers" && "Promotions & Discount Codes"}
@@ -1300,7 +1222,7 @@ function AdminDashboard() {
                 </span>
               </div>
               <p className="text-[11px] text-muted-foreground hidden sm:block truncate">
-                {pending} pending approval &bull; {data.products.length} products &bull; {todayOrders.length} orders scheduled today
+                {pending} pending approval &bull; {activeProducts.length} active bakes &bull; {todayOrders.length} orders scheduled today
               </p>
             </div>
           </div>
@@ -1411,25 +1333,21 @@ function AdminDashboard() {
 
                 <div
                   onClick={() => setActiveTab("inventory")}
-                  className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3 hover:border-berry/50 cursor-pointer transition-all hover:shadow-lift"
+                  className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3 hover:border-emerald-500/50 cursor-pointer transition-all hover:shadow-lift"
                 >
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Active Products
+                      Active Menu Items
                     </p>
                     <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
-                      {data.products.length}
+                      {activeProducts.length}
                     </h3>
-                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
-                      {lowStockProducts.length > 0 ? (
-                        <span className="text-amber-600 font-bold">{lowStockProducts.length} low stock items</span>
-                      ) : (
-                        "Stock levels healthy"
-                      )}
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
+                      🌿 100% Baked Fresh to Order
                     </p>
                   </div>
-                  <div className="size-12 rounded-2xl bg-berry/15 text-berry flex items-center justify-center text-xl shadow-2xs">
-                    🥐
+                  <div className="size-12 rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center text-xl shadow-2xs">
+                    🧁
                   </div>
                 </div>
 
@@ -1451,7 +1369,7 @@ function AdminDashboard() {
                 </div>
               </div>
 
-              {/* 2-Column Bento Grid: Today's Orders & Low Stock Watch */}
+              {/* 2-Column Bento Grid: Today's Orders & Fresh Bake Menu */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Left Column: Today's Kitchen Production Queue */}
                 <div className="lg:col-span-7 space-y-4">
@@ -1527,95 +1445,71 @@ function AdminDashboard() {
                   )}
                 </div>
 
-                {/* Right Column: Low Stock Alerts & Quick Restock */}
+                {/* Right Column: Fresh Bake Atelier Menu */}
                 <div className="lg:col-span-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-display text-lg font-bold text-cocoa flex items-center gap-1.5">
-                      <span>Low Stock Watch</span>
-                      {lowStockProducts.length > 0 && (
-                        <span className="rounded-full bg-destructive/15 text-destructive px-2 py-0.5 text-[10px] font-bold">
-                          {lowStockProducts.length} items
-                        </span>
-                      )}
+                      <span>Fresh Bake Menu</span>
+                      <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold">
+                        {activeProducts.length} Active
+                      </span>
                     </h3>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => {
-                        setInventoryStockFilter("low");
-                        setActiveTab("inventory");
-                      }}
+                      onClick={() => setActiveTab("inventory")}
                       className="text-xs font-bold text-berry hover:underline p-0 h-auto cursor-pointer"
                     >
-                      Manage Inventory →
+                      Manage Menu →
                     </Button>
                   </div>
 
-                  {lowStockProducts.length === 0 ? (
-                    <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-6 text-center">
-                      <p className="text-2xl mb-1.5">✨</p>
-                      <h4 className="font-display text-sm font-bold text-cocoa">Stock Levels Are Healthy</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        No items are below the 5-unit threshold.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {lowStockProducts.slice(0, 5).map((prod) => (
-                        <div
-                          key={prod.id}
-                          className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-border/70 bg-card shadow-2xs"
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            {prod.image_url ? (
-                              <img
-                                src={prod.image_url}
-                                alt={prod.name}
-                                className="size-10 rounded-xl object-cover border border-border/50 shrink-0"
-                              />
-                            ) : (
-                              <div className="size-10 rounded-xl bg-secondary flex items-center justify-center text-base">
-                                🥖
-                              </div>
-                            )}
-                            <div className="min-w-0">
-                              <p className="text-xs font-bold text-cocoa truncate">{prod.name}</p>
-                              <p className="text-[10px] font-bold text-destructive">
-                                {prod.stock === 0 ? "Out of stock" : `Only ${prod.stock} left`}
-                              </p>
+                  <div className="space-y-2.5">
+                    {data.products.slice(0, 5).map((prod) => (
+                      <div
+                        key={prod.id}
+                        className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-border/70 bg-card shadow-2xs hover:border-berry/30 transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {prod.image_url ? (
+                            <img
+                              src={prod.image_url}
+                              alt={prod.name}
+                              className="size-10 rounded-xl object-cover border border-border/50 shrink-0"
+                            />
+                          ) : (
+                            <div className="size-10 rounded-xl bg-secondary flex items-center justify-center text-base">
+                              🥖
                             </div>
-                          </div>
-
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => handleQuickStockAdjust(prod, 5)}
-                              className="rounded-lg bg-secondary/80 hover:bg-secondary px-2 py-1 text-[10px] font-bold text-cocoa border border-border/50 cursor-pointer shadow-2xs"
-                              title="Restock +5"
-                            >
-                              +5
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleQuickStockAdjust(prod, 10)}
-                              className="rounded-lg bg-secondary/80 hover:bg-secondary px-2 py-1 text-[10px] font-bold text-cocoa border border-border/50 cursor-pointer shadow-2xs"
-                              title="Restock +10"
-                            >
-                              +10
-                            </button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleEditProduct(prod)}
-                              className="size-7 p-0 rounded-lg hover:bg-secondary cursor-pointer text-xs"
-                            >
-                              ✏️
-                            </Button>
+                          )}
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-cocoa truncate">{prod.name}</p>
+                            <p className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1">
+                              <span>{formatCurrency(prod.price)}</span>
+                              <span>&bull;</span>
+                              {prod.is_active ? (
+                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">🌿 Fresh to order</span>
+                              ) : (
+                                <span className="text-muted-foreground">Paused</span>
+                              )}
+                            </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleEditProduct(prod)}
+                            className="size-8 p-0 rounded-xl hover:bg-secondary cursor-pointer text-xs font-semibold"
+                            title="Edit bake"
+                          >
+                            ✏️
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
                   {/* Quick Shortcuts Cards */}
                   <div className="grid grid-cols-2 gap-3 pt-2">
@@ -2062,7 +1956,7 @@ function AdminDashboard() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="p-price" className="text-xs font-semibold">Price (₹) <span className="text-berry">*</span></Label>
+                  <Label htmlFor="p-price" className="text-xs font-semibold">Base Price (₹) <span className="text-berry">*</span></Label>
                   <Input
                     id="p-price"
                     type="number"
@@ -2071,15 +1965,10 @@ function AdminDashboard() {
                     onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="p-stock" className="text-xs font-semibold">Stock Quantity</Label>
-                  <Input
-                    id="p-stock"
-                    type="number"
-                    value={form.stock}
-                    className="rounded-xl h-9 text-xs mt-1"
-                    onChange={(e) => setForm((f) => ({ ...f, stock: e.target.value }))}
-                  />
+                <div className="flex flex-col justify-end">
+                  <div className="h-9 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mt-1">
+                    <span>🌿 Baked Fresh to Order</span>
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -2727,16 +2616,13 @@ function AdminDashboard() {
 
                 <div className="flex flex-wrap items-center gap-2">
                   <select
-                    value={inventoryStockFilter}
-                    onChange={(e) => setInventoryStockFilter(e.target.value)}
+                    value={inventoryStatusFilter}
+                    onChange={(e) => setInventoryStatusFilter(e.target.value)}
                     className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
                   >
-                    <option value="all">All Stock Status</option>
-                    <option value="in_stock">In Stock (&gt;0)</option>
-                    <option value="low">⚠️ Low Stock (1–5)</option>
-                    <option value="out">❌ Out of Stock (0)</option>
-                    <option value="active">Visible in Shop</option>
-                    <option value="hidden">Hidden Only</option>
+                    <option value="all">All Bakes</option>
+                    <option value="active">🌿 Visible in Shop</option>
+                    <option value="hidden">⏸️ Paused Only</option>
                   </select>
 
                   <select
@@ -2748,8 +2634,6 @@ function AdminDashboard() {
                     <option value="name_desc">Name: Z to A</option>
                     <option value="price_asc">Price: Low to High</option>
                     <option value="price_desc">Price: High to Low</option>
-                    <option value="stock_asc">Stock: Low First (Alerts)</option>
-                    <option value="stock_desc">Stock: High to Low</option>
                     <option value="active_first">Visible Items First</option>
                   </select>
                 </div>
@@ -2760,18 +2644,18 @@ function AdminDashboard() {
             {sortedProducts.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-border p-12 text-center">
                 <p className="text-sm font-medium text-muted-foreground">
-                  {inventorySearchQuery || inventoryStockFilter !== "all" || inventoryCategoryFilter !== "all"
+                  {inventorySearchQuery || inventoryStatusFilter !== "all" || inventoryCategoryFilter !== "all"
                     ? "No bakery items match your filter criteria."
-                    : "No products in inventory yet."}
+                    : "No products in catalog yet."}
                 </p>
-                {(inventorySearchQuery || inventoryStockFilter !== "all" || inventoryCategoryFilter !== "all") && (
+                {(inventorySearchQuery || inventoryStatusFilter !== "all" || inventoryCategoryFilter !== "all") && (
                   <Button
                     variant="outline"
                     size="sm"
                     className="mt-3 rounded-xl text-xs"
                     onClick={() => {
                       setInventorySearchQuery("");
-                      setInventoryStockFilter("all");
+                      setInventoryStatusFilter("all");
                       setInventoryCategoryFilter("all");
                     }}
                   >
@@ -2801,7 +2685,6 @@ function AdminDashboard() {
                       categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
                       onEdit={() => handleEditProduct(product)}
                       onDuplicate={() => handleDuplicateProduct(product)}
-                      onAdjustStock={(delta) => handleQuickStockAdjust(product, delta)}
                       onDelete={() =>
                         run(() => removeProductFn({ data: product.id }), "Product deleted")
                       }
@@ -2815,7 +2698,7 @@ function AdminDashboard() {
                 {data.categories.map((cat) => {
                   const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
                   if (catProducts.length === 0) return null;
-                  const totalStock = catProducts.reduce((sum, p) => sum + Number(p.stock), 0);
+                  const activeCount = catProducts.filter((p) => p.is_active).length;
 
                   return (
                     <div key={cat.id} className="space-y-3">
@@ -2826,8 +2709,8 @@ function AdminDashboard() {
                             {catProducts.length} {catProducts.length === 1 ? "item" : "items"}
                           </span>
                         </div>
-                        <span className="text-xs text-muted-foreground">
-                          {totalStock} total in stock
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {activeCount} active for fresh bake
                         </span>
                       </div>
 
@@ -2839,7 +2722,6 @@ function AdminDashboard() {
                             categoryName={cat.name}
                             onEdit={() => handleEditProduct(product)}
                             onDuplicate={() => handleDuplicateProduct(product)}
-                            onAdjustStock={(delta) => handleQuickStockAdjust(product, delta)}
                             onDelete={() =>
                               run(() => removeProductFn({ data: product.id }), "Product deleted")
                             }
@@ -2871,7 +2753,6 @@ function AdminDashboard() {
                             product={product}
                             onEdit={() => handleEditProduct(product)}
                             onDuplicate={() => handleDuplicateProduct(product)}
-                            onAdjustStock={(delta) => handleQuickStockAdjust(product, delta)}
                             onDelete={() =>
                               run(() => removeProductFn({ data: product.id }), "Product deleted")
                             }
