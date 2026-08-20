@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef, useEffect } from "react";
@@ -63,6 +63,26 @@ import {
   Layers,
   LayoutGrid,
   Sliders,
+  LayoutDashboard,
+  ShoppingBag,
+  Package,
+  Users,
+  Tag,
+  Calendar,
+  Mail,
+  Star,
+  BarChart3,
+  Menu,
+  X,
+  ChevronRight,
+  Plus,
+  RefreshCw,
+  Copy,
+  Sparkles,
+  ExternalLink,
+  Pin,
+  PinOff,
+  ImageIcon,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -110,7 +130,7 @@ const STATUS_BADGE_STYLES: Record<string, string> = {
 };
 
 type ProductForm = {
-  id?: string;
+  id?: string | undefined;
   name: string;
   slug: string;
   description: string;
@@ -118,6 +138,7 @@ type ProductForm = {
   discount_type: "none" | "percent" | "flat";
   discount_value: string;
   image_url: string;
+  images: string[];
   stock: string;
   is_active: boolean;
   category_id: string;
@@ -135,6 +156,7 @@ const EMPTY_FORM: ProductForm = {
   discount_type: "none",
   discount_value: "0",
   image_url: "",
+  images: [],
   stock: "10",
   is_active: true,
   category_id: "",
@@ -172,6 +194,8 @@ function ProductAdminRow({
   categoryName,
   onEdit,
   onDelete,
+  onDuplicate,
+  onAdjustStock,
 }: {
   product: {
     id: string;
@@ -182,6 +206,7 @@ function ProductAdminRow({
     discount_type: "none" | "percent" | "flat";
     discount_value: number;
     image_url: string | null;
+    images?: string[] | null;
     stock: number;
     is_active: boolean;
     category_id: string | null;
@@ -189,11 +214,14 @@ function ProductAdminRow({
   categoryName?: string | undefined;
   onEdit: () => void;
   onDelete: () => void;
+  onDuplicate?: () => void;
+  onAdjustStock?: (delta: number) => void;
 }) {
   const stock = Number(product.stock);
   const price = Number(product.price);
   const discountType = product.discount_type;
   const discountVal = Number(product.discount_value);
+  const imagesList = (product as any).images && Array.isArray((product as any).images) ? (product as any).images : [];
 
   let finalPrice = price;
   if (discountType === "percent" && discountVal > 0) {
@@ -218,6 +246,11 @@ function ProductAdminRow({
             <div className="flex h-full w-full items-center justify-center text-xl text-muted-foreground/60">
               🥖
             </div>
+          )}
+          {imagesList.length > 1 && (
+            <span className="absolute bottom-1 right-1 rounded-md bg-black/75 px-1 py-0.2 text-[9px] font-bold text-white leading-tight">
+              📸 {imagesList.length}
+            </span>
           )}
         </div>
 
@@ -288,6 +321,12 @@ function ProductAdminRow({
               </span>
             ) : null}
 
+            {imagesList.length > 1 && (
+              <span className="rounded-md bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-400">
+                🖼️ {imagesList.length} photos
+              </span>
+            )}
+
             <span className="font-mono text-[11px] text-muted-foreground/70 truncate max-w-[150px]">
               /{product.slug}
             </span>
@@ -301,12 +340,50 @@ function ProductAdminRow({
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2 border-t border-border/40 pt-2 sm:border-t-0 sm:pt-0 shrink-0">
+      {/* Quick Stock Controls & Action Buttons */}
+      <div className="flex flex-wrap items-center gap-2 border-t border-border/40 pt-2 sm:border-t-0 sm:pt-0 shrink-0">
+        {onAdjustStock && (
+          <div className="flex items-center gap-1 rounded-xl border border-border/70 bg-secondary/30 p-1">
+            <button
+              type="button"
+              title="Decrease stock by 1"
+              disabled={stock <= 0}
+              onClick={() => onAdjustStock(-1)}
+              className="size-6 rounded-lg bg-background hover:bg-secondary flex items-center justify-center text-xs font-bold text-cocoa border border-border/50 disabled:opacity-40 cursor-pointer shadow-2xs"
+            >
+              -
+            </button>
+            <span className="px-1.5 text-xs font-mono font-bold text-cocoa min-w-[20px] text-center">
+              {stock}
+            </span>
+            <button
+              type="button"
+              title="Increase stock by 1"
+              onClick={() => onAdjustStock(1)}
+              className="size-6 rounded-lg bg-background hover:bg-secondary flex items-center justify-center text-xs font-bold text-cocoa border border-border/50 cursor-pointer shadow-2xs"
+            >
+              +
+            </button>
+          </div>
+        )}
+
+        {onDuplicate && (
+          <Button
+            size="sm"
+            variant="outline"
+            title="Duplicate bake details"
+            className="rounded-xl h-8 px-2.5 text-xs font-semibold hover:border-berry/40 flex items-center gap-1 cursor-pointer"
+            onClick={onDuplicate}
+          >
+            <Copy className="size-3.5 text-muted-foreground" />
+            <span className="hidden md:inline">Clone</span>
+          </Button>
+        )}
+
         <Button
           size="sm"
           variant="outline"
-          className="rounded-xl h-8 px-3 text-xs font-semibold hover:border-berry/40"
+          className="rounded-xl h-8 px-3 text-xs font-semibold hover:border-berry/40 cursor-pointer"
           onClick={onEdit}
         >
           Edit
@@ -314,7 +391,7 @@ function ProductAdminRow({
         <Button
           size="sm"
           variant="outline"
-          className="rounded-xl h-8 px-3 text-xs font-semibold text-destructive hover:bg-destructive/10 hover:border-destructive/30"
+          className="rounded-xl h-8 px-3 text-xs font-semibold text-destructive hover:bg-destructive/10 hover:border-destructive/30 cursor-pointer"
           onClick={onDelete}
         >
           Delete
@@ -771,6 +848,10 @@ function AdminDashboard() {
     );
   }
 
+  const [activeTab, setActiveTab] = useState<string>("overview");
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [manualUrlInput, setManualUrlInput] = useState<string>("");
+
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
   const [orderSortBy, setOrderSortBy] = useState<string>("priority");
   const [orderSearchQuery, setOrderSearchQuery] = useState<string>("");
@@ -891,113 +972,735 @@ function AdminDashboard() {
     return 0;
   });
 
+  const totalRevenue = data.orders
+    .filter((o) => o.status === "confirmed" || o.status === "completed")
+    .reduce((sum, o) => sum + Number(o.total || 0), 0);
+
+  const todayOrders = data.orders.filter((o) => o.slot_date === todayISO && o.status !== "rejected");
+  const lowStockProducts = data.products.filter((p) => p.stock <= 5);
+
+  const handleEditProduct = (product: any) => {
+    const isCake =
+      product.name.toLowerCase().includes("cake") ||
+      product.name.toLowerCase().includes("cheesecake");
+    const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
+    const variants =
+      (product as any).weight_variants && (product as any).weight_variants.length > 0
+        ? (product as any).weight_variants
+        : itemType === "weight"
+          ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
+          : [];
+    const imagesList =
+      (product as any).images && Array.isArray((product as any).images) && (product as any).images.length > 0
+        ? (product as any).images
+        : product.image_url
+          ? [product.image_url]
+          : [];
+
+    setForm({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      description: product.description ?? "",
+      price: String(product.price),
+      discount_type: product.discount_type,
+      discount_value: String(product.discount_value),
+      image_url: product.image_url ?? (imagesList[0] || ""),
+      images: imagesList,
+      stock: String(product.stock),
+      is_active: product.is_active,
+      category_id: product.category_id ?? "",
+      item_type: itemType,
+      unit_weight_grams: String((product as any).unit_weight_grams || ""),
+      serving_yield: (product as any).serving_yield || "",
+      weight_variants: variants,
+    });
+    setActiveTab("inventory");
+    window.scrollTo({ top: 120, behavior: "smooth" });
+  };
+
+  const handleDuplicateProduct = (product: any) => {
+    const isCake =
+      product.name.toLowerCase().includes("cake") ||
+      product.name.toLowerCase().includes("cheesecake");
+    const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
+    const variants =
+      (product as any).weight_variants && (product as any).weight_variants.length > 0
+        ? (product as any).weight_variants
+        : itemType === "weight"
+          ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
+          : [];
+    const imagesList =
+      (product as any).images && Array.isArray((product as any).images) && (product as any).images.length > 0
+        ? (product as any).images
+        : product.image_url
+          ? [product.image_url]
+          : [];
+
+    setForm({
+      id: undefined,
+      name: `${product.name} (Copy)`,
+      slug: `${product.slug}-copy-${Math.floor(Math.random() * 1000)}`,
+      description: product.description ?? "",
+      price: String(product.price),
+      discount_type: product.discount_type,
+      discount_value: String(product.discount_value),
+      image_url: product.image_url ?? (imagesList[0] || ""),
+      images: imagesList,
+      stock: String(product.stock),
+      is_active: true,
+      category_id: product.category_id ?? "",
+      item_type: itemType,
+      unit_weight_grams: String((product as any).unit_weight_grams || ""),
+      serving_yield: (product as any).serving_yield || "",
+      weight_variants: variants,
+    });
+    setActiveTab("inventory");
+    toast.info(`Cloned "${product.name}". Adjust details and save.`);
+    window.scrollTo({ top: 120, behavior: "smooth" });
+  };
+
+  const handleQuickStockAdjust = async (product: any, delta: number) => {
+    const newStock = Math.max(0, Number(product.stock) + delta);
+    try {
+      await persistProduct({
+        data: {
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          description: product.description ?? undefined,
+          price: Number(product.price),
+          discount_type: product.discount_type,
+          discount_value: Number(product.discount_value),
+          image_url: product.image_url ?? undefined,
+          images: (product as any).images || undefined,
+          stock: newStock,
+          is_active: product.is_active,
+          category_id: product.category_id ?? undefined,
+          item_type: (product as any).item_type ?? undefined,
+          unit_weight_grams: (product as any).unit_weight_grams ? Number((product as any).unit_weight_grams) : undefined,
+          serving_yield: (product as any).serving_yield ?? undefined,
+          weight_variants: (product as any).weight_variants ?? undefined,
+        },
+      });
+      toast.success(`Stock for "${product.name}" updated to ${newStock}!`);
+      await refresh();
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to adjust stock");
+    }
+  };
+
+  const NAV_GROUPS = [
+    {
+      title: "Core Operations",
+      items: [
+        { id: "overview", label: "Dashboard", icon: LayoutDashboard, badge: null },
+        {
+          id: "orders",
+          label: "Orders & Slots",
+          icon: ShoppingBag,
+          badge: pending > 0 ? `${pending} new` : null,
+          badgeColor: "bg-amber-500 text-white font-bold animate-pulse",
+        },
+        {
+          id: "inventory",
+          label: "Products & Stock",
+          icon: Package,
+          badge: data.products.length,
+          badgeColor: "bg-secondary text-muted-foreground",
+        },
+        { id: "shop_layout", label: "Shop & Categories", icon: Layers, badge: null },
+      ],
+    },
+    {
+      title: "Customers & Growth",
+      items: [
+        {
+          id: "users",
+          label: "Customer Accounts",
+          icon: Users,
+          badge: usersList.length,
+          badgeColor: "bg-secondary text-muted-foreground",
+        },
+        {
+          id: "offers",
+          label: "Promo Codes",
+          icon: Tag,
+          badge: offerCodes?.length ?? 0,
+          badgeColor: "bg-secondary text-muted-foreground",
+        },
+        { id: "newsletter", label: "Newsletter", icon: Mail, badge: null },
+        {
+          id: "reviews",
+          label: "Reviews & Moments",
+          icon: Star,
+          badge: null,
+        },
+      ],
+    },
+    {
+      title: "Bakery Configuration",
+      items: [
+        {
+          id: "calendar",
+          label: "Closed Dates",
+          icon: Calendar,
+          badge: data.blackouts?.length ?? 0,
+          badgeColor: "bg-secondary text-muted-foreground",
+        },
+        { id: "analytics", label: "Analytics", icon: BarChart3, badge: null },
+      ],
+    },
+  ];
+
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-blogh text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa uppercase tracking-wide">
-            Bakery Admin
-          </h1>
-          <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground">
-            {pending} order{pending === 1 ? "" : "s"} waiting for approval · {data.products.length} catalog items
-          </p>
-        </div>
+    <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">
+      {/* Mobile Drawer Backdrop */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden transition-opacity"
+        />
+      )}
 
-        {/* 3D Analytics Clipboard Illustration (Unboxed & Generously Sized) */}
-        <div className="hidden sm:flex size-24 md:size-28 shrink-0 items-center justify-center">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="size-full object-contain pointer-events-none drop-shadow-md"
-          >
-            <source
-              src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.webm"
-              type="video/webm"
-            />
-            <source
-              src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.mp4"
-              type="video/mp4"
-            />
-          </video>
-        </div>
-      </div>
-
-      <Tabs defaultValue="orders" className="mt-8">
-        <TabsList className="flex flex-wrap h-auto gap-1">
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="users">
-            Users ({usersList.length})
-          </TabsTrigger>
-          <TabsTrigger value="inventory">Inventory</TabsTrigger>
-          <TabsTrigger value="shop_layout">Shop & Categories</TabsTrigger>
-          <TabsTrigger value="reviews">Customer Reviews</TabsTrigger>
-          <TabsTrigger value="offers">Offer codes</TabsTrigger>
-          <TabsTrigger value="calendar">Closed dates</TabsTrigger>
-          <TabsTrigger value="newsletter">Newsletter</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="orders" className="mt-6 space-y-5">
-          {/* Filter & Sort Controls Bar */}
-          <div className="flex flex-col gap-3.5 rounded-3xl border border-border/70 bg-card p-4 shadow-soft">
-            {/* Status Filter Tabs with Counts */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              {[
-                { id: "all", label: "All Orders", count: data.orders.length },
-                {
-                  id: "pending_approval",
-                  label: "Kitchen Queue",
-                  count: data.orders.filter((o) => o.status === "pending_approval").length,
-                },
-                {
-                  id: "confirmed",
-                  label: "Confirmed",
-                  count: data.orders.filter((o) => o.status === "confirmed").length,
-                },
-                {
-                  id: "rescheduled",
-                  label: "Rescheduled",
-                  count: data.orders.filter((o) => o.status === "rescheduled").length,
-                },
-                {
-                  id: "completed",
-                  label: "Completed",
-                  count: data.orders.filter((o) => o.status === "completed").length,
-                },
-                {
-                  id: "rejected",
-                  label: "Rejected",
-                  count: data.orders.filter((o) => o.status === "rejected").length,
-                },
-              ].map((pill) => {
-                const isActive = orderStatusFilter === pill.id;
-                return (
-                  <button
-                    key={pill.id}
-                    type="button"
-                    onClick={() => setOrderStatusFilter(pill.id)}
-                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
-                      isActive
-                        ? "bg-cocoa text-background shadow-sm"
-                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}
-                  >
-                    <span>{pill.label}</span>
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                        isActive
-                          ? "bg-background/20 text-background"
-                          : "bg-background/80 text-foreground"
-                      }`}
-                    >
-                      {pill.count}
-                    </span>
-                  </button>
-                );
-              })}
+      {/* Left Sidebar Navigation */}
+      <aside
+        className={`fixed top-0 bottom-0 left-0 z-50 w-72 border-r border-border/70 bg-card/95 backdrop-blur-md p-5 flex flex-col justify-between transition-transform duration-200 lg:static lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+        }`}
+      >
+        <div className="space-y-6">
+          {/* Brand Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="size-9 rounded-2xl bg-berry/15 text-berry flex items-center justify-center font-blogh font-bold text-lg shadow-2xs">
+                🎂
+              </div>
+              <div>
+                <h2 className="font-blogh text-base font-bold text-cocoa uppercase tracking-wide">
+                  Ani Bakes
+                </h2>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
+                  Atelier Control
+                </p>
+              </div>
             </div>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden size-8 p-0 rounded-xl"
+            >
+              <X className="size-4" />
+            </Button>
+          </div>
+
+          {/* Nav Items Grouped */}
+          <nav className="space-y-5">
+            {NAV_GROUPS.map((group) => (
+              <div key={group.title} className="space-y-1">
+                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                  {group.title}
+                </p>
+                <div className="space-y-0.5 pt-1">
+                  {group.items.map((item) => {
+                    const IconComp = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
+                          isActive
+                            ? "bg-berry text-berry-foreground shadow-soft"
+                            : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <IconComp className={`size-4 shrink-0 ${isActive ? "text-berry-foreground" : "text-cocoa/70"}`} />
+                          <span className="truncate">{item.label}</span>
+                        </div>
+                        {item.badge && (
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                              isActive ? "bg-white/20 text-white" : item.badgeColor
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </nav>
+        </div>
+
+        {/* Sidebar Footer Controls */}
+        <div className="pt-4 border-t border-border/60 space-y-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => setBakeSheetOpen(true)}
+            className="w-full rounded-2xl h-9 text-xs font-semibold flex items-center justify-center gap-2 hover:border-berry/40 cursor-pointer"
+          >
+            📋 <span>Kitchen Bake Sheet</span>
+          </Button>
+
+          <Link
+            to="/shop"
+            target="_blank"
+            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-secondary/70 hover:bg-secondary text-cocoa h-9 text-xs font-semibold transition-colors"
+          >
+            <ExternalLink className="size-3.5" />
+            <span>Open Public Storefront</span>
+          </Link>
+        </div>
+      </aside>
+
+      {/* Main Full-Width Content Container */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        {/* Top Header Bar */}
+        <header className="sticky top-0 z-30 border-b border-border/70 bg-background/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4 shadow-2xs">
+          <div className="flex items-center gap-3 min-w-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden size-9 p-0 rounded-2xl"
+            >
+              <Menu className="size-4" />
+            </Button>
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h1 className="font-blogh text-lg sm:text-xl font-bold text-cocoa uppercase tracking-wide truncate">
+                  {activeTab === "overview" && "Atelier Overview"}
+                  {activeTab === "orders" && "Orders & Kitchen Slots"}
+                  {activeTab === "inventory" && "Bakery Catalog & Inventory"}
+                  {activeTab === "shop_layout" && "Shop Page & Category Arrangement"}
+                  {activeTab === "users" && "Customer Accounts & Loyalty"}
+                  {activeTab === "offers" && "Promotions & Discount Codes"}
+                  {activeTab === "calendar" && "Holiday & Closed Dates"}
+                  {activeTab === "newsletter" && "Newsletter Subscribers"}
+                  {activeTab === "reviews" && "Customer Reviews & Community"}
+                  {activeTab === "analytics" && "Bakery Analytics & Reports"}
+                </h1>
+                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Kitchen
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground hidden sm:block truncate">
+                {pending} pending approval &bull; {data.products.length} products &bull; {todayOrders.length} orders scheduled today
+              </p>
+            </div>
+          </div>
+
+          {/* Top Quick Actions */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => refresh()}
+              className="rounded-2xl h-9 px-3 text-xs font-semibold hover:border-berry/40 flex items-center gap-1.5 cursor-pointer"
+            >
+              <RefreshCw className="size-3.5 text-muted-foreground" />
+              <span className="hidden md:inline">Refresh</span>
+            </Button>
+
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => {
+                setForm(EMPTY_FORM);
+                setActiveTab("inventory");
+                window.scrollTo({ top: 120, behavior: "smooth" });
+              }}
+              className="rounded-2xl h-9 px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="size-4" />
+              <span>New Bake</span>
+            </Button>
+          </div>
+        </header>
+
+        {/* Tab Router Contents */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            {/* OVERVIEW TAB CONTENT */}
+            <TabsContent value="overview" className="mt-0 space-y-6">
+              {/* Executive Welcome & Live Summary Banner */}
+              <div className="rounded-3xl border border-border/80 bg-linear-to-br from-card via-card to-secondary/30 p-6 sm:p-8 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-2 max-w-xl">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/15 text-berry px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                    ✨ Daily Bakehouse Briefing
+                  </span>
+                  <h2 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
+                    Welcome to the Kitchen Command Hub
+                  </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    You have <strong>{pending} order{pending === 1 ? "" : "s"}</strong> awaiting kitchen confirmation and <strong>{todayOrders.length} order{todayOrders.length === 1 ? "" : "s"}</strong> scheduled for today&apos;s deliveries and counter pickups.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 shrink-0">
+                  <Button
+                    onClick={() => setActiveTab("orders")}
+                    className="rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 h-10 px-4 text-xs font-bold shadow-soft cursor-pointer"
+                  >
+                    View Orders Queue ({pending})
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setBakeSheetOpen(true)}
+                    className="rounded-2xl h-10 px-4 text-xs font-bold hover:border-berry/40 cursor-pointer"
+                  >
+                    📋 Open Kitchen Bake Sheet
+                  </Button>
+                </div>
+              </div>
+
+              {/* 4 Executive KPI Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Confirmed Revenue
+                    </p>
+                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
+                      {formatCurrency(totalRevenue)}
+                    </h3>
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
+                      From confirmed & completed bakes
+                    </p>
+                  </div>
+                  <div className="size-12 rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center text-xl shadow-2xs">
+                    💰
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setActiveTab("orders")}
+                  className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3 hover:border-amber-500/50 cursor-pointer transition-all hover:shadow-lift"
+                >
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Pending Approvals
+                    </p>
+                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
+                      {pending}
+                    </h3>
+                    <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
+                      {pending > 0 ? "Requires baker action" : "All orders up to date"}
+                    </p>
+                  </div>
+                  <div className="size-12 rounded-2xl bg-amber-500/15 text-amber-600 flex items-center justify-center text-xl shadow-2xs">
+                    🛎️
+                  </div>
+                </div>
+
+                <div
+                  onClick={() => setActiveTab("inventory")}
+                  className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3 hover:border-berry/50 cursor-pointer transition-all hover:shadow-lift"
+                >
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Active Products
+                    </p>
+                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
+                      {data.products.length}
+                    </h3>
+                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+                      {lowStockProducts.length > 0 ? (
+                        <span className="text-amber-600 font-bold">{lowStockProducts.length} low stock items</span>
+                      ) : (
+                        "Stock levels healthy"
+                      )}
+                    </p>
+                  </div>
+                  <div className="size-12 rounded-2xl bg-berry/15 text-berry flex items-center justify-center text-xl shadow-2xs">
+                    🥐
+                  </div>
+                </div>
+
+                <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Today&apos;s Production
+                    </p>
+                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
+                      {todayOrders.length}
+                    </h3>
+                    <p className="text-[10px] text-cocoa/70 font-semibold mt-0.5">
+                      Deliveries & pickups for today
+                    </p>
+                  </div>
+                  <div className="size-12 rounded-2xl bg-purple-500/15 text-purple-600 flex items-center justify-center text-xl shadow-2xs">
+                    📅
+                  </div>
+                </div>
+              </div>
+
+              {/* 2-Column Bento Grid: Today's Orders & Low Stock Watch */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Left Column: Today's Kitchen Production Queue */}
+                <div className="lg:col-span-7 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-display text-lg font-bold text-cocoa">
+                        Today&apos;s Production Queue ({todayOrders.length})
+                      </h3>
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                        {todayISO}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setActiveTab("orders")}
+                      className="text-xs font-bold text-berry hover:underline p-0 h-auto cursor-pointer"
+                    >
+                      View All Orders →
+                    </Button>
+                  </div>
+
+                  {todayOrders.length === 0 ? (
+                    <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-8 text-center">
+                      <p className="text-3xl mb-2">🧁</p>
+                      <h4 className="font-display text-sm font-bold text-cocoa">No Bakes Scheduled for Today</h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Upcoming orders will appear here automatically on their delivery slot date.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {todayOrders.slice(0, 5).map((order) => (
+                        <div
+                          key={order.id}
+                          className="rounded-2xl border border-border/70 bg-card p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-berry/30 transition-colors"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-bold text-cocoa">
+                                #{order.id.slice(-6)}
+                              </span>
+                              <span className="font-bold text-xs text-cocoa truncate">
+                                {order.contact_name}
+                              </span>
+                              <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-cocoa">
+                                🕒 {order.slot_start.slice(0, 5)}–{order.slot_end.slice(0, 5)}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                              {order.order_items.map((i: any) => `${i.quantity}× ${i.product_name}`).join(", ")}
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                            <span className="font-display text-sm font-bold text-cocoa">
+                              {formatCurrency(order.total)}
+                            </span>
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                                order.status === "pending_approval"
+                                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                                  : order.status === "confirmed"
+                                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+                                    : "bg-secondary text-muted-foreground"
+                              }`}
+                            >
+                              {order.status.replace("_", " ")}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Column: Low Stock Alerts & Quick Restock */}
+                <div className="lg:col-span-5 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-display text-lg font-bold text-cocoa flex items-center gap-1.5">
+                      <span>Low Stock Watch</span>
+                      {lowStockProducts.length > 0 && (
+                        <span className="rounded-full bg-destructive/15 text-destructive px-2 py-0.5 text-[10px] font-bold">
+                          {lowStockProducts.length} items
+                        </span>
+                      )}
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setInventoryStockFilter("low");
+                        setActiveTab("inventory");
+                      }}
+                      className="text-xs font-bold text-berry hover:underline p-0 h-auto cursor-pointer"
+                    >
+                      Manage Inventory →
+                    </Button>
+                  </div>
+
+                  {lowStockProducts.length === 0 ? (
+                    <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-6 text-center">
+                      <p className="text-2xl mb-1.5">✨</p>
+                      <h4 className="font-display text-sm font-bold text-cocoa">Stock Levels Are Healthy</h4>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        No items are below the 5-unit threshold.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {lowStockProducts.slice(0, 5).map((prod) => (
+                        <div
+                          key={prod.id}
+                          className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-border/70 bg-card shadow-2xs"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {prod.image_url ? (
+                              <img
+                                src={prod.image_url}
+                                alt={prod.name}
+                                className="size-10 rounded-xl object-cover border border-border/50 shrink-0"
+                              />
+                            ) : (
+                              <div className="size-10 rounded-xl bg-secondary flex items-center justify-center text-base">
+                                🥖
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-cocoa truncate">{prod.name}</p>
+                              <p className="text-[10px] font-bold text-destructive">
+                                {prod.stock === 0 ? "Out of stock" : `Only ${prod.stock} left`}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleQuickStockAdjust(prod, 5)}
+                              className="rounded-lg bg-secondary/80 hover:bg-secondary px-2 py-1 text-[10px] font-bold text-cocoa border border-border/50 cursor-pointer shadow-2xs"
+                              title="Restock +5"
+                            >
+                              +5
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleQuickStockAdjust(prod, 10)}
+                              className="rounded-lg bg-secondary/80 hover:bg-secondary px-2 py-1 text-[10px] font-bold text-cocoa border border-border/50 cursor-pointer shadow-2xs"
+                              title="Restock +10"
+                            >
+                              +10
+                            </button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleEditProduct(prod)}
+                              className="size-7 p-0 rounded-lg hover:bg-secondary cursor-pointer text-xs"
+                            >
+                              ✏️
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Quick Shortcuts Cards */}
+                  <div className="grid grid-cols-2 gap-3 pt-2">
+                    <div
+                      onClick={() => setActiveTab("shop_layout")}
+                      className="p-3.5 rounded-2xl border border-border/70 bg-card hover:border-berry/40 transition-all cursor-pointer shadow-2xs group"
+                    >
+                      <div className="text-lg mb-1 group-hover:scale-110 transition-transform">🗂️</div>
+                      <p className="text-xs font-bold text-cocoa">Shop Layout</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">Reorder categories</p>
+                    </div>
+
+                    <div
+                      onClick={() => setActiveTab("offers")}
+                      className="p-3.5 rounded-2xl border border-border/70 bg-card hover:border-berry/40 transition-all cursor-pointer shadow-2xs group"
+                    >
+                      <div className="text-lg mb-1 group-hover:scale-110 transition-transform">🏷️</div>
+                      <p className="text-xs font-bold text-cocoa">Promo Codes</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{offerCodes?.length ?? 0} active codes</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* ORDERS TAB */}
+            <TabsContent value="orders" className="mt-0 space-y-5">
+              {/* Filter & Sort Controls Bar */}
+              <div className="flex flex-col gap-3.5 rounded-3xl border border-border/70 bg-card p-4 shadow-soft">
+                {/* Status Filter Tabs with Counts */}
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {[
+                    { id: "all", label: "All Orders", count: data.orders.length },
+                    {
+                      id: "pending_approval",
+                      label: "Kitchen Queue",
+                      count: data.orders.filter((o) => o.status === "pending_approval").length,
+                    },
+                    {
+                      id: "confirmed",
+                      label: "Confirmed",
+                      count: data.orders.filter((o) => o.status === "confirmed").length,
+                    },
+                    {
+                      id: "rescheduled",
+                      label: "Rescheduled",
+                      count: data.orders.filter((o) => o.status === "rescheduled").length,
+                    },
+                    {
+                      id: "completed",
+                      label: "Completed",
+                      count: data.orders.filter((o) => o.status === "completed").length,
+                    },
+                    {
+                      id: "rejected",
+                      label: "Rejected",
+                      count: data.orders.filter((o) => o.status === "rejected").length,
+                    },
+                  ].map((pill) => {
+                    const isActive = orderStatusFilter === pill.id;
+                    return (
+                      <button
+                        key={pill.id}
+                        type="button"
+                        onClick={() => setOrderStatusFilter(pill.id)}
+                        className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                          isActive
+                            ? "bg-cocoa text-background shadow-sm"
+                            : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        }`}
+                      >
+                        <span>{pill.label}</span>
+                        <span
+                          className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                            isActive
+                              ? "bg-background/20 text-background"
+                              : "bg-background/80 text-foreground"
+                          }`}
+                        >
+                          {pill.count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
 
             {/* Search Bar & Sort Dropdown */}
             <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/50">
@@ -1597,150 +2300,250 @@ function AdminDashboard() {
                   </div>
                 )}
               </div>
-              <div className="space-y-1.5">
+              {/* Product Multi-Image Gallery & Pinned Cover Photo */}
+              <div className="space-y-2.5 rounded-2xl border border-border/80 bg-secondary/30 p-3 sm:p-4">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs font-semibold text-foreground">
-                    Product Picture
+                  <Label className="text-xs font-bold text-cocoa uppercase tracking-wider flex items-center gap-1.5">
+                    <ImageIcon className="size-3.5 text-berry" />
+                    <span>Product Gallery & Cover Photo</span>
                   </Label>
-                  <button
-                    type="button"
-                    onClick={() => setManualUrlMode(!manualUrlMode)}
-                    className="text-[10px] text-berry hover:underline font-semibold cursor-pointer"
-                  >
-                    {manualUrlMode ? "Switch to File Upload" : "Or enter manual URL"}
-                  </button>
+                  <span className="text-[11px] text-muted-foreground">
+                    {(form.images && form.images.length > 0 ? form.images.length : (form.image_url ? 1 : 0))} photo{((form.images?.length || (form.image_url ? 1 : 0)) === 1) ? "" : "s"} attached
+                  </span>
                 </div>
 
-                {!manualUrlMode ? (
-                  <div>
-                    <input
-                      ref={productImageInputRef}
-                      type="file"
-                      id="product-image-file"
-                      accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Add 2, 3, or more pictures. They automatically appear as an interactive carousel on the product detail page. Click <strong>Pin as Cover</strong> on any photo to choose what displays on the Shop catalog page.
+                </p>
 
-                        if (file.size > 10 * 1024 * 1024) {
-                          toast.error("Image file is too large. Max size is 10 MB.");
-                          return;
-                        }
+                {/* Gallery Preview Grid */}
+                {((form.images && form.images.length > 0) || form.image_url) && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+                    {(form.images && form.images.length > 0 ? form.images : [form.image_url]).filter(Boolean).map((img, idx) => {
+                      const isPinned = form.image_url ? form.image_url === img : idx === 0;
+                      return (
+                        <div
+                          key={idx}
+                          className={`relative group rounded-2xl overflow-hidden border-2 transition-all p-1.5 bg-card flex flex-col justify-between ${
+                            isPinned
+                              ? "border-berry ring-2 ring-berry/30 shadow-xs"
+                              : "border-border/70 hover:border-berry/40"
+                          }`}
+                        >
+                          <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-secondary">
+                            <img
+                              src={img}
+                              alt={`Product photo ${idx + 1}`}
+                              className="size-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = "/products/artisan-croissant.jpg";
+                              }}
+                            />
+                            {isPinned && (
+                              <span className="absolute top-1.5 left-1.5 rounded-full bg-berry text-berry-foreground px-2 py-0.5 text-[9px] font-bold shadow-xs flex items-center gap-1">
+                                <Pin className="size-2.5" />
+                                <span>Shop Cover</span>
+                              </span>
+                            )}
+                            <span className="absolute bottom-1.5 right-1.5 rounded-md bg-black/60 text-white backdrop-blur-xs px-1.5 py-0.5 text-[9px] font-mono font-bold">
+                              #{idx + 1}
+                            </span>
+                          </div>
 
-                        setUploadingImage(true);
-                        const reader = new FileReader();
-                        reader.onload = async () => {
-                          try {
-                            const result = reader.result as string;
-                            const commaIndex = result.indexOf(",");
-                            const base64 = commaIndex !== -1 ? result.slice(commaIndex + 1) : result;
+                          <div className="mt-2 flex items-center justify-between gap-1">
+                            {!isPinned ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setForm((f) => ({ ...f, image_url: img }));
+                                  toast.success(`Photo #${idx + 1} pinned as primary cover!`);
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] font-bold text-berry hover:underline py-1 px-1.5 rounded-lg hover:bg-berry/10 cursor-pointer"
+                              >
+                                <Pin className="size-3" />
+                                <span>Pin as Cover</span>
+                              </button>
+                            ) : (
+                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 py-1 px-1.5 flex items-center gap-1">
+                                <CheckCircle2 className="size-3" />
+                                <span>Active Cover</span>
+                              </span>
+                            )}
 
-                            // Appwrite Storage upload
-                            const uploadRes = await uploadImageFn({
-                              data: {
-                                filename: file.name,
-                                base64,
-                                mimeType: file.type || "image/jpeg",
-                              },
-                            });
-
-                            if (uploadRes?.imageUrl) {
-                              setForm((f) => ({ ...f, image_url: uploadRes.imageUrl }));
-                              toast.success("Picture stored in Bakery Database!");
-                            } else {
-                              toast.error("Failed to retrieve image URL from storage.");
-                            }
-                          } catch (err: any) {
-                            console.error("Image upload failed:", err);
-                            toast.error(err?.message || "Failed to upload image to storage");
-                          } finally {
-                            setUploadingImage(false);
-                          }
-                        };
-                        reader.onerror = () => {
-                          toast.error("Failed to read file");
-                          setUploadingImage(false);
-                        };
-                        reader.readAsDataURL(file);
-                      }}
-                      className="hidden"
-                    />
-
-                    {form.image_url ? (
-                      <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-card p-2.5 shadow-2xs">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <img
-                            src={form.image_url}
-                            alt="Product preview"
-                            className="size-12 rounded-xl object-cover border border-border/60 shrink-0"
-                          />
-                          <div className="min-w-0">
-                            <p className="text-xs font-bold text-cocoa truncate">
-                              {uploadingImage ? "Uploading to Storage…" : "Picture Attached"}
-                            </p>
-                            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold truncate">
-                              {uploadingImage ? "Transferring file…" : "✓ Stored in Bakery DB"}
-                            </p>
+                            <div className="flex items-center gap-0.5">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                title="Move Left"
+                                onClick={() => {
+                                  setForm((f) => {
+                                    const imgs = [...(f.images && f.images.length > 0 ? f.images : [f.image_url])];
+                                    const [moved] = imgs.splice(idx, 1);
+                                    imgs.splice(idx - 1, 0, moved!);
+                                    return { ...f, images: imgs };
+                                  });
+                                }}
+                                className="size-6 rounded-md hover:bg-secondary flex items-center justify-center text-xs font-bold disabled:opacity-30 cursor-pointer"
+                              >
+                                ←
+                              </button>
+                              <button
+                                type="button"
+                                disabled={idx === ((form.images?.length || 1) - 1)}
+                                title="Move Right"
+                                onClick={() => {
+                                  setForm((f) => {
+                                    const imgs = [...(f.images && f.images.length > 0 ? f.images : [f.image_url])];
+                                    const [moved] = imgs.splice(idx, 1);
+                                    imgs.splice(idx + 1, 0, moved!);
+                                    return { ...f, images: imgs };
+                                  });
+                                }}
+                                className="size-6 rounded-md hover:bg-secondary flex items-center justify-center text-xs font-bold disabled:opacity-30 cursor-pointer"
+                              >
+                                →
+                              </button>
+                              <button
+                                type="button"
+                                title="Delete Photo"
+                                onClick={() => {
+                                  setForm((f) => {
+                                    const imgs = (f.images && f.images.length > 0 ? f.images : [f.image_url]).filter((_, i) => i !== idx);
+                                    const newCover = isPinned ? (imgs[0] || "") : f.image_url;
+                                    return { ...f, images: imgs, image_url: newCover };
+                                  });
+                                }}
+                                className="size-6 rounded-md text-destructive hover:bg-destructive/10 flex items-center justify-center cursor-pointer"
+                              >
+                                <Trash2 className="size-3" />
+                              </button>
+                            </div>
                           </div>
                         </div>
-
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            disabled={uploadingImage}
-                            onClick={() => productImageInputRef.current?.click()}
-                            className="h-7 px-2 text-[10px] rounded-lg cursor-pointer"
-                          >
-                            Change
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="ghost"
-                            disabled={uploadingImage}
-                            onClick={() => {
-                              setForm((f) => ({ ...f, image_url: "" }));
-                              if (productImageInputRef.current) productImageInputRef.current.value = "";
-                            }}
-                            className="size-7 p-0 text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
-                          >
-                            <Trash2 className="size-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <label
-                        htmlFor="product-image-file"
-                        className={`flex flex-col items-center justify-center p-4 border border-dashed border-border/80 hover:border-berry/60 bg-secondary/20 hover:bg-secondary/40 rounded-2xl cursor-pointer transition-all ${
-                          uploadingImage ? "opacity-60 pointer-events-none" : ""
-                        }`}
-                      >
-                        <div className="flex size-9 items-center justify-center rounded-xl bg-berry/10 text-berry mb-1.5 shadow-2xs">
-                          <Camera className="size-4" />
-                        </div>
-                        <span className="text-xs font-semibold text-foreground">
-                          {uploadingImage ? "Uploading picture…" : "Click or drop image to upload"}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground mt-0.5">
-                          JPG, PNG, WebP up to 10MB · Automatically stored in DB
-                        </span>
-                      </label>
-                    )}
-                  </div>
-                ) : (
-                  <div>
-                    <Input
-                      id="p-img"
-                      value={form.image_url}
-                      placeholder="https://... or /products/croissant.jpg"
-                      className="rounded-xl h-9 text-xs"
-                      onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
-                    />
+                      );
+                    })}
                   </div>
                 )}
+
+                {/* Upload & Add URL controls */}
+                <div className="space-y-2 pt-1">
+                  <input
+                    ref={productImageInputRef}
+                    type="file"
+                    id="product-multi-image-file"
+                    multiple
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                    onChange={async (e) => {
+                      const files = Array.from(e.target.files || []);
+                      if (files.length === 0) return;
+                      setUploadingImage(true);
+                      const newUrls: string[] = [];
+
+                      for (const file of files) {
+                        if (file.size > 10 * 1024 * 1024) {
+                          toast.error(`"${file.name}" exceeds 10MB limit.`);
+                          continue;
+                        }
+                        try {
+                          const base64 = await new Promise<string>((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              const res = reader.result as string;
+                              const commaIndex = res.indexOf(",");
+                              resolve(commaIndex !== -1 ? res.slice(commaIndex + 1) : res);
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                          });
+
+                          const uploadRes = await uploadImageFn({
+                            data: {
+                              filename: file.name,
+                              base64,
+                              mimeType: file.type || "image/jpeg",
+                            },
+                          });
+
+                          if (uploadRes?.imageUrl) {
+                            newUrls.push(uploadRes.imageUrl);
+                          }
+                        } catch (err: any) {
+                          toast.error(err?.message || `Failed to upload ${file.name}`);
+                        }
+                      }
+
+                      if (newUrls.length > 0) {
+                        setForm((f) => {
+                          const current = f.images && f.images.length > 0 ? f.images : (f.image_url ? [f.image_url] : []);
+                          const merged = [...current, ...newUrls];
+                          return {
+                            ...f,
+                            images: merged,
+                            image_url: f.image_url || newUrls[0] || "",
+                          };
+                        });
+                        toast.success(`Added ${newUrls.length} photo${newUrls.length === 1 ? "" : "s"} to product gallery!`);
+                      }
+                      setUploadingImage(false);
+                      if (productImageInputRef.current) productImageInputRef.current.value = "";
+                    }}
+                    className="hidden"
+                  />
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={uploadingImage}
+                      onClick={() => productImageInputRef.current?.click()}
+                      className="flex-1 rounded-xl h-9 text-xs font-semibold hover:border-berry/50 flex items-center justify-center gap-1.5 cursor-pointer bg-card"
+                    >
+                      <Camera className="size-3.5 text-berry" />
+                      <span>{uploadingImage ? "Uploading to Storage…" : "+ Upload Photos from Device (Multiple)"}</span>
+                    </Button>
+                    <button
+                      type="button"
+                      onClick={() => setManualUrlMode(!manualUrlMode)}
+                      className="text-xs text-berry hover:underline font-semibold px-2 py-1 text-center cursor-pointer"
+                    >
+                      {manualUrlMode ? "Hide URL input" : "Or add by URL"}
+                    </button>
+                  </div>
+
+                  {manualUrlMode && (
+                    <div className="flex gap-2 pt-1">
+                      <Input
+                        placeholder="Paste image URL (e.g. https://...)"
+                        value={manualUrlInput}
+                        onChange={(e) => setManualUrlInput(e.target.value)}
+                        className="rounded-xl h-9 text-xs flex-1 bg-background"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          if (!manualUrlInput.trim()) return;
+                          const url = manualUrlInput.trim();
+                          setForm((f) => {
+                            const current = f.images && f.images.length > 0 ? f.images : (f.image_url ? [f.image_url] : []);
+                            return {
+                              ...f,
+                              images: [...current, url],
+                              image_url: f.image_url || url,
+                            };
+                          });
+                          setManualUrlInput("");
+                          toast.success("Image URL added to gallery!");
+                        }}
+                        className="rounded-xl h-9 px-3 text-xs font-semibold bg-cocoa text-background hover:bg-cocoa/90 cursor-pointer"
+                      >
+                        + Add Photo
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
+
               <label className="flex items-center gap-2 text-xs font-medium cursor-pointer pt-1">
                 <input
                   type="checkbox"
@@ -1770,6 +2573,9 @@ function AdminDashboard() {
                         throw new Error("Image is still processing. Please wait or re-upload.");
                       }
 
+                      const finalImages = form.images && form.images.length > 0 ? form.images : (form.image_url ? [form.image_url] : []);
+                      const primaryCover = form.image_url || (finalImages[0] ?? null);
+
                       await persistProduct({
                         data: {
                           ...(form.id ? { id: form.id } : {}),
@@ -1779,7 +2585,8 @@ function AdminDashboard() {
                           price: Math.max(0, Number(form.price) || 0),
                           discount_type: form.discount_type,
                           discount_value: Math.max(0, Number(form.discount_value) || 0),
-                          image_url: form.image_url?.trim() || null,
+                          image_url: primaryCover,
+                          images: finalImages.length > 0 ? finalImages : null,
                           stock: Math.max(0, Math.floor(Number(form.stock) || 0)),
                           is_active: form.is_active,
                           category_id: form.category_id?.trim() || null,
@@ -1992,37 +2799,9 @@ function AdminDashboard() {
                       key={product.id}
                       product={product}
                       categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
-                      onEdit={() => {
-                        const isCake =
-                          product.name.toLowerCase().includes("cake") ||
-                          product.name.toLowerCase().includes("cheesecake");
-                        const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
-                        const variants =
-                          (product as any).weight_variants && (product as any).weight_variants.length > 0
-                            ? (product as any).weight_variants
-                            : itemType === "weight"
-                              ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
-                              : [];
-
-                        setForm({
-                          id: product.id,
-                          name: product.name,
-                          slug: product.slug,
-                          description: product.description ?? "",
-                          price: String(product.price),
-                          discount_type: product.discount_type,
-                          discount_value: String(product.discount_value),
-                          image_url: product.image_url ?? "",
-                          stock: String(product.stock),
-                          is_active: product.is_active,
-                          category_id: product.category_id ?? "",
-                          item_type: itemType,
-                          unit_weight_grams: String((product as any).unit_weight_grams || ""),
-                          serving_yield: (product as any).serving_yield || "",
-                          weight_variants: variants,
-                        });
-                        window.scrollTo({ top: 180, behavior: "smooth" });
-                      }}
+                      onEdit={() => handleEditProduct(product)}
+                      onDuplicate={() => handleDuplicateProduct(product)}
+                      onAdjustStock={(delta) => handleQuickStockAdjust(product, delta)}
                       onDelete={() =>
                         run(() => removeProductFn({ data: product.id }), "Product deleted")
                       }
@@ -2058,38 +2837,9 @@ function AdminDashboard() {
                             key={product.id}
                             product={product}
                             categoryName={cat.name}
-                            onEdit={() => {
-                              const isCake =
-                                cat.slug === "cakes" ||
-                                cat.slug === "cheesecakes" ||
-                                product.name.toLowerCase().includes("cake");
-                              const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
-                              const variants =
-                                (product as any).weight_variants && (product as any).weight_variants.length > 0
-                                  ? (product as any).weight_variants
-                                  : itemType === "weight"
-                                    ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
-                                    : [];
-
-                              setForm({
-                                id: product.id,
-                                name: product.name,
-                                slug: product.slug,
-                                description: product.description ?? "",
-                                price: String(product.price),
-                                discount_type: product.discount_type,
-                                discount_value: String(product.discount_value),
-                                image_url: product.image_url ?? "",
-                                stock: String(product.stock),
-                                is_active: product.is_active,
-                                category_id: product.category_id ?? "",
-                                item_type: itemType,
-                                unit_weight_grams: String((product as any).unit_weight_grams || ""),
-                                serving_yield: (product as any).serving_yield || "",
-                                weight_variants: variants,
-                              });
-                              window.scrollTo({ top: 180, behavior: "smooth" });
-                            }}
+                            onEdit={() => handleEditProduct(product)}
+                            onDuplicate={() => handleDuplicateProduct(product)}
+                            onAdjustStock={(delta) => handleQuickStockAdjust(product, delta)}
                             onDelete={() =>
                               run(() => removeProductFn({ data: product.id }), "Product deleted")
                             }
@@ -2119,37 +2869,9 @@ function AdminDashboard() {
                           <ProductAdminRow
                             key={product.id}
                             product={product}
-                            onEdit={() => {
-                              const isCake =
-                                product.name.toLowerCase().includes("cake") ||
-                                product.name.toLowerCase().includes("cheesecake");
-                              const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
-                              const variants =
-                                (product as any).weight_variants && (product as any).weight_variants.length > 0
-                                  ? (product as any).weight_variants
-                                  : itemType === "weight"
-                                    ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
-                                    : [];
-
-                              setForm({
-                                id: product.id,
-                                name: product.name,
-                                slug: product.slug,
-                                description: product.description ?? "",
-                                price: String(product.price),
-                                discount_type: product.discount_type,
-                                discount_value: String(product.discount_value),
-                                image_url: product.image_url ?? "",
-                                stock: String(product.stock),
-                                is_active: product.is_active,
-                                category_id: product.category_id ?? "",
-                                item_type: itemType,
-                                unit_weight_grams: String((product as any).unit_weight_grams || ""),
-                                serving_yield: (product as any).serving_yield || "",
-                                weight_variants: variants,
-                              });
-                              window.scrollTo({ top: 180, behavior: "smooth" });
-                            }}
+                            onEdit={() => handleEditProduct(product)}
+                            onDuplicate={() => handleDuplicateProduct(product)}
+                            onAdjustStock={(delta) => handleQuickStockAdjust(product, delta)}
                             onDelete={() =>
                               run(() => removeProductFn({ data: product.id }), "Product deleted")
                             }
@@ -2908,10 +3630,12 @@ function AdminDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="reviews" className="mt-6">
+        <TabsContent value="reviews" className="mt-0">
           <AdminCustomerMoments />
         </TabsContent>
       </Tabs>
+      </main>
+      </div>
 
       {/* Postpone / Reschedule Slot Dialog */}
       <Dialog

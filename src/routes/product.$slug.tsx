@@ -9,6 +9,8 @@ import {
   Clock,
   HeartHandshake,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Plus,
   Minus,
   Cake,
@@ -126,6 +128,17 @@ function ProductDetailPage() {
     variants ? variants[0] ?? null : null
   );
 
+  // Multi-image gallery carousel state
+  const galleryImages = (
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image_url ?? "/products/artisan-croissant.jpg"]
+  ).filter(Boolean) as string[];
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const activeImage =
+    galleryImages[activeImageIndex] || galleryImages[0] || product.image_url || "/products/artisan-croissant.jpg";
+
   const activeBasePrice = selectedVariant ? selectedVariant.price : product.price;
   const price = finalPrice(activeBasePrice, product.discount_type, product.discount_value);
   const discounted = hasDiscount(product.discount_type, product.discount_value);
@@ -142,7 +155,7 @@ function ProductDetailPage() {
         name: product.name,
         unitPrice: price,
         basePrice: activeBasePrice,
-        imageUrl: product.image_url,
+        imageUrl: activeImage || product.image_url,
         variantLabel: variantKey,
         variantWeightGrams: selectedVariant?.weight_grams ?? product.unit_weight_grams ?? null,
       },
@@ -170,30 +183,100 @@ function ProductDetailPage() {
       {/* 1. Hero: Image + Details Bento Grid */}
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
         
-        {/* Left Column: Product Showcase Photo Frame */}
-        <div className="relative group overflow-hidden rounded-3xl sm:rounded-4xl border border-border/80 bg-card p-2 sm:p-3 shadow-soft">
-          <div className="relative aspect-[16/10] sm:aspect-square max-h-48 sm:max-h-none w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-secondary/30">
-            <img
-              src={product.image_url ?? "/products/artisan-croissant.jpg"}
-              alt={product.name}
-              onError={(e) => {
-                e.currentTarget.src = "/products/artisan-croissant.jpg";
-              }}
-              className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+        {/* Left Column: Product Showcase Photo Frame & Gallery Carousel */}
+        <div className="flex flex-col gap-3">
+          <div className="relative group overflow-hidden rounded-3xl sm:rounded-4xl border border-border/80 bg-card p-2 sm:p-3 shadow-soft">
+            <div className="relative aspect-[16/10] sm:aspect-square max-h-48 sm:max-h-none w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-secondary/30">
+              <img
+                src={activeImage}
+                alt={`${product.name} — view ${activeImageIndex + 1}`}
+                onError={(e) => {
+                  e.currentTarget.src = "/products/artisan-croissant.jpg";
+                }}
+                className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
 
-            {/* Discount Badge */}
-            {discounted && (
-              <span className="absolute left-3 sm:left-4 top-3 sm:top-4 rounded-full bg-berry px-3 py-0.5 text-xs font-bold text-berry-foreground shadow-lift">
-                {discountLabel(product.discount_type, product.discount_value)}
+              {/* Discount Badge */}
+              {discounted && (
+                <span className="absolute left-3 sm:left-4 top-3 sm:top-4 rounded-full bg-berry px-3 py-0.5 text-xs font-bold text-berry-foreground shadow-lift">
+                  {discountLabel(product.discount_type, product.discount_value)}
+                </span>
+              )}
+
+              {/* Kitchen Freshness Pill */}
+              <span className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                ✨ Fresh Small-Batch
               </span>
-            )}
 
-            {/* Kitchen Freshness Pill */}
-            <span className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
-              ✨ Fresh Small-Batch
-            </span>
+              {/* Multi-Image Carousel Controls */}
+              {galleryImages.length > 1 && (
+                <>
+                  {/* Prev Button */}
+                  <button
+                    type="button"
+                    aria-label="Previous photo"
+                    onClick={() =>
+                      setActiveImageIndex((prev) =>
+                        prev === 0 ? galleryImages.length - 1 : prev - 1
+                      )
+                    }
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 flex size-8 sm:size-9 items-center justify-center rounded-full bg-background/85 text-foreground backdrop-blur-md border border-border/60 shadow-md transition-all hover:bg-background hover:scale-110 active:scale-95 cursor-pointer opacity-90 sm:opacity-0 sm:group-hover:opacity-100"
+                  >
+                    <ChevronLeft className="size-4 sm:size-5" />
+                  </button>
+
+                  {/* Next Button */}
+                  <button
+                    type="button"
+                    aria-label="Next photo"
+                    onClick={() =>
+                      setActiveImageIndex((prev) =>
+                        prev === galleryImages.length - 1 ? 0 : prev + 1
+                      )
+                    }
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 flex size-8 sm:size-9 items-center justify-center rounded-full bg-background/85 text-foreground backdrop-blur-md border border-border/60 shadow-md transition-all hover:bg-background hover:scale-110 active:scale-95 cursor-pointer opacity-90 sm:opacity-0 sm:group-hover:opacity-100"
+                  >
+                    <ChevronRight className="size-4 sm:size-5" />
+                  </button>
+
+                  {/* Slide Counter Indicator */}
+                  <span className="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 rounded-full bg-black/60 backdrop-blur-md px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-white shadow-2xs">
+                    📸 {activeImageIndex + 1} / {galleryImages.length}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
+
+          {/* Interactive Thumbnail Strip (if 2+ images exist) */}
+          {galleryImages.length > 1 && (
+            <div className="flex items-center gap-2 overflow-x-auto px-1 py-1">
+              {galleryImages.map((img, idx) => {
+                const isActive = idx === activeImageIndex;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative size-14 sm:size-16 shrink-0 overflow-hidden rounded-xl sm:rounded-2xl border-2 transition-all cursor-pointer ${
+                      isActive
+                        ? "border-berry ring-2 ring-berry/40 scale-105 shadow-sm"
+                        : "border-border/60 hover:border-berry/40 opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="size-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "/products/artisan-croissant.jpg";
+                      }}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Right Column: Details & Ordering Bento */}

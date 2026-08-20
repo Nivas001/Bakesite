@@ -205,6 +205,8 @@ export async function fetchAdminProducts() {
       discount_type: p.discount_type,
       discount_value: Number(p.discount_value),
       image_url: p.image_url ?? null,
+      images: p.images ?? (p.image_url ? [p.image_url] : []),
+      pinned_image_url: p.pinned_image_url || p.image_url || null,
       stock: Number(p.stock),
       is_active: Boolean(p.stock > 0 || true),
       category_id: p.category_id ?? null,
@@ -264,6 +266,8 @@ export async function saveProductSequenceAdmin(input: {
 export async function upsertProduct(input: ProductInput) {
   const { updateProductWeightOverrides } = await import("./catalog.server");
 
+  const primaryCoverImage = input.image_url?.trim() || (input.images && input.images.length > 0 ? input.images[0]?.trim() : "") || "";
+
   const row: Record<string, unknown> = {
     name: input.name.trim(),
     slug: input.slug.trim(),
@@ -272,10 +276,10 @@ export async function upsertProduct(input: ProductInput) {
     discount_value: input.discount_value,
     stock: input.stock,
     is_active: input.is_active,
+    image_url: primaryCoverImage,
   };
 
   if (input.description) row['description'] = input.description.trim();
-  if (input.image_url) row['image_url'] = input.image_url.trim();
   if (input.category_id) row['category_id'] = input.category_id.trim();
   if (input.item_type) row['item_type'] = input.item_type;
   if (input.unit_weight_grams !== undefined && input.unit_weight_grams !== null) {
@@ -285,6 +289,9 @@ export async function upsertProduct(input: ProductInput) {
   if (input.weight_variants && input.weight_variants.length > 0) {
     row['weight_variants_json'] = JSON.stringify(input.weight_variants);
   }
+  if (input.images && input.images.length > 0) {
+    row['images_json'] = JSON.stringify(input.images);
+  }
 
   try {
     let savedId = input.id;
@@ -292,7 +299,7 @@ export async function upsertProduct(input: ProductInput) {
       await updateDoc(COLLECTIONS.products, input.id, {
         ...row,
         description: input.description?.trim() || "",
-        image_url: input.image_url?.trim() || "",
+        image_url: primaryCoverImage,
         category_id: input.category_id?.trim() || "",
       });
     } else {
@@ -306,6 +313,7 @@ export async function upsertProduct(input: ProductInput) {
         unit_weight_grams: input.unit_weight_grams ?? null,
         serving_yield: input.serving_yield ?? null,
         weight_variants: (input.weight_variants as any) ?? null,
+        images: input.images ? input.images.filter(Boolean) : (primaryCoverImage ? [primaryCoverImage] : []),
       });
     }
 

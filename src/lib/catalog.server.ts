@@ -21,6 +21,8 @@ export type ProductDoc = {
   discount_type: DiscountType;
   discount_value: number;
   image_url: string | null;
+  images?: string[] | null;
+  images_json?: string | null;
   stock: number;
   is_active: boolean;
   category_id: string | null;
@@ -567,6 +569,7 @@ const productWeightConfigOverrides = new Map<string, {
   unit_weight_grams?: number | null;
   serving_yield?: string | null;
   weight_variants?: ProductWeightVariant[] | null;
+  images?: string[] | null;
 }>();
 
 export function updateProductWeightOverrides(
@@ -576,6 +579,7 @@ export function updateProductWeightOverrides(
     unit_weight_grams?: number | null;
     serving_yield?: string | null;
     weight_variants?: ProductWeightVariant[] | null;
+    images?: string[] | null;
   },
 ) {
   productWeightConfigOverrides.set(productId, config);
@@ -607,6 +611,24 @@ export function mapProduct(
       weightVariants = JSON.parse(doc.weight_variants_json);
     } catch {}
   }
+
+  // Parse images gallery
+  let images: string[] = [];
+  if (weightOverride?.images && Array.isArray(weightOverride.images) && weightOverride.images.length > 0) {
+    images = weightOverride.images.filter(Boolean);
+  } else if (doc.images && Array.isArray(doc.images) && doc.images.length > 0) {
+    images = doc.images.filter(Boolean);
+  } else if (doc.images_json) {
+    try {
+      const parsed = JSON.parse(doc.images_json);
+      if (Array.isArray(parsed)) images = parsed.filter(Boolean);
+    } catch {}
+  }
+  if (images.length === 0 && doc.image_url) {
+    images = [doc.image_url];
+  }
+
+  const primaryCoverImage: string | null = (doc.image_url ?? (images.length > 0 ? images[0] : null)) ?? null;
 
   // Default portion & weight logic if not custom set
   if (isCakeOrCheesecake) {
@@ -641,7 +663,9 @@ export function mapProduct(
     price: Number(doc.price),
     discount_type: doc.discount_type,
     discount_value: Number(doc.discount_value),
-    image_url: doc.image_url ?? null,
+    image_url: primaryCoverImage,
+    images: images,
+    pinned_image_url: primaryCoverImage,
     stock: Number(doc.stock),
     category_id: doc.category_id ?? null,
     category_name: category?.name ?? null,
@@ -743,6 +767,9 @@ export async function loadCatalog() {
       if (!servingYield) servingYield = "Approx. 95g (72 butter layers)";
     }
 
+    const seedImages = p.image_url ? [p.image_url] : [];
+    const primaryImg = p.image_url || null;
+
     return {
       id: p.id,
       name: p.name,
@@ -751,7 +778,9 @@ export async function loadCatalog() {
       price: p.price,
       discount_type: p.discount_type,
       discount_value: p.discount_value,
-      image_url: p.image_url,
+      image_url: primaryImg,
+      images: weightOverride?.images && weightOverride.images.length > 0 ? weightOverride.images : seedImages,
+      pinned_image_url: primaryImg,
       stock: p.stock,
       category_id: p.category_id,
       category_name: SEED_CATEGORIES.find((c) => c.slug === p.category_slug)?.name ?? "Bakery",

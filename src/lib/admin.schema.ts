@@ -37,6 +37,7 @@ export const productSchema = z.object({
   discount_type: z.enum(["none", "percent", "flat"]),
   discount_value: z.number().min(0).max(100000),
   image_url: z.string().trim().max(1500).nullable().optional(),
+  images: z.array(z.string().trim()).optional().nullable(),
   stock: z.number().int().min(0).max(10000),
   is_active: z.boolean(),
   category_id: id.nullable().optional(),

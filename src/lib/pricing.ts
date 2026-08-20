@@ -18,6 +18,8 @@ export interface CatalogProduct {
   discount_type: DiscountType;
   discount_value: number;
   image_url: string | null;
+  images?: string[] | null;
+  pinned_image_url?: string | null;
   stock: number;
   category_id: string | null;
   category_name?: string | null;
