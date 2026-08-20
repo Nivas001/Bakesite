@@ -27,6 +27,14 @@ const CATEGORY_STYLE_MAP: Record<
     accentGlow: string;
   }
 > = {
+  brownies: {
+    icon: Sparkles,
+    desc: "Rich dark Belgian chocolate fudge brownies & gourmet tasting squares",
+    image: "/products/belgian-fudge-brownie-stack.jpg",
+    badge: "70% Couverture",
+    tag: "Fudge Hearth",
+    accentGlow: "from-amber-900/40 to-stone-950/80",
+  },
   breads: {
     icon: Croissant,
     desc: "Wild sourdough boules, rustic hearth loaves & golden morning blondies",
@@ -72,7 +80,7 @@ export function CategoryPeekCarousel({
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
-  const displayCategories = categories.slice(0, 4);
+  const displayCategories = categories.slice(0, 6);
   const total = displayCategories.length;
 
   const handlePrev = () => {

@@ -54,6 +54,33 @@ const SEED_CATEGORIES: CategoryDoc[] = [
 const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> = [
   // 🍫 Brownies
   {
+    id: "prod_signature_belgian_fudge_brownie",
+    name: "Signature Belgian Truffle Fudge Brownie",
+    slug: "signature-belgian-fudge-brownie",
+    price: 95,
+    discount_type: "none",
+    discount_value: 0,
+    category_id: "cat_brownies",
+    category_slug: "brownies",
+    stock: 50,
+    description: "Rich 70% dark Belgian chocolate fudge brownie topped with silky ganache piping, roasted Iranian pistachio nibs, and artisanal chocolate drizzle. Dense, fudgy centre with crackly paper-thin crust.",
+    image_url: "/products/belgian-fudge-brownie-stack.jpg",
+    images: [
+      "/products/belgian-fudge-brownie-stack.jpg",
+      "/products/belgian-fudge-brownie-drizzle.jpg",
+      "/products/belgian-fudge-brownie-fork.jpg",
+    ],
+    item_type: "pack",
+    unit_weight_grams: 95,
+    serving_yield: "Approx. 95g gourmet fudge square",
+    weight_variants_json: JSON.stringify([
+      { id: "var_single", label: "Single Square (95g)", price: 95, weight_grams: 95, is_default: true },
+      { id: "var_box4", label: "Gourmet Box of 4 (380g)", price: 360, weight_grams: 380, is_default: false },
+      { id: "var_box9", label: "Grand Tasting Box of 9 (850g)", price: 790, weight_grams: 850, is_default: false },
+    ]),
+    is_active: true,
+  },
+  {
     id: "prod_classic_brownie",
     name: "Classic Fudgy Brownie",
     slug: "classic-brownie",
@@ -760,10 +787,16 @@ export async function loadCatalog() {
     const weightOverride = findProductWeightOverride(p.id, p.slug);
     const isCake = p.category_slug === "cakes" || p.category_slug === "cheesecakes";
 
-    let itemType: "weight" | "unit" | "pack" = weightOverride?.item_type || (isCake ? "weight" : "unit");
-    let unitWeightGrams = weightOverride?.unit_weight_grams ?? null;
-    let servingYield = weightOverride?.serving_yield ?? null;
+    let itemType: "weight" | "unit" | "pack" = weightOverride?.item_type || p.item_type || (isCake ? "weight" : "unit");
+    let unitWeightGrams = weightOverride?.unit_weight_grams ?? p.unit_weight_grams ?? null;
+    let servingYield = weightOverride?.serving_yield ?? p.serving_yield ?? null;
     let weightVariants: ProductWeightVariant[] | null = weightOverride?.weight_variants ?? null;
+
+    if (!weightVariants && p.weight_variants_json) {
+      try {
+        weightVariants = JSON.parse(p.weight_variants_json);
+      } catch {}
+    }
 
     if (isCake) {
       itemType = "weight";
@@ -789,14 +822,14 @@ export async function loadCatalog() {
       if (!servingYield) servingYield = "Approx. 95g (72 butter layers)";
     }
 
-    const seedImages = p.image_url ? [p.image_url] : [];
-    const primaryImg = p.image_url || null;
+    const seedImages: string[] = p.images && p.images.length > 0 ? p.images : (p.image_url ? [p.image_url] : []);
+    const primaryImg: string | null = (p.image_url ?? (seedImages.length > 0 ? seedImages[0] : null)) ?? null;
 
-    return {
+    const mapped: CatalogProduct = {
       id: p.id,
       name: p.name,
       slug: p.slug,
-      description: p.description,
+      description: p.description ?? null,
       price: p.price,
       discount_type: p.discount_type,
       discount_value: p.discount_value,
@@ -813,6 +846,7 @@ export async function loadCatalog() {
       serving_yield: servingYield,
       weight_variants: weightVariants,
     };
+    return mapped;
   }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
 
   return {

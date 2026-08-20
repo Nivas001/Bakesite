@@ -155,7 +155,7 @@ function ProductDetailPage() {
         name: product.name,
         unitPrice: price,
         basePrice: activeBasePrice,
-        imageUrl: activeImage || product.image_url,
+        imageUrl: activeImage || product.image_url || null,
         variantLabel: variantKey,
         variantWeightGrams: selectedVariant?.weight_grams ?? product.unit_weight_grams ?? null,
       },
@@ -186,14 +186,14 @@ function ProductDetailPage() {
         {/* Left Column: Product Showcase Photo Frame & Gallery Carousel */}
         <div className="flex flex-col gap-3">
           <div className="relative group overflow-hidden rounded-3xl sm:rounded-4xl border border-border/80 bg-card p-2 sm:p-3 shadow-soft">
-            <div className="relative aspect-[16/10] sm:aspect-square max-h-48 sm:max-h-none w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-secondary/30">
+            <div className="relative aspect-square w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-secondary/30">
               <img
                 src={activeImage}
                 alt={`${product.name} — view ${activeImageIndex + 1}`}
                 onError={(e) => {
                   e.currentTarget.src = "/products/artisan-croissant.jpg";
                 }}
-                className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="size-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
               />
 
               {/* Discount Badge */}
