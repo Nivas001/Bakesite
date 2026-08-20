@@ -266,45 +266,69 @@ export async function saveProductSequenceAdmin(input: {
 export async function upsertProduct(input: ProductInput) {
   const { updateProductWeightOverrides } = await import("./catalog.server");
 
-  const primaryCoverImage = input.image_url?.trim() || (input.images && input.images.length > 0 ? input.images[0]?.trim() : "") || "";
+  const primaryCoverImage =
+    input.image_url?.trim() ||
+    (input.images && input.images.length > 0 ? input.images[0]?.trim() : "") ||
+    "";
 
-  const row: Record<string, unknown> = {
-    name: input.name.trim(),
-    slug: input.slug.trim(),
-    price: input.price,
-    discount_type: input.discount_type,
-    discount_value: input.discount_value,
-    stock: input.stock,
-    is_active: input.is_active,
-    image_url: primaryCoverImage,
+  // Base attributes supported by standard Appwrite products collection
+  const baseRow: Record<string, unknown> = {
+    name: input.name.trim().slice(0, 120),
+    slug: input.slug.trim().slice(0, 120),
+    price: Math.max(0, Number(input.price) || 0),
+    discount_type: input.discount_type || "none",
+    discount_value: Math.max(0, Number(input.discount_value) || 0),
+    stock: Math.max(0, Math.floor(Number(input.stock) || 0)),
+    is_active: Boolean(input.is_active),
   };
 
-  if (input.description) row['description'] = input.description.trim();
-  if (input.category_id) row['category_id'] = input.category_id.trim();
-  if (input.item_type) row['item_type'] = input.item_type;
-  if (input.unit_weight_grams !== undefined && input.unit_weight_grams !== null) {
-    row['unit_weight_grams'] = input.unit_weight_grams;
-  }
-  if (input.serving_yield) row['serving_yield'] = input.serving_yield.trim();
-  if (input.weight_variants && input.weight_variants.length > 0) {
-    row['weight_variants_json'] = JSON.stringify(input.weight_variants);
-  }
-  if (input.images && input.images.length > 0) {
-    row['images_json'] = JSON.stringify(input.images);
+  if (input.description?.trim()) {
+    baseRow["description"] = input.description.trim().slice(0, 600);
+  } else {
+    baseRow["description"] = "";
   }
 
+  if (primaryCoverImage) {
+    baseRow["image_url"] = primaryCoverImage.slice(0, 500);
+  }
+
+  if (input.category_id?.trim()) {
+    baseRow["category_id"] = input.category_id.trim().slice(0, 64);
+  }
+
+  // Extended attributes if collection has them provisioned
+  const extendedRow: Record<string, unknown> = { ...baseRow };
+  if (input.item_type) extendedRow["item_type"] = input.item_type;
+  if (input.unit_weight_grams !== undefined && input.unit_weight_grams !== null) {
+    extendedRow["unit_weight_grams"] = Number(input.unit_weight_grams);
+  }
+  if (input.serving_yield?.trim()) extendedRow["serving_yield"] = input.serving_yield.trim().slice(0, 200);
+  if (input.weight_variants && input.weight_variants.length > 0) {
+    extendedRow["weight_variants_json"] = JSON.stringify(input.weight_variants);
+  }
+  if (input.images && input.images.length > 0) {
+    extendedRow["images_json"] = JSON.stringify(input.images.filter(Boolean));
+  }
+
+  let savedId = input.id;
+
   try {
-    let savedId = input.id;
     if (input.id) {
-      await updateDoc(COLLECTIONS.products, input.id, {
-        ...row,
-        description: input.description?.trim() || "",
-        image_url: primaryCoverImage,
-        category_id: input.category_id?.trim() || "",
-      });
+      try {
+        await updateDoc(COLLECTIONS.products, input.id, extendedRow);
+      } catch (innerErr: any) {
+        console.warn("Retrying update with base attributes only:", innerErr?.message);
+        await updateDoc(COLLECTIONS.products, input.id, baseRow);
+      }
     } else {
-      const created = await createDoc(COLLECTIONS.products, row);
-      savedId = created.$id;
+      try {
+        const created = await createDoc(COLLECTIONS.products, extendedRow);
+        savedId = created.$id;
+      } catch (innerErr: any) {
+        console.warn("Retrying create with base attributes only:", innerErr?.message);
+        const created = await createDoc(COLLECTIONS.products, baseRow);
+        savedId = created.$id;
+      }
     }
 
     if (savedId) {
@@ -317,15 +341,12 @@ export async function upsertProduct(input: ProductInput) {
       });
     }
 
-    return { ok: true as const };
+    return { ok: true as const, id: savedId };
   } catch (err: any) {
     console.error("Appwrite upsertProduct failed:", err);
     const msg = err?.message || String(err);
     if (msg.includes("409") || msg.toLowerCase().includes("already exists") || msg.includes("duplicate")) {
       throw new Error(`A product with the slug "${input.slug}" already exists. Please choose a different URL slug.`);
-    }
-    if (msg.includes("Invalid document structure")) {
-      throw new Error(`Database error: Please check that all product fields have valid values.`);
     }
     throw new Error(msg || "Failed to save product to database.");
   }

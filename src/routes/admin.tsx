@@ -50,6 +50,7 @@ import {
   type ProductForm,
   EMPTY_FORM,
 } from "@/components/admin-product-editor-dialog";
+import { AdminProductForm } from "@/components/admin-product-form";
 import { ProductAdminCard } from "@/components/admin-product-card";
 import {
   AlertTriangle,
@@ -979,7 +980,6 @@ function AdminDashboard() {
 
   const handleNewProduct = () => {
     setForm(EMPTY_FORM);
-    setProductModalOpen(true);
     navigate({
       search: (prev: any) => ({
         ...prev,
@@ -988,6 +988,13 @@ function AdminDashboard() {
         id: undefined,
       }),
     });
+    setTimeout(() => {
+      const sideName = document.getElementById("side-name");
+      if (sideName) {
+        sideName.scrollIntoView({ behavior: "smooth", block: "center" });
+        sideName.focus();
+      }
+    }, 50);
   };
 
   const handleEditProduct = (product: any, updateUrl = true) => {
@@ -1026,7 +1033,6 @@ function AdminDashboard() {
       serving_yield: (product as any).serving_yield || "",
       weight_variants: variants,
     });
-    setProductModalOpen(true);
     if (updateUrl) {
       navigate({
         search: (prev: any) => ({
@@ -1037,6 +1043,13 @@ function AdminDashboard() {
         }),
       });
     }
+    setTimeout(() => {
+      const sideName = document.getElementById("side-name");
+      if (sideName) {
+        sideName.scrollIntoView({ behavior: "smooth", block: "center" });
+        sideName.focus();
+      }
+    }, 50);
   };
 
   const handleDuplicateProduct = (product: any) => {
@@ -2116,438 +2129,15 @@ function AdminDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="inventory" className="mt-6 space-y-6">
-          {/* Header & Controls Bar */}
-          <div className="flex flex-col gap-4 rounded-3xl border border-border/70 bg-card p-5 sm:p-6 shadow-soft">
-            {/* Top Row: Title, Stats & Add Button */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-display text-xl sm:text-2xl font-bold text-cocoa">
-                    Bakery Menu &amp; Catalog
-                  </h2>
-                  <span className="rounded-full bg-berry/15 text-berry border border-berry/30 px-2.5 py-0.5 text-xs font-bold">
-                    {data.products.length} Bakes
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Manage recipe pricing, portion sizing, tiered volume discounts, and storefront visibility.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2.5 shrink-0">
-                {/* View Mode Switcher */}
-                <div className="flex items-center rounded-2xl border border-border/70 bg-secondary/40 p-1">
-                  <button
-                    type="button"
-                    onClick={() => setInventoryViewMode("grid")}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      inventoryViewMode === "grid"
-                        ? "bg-card text-cocoa shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    title="Card Grid View"
-                  >
-                    <LayoutGrid className="size-3.5" />
-                    <span>Cards</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setInventoryViewMode("list")}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      inventoryViewMode === "list"
-                        ? "bg-card text-cocoa shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    title="Compact Row List View"
-                  >
-                    <Sliders className="size-3.5" />
-                    <span>Rows</span>
-                  </button>
-                </div>
-
-                <Button
-                  onClick={handleNewProduct}
-                  className="rounded-2xl h-10 px-4 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Plus className="size-4" />
-                  <span>Add New Bake</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Category Filter Pills */}
-            <div className="pt-2 border-t border-border/50">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                Filter by Category
-              </span>
-              <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                <button
-                  type="button"
-                  onClick={() => setInventoryCategoryFilter("all")}
-                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                    inventoryCategoryFilter === "all"
-                      ? "bg-cocoa text-background shadow-xs"
-                      : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                  }`}
-                >
-                  <span>All Categories</span>
-                  <span
-                    className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                      inventoryCategoryFilter === "all"
-                        ? "bg-background/20 text-background"
-                        : "bg-background/80 text-foreground"
-                    }`}
-                  >
-                    {data.products.length}
-                  </span>
-                </button>
-
-                {data.categories.map((cat) => {
-                  const count = data.products.filter((p) => p.category_id === cat.id).length;
-                  const isActive = inventoryCategoryFilter === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setInventoryCategoryFilter(cat.id)}
-                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                        isActive
-                          ? "bg-cocoa text-background shadow-xs"
-                          : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                      }`}
-                    >
-                      <span>{cat.name}</span>
-                      <span
-                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                          isActive
-                            ? "bg-background/20 text-background"
-                            : "bg-background/80 text-foreground"
-                        }`}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
-
-                {data.products.some((p) => !p.category_id) && (
-                  <button
-                    type="button"
-                    onClick={() => setInventoryCategoryFilter("uncategorized")}
-                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-                      inventoryCategoryFilter === "uncategorized"
-                        ? "bg-cocoa text-background shadow-xs"
-                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}
-                  >
-                    <span>Uncategorised</span>
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                        inventoryCategoryFilter === "uncategorized"
-                          ? "bg-background/20 text-background"
-                          : "bg-background/80 text-foreground"
-                      }`}
-                    >
-                      {data.products.filter((p) => !p.category_id).length}
-                    </span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Search, Status & Sorting Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/50">
-              <div className="relative min-w-[220px] flex-1 max-w-sm">
-                <Input
-                  placeholder="Search bakes by name, slug, notes…"
-                  value={inventorySearchQuery}
-                  onChange={(e) => setInventorySearchQuery(e.target.value)}
-                  className="h-9 text-xs pl-8 rounded-xl bg-background"
-                />
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
-                  🔍
-                </span>
-                {inventorySearchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setInventorySearchQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <select
-                  value={inventoryStatusFilter}
-                  onChange={(e) => setInventoryStatusFilter(e.target.value)}
-                  className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
-                >
-                  <option value="all">All Statuses ({data.products.length})</option>
-                  <option value="active">🌿 Visible in Shop ({activeProducts.length})</option>
-                  <option value="hidden">⏸️ Paused Only ({data.products.length - activeProducts.length})</option>
-                </select>
-
-                <select
-                  value={inventorySortBy}
-                  onChange={(e) => setInventorySortBy(e.target.value)}
-                  className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
-                >
-                  <option value="name_asc">Name: A to Z</option>
-                  <option value="name_desc">Name: Z to A</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                  <option value="active_first">Visible Items First</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Product Catalog Display (Cards Grid or Rows List) */}
-          {sortedProducts.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-border p-12 text-center bg-card/50">
-              <p className="text-3xl mb-2">🧁</p>
-              <p className="text-sm font-semibold text-cocoa">
-                {inventorySearchQuery || inventoryStatusFilter !== "all" || inventoryCategoryFilter !== "all"
-                  ? "No bakery items match your current filter criteria."
-                  : "No products in catalog yet."}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Try clearing your search query or reset your filters.
-              </p>
-              {(inventorySearchQuery || inventoryStatusFilter !== "all" || inventoryCategoryFilter !== "all") && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-3.5 rounded-xl text-xs font-semibold cursor-pointer"
-                  onClick={() => {
-                    setInventorySearchQuery("");
-                    setInventoryStatusFilter("all");
-                    setInventoryCategoryFilter("all");
-                  }}
-                >
-                  Reset All Filters
-                </Button>
-              )}
-            </div>
-          ) : inventoryViewMode === "grid" ? (
-            /* BENTO CARDS GRID VIEW */
-            inventoryCategoryFilter !== "all" ? (
-              /* Single Category Cards Grid */
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
-                  <h3 className="font-display text-lg font-bold text-cocoa">
-                    {inventoryCategoryFilter === "uncategorized"
-                      ? "Uncategorised Items"
-                      : categoryMap.get(inventoryCategoryFilter) || "Category"}
-                  </h3>
-                  <span className="text-xs font-semibold text-muted-foreground">
-                    {sortedProducts.length} {sortedProducts.length === 1 ? "bake" : "bakes"}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                  {sortedProducts.map((product) => (
-                    <ProductAdminCard
-                      key={product.id}
-                      product={product}
-                      categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
-                      onEdit={() => handleEditProduct(product)}
-                      onDuplicate={() => handleDuplicateProduct(product)}
-                      onToggleActive={() => handleToggleActiveProduct(product)}
-                      onDelete={() =>
-                        run(() => removeProductFn({ data: product.id }), "Product deleted")
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : (
-              /* Grouped by Category Cards Grid */
-              <div className="space-y-8">
-                {data.categories.map((cat) => {
-                  const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
-                  if (catProducts.length === 0) return null;
-                  const activeCount = catProducts.filter((p) => p.is_active).length;
-
-                  return (
-                    <div key={cat.id} className="space-y-3.5">
-                      <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-display text-lg font-bold text-cocoa">{cat.name}</h3>
-                          <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
-                            {catProducts.length} {catProducts.length === 1 ? "bake" : "bakes"}
-                          </span>
-                        </div>
-                        <span className="text-xs text-muted-foreground font-medium">
-                          {activeCount} active for fresh bake
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                        {catProducts.map((product) => (
-                          <ProductAdminCard
-                            key={product.id}
-                            product={product}
-                            categoryName={cat.name}
-                            onEdit={() => handleEditProduct(product)}
-                            onDuplicate={() => handleDuplicateProduct(product)}
-                            onToggleActive={() => handleToggleActiveProduct(product)}
-                            onDelete={() =>
-                              run(() => removeProductFn({ data: product.id }), "Product deleted")
-                            }
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {/* Uncategorized products */}
-                {sortedProducts.some((p) => !p.category_id) && (
-                  <div className="space-y-3.5">
-                    <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-display text-lg font-bold text-cocoa">Uncategorised</h3>
-                        <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
-                          {sortedProducts.filter((p) => !p.category_id).length} bakes
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                      {sortedProducts
-                        .filter((p) => !p.category_id)
-                        .map((product) => (
-                          <ProductAdminCard
-                            key={product.id}
-                            product={product}
-                            onEdit={() => handleEditProduct(product)}
-                            onDuplicate={() => handleDuplicateProduct(product)}
-                            onToggleActive={() => handleToggleActiveProduct(product)}
-                            onDelete={() =>
-                              run(() => removeProductFn({ data: product.id }), "Product deleted")
-                            }
-                          />
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          ) : (
-            /* COMPACT ROWS LIST VIEW */
-            inventoryCategoryFilter !== "all" ? (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between px-1">
-                  <h3 className="font-display text-xl font-bold text-cocoa">
-                    {inventoryCategoryFilter === "uncategorized"
-                      ? "Uncategorised Items"
-                      : categoryMap.get(inventoryCategoryFilter) || "Category"}
-                  </h3>
-                  <span className="text-xs font-semibold text-muted-foreground">
-                    {sortedProducts.length} {sortedProducts.length === 1 ? "product" : "products"}
-                  </span>
-                </div>
-
-                <div className="space-y-3">
-                  {sortedProducts.map((product) => (
-                    <ProductAdminRow
-                      key={product.id}
-                      product={product}
-                      categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
-                      onEdit={() => handleEditProduct(product)}
-                      onDuplicate={() => handleDuplicateProduct(product)}
-                      onToggleActive={() => handleToggleActiveProduct(product)}
-                      onDelete={() =>
-                        run(() => removeProductFn({ data: product.id }), "Product deleted")
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-8">
-                {data.categories.map((cat) => {
-                  const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
-                  if (catProducts.length === 0) return null;
-                  const activeCount = catProducts.filter((p) => p.is_active).length;
-
-                  return (
-                    <div key={cat.id} className="space-y-3">
-                      <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-display text-lg font-bold text-cocoa">{cat.name}</h3>
-                          <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
-                            {catProducts.length} {catProducts.length === 1 ? "item" : "items"}
-                          </span>
-                        </div>
-                        <span className="text-xs text-muted-foreground font-medium">
-                          {activeCount} active for fresh bake
-                        </span>
-                      </div>
-
-                      <div className="space-y-3">
-                        {catProducts.map((product) => (
-                          <ProductAdminRow
-                            key={product.id}
-                            product={product}
-                            categoryName={cat.name}
-                            onEdit={() => handleEditProduct(product)}
-                            onDuplicate={() => handleDuplicateProduct(product)}
-                            onToggleActive={() => handleToggleActiveProduct(product)}
-                            onDelete={() =>
-                              run(() => removeProductFn({ data: product.id }), "Product deleted")
-                            }
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {sortedProducts.some((p) => !p.category_id) && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-display text-lg font-bold text-cocoa">Uncategorised</h3>
-                        <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
-                          {sortedProducts.filter((p) => !p.category_id).length} items
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      {sortedProducts
-                        .filter((p) => !p.category_id)
-                        .map((product) => (
-                          <ProductAdminRow
-                            key={product.id}
-                            product={product}
-                            onEdit={() => handleEditProduct(product)}
-                            onDuplicate={() => handleDuplicateProduct(product)}
-                            onToggleActive={() => handleToggleActiveProduct(product)}
-                            onDelete={() =>
-                              run(() => removeProductFn({ data: product.id }), "Product deleted")
-                            }
-                          />
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          )}
-
-          {/* Product Editor Modal / Dialog */}
-          <ProductEditorDialog
-            open={productModalOpen}
-            onOpenChange={(open) => {
-              setProductModalOpen(open);
-              if (!open) {
+        <TabsContent value="inventory" className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr] items-start">
+          {/* LEFT SIDE: PRODUCT CREATION & EDIT FORM */}
+          <div className="w-full">
+            <AdminProductForm
+              form={form}
+              setForm={setForm}
+              categories={data.categories}
+              onSave={handleSaveProduct}
+              onCancel={() => {
                 setForm(EMPTY_FORM);
                 navigate({
                   search: (prev: any) => ({
@@ -2557,21 +2147,443 @@ function AdminDashboard() {
                     id: undefined,
                   }),
                 });
-              }
-            }}
-            form={form}
-            setForm={setForm}
-            categories={data.categories}
-            onSave={handleSaveProduct}
-            saving={savingProduct}
-            uploadingImage={uploadingImage}
-            setUploadingImage={setUploadingImage}
-            productImageInputRef={productImageInputRef}
-            manualUrlMode={manualUrlMode}
-            setManualUrlMode={setManualUrlMode}
-            manualUrlInput={manualUrlInput}
-            setManualUrlInput={setManualUrlInput}
-          />
+              }}
+              saving={savingProduct}
+              uploadingImage={uploadingImage}
+              setUploadingImage={setUploadingImage}
+              productImageInputRef={productImageInputRef}
+              manualUrlMode={manualUrlMode}
+              setManualUrlMode={setManualUrlMode}
+              manualUrlInput={manualUrlInput}
+              setManualUrlInput={setManualUrlInput}
+            />
+          </div>
+
+          {/* RIGHT SIDE: PRODUCT CATALOG (CARDS GRID OR ROWS LIST WITH TOOLBAR) */}
+          <div className="min-w-0 space-y-5">
+            {/* Header & Controls Bar */}
+            <div className="flex flex-col gap-4 rounded-3xl border border-border/70 bg-card p-4 sm:p-5 shadow-soft">
+              {/* Top Row: Title, Stats & View Switcher */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-display text-xl sm:text-2xl font-bold text-cocoa">
+                      Bakery Catalog
+                    </h2>
+                    <span className="rounded-full bg-berry/15 text-berry border border-berry/30 px-2.5 py-0.5 text-xs font-bold">
+                      {data.products.length} Bakes
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {activeProducts.length} active in storefront &bull; Click any bake to edit on the left.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {/* View Mode Switcher */}
+                  <div className="flex items-center rounded-2xl border border-border/70 bg-secondary/40 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setInventoryViewMode("grid")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        inventoryViewMode === "grid"
+                          ? "bg-card text-cocoa shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      title="Card Grid View"
+                    >
+                      <LayoutGrid className="size-3.5" />
+                      <span>Cards</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setInventoryViewMode("list")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        inventoryViewMode === "list"
+                          ? "bg-card text-cocoa shadow-xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      title="Compact Row List View"
+                    >
+                      <Sliders className="size-3.5" />
+                      <span>Rows</span>
+                    </button>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    onClick={handleNewProduct}
+                    className="rounded-2xl h-9 px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Plus className="size-3.5" />
+                    <span>New Bake</span>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Category Filter Pills */}
+              <div className="pt-2 border-t border-border/50">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setInventoryCategoryFilter("all")}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                      inventoryCategoryFilter === "all"
+                        ? "bg-cocoa text-background shadow-xs"
+                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    }`}
+                  >
+                    <span>All</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                        inventoryCategoryFilter === "all"
+                          ? "bg-background/20 text-background"
+                          : "bg-background/80 text-foreground"
+                      }`}
+                    >
+                      {data.products.length}
+                    </span>
+                  </button>
+
+                  {data.categories.map((cat) => {
+                    const count = data.products.filter((p) => p.category_id === cat.id).length;
+                    const isActive = inventoryCategoryFilter === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setInventoryCategoryFilter(cat.id)}
+                        className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                          isActive
+                            ? "bg-cocoa text-background shadow-xs"
+                            : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        }`}
+                      >
+                        <span>{cat.name}</span>
+                        <span
+                          className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                            isActive
+                              ? "bg-background/20 text-background"
+                              : "bg-background/80 text-foreground"
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+
+                  {data.products.some((p) => !p.category_id) && (
+                    <button
+                      type="button"
+                      onClick={() => setInventoryCategoryFilter("uncategorized")}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                        inventoryCategoryFilter === "uncategorized"
+                          ? "bg-cocoa text-background shadow-xs"
+                          : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      }`}
+                    >
+                      <span>Uncategorised</span>
+                      <span
+                        className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                          inventoryCategoryFilter === "uncategorized"
+                            ? "bg-background/20 text-background"
+                            : "bg-background/80 text-foreground"
+                        }`}
+                      >
+                        {data.products.filter((p) => !p.category_id).length}
+                      </span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Search, Status & Sorting Controls */}
+              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2.5 border-t border-border/50">
+                <div className="relative min-w-[180px] flex-1 max-w-xs">
+                  <Input
+                    placeholder="Search bakes by name, slug…"
+                    value={inventorySearchQuery}
+                    onChange={(e) => setInventorySearchQuery(e.target.value)}
+                    className="h-8 text-xs pl-7 rounded-xl bg-background"
+                  />
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[11px] pointer-events-none">
+                    🔍
+                  </span>
+                  {inventorySearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setInventorySearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={inventoryStatusFilter}
+                    onChange={(e) => setInventoryStatusFilter(e.target.value)}
+                    className="h-8 rounded-xl border border-input bg-background px-2.5 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                  >
+                    <option value="all">All Statuses ({data.products.length})</option>
+                    <option value="active">🌿 Visible ({activeProducts.length})</option>
+                    <option value="hidden">⏸️ Paused ({data.products.length - activeProducts.length})</option>
+                  </select>
+
+                  <select
+                    value={inventorySortBy}
+                    onChange={(e) => setInventorySortBy(e.target.value)}
+                    className="h-8 rounded-xl border border-input bg-background px-2.5 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                  >
+                    <option value="name_asc">Name: A to Z</option>
+                    <option value="name_desc">Name: Z to A</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="active_first">Visible Items First</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Catalog Display (Cards Grid or Rows List) */}
+            {sortedProducts.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-border p-12 text-center bg-card/50">
+                <p className="text-3xl mb-2">🧁</p>
+                <p className="text-sm font-semibold text-cocoa">
+                  {inventorySearchQuery || inventoryStatusFilter !== "all" || inventoryCategoryFilter !== "all"
+                    ? "No bakery items match your current filter criteria."
+                    : "No products in catalog yet."}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Try clearing your search query or reset your filters.
+                </p>
+                {(inventorySearchQuery || inventoryStatusFilter !== "all" || inventoryCategoryFilter !== "all") && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3.5 rounded-xl text-xs font-semibold cursor-pointer"
+                    onClick={() => {
+                      setInventorySearchQuery("");
+                      setInventoryStatusFilter("all");
+                      setInventoryCategoryFilter("all");
+                    }}
+                  >
+                    Reset All Filters
+                  </Button>
+                )}
+              </div>
+            ) : inventoryViewMode === "grid" ? (
+              /* BENTO CARDS GRID VIEW */
+              inventoryCategoryFilter !== "all" ? (
+                /* Single Category Cards Grid */
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="font-display text-lg font-bold text-cocoa">
+                      {inventoryCategoryFilter === "uncategorized"
+                        ? "Uncategorised Items"
+                        : categoryMap.get(inventoryCategoryFilter) || "Category"}
+                    </h3>
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {sortedProducts.length} {sortedProducts.length === 1 ? "bake" : "bakes"}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                    {sortedProducts.map((product) => (
+                      <ProductAdminCard
+                        key={product.id}
+                        product={product}
+                        categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
+                        onEdit={() => handleEditProduct(product)}
+                        onDuplicate={() => handleDuplicateProduct(product)}
+                        onToggleActive={() => handleToggleActiveProduct(product)}
+                        onDelete={() =>
+                          run(() => removeProductFn({ data: product.id }), "Product deleted")
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Grouped by Category Cards Grid */
+                <div className="space-y-7">
+                  {data.categories.map((cat) => {
+                    const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
+                    if (catProducts.length === 0) return null;
+                    const activeCount = catProducts.filter((p) => p.is_active).length;
+
+                    return (
+                      <div key={cat.id} className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">{cat.name}</h3>
+                            <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                              {catProducts.length} {catProducts.length === 1 ? "bake" : "bakes"}
+                            </span>
+                          </div>
+                          <span className="text-xs text-muted-foreground font-medium">
+                            {activeCount} active
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                          {catProducts.map((product) => (
+                            <ProductAdminCard
+                              key={product.id}
+                              product={product}
+                              categoryName={cat.name}
+                              onEdit={() => handleEditProduct(product)}
+                              onDuplicate={() => handleDuplicateProduct(product)}
+                              onToggleActive={() => handleToggleActiveProduct(product)}
+                              onDelete={() =>
+                                run(() => removeProductFn({ data: product.id }), "Product deleted")
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Uncategorized products */}
+                  {sortedProducts.some((p) => !p.category_id) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">Uncategorised</h3>
+                          <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                            {sortedProducts.filter((p) => !p.category_id).length} bakes
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                        {sortedProducts
+                          .filter((p) => !p.category_id)
+                          .map((product) => (
+                            <ProductAdminCard
+                              key={product.id}
+                              product={product}
+                              onEdit={() => handleEditProduct(product)}
+                              onDuplicate={() => handleDuplicateProduct(product)}
+                              onToggleActive={() => handleToggleActiveProduct(product)}
+                              onDelete={() =>
+                                run(() => removeProductFn({ data: product.id }), "Product deleted")
+                              }
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            ) : (
+              /* COMPACT ROWS LIST VIEW */
+              inventoryCategoryFilter !== "all" ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="font-display text-lg font-bold text-cocoa">
+                      {inventoryCategoryFilter === "uncategorized"
+                        ? "Uncategorised Items"
+                        : categoryMap.get(inventoryCategoryFilter) || "Category"}
+                    </h3>
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {sortedProducts.length} {sortedProducts.length === 1 ? "product" : "products"}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {sortedProducts.map((product) => (
+                      <ProductAdminRow
+                        key={product.id}
+                        product={product}
+                        categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
+                        onEdit={() => handleEditProduct(product)}
+                        onDuplicate={() => handleDuplicateProduct(product)}
+                        onToggleActive={() => handleToggleActiveProduct(product)}
+                        onDelete={() =>
+                          run(() => removeProductFn({ data: product.id }), "Product deleted")
+                        }
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-7">
+                  {data.categories.map((cat) => {
+                    const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
+                    if (catProducts.length === 0) return null;
+                    const activeCount = catProducts.filter((p) => p.is_active).length;
+
+                    return (
+                      <div key={cat.id} className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">{cat.name}</h3>
+                            <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                              {catProducts.length} {catProducts.length === 1 ? "item" : "items"}
+                            </span>
+                          </div>
+                          <span className="text-xs text-muted-foreground font-medium">
+                            {activeCount} active
+                          </span>
+                        </div>
+
+                        <div className="space-y-3">
+                          {catProducts.map((product) => (
+                            <ProductAdminRow
+                              key={product.id}
+                              product={product}
+                              categoryName={cat.name}
+                              onEdit={() => handleEditProduct(product)}
+                              onDuplicate={() => handleDuplicateProduct(product)}
+                              onToggleActive={() => handleToggleActiveProduct(product)}
+                              onDelete={() =>
+                                run(() => removeProductFn({ data: product.id }), "Product deleted")
+                              }
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {sortedProducts.some((p) => !p.category_id) && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">Uncategorised</h3>
+                          <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                            {sortedProducts.filter((p) => !p.category_id).length} items
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        {sortedProducts
+                          .filter((p) => !p.category_id)
+                          .map((product) => (
+                            <ProductAdminRow
+                              key={product.id}
+                              product={product}
+                              onEdit={() => handleEditProduct(product)}
+                              onDuplicate={() => handleDuplicateProduct(product)}
+                              onToggleActive={() => handleToggleActiveProduct(product)}
+                              onDelete={() =>
+                                run(() => removeProductFn({ data: product.id }), "Product deleted")
+                              }
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="shop_layout" className="mt-6 space-y-6">
