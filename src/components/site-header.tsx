@@ -37,7 +37,7 @@ export function SiteHeader() {
   const { user: session } = useAuth();
   const [open, setOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-  const { inHero, bgColor, textColor } = useHeroNavbarTheme();
+  const { inHero, bgColor, textColor, dotColor, btnBg, btnText } = useHeroNavbarTheme();
 
   const isHomePage = location.pathname === "/" || location.pathname === "";
 
@@ -92,7 +92,14 @@ export function SiteHeader() {
           >
             Ani Bakes
           </span>
-          <span className="flex size-2 rounded-full bg-berry animate-pulse" />
+          <span
+            style={
+              isHeroActive && dotColor
+                ? { backgroundColor: dotColor }
+                : undefined
+            }
+            className="flex size-2 rounded-full bg-berry animate-pulse transition-colors duration-700"
+          />
         </Link>
 
         {/* Desktop Navigation with Floating Frosted Glass Pills */}
@@ -218,7 +225,16 @@ export function SiteHeader() {
             <Button
               asChild
               size="sm"
-              className="hidden bg-berry text-berry-foreground hover:bg-berry/90 sm:inline-flex h-8 sm:h-9 px-4 rounded-full text-xs sm:text-sm font-semibold shadow-soft whitespace-nowrap"
+              style={
+                isHeroActive && btnBg
+                  ? {
+                      backgroundColor: btnBg,
+                      color: btnText ?? "#ffffff",
+                      borderColor: "transparent",
+                    }
+                  : undefined
+              }
+              className="hidden bg-berry text-berry-foreground hover:bg-berry/90 sm:inline-flex h-8 sm:h-9 px-4 rounded-full text-xs sm:text-sm font-semibold shadow-soft whitespace-nowrap transition-all duration-700"
             >
               <Link to="/auth" search={{ redirect: undefined }}>Sign in</Link>
             </Button>

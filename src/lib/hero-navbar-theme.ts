@@ -5,6 +5,9 @@ export interface HeroThemeState {
   bgColor: string | null;
   textColor: string | null;
   accentColor: string | null;
+  dotColor: string | null;
+  btnBg: string | null;
+  btnText: string | null;
 }
 
 const getInitialState = (): HeroThemeState => {
@@ -17,6 +20,9 @@ const getInitialState = (): HeroThemeState => {
       bgColor: "#F5C2CD",
       textColor: "#3A1018",
       accentColor: "#9B112D",
+      dotColor: "#C41E3A",
+      btnBg: "#C41E3A",
+      btnText: "#ffffff",
     };
   }
   return {
@@ -24,6 +30,9 @@ const getInitialState = (): HeroThemeState => {
     bgColor: null,
     textColor: null,
     accentColor: null,
+    dotColor: null,
+    btnBg: null,
+    btnText: null,
   };
 };
 
@@ -45,7 +54,10 @@ export function setHeroTheme(newState: Partial<HeroThemeState>) {
     updated.inHero !== currentState.inHero ||
     updated.bgColor !== currentState.bgColor ||
     updated.textColor !== currentState.textColor ||
-    updated.accentColor !== currentState.accentColor
+    updated.accentColor !== currentState.accentColor ||
+    updated.dotColor !== currentState.dotColor ||
+    updated.btnBg !== currentState.btnBg ||
+    updated.btnText !== currentState.btnText
   ) {
     currentState = updated;
     notify();
@@ -59,6 +71,9 @@ export function resetHeroTheme() {
       bgColor: null,
       textColor: null,
       accentColor: null,
+      dotColor: null,
+      btnBg: null,
+      btnText: null,
     };
     notify();
   }

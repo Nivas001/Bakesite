@@ -13,6 +13,8 @@ const FLAVORS = [
     pillBg: "bg-[#E63956]",
     textColor: "text-white",
     borderColor: "border-[#C9203E]",
+    ringClass: "ring-white/95",
+    blendMode: "normal",
     canvasBg: "#F5C2CD",
     word: "DONUTING",
     sizeClass: "text-3xl sm:text-5xl lg:text-[4.85rem] xl:text-[5.75rem]",
@@ -24,6 +26,10 @@ const FLAVORS = [
     depthShadow: "#4E0713",
     ribbonColor: "#FCE7EC",
     ribbonTextColor: "#3A1018",
+    showChocoDrip: false,
+    dotColor: "#C41E3A",
+    btnBg: "#C41E3A",
+    btnText: "#ffffff",
   },
   {
     id: "mango",
@@ -35,6 +41,8 @@ const FLAVORS = [
     pillBg: "bg-[#D97706]",
     textColor: "text-white",
     borderColor: "border-[#B45309]",
+    ringClass: "ring-white/95",
+    blendMode: "normal",
     canvasBg: "#FDE68A",
     word: "CHEESECAKE",
     sizeClass: "text-2xl sm:text-4xl lg:text-[3.6rem] xl:text-[4.35rem]",
@@ -46,6 +54,10 @@ const FLAVORS = [
     depthShadow: "#451A03",
     ribbonColor: "#FFFBEB",
     ribbonTextColor: "#361D04",
+    showChocoDrip: false,
+    dotColor: "#D97706",
+    btnBg: "#B45309",
+    btnText: "#ffffff",
   },
   {
     id: "brownie",
@@ -54,21 +66,41 @@ const FLAVORS = [
     heroImage: "/hero/hero-3d-brownie.jpg",
     image: "/hero/mini-brownie.jpg",
     title: "Artisan Belgian Dark Chocolate Fudge Brownie",
-    pillBg: "bg-[#4A1E0C]",
+    pillBg: "bg-[#5C2D0A]",
     textColor: "text-white",
-    borderColor: "border-[#2D1005]",
-    canvasBg: "#EAD8C7",
+    borderColor: "border-[#3D1A05]",
+    ringClass: "ring-white/95",
+    blendMode: "normal",
+    // Sampled exact amber-gold from the product image background
+    canvasBg: "#D4A040",
     word: "BROWNIE",
     sizeClass: "text-2xl sm:text-4xl lg:text-[4rem] xl:text-[4.85rem]",
     headlineHighlight: "BELGIAN FUDGE BROWNIES",
-    headingText: "#240E05",
-    highlightText: "#6B270A",
-    depthFront: "#5E230B",
-    depthMid: "#3B1506",
-    depthShadow: "#1D0701",
-    ribbonColor: "#F5EBE1",
-    ribbonTextColor: "#240E05",
+    headingText: "#3D1A05",
+    highlightText: "#7A2D08",
+    depthFront: "#7A2E0A",
+    depthMid: "#4A1A05",
+    depthShadow: "#280E02",
+    ribbonColor: "#F5D680",
+    ribbonTextColor: "#3D1A05",
+    showChocoDrip: true,
+    dotColor: "#7A2E0A",
+    btnBg: "#5C2D0A",
+    btnText: "#FFF3E0",
   },
+];
+
+// Fixed drip positions for the BROWNIE text chocolate drip effect
+const CHOCO_DRIPS = [
+  { left: "5%",  height: 16, delay: "0s",    width: 7  },
+  { left: "16%", height: 24, delay: "0.3s",  width: 6  },
+  { left: "27%", height: 14, delay: "0.6s",  width: 8  },
+  { left: "38%", height: 20, delay: "0.15s", width: 6  },
+  { left: "50%", height: 28, delay: "0.45s", width: 7  },
+  { left: "61%", height: 12, delay: "0.7s",  width: 5  },
+  { left: "72%", height: 22, delay: "0.25s", width: 8  },
+  { left: "83%", height: 18, delay: "0.55s", width: 6  },
+  { left: "93%", height: 26, delay: "0.1s",  width: 7  },
 ];
 
 export function HeroRevampSection() {
@@ -82,19 +114,19 @@ export function HeroRevampSection() {
 
     const checkVisibility = () => {
       const rect = el.getBoundingClientRect();
-      // Hero is active in header as long as the hero bottom is below the header (64px) and top is near top
       const isVisible = rect.bottom > 64 && rect.top <= 200;
       setHeroTheme({
         inHero: isVisible,
         bgColor: isVisible ? activeFlavor.canvasBg : null,
         textColor: isVisible ? activeFlavor.headingText : null,
         accentColor: isVisible ? activeFlavor.highlightText : null,
+        dotColor: isVisible ? activeFlavor.dotColor : null,
+        btnBg: isVisible ? activeFlavor.btnBg : null,
+        btnText: isVisible ? activeFlavor.btnText : null,
       });
     };
 
-    // Run check immediately
     checkVisibility();
-
     window.addEventListener("scroll", checkVisibility, { passive: true });
     window.addEventListener("resize", checkVisibility, { passive: true });
 
@@ -119,7 +151,7 @@ export function HeroRevampSection() {
       style={{ backgroundColor: activeFlavor.canvasBg }}
       className="w-full min-h-0 lg:min-h-[calc(100vh-4.5rem)] flex flex-col justify-between text-[#3A1C14] overflow-hidden relative transition-colors duration-700 pt-6 sm:pt-10 lg:pt-14 pb-1 sm:pb-2"
     >
-      {/* Ambient Soft Glows (positioned away from top seam so header and hero background are 100% identical) */}
+      {/* Ambient Soft Glows */}
       <div
         aria-hidden
         className="pointer-events-none absolute top-1/2 -translate-y-1/2 -left-32 size-96 rounded-full bg-white/20 blur-3xl"
@@ -131,8 +163,8 @@ export function HeroRevampSection() {
 
       {/* Main Vertical Hero Container */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-3 sm:gap-5 my-auto text-center">
-        
-        {/* 1. [TOP]: Prominent Bold Blogh Headline (Giant on Desktop, Stacked on Mobile) */}
+
+        {/* 1. [TOP]: Prominent Bold Headline */}
         <div className="w-full max-w-[98vw] mx-auto text-center px-2 sm:px-4 overflow-hidden pt-1 sm:pt-2">
           <h1
             style={{ color: activeFlavor.headingText }}
@@ -150,12 +182,13 @@ export function HeroRevampSection() {
           </h1>
         </div>
 
-        {/* 2. [MIDDLE]: Seamless 3D Pastry Photo with 3D Depth Typography Layered Elegantly */}
-        <div className="relative w-full max-w-3xl flex items-center justify-center min-h-[170px] sm:min-h-[260px] lg:min-h-[380px]">
-          
-          {/* Seamless 3D Floating Pastry (Feathered edge dissolving) */}
+        {/* 2. [MIDDLE]: 3D Pastry + 3D Depth Typography */}
+        {/* Bigger container: max-w-4xl (was 3xl), taller min-h */}
+        <div className="relative w-full max-w-4xl flex items-center justify-center min-h-[200px] sm:min-h-[310px] lg:min-h-[440px]">
+
+          {/* 3D Floating Pastry — bigger: max-w-md → xl → 3xl */}
           <div
-            className="relative z-10 w-full max-w-sm sm:max-w-xl lg:max-w-2xl transition-transform duration-200 ease-out"
+            className="relative z-10 w-full max-w-md sm:max-w-2xl lg:max-w-3xl transition-transform duration-200 ease-out"
             style={{
               transform: `perspective(1000px) rotateX(${-mousePos.y * 10}deg) rotateY(${mousePos.x * 10}deg) scale(1.02)`,
             }}
@@ -167,6 +200,7 @@ export function HeroRevampSection() {
                 alt={activeFlavor.title}
                 className="size-full object-cover transition-all duration-700 pointer-events-none"
                 style={{
+                  mixBlendMode: activeFlavor.blendMode as React.CSSProperties["mixBlendMode"],
                   maskImage: "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
                   WebkitMaskImage: "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
                 }}
@@ -174,7 +208,7 @@ export function HeroRevampSection() {
             </div>
           </div>
 
-          {/* Giant 3D Depth Typography in Blogh font Layered in Bottom-Right Corner */}
+          {/* Giant 3D Depth Typography */}
           <div
             className="absolute bottom-0 sm:bottom-1 lg:bottom-1 right-0 sm:right-2 lg:-right-2 xl:-right-6 z-30 pointer-events-none select-none"
             style={{
@@ -205,15 +239,46 @@ export function HeroRevampSection() {
               >
                 {activeFlavor.word}
               </span>
+
+              {/* 🍫 Chocolate Drip Effect — only for brownie */}
+              {activeFlavor.showChocoDrip && (
+                <div
+                  aria-hidden
+                  className="absolute left-0 right-0 top-full flex items-start"
+                  style={{ marginTop: "-2px" }}
+                >
+                  {CHOCO_DRIPS.map((drip, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        position: "absolute",
+                        left: drip.left,
+                        top: 0,
+                        width: `${drip.width}px`,
+                        height: `${drip.height}px`,
+                        backgroundColor: "#3D1A05",
+                        borderRadius: "0 0 40% 40%",
+                        opacity: 0.88,
+                        animationName: "chocoDripDrop",
+                        animationDuration: "2.4s",
+                        animationDelay: drip.delay,
+                        animationTimingFunction: "ease-in-out",
+                        animationIterationCount: "infinite",
+                        animationDirection: "alternate",
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
         </div>
 
-        {/* 3. [BOTTOM]: 3 Flavor Pill Buttons in a Streamlined Row */}
+        {/* 3. [BOTTOM]: Flavor Pill Buttons */}
         <div className="w-full flex items-center justify-center pt-1">
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 w-full">
-            {FLAVORS.map((flavor, index) => {
+            {FLAVORS.map((flavor) => {
               const isSelected = activeFlavor.id === flavor.id;
               return (
                 <button
@@ -222,7 +287,7 @@ export function HeroRevampSection() {
                   onClick={() => setActiveFlavor(flavor)}
                   className={`group relative flex items-center rounded-full ${flavor.pillBg} ${flavor.textColor} p-1 pr-3 sm:p-1.5 sm:pr-4 shadow-md border ${flavor.borderColor} transition-all duration-300 hover:scale-[1.04] active:scale-98 cursor-pointer ${
                     isSelected
-                      ? "ring-3 sm:ring-4 ring-white/95 shadow-lg scale-[1.04] z-20"
+                      ? `ring-3 sm:ring-4 ${flavor.ringClass} shadow-lg scale-[1.04] z-20`
                       : "opacity-85 hover:opacity-100"
                   }`}
                 >
