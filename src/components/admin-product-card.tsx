@@ -10,6 +10,7 @@ export function ProductAdminCard({
   onDelete,
   onDuplicate,
   onToggleActive,
+  isBeingEdited = false,
 }: {
   product: {
     id: string;
@@ -30,6 +31,7 @@ export function ProductAdminCard({
   onDelete: () => void;
   onDuplicate?: () => void;
   onToggleActive?: () => void;
+  isBeingEdited?: boolean;
 }) {
   const price = Number(product.price);
   const discountType = product.discount_type;
@@ -54,11 +56,21 @@ export function ProductAdminCard({
   return (
     <div
       className={`group relative flex flex-col justify-between rounded-3xl border bg-card p-3.5 sm:p-4 shadow-soft hover:shadow-lift transition-all ${
-        product.is_active
+        isBeingEdited
+          ? "border-berry shadow-lift ring-2 ring-berry/40 ring-offset-1"
+          : product.is_active
           ? "border-border/70 hover:border-berry/40"
           : "border-dashed border-border/60 opacity-85 hover:opacity-100 bg-muted/20"
       }`}
     >
+      {/* Editing indicator banner */}
+      {isBeingEdited && (
+        <div className="absolute -top-2.5 left-3 right-3 flex items-center justify-center z-10">
+          <span className="rounded-full bg-berry text-berry-foreground px-3 py-0.5 text-[10px] font-bold shadow-sm flex items-center gap-1">
+            ✏️ Currently Editing
+          </span>
+        </div>
+      )}
       {/* Top Image Box */}
       <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-secondary border border-border/50 shadow-2xs">
         {product.image_url ? (

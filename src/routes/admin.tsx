@@ -46,7 +46,6 @@ import { AdminNewsletter } from "@/components/admin-newsletter";
 import { AdminCustomerMoments } from "@/components/admin-customer-moments";
 import { AdminSiteContentEditor } from "@/components/admin-site-content-editor";
 import {
-  ProductEditorDialog,
   type ProductForm,
   EMPTY_FORM,
 } from "@/components/admin-product-editor-dialog";
@@ -771,9 +770,9 @@ function AdminDashboard() {
   };
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [manualUrlInput, setManualUrlInput] = useState<string>("");
-  const [productModalOpen, setProductModalOpen] = useState<boolean>(false);
   const [savingProduct, setSavingProduct] = useState<boolean>(false);
   const [inventoryViewMode, setInventoryViewMode] = useState<"grid" | "list">("grid");
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
 
   // Product & offer forms
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
@@ -968,7 +967,7 @@ function AdminDashboard() {
     if (search.tab === "inventory" || search.tab === "products") {
       if (search.action === "new") {
         setForm(EMPTY_FORM);
-        setProductModalOpen(true);
+        setEditingProductId(null);
       } else if (search.action === "edit" && search.id && data?.products) {
         const prod = data.products.find((p) => p.id === search.id);
         if (prod) {
@@ -997,24 +996,18 @@ function AdminDashboard() {
     }, 50);
   };
 
-  const handleEditProduct = (product: any, updateUrl = true) => {
+  const handleEditProduct = (product: any, _updateUrl = true) => {
+    const imagesList = (product as any).images && Array.isArray((product as any).images) ? (product as any).images : [];
     const isCake =
       product.name.toLowerCase().includes("cake") ||
       product.name.toLowerCase().includes("cheesecake");
     const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
     const variants =
-      (product as any).weight_variants && (product as any).weight_variants.length > 0
+      (product as any).weight_variants && Array.isArray((product as any).weight_variants) && (product as any).weight_variants.length > 0
         ? (product as any).weight_variants
         : itemType === "weight"
           ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
           : [];
-    const imagesList =
-      (product as any).images && Array.isArray((product as any).images) && (product as any).images.length > 0
-        ? (product as any).images
-        : product.image_url
-          ? [product.image_url]
-          : [];
-
     setForm({
       id: product.id,
       name: product.name,
@@ -1025,7 +1018,7 @@ function AdminDashboard() {
       discount_value: String(product.discount_value),
       image_url: product.image_url ?? (imagesList[0] || ""),
       images: imagesList,
-      stock: "100",
+      stock: String(product.stock ?? "100"),
       is_active: product.is_active,
       category_id: product.category_id ?? "",
       item_type: itemType,
@@ -1033,23 +1026,16 @@ function AdminDashboard() {
       serving_yield: (product as any).serving_yield || "",
       weight_variants: variants,
     });
-    if (updateUrl) {
-      navigate({
-        search: (prev: any) => ({
-          ...prev,
-          tab: "inventory",
-          action: "edit",
-          id: product.id,
-        }),
-      });
-    }
-    setTimeout(() => {
-      const sideName = document.getElementById("side-name");
-      if (sideName) {
-        sideName.scrollIntoView({ behavior: "smooth", block: "center" });
-        sideName.focus();
-      }
-    }, 50);
+    setEditingProductId(product.id);
+    navigate({
+      search: (prev: any) => ({
+        ...prev,
+        tab: "inventory",
+        action: "edit",
+        id: product.id,
+      }),
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDuplicateProduct = (product: any) => {
@@ -1088,7 +1074,7 @@ function AdminDashboard() {
       serving_yield: (product as any).serving_yield || "",
       weight_variants: variants,
     });
-    setProductModalOpen(true);
+    setEditingProductId(null);
     toast.info(`Cloned "${product.name}". Adjust details and save.`);
     navigate({
       search: (prev: any) => ({
@@ -1217,7 +1203,8 @@ function AdminDashboard() {
                 : null,
           },
         });
-        setProductModalOpen(false);
+        // Auto-clear form to "new bake" state after saving
+        setEditingProductId(null);
         setForm(EMPTY_FORM);
         if (productImageInputRef.current) productImageInputRef.current.value = "";
         navigate({
@@ -1228,7 +1215,7 @@ function AdminDashboard() {
             id: undefined,
           }),
         });
-      }, form.id ? "Product updated" : "Product created");
+      }, form.id ? "✅ Product updated!" : "🧁 New bake added to catalog!");
     } finally {
       setSavingProduct(false);
     }
@@ -1475,8 +1462,12 @@ function AdminDashboard() {
               size="sm"
               onClick={() => {
                 setForm(EMPTY_FORM);
+                setEditingProductId(null);
                 setActiveTab("inventory");
-                window.scrollTo({ top: 120, behavior: "smooth" });
+                setTimeout(() => {
+                  const el = document.getElementById("side-name");
+                  if (el) { el.focus(); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+                }, 120);
               }}
               className="rounded-2xl h-9 px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
             >
@@ -1880,6 +1871,53 @@ function AdminDashboard() {
             </div>
           </div>
 
+          {/* Orders Summary Stats Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              {
+                label: "Pending Review",
+                value: data.orders.filter(o => o.status === "pending_approval").length,
+                color: "bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-400",
+                icon: "🛎️",
+                filter: "pending_approval",
+              },
+              {
+                label: "Confirmed",
+                value: data.orders.filter(o => o.status === "confirmed").length,
+                color: "bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400",
+                icon: "✅",
+                filter: "confirmed",
+              },
+              {
+                label: "Today's Orders",
+                value: todayOrders.length,
+                color: "bg-purple-500/15 border-purple-500/30 text-purple-700 dark:text-purple-400",
+                icon: "📅",
+                filter: "all",
+              },
+              {
+                label: "Revenue (Confirmed)",
+                value: formatCurrency(data.orders.filter(o => o.status === "confirmed" || o.status === "completed").reduce((s, o) => s + Number(o.total || 0), 0)),
+                color: "bg-blue-500/15 border-blue-500/30 text-blue-700 dark:text-blue-400",
+                icon: "💰",
+                filter: "all",
+              },
+            ].map((stat) => (
+              <button
+                key={stat.label}
+                type="button"
+                onClick={() => setOrderStatusFilter(stat.filter)}
+                className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-all hover:shadow-lift cursor-pointer ${stat.color} ${orderStatusFilter === stat.filter && stat.filter !== "all" ? "shadow-soft ring-2 ring-current ring-offset-1" : ""}`}
+              >
+                <span className="text-xl">{stat.icon}</span>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider opacity-80">{stat.label}</p>
+                  <p className="font-display text-lg font-extrabold">{stat.value}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+
           {/* Orders Cards Grid */}
           {sortedOrders.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-border p-12 text-center">
@@ -2129,7 +2167,7 @@ function AdminDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value="inventory" className="mt-6 grid gap-6 lg:grid-cols-[380px_1fr] xl:grid-cols-[420px_1fr] items-start">
+        <TabsContent value="inventory" className="mt-6 grid gap-6 lg:grid-cols-[400px_1fr] xl:grid-cols-[440px_1fr] items-start">
           {/* LEFT SIDE: PRODUCT CREATION & EDIT FORM */}
           <div className="w-full">
             <AdminProductForm
@@ -2138,6 +2176,7 @@ function AdminDashboard() {
               categories={data.categories}
               onSave={handleSaveProduct}
               onCancel={() => {
+                setEditingProductId(null);
                 setForm(EMPTY_FORM);
                 navigate({
                   search: (prev: any) => ({
@@ -2397,6 +2436,7 @@ function AdminDashboard() {
                         key={product.id}
                         product={product}
                         categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
+                        isBeingEdited={editingProductId === product.id}
                         onEdit={() => handleEditProduct(product)}
                         onDuplicate={() => handleDuplicateProduct(product)}
                         onToggleActive={() => handleToggleActiveProduct(product)}
@@ -2435,6 +2475,7 @@ function AdminDashboard() {
                               key={product.id}
                               product={product}
                               categoryName={cat.name}
+                              isBeingEdited={editingProductId === product.id}
                               onEdit={() => handleEditProduct(product)}
                               onDuplicate={() => handleDuplicateProduct(product)}
                               onToggleActive={() => handleToggleActiveProduct(product)}
@@ -2467,6 +2508,7 @@ function AdminDashboard() {
                             <ProductAdminCard
                               key={product.id}
                               product={product}
+                              isBeingEdited={editingProductId === product.id}
                               onEdit={() => handleEditProduct(product)}
                               onDuplicate={() => handleDuplicateProduct(product)}
                               onToggleActive={() => handleToggleActiveProduct(product)}
@@ -2594,20 +2636,41 @@ function AdminDashboard() {
           />
         </TabsContent>
 
-        <TabsContent value="calendar" className="mt-6 max-w-xl space-y-4">
-          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-            <h2 className="font-display text-xl font-semibold">Close a date</h2>
-            <div className="mt-3 grid gap-3 sm:grid-cols-[160px_1fr_auto] sm:items-end">
+        <TabsContent value="calendar" className="mt-6 space-y-5">
+          {/* Add Closed Date Card */}
+          <div className="rounded-3xl border border-border/70 bg-card p-5 sm:p-6 shadow-soft">
+            <div className="flex items-center gap-2.5 mb-4">
+              <span className="flex size-9 items-center justify-center rounded-2xl bg-berry/10 text-berry text-lg">📅</span>
               <div>
-                <Label htmlFor="b-date">Date</Label>
-                <Input id="b-date" type="date" value={blackoutDate} onChange={(e) => setBlackoutDate(e.target.value)} />
+                <h2 className="font-display text-xl font-bold text-cocoa">Close a Baking Date</h2>
+                <p className="text-xs text-muted-foreground">Mark a date as fully closed — no new orders will be accepted for that slot.</p>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-[180px_1fr_auto] sm:items-end">
+              <div>
+                <Label htmlFor="b-date" className="text-xs font-semibold">Date to Close</Label>
+                <Input
+                  id="b-date"
+                  type="date"
+                  value={blackoutDate}
+                  min={new Date().toISOString().slice(0, 10)}
+                  onChange={(e) => setBlackoutDate(e.target.value)}
+                  className="rounded-xl h-10 text-sm mt-1"
+                />
               </div>
               <div>
-                <Label htmlFor="b-reason">Reason</Label>
-                <Input id="b-reason" value={blackoutReason} onChange={(e) => setBlackoutReason(e.target.value)} />
+                <Label htmlFor="b-reason" className="text-xs font-semibold">Reason (optional)</Label>
+                <Input
+                  id="b-reason"
+                  placeholder="e.g. Public holiday, family event…"
+                  value={blackoutReason}
+                  onChange={(e) => setBlackoutReason(e.target.value)}
+                  className="rounded-xl h-10 text-sm mt-1"
+                />
               </div>
               <Button
-                className="bg-berry text-berry-foreground hover:bg-berry/90"
+                disabled={!blackoutDate}
+                className="bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-10 font-bold text-sm cursor-pointer shadow-soft"
                 onClick={() =>
                   run(async () => {
                     await addBlackoutFn({
@@ -2615,32 +2678,90 @@ function AdminDashboard() {
                     });
                     setBlackoutDate("");
                     setBlackoutReason("");
-                  }, "Date closed")
+                  }, "📅 Date closed successfully")
                 }
               >
-                Add
+                Close Date
               </Button>
             </div>
           </div>
 
-          {data.blackouts.map((blackout) => (
-            <div
-              key={blackout.id}
-              className="flex items-center justify-between rounded-2xl border border-border/70 bg-card p-4"
-            >
-              <p className="text-sm">
-                {blackout.blackout_date}
-                {blackout.reason ? ` — ${blackout.reason}` : ""}
-              </p>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => run(() => removeBlackoutFn({ data: blackout.id }), "Date reopened")}
-              >
-                Remove
-              </Button>
+          {/* Blocked Dates List */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="font-display text-base font-bold text-cocoa">Blocked Dates</h3>
+              <span className="rounded-full bg-destructive/10 border border-destructive/20 px-2.5 py-0.5 text-xs font-bold text-destructive">
+                {data.blackouts.length} closed
+              </span>
             </div>
-          ))}
+
+            {data.blackouts.length === 0 && (
+              <div className="rounded-3xl border border-dashed border-border/80 bg-card/50 p-8 text-center">
+                <p className="text-3xl mb-2">🟢</p>
+                <p className="text-sm font-semibold text-cocoa">All Dates Open</p>
+                <p className="text-xs text-muted-foreground mt-1">No baking dates are currently blocked. Add a date above to close it.</p>
+              </div>
+            )}
+
+            {[...data.blackouts].sort((a, b) => a.blackout_date.localeCompare(b.blackout_date)).map((blackout) => {
+              const dateObj = new Date(blackout.blackout_date + "T00:00:00");
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              const diffDays = Math.round((dateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+              const isPast = diffDays < 0;
+              const relLabel = isPast
+                ? `${Math.abs(diffDays)} days ago`
+                : diffDays === 0
+                ? "Today"
+                : diffDays === 1
+                ? "Tomorrow"
+                : `In ${diffDays} days`;
+              const formattedDate = dateObj.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+              return (
+                <div
+                  key={blackout.id}
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border p-4 shadow-2xs transition-all ${
+                    isPast
+                      ? "border-border/40 bg-muted/20 opacity-70"
+                      : "border-destructive/25 bg-destructive/5 hover:border-destructive/40"
+                  }`}
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className={`flex size-9 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${
+                      isPast ? "bg-muted text-muted-foreground" : "bg-destructive/15 text-destructive"
+                    }`}>
+                      🔒
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-foreground">{formattedDate}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          isPast
+                            ? "bg-muted text-muted-foreground"
+                            : diffDays === 0
+                            ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                            : "bg-destructive/15 text-destructive"
+                        }`}>{relLabel}</span>
+                        {blackout.reason && (
+                          <span className="text-xs text-muted-foreground italic">— {blackout.reason}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-xl h-8 text-xs font-semibold text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10 cursor-pointer shrink-0"
+                    onClick={() => run(() => removeBlackoutFn({ data: blackout.id }), "📅 Date reopened")}
+                  >
+                    🔓 Reopen Date
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
         </TabsContent>
 
         <TabsContent value="newsletter" className="mt-6">
@@ -2658,55 +2779,96 @@ function AdminDashboard() {
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-6 space-y-6">
+          {/* KPI Cards */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: "Total orders", value: String(data.stats.totalOrders) },
-              { label: "Orders (30 days)", value: String(data.stats.ordersLast30Days) },
-              { label: "Paid revenue", value: formatCurrency(data.stats.revenue) },
-              { label: "Average order", value: formatCurrency(data.stats.averageOrder) },
+              { label: "Total Orders", value: String(data.stats.totalOrders), icon: "📦", color: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/25" },
+              { label: "Last 30 Days", value: String(data.stats.ordersLast30Days), icon: "📈", color: "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/25" },
+              { label: "Paid Revenue", value: formatCurrency(data.stats.revenue), icon: "💰", color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/25" },
+              { label: "Avg Order Value", value: formatCurrency(data.stats.averageOrder), icon: "🎯", color: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/25" },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-                <p className="mt-1 font-display text-2xl font-bold text-cocoa">{stat.value}</p>
+              <div key={stat.label} className={`rounded-3xl border p-5 shadow-soft flex items-center gap-3.5 ${stat.color}`}>
+                <span className="text-2xl">{stat.icon}</span>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">{stat.label}</p>
+                  <p className="font-display text-2xl font-bold mt-0.5">{stat.value}</p>
+                </div>
               </div>
             ))}
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
+            {/* Orders by Status */}
             <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-              <h2 className="font-display text-xl font-semibold">Orders by status</h2>
-              <ul className="mt-3 space-y-2 text-sm">
-                {Object.entries(data.stats.byStatus).map(([status, count]) => (
-                  <li key={status} className="flex items-center justify-between">
-                    <span>{STATUS_LABELS[status] ?? status}</span>
-                    <span className="font-semibold">{count}</span>
-                  </li>
-                ))}
-              </ul>
+              <h2 className="font-display text-lg font-bold text-cocoa mb-4">Orders by Status</h2>
+              <div className="space-y-2.5">
+                {Object.entries(data.stats.byStatus).map(([status, count]) => {
+                  const total = data.stats.totalOrders || 1;
+                  const pct = Math.round((Number(count) / total) * 100);
+                  const barColors: Record<string, string> = {
+                    pending_approval: "bg-amber-500",
+                    confirmed: "bg-emerald-500",
+                    completed: "bg-blue-500",
+                    rejected: "bg-destructive",
+                    rescheduled: "bg-purple-500",
+                    awaiting_payment: "bg-orange-500",
+                  };
+                  return (
+                    <div key={status} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-foreground">{STATUS_LABELS[status] ?? status}</span>
+                        <span className="font-bold text-muted-foreground">{count} ({pct}%)</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${barColors[status] ?? "bg-cocoa"}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
+            {/* Best Sellers */}
             <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-              <h2 className="font-display text-xl font-semibold">Best sellers</h2>
-              <ul className="mt-3 space-y-2 text-sm">
-                {data.stats.topProducts.length === 0 && (
-                  <li className="text-muted-foreground">No sales yet.</li>
-                )}
-                {data.stats.topProducts.map((product) => (
-                  <li key={product.name} className="flex items-center justify-between">
-                    <span>{product.name}</span>
-                    <span className="font-semibold">
-                      {product.quantity} · {formatCurrency(product.revenue)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <h2 className="font-display text-lg font-bold text-cocoa mb-4">🏆 Top Selling Bakes</h2>
+              {data.stats.topProducts.length === 0 ? (
+                <div className="py-8 text-center">
+                  <p className="text-2xl mb-1">🧁</p>
+                  <p className="text-sm text-muted-foreground">No sales data yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {data.stats.topProducts.slice(0, 6).map((product, idx) => {
+                    const maxQty = data.stats.topProducts[0]?.quantity || 1;
+                    const pct = Math.round((product.quantity / maxQty) * 100);
+                    const medals = ["🥇", "🥈", "🥉"];
+                    return (
+                      <div key={product.name} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-foreground flex items-center gap-1.5">
+                            {medals[idx] ?? <span className="w-4 text-center font-mono text-muted-foreground">{idx + 1}</span>}
+                            <span className="truncate max-w-[160px]">{product.name}</span>
+                          </span>
+                          <span className="font-bold text-cocoa shrink-0">{product.quantity} pcs · {formatCurrency(product.revenue)}</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                          <div className="h-full rounded-full bg-berry transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            Heatmaps and session recordings run through Microsoft Clarity. Add your Clarity project id
-            as <code>VITE_CLARITY_PROJECT_ID</code> and the tracking tag loads on every page.
-          </p>
+          <div className="rounded-3xl border border-border/70 bg-card/50 p-4 text-xs text-muted-foreground flex items-start gap-2.5">
+            <span className="text-base">📊</span>
+            <p>Heatmaps and session recordings run through Microsoft Clarity. Add your Clarity project ID as <code className="font-mono bg-secondary px-1 rounded">VITE_CLARITY_PROJECT_ID</code> and the tracking tag loads on every page automatically.</p>
+          </div>
         </TabsContent>
 
         <TabsContent value="offers" className="mt-6 grid gap-8 lg:grid-cols-[380px_1fr]">
@@ -2908,9 +3070,14 @@ function AdminDashboard() {
           <div className="space-y-3">
             <div className="flex items-center justify-between px-1">
               <h3 className="font-display text-lg font-bold text-cocoa">All Promo Codes</h3>
-              <span className="text-xs font-semibold text-muted-foreground">
-                {offerCodes?.length || 0} total
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-secondary border border-border/60 px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
+                  {offerCodes?.length || 0} total
+                </span>
+                <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                  {offerCodes?.filter(o => o.is_active && new Date(o.expires_at).getTime() > Date.now()).length || 0} active
+                </span>
+              </div>
             </div>
 
             {(!offerCodes || offerCodes.length === 0) && (
@@ -2983,20 +3150,39 @@ function AdminDashboard() {
                       {offer.min_order_amount > 0 ? ` · Min order ₹${offer.min_order_amount}` : ""}
                     </p>
 
-                    <p className="text-[11px] text-muted-foreground">
-                      Expires: {new Date(offer.expires_at).toLocaleString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                      {offer.description ? ` · ${offer.description}` : ""}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      {/* Expiry countdown badge */}
+                      {(() => {
+                        const expiresMs = new Date(offer.expires_at).getTime();
+                        const nowMs = Date.now();
+                        const diffMs = expiresMs - nowMs;
+                        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                        if (diffMs <= 0) return <span className="text-[10px] font-bold bg-destructive/15 text-destructive px-2 py-0.5 rounded-full border border-destructive/30">Expired</span>;
+                        if (diffDays <= 3) return <span className="text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 animate-pulse">⚠️ Expires in {diffDays}d</span>;
+                        if (diffDays <= 7) return <span className="text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20">Expires in {diffDays}d</span>;
+                        return <span className="text-[10px] text-muted-foreground">Expires {new Date(offer.expires_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>;
+                      })()}
+                      {offer.description && (
+                        <span className="text-[10px] text-muted-foreground italic">{offer.description}</span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Actions Bar */}
                   <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2 sm:border-t-0 sm:pt-0 shrink-0">
+                    {/* Copy Code Button */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      title="Copy promo code to clipboard"
+                      className="h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer hover:border-berry/40 hover:bg-berry/5"
+                      onClick={() => {
+                        navigator.clipboard.writeText(offer.code);
+                        toast.success(`Copied "${offer.code}" to clipboard!`);
+                      }}
+                    >
+                      📋 Copy Code
+                    </Button>
                     {/* Toggle Visibility Button */}
                     <Button
                       size="sm"
@@ -3247,6 +3433,19 @@ function AdminDashboard() {
                     })
                   : formattedCreated;
 
+                // Cross-reference lifetime spend from orders
+                const userOrders = data.orders.filter(
+                  (o) =>
+                    (o as any).user_id === user.id ||
+                    (o.contact_phone && user.phone && o.contact_phone === user.phone)
+                );
+                const lifetimeSpend = userOrders
+                  .filter(o => o.status === "confirmed" || o.status === "completed")
+                  .reduce((s, o) => s + Number(o.total || 0), 0);
+                const lastOrderDate = userOrders.length > 0
+                  ? userOrders.sort((a, b) => new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime())[0]?.slot_date
+                  : null;
+
                 return (
                   <div
                     key={user.id}
@@ -3296,32 +3495,37 @@ function AdminDashboard() {
                       </div>
                     </div>
 
-                    {/* Registration & Last Login Times */}
-                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-6 border-t border-border/40 pt-3 lg:border-t-0 lg:pt-0 shrink-0 text-xs">
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Registered On
-                        </p>
-                        <p className="font-medium text-cocoa/90">{formattedCreated}</p>
-                      </div>
+                    {/* Registration, Login & Spend Info */}
+                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 border-t border-border/40 pt-3 lg:border-t-0 lg:pt-0 shrink-0 text-xs">
+                      {lifetimeSpend > 0 && (
+                        <div className="space-y-0.5">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-berry">Lifetime Spend</p>
+                          <p className="font-display text-base font-bold text-cocoa">{formatCurrency(lifetimeSpend)}</p>
+                        </div>
+                      )}
+
+                      {lastOrderDate && (
+                        <div className="space-y-0.5">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Last Order</p>
+                          <p className="font-medium text-foreground">{lastOrderDate}</p>
+                        </div>
+                      )}
 
                       <div className="space-y-0.5">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Last Logged In
-                        </p>
-                        <p className="font-medium text-berry">{formattedAccessed}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Registered</p>
+                        <p className="font-medium text-cocoa/90">{formattedCreated}</p>
                       </div>
 
                       <Button
                         size="sm"
                         variant="outline"
-                        className="rounded-xl text-xs h-8"
+                        className="rounded-xl text-xs h-8 cursor-pointer"
                         onClick={() => {
                           navigator.clipboard.writeText(user.email);
-                          toast.success(`Copied ${user.email} to clipboard!`);
+                          toast.success(`Copied ${user.email}!`);
                         }}
                       >
-                        Copy Email
+                        📋 Copy Email
                       </Button>
                     </div>
                   </div>
