@@ -27,6 +27,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Cake3dModelViewer } from "@/components/cake-3d-model-viewer";
 import { DeliverySecurityShowcase } from "@/components/delivery-security-showcase";
+import { useSiteContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -244,6 +245,7 @@ const STORY_CHAPTERS = [
 ];
 
 export function AboutUsPage() {
+  const { content: siteContent } = useSiteContent();
   const [activeMuffinHotspot, setActiveMuffinHotspot] = useState<number>(1);
   const [activeAngle, setActiveAngle] = useState<CakeAngle>("front");
   const [activeDietFilter, setActiveDietFilter] = useState("all");
@@ -484,7 +486,7 @@ export function AboutUsPage() {
             <div className="flex items-center gap-2.5">
               <span className="flex size-3 rounded-full bg-amber-400 animate-ping" />
               <span className="font-nimbus text-lg sm:text-xl text-amber-300 uppercase tracking-wide">
-                Interactive 3D Cake Atelier
+                {siteContent.about_3d.title || "Interactive 3D Cake Atelier"}
               </span>
               <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/10 text-amber-200 border border-white/15 text-[11px] font-mono font-bold">
                 <Compass className="size-3 text-amber-400" />

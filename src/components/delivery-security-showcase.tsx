@@ -12,6 +12,7 @@ import {
   Truck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSiteContent } from "@/lib/site-content";
 
 export interface PackagingSlide {
   id: string;
@@ -94,6 +95,7 @@ const SECURITY_PILLARS = [
 ];
 
 export function DeliverySecurityShowcase() {
+  const { content: siteContent } = useSiteContent();
   const [currentSlide, setCurrentSlide] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
@@ -135,13 +137,13 @@ export function DeliverySecurityShowcase() {
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-sky-500/15 border border-sky-500/30 px-3.5 py-1 text-[10.5px] sm:text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300">
             <ShieldCheck className="size-3.5 text-sky-600" />
-            <span>Safe & Damage-Proof Courier Shield</span>
+            <span>{siteContent.about_delivery.badge || "Safe & Damage-Proof Courier Shield"}</span>
           </div>
           <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide">
-            How we deliver your bakes 100% safe & intact
+            {siteContent.about_delivery.title || "How we deliver your bakes 100% safe & intact"}
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Delicate croissants, moist multi-layer cakes, and artisanal brownie slabs require precision engineering to travel from our dawn hearth to your celebration table.
+            {siteContent.about_delivery.description || "Delicate croissants, moist multi-layer cakes, and artisanal brownie slabs require precision engineering to travel from our dawn hearth to your celebration table."}
           </p>
         </div>
 

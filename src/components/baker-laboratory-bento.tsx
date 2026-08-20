@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Sparkles, Clock, ShieldCheck, Flame, Lock, Unlock, Copy, Check, Thermometer, Wind, Droplets } from "lucide-react";
 import { toast } from "sonner";
+import { useSiteContent } from "@/lib/site-content";
 
 interface FermentStage {
   stage: string;
@@ -74,6 +75,7 @@ const INGREDIENTS = [
 ];
 
 export function BakerLaboratoryBento() {
+  const { content: siteContent } = useSiteContent();
   const [activeStage, setActiveStage] = useState(2); // 36-hour cold proof active by default
   const [selectedIngredient, setSelectedIngredient] = useState<number | null>(null);
   const [vaultUnlocked, setVaultUnlocked] = useState(false);
@@ -103,14 +105,14 @@ export function BakerLaboratoryBento() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
           <div>
             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry block mb-1">
-              Pure Craft & Cold Fermentation
+              {siteContent.home_lab.badge || "Pure Craft & Cold Fermentation"}
             </span>
             <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide">
-              The artisan bakery laboratory
+              {siteContent.home_lab.title || "The artisan bakery laboratory"}
             </h2>
           </div>
           <p className="max-w-md text-xs sm:text-sm text-muted-foreground">
-            No shortcuts, zero chemical improvers. Just wild fermentation, stone-ground flour, and real French butter.
+            {siteContent.home_lab.description || "No shortcuts, zero chemical improvers. Just wild fermentation, stone-ground flour, and real French butter."}
           </p>
         </div>
 

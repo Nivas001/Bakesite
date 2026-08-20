@@ -44,6 +44,7 @@ import {
 import { DevPanel } from "@/components/dev-panel";
 import { AdminNewsletter } from "@/components/admin-newsletter";
 import { AdminCustomerMoments } from "@/components/admin-customer-moments";
+import { AdminSiteContentEditor } from "@/components/admin-site-content-editor";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -83,6 +84,7 @@ import {
   Pin,
   PinOff,
   ImageIcon,
+  FileText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -1071,6 +1073,13 @@ function AdminDashboard() {
           badgeColor: "bg-secondary text-muted-foreground",
         },
         { id: "analytics", label: "Analytics", icon: BarChart3, badge: null },
+        {
+          id: "content_editor",
+          label: "Page Text & Copy",
+          icon: FileText,
+          badge: "Editor",
+          badgeColor: "bg-berry/15 text-berry font-bold",
+        },
       ],
     },
   ];
@@ -1215,6 +1224,7 @@ function AdminDashboard() {
                   {activeTab === "newsletter" && "Newsletter Subscribers"}
                   {activeTab === "reviews" && "Customer Reviews & Community"}
                   {activeTab === "analytics" && "Bakery Analytics & Reports"}
+                  {activeTab === "content_editor" && "Page Text & Copywriting Studio"}
                 </h1>
                 <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
                   <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -3513,6 +3523,10 @@ function AdminDashboard() {
 
         <TabsContent value="reviews" className="mt-0">
           <AdminCustomerMoments />
+        </TabsContent>
+
+        <TabsContent value="content_editor" className="mt-0">
+          <AdminSiteContentEditor />
         </TabsContent>
       </Tabs>
       </main>
