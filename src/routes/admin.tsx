@@ -1128,22 +1128,59 @@ function AdminDashboard() {
       toast.error("Please wait for the photo upload to complete.");
       return;
     }
-    if (form.image_url && form.image_url.startsWith("data:")) {
-      toast.error("Image is still processing. Please wait or re-upload.");
-      return;
-    }
-
-    const finalImages =
-      form.images && form.images.length > 0
-        ? form.images
-        : form.image_url
-          ? [form.image_url]
-          : [];
-    const primaryCover = form.image_url || (finalImages[0] ?? null);
 
     setSavingProduct(true);
     try {
       await run(async () => {
+        let primaryCover = form.image_url;
+        let finalImages =
+          form.images && form.images.length > 0
+            ? [...form.images]
+            : primaryCover
+              ? [primaryCover]
+              : [];
+
+        // Auto-upload any remaining data URI images to Appwrite Storage
+        for (let i = 0; i < finalImages.length; i++) {
+          const img = finalImages[i];
+          if (img && img.startsWith("data:")) {
+            const commaIdx = img.indexOf(",");
+            const base64 = commaIdx !== -1 ? img.slice(commaIdx + 1) : img;
+            const matchMime = img.match(/^data:([^;]+);/);
+            const mimeType = matchMime ? matchMime[1]! : "image/jpeg";
+            const res = await uploadImageFn({
+              data: {
+                filename: `product-${form.slug || "image"}-${i + 1}.jpg`,
+                base64,
+                mimeType,
+              },
+            });
+            if (res?.imageUrl) {
+              finalImages[i] = res.imageUrl;
+              if (primaryCover === img) {
+                primaryCover = res.imageUrl;
+              }
+            }
+          }
+        }
+
+        if (primaryCover && primaryCover.startsWith("data:")) {
+          const commaIdx = primaryCover.indexOf(",");
+          const base64 = commaIdx !== -1 ? primaryCover.slice(commaIdx + 1) : primaryCover;
+          const matchMime = primaryCover.match(/^data:([^;]+);/);
+          const mimeType = matchMime ? matchMime[1]! : "image/jpeg";
+          const res = await uploadImageFn({
+            data: {
+              filename: `product-${form.slug || "cover"}.jpg`,
+              base64,
+              mimeType,
+            },
+          });
+          if (res?.imageUrl) {
+            primaryCover = res.imageUrl;
+          }
+        }
+
         await persistProduct({
           data: {
             ...(form.id ? { id: form.id } : {}),
@@ -1153,7 +1190,7 @@ function AdminDashboard() {
             price: Math.max(0, Number(form.price) || 0),
             discount_type: form.discount_type,
             discount_value: Math.max(0, Number(form.discount_value) || 0),
-            image_url: primaryCover,
+            image_url: primaryCover || (finalImages[0] ?? null),
             images: finalImages.length > 0 ? finalImages : null,
             stock: Math.max(0, Math.floor(Number(form.stock) || 0)),
             is_active: form.is_active,

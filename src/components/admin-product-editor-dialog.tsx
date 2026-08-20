@@ -27,6 +27,8 @@ import {
   Tag,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { uploadProductImageAdmin } from "@/lib/admin.functions";
 
 export type ProductForm = {
   id?: string | undefined;
@@ -98,6 +100,7 @@ export function ProductEditorDialog({
   manualUrlInput,
   setManualUrlInput,
 }: ProductEditorDialogProps) {
+  const uploadImageFn = useServerFn(uploadProductImageAdmin);
   const priceNum = Math.max(0, Number(form.price) || 0);
   const discountVal = Math.max(0, Number(form.discount_value) || 0);
   let finalCalculatedPrice = priceNum;
@@ -635,46 +638,74 @@ export function ProductEditorDialog({
                   const files = Array.from(e.target.files || []);
                   if (files.length === 0) return;
                   setUploadingImage(true);
-                  const newUrls: string[] = [];
+                  const newUploadedUrls: string[] = [];
 
-                  for (const file of files) {
-                    if (file.size > 10 * 1024 * 1024) {
-                      toast.error(`"${file.name}" exceeds 10MB limit.`);
-                      continue;
-                    }
-                    try {
-                      const reader = new FileReader();
-                      const dataUrlPromise = new Promise<string>((resolve) => {
-                        reader.onload = () => resolve(reader.result as string);
+                  try {
+                    for (let i = 0; i < files.length; i++) {
+                      const file = files[i];
+                      if (!file) continue;
+                      if (file.size > 10 * 1024 * 1024) {
+                        toast.error(`"${file.name}" exceeds 10MB limit.`);
+                        continue;
+                      }
+
+                      toast.loading(`Uploading photo ${i + 1} of ${files.length} to storage…`, {
+                        id: "uploading-product-photo",
                       });
-                      reader.readAsDataURL(file);
-                      const base64 = await dataUrlPromise;
 
-                      newUrls.push(base64);
-                    } catch (err) {
-                      console.error("Failed to read file:", err);
+                      const reader = new FileReader();
+                      const dataUrl = await new Promise<string>((resolve, reject) => {
+                        reader.onload = () => resolve(reader.result as string);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                      });
+
+                      const commaIdx = dataUrl.indexOf(",");
+                      const base64 = commaIdx !== -1 ? dataUrl.slice(commaIdx + 1) : dataUrl;
+
+                      const uploadRes = await uploadImageFn({
+                        data: {
+                          filename: file.name,
+                          base64,
+                          mimeType: file.type || "image/jpeg",
+                        },
+                      });
+
+                      if (uploadRes?.imageUrl) {
+                        newUploadedUrls.push(uploadRes.imageUrl);
+                      }
                     }
-                  }
 
-                  if (newUrls.length > 0) {
-                    setForm((f) => {
-                      const current =
-                        f.images && f.images.length > 0
-                          ? f.images
-                          : f.image_url
-                            ? [f.image_url]
-                            : [];
-                      return {
-                        ...f,
-                        images: [...current, ...newUrls],
-                        image_url: f.image_url || newUrls[0] || "",
-                      };
+                    if (newUploadedUrls.length > 0) {
+                      setForm((f) => {
+                        const current =
+                          f.images && f.images.length > 0
+                            ? f.images
+                            : f.image_url
+                              ? [f.image_url]
+                              : [];
+                        return {
+                          ...f,
+                          images: [...current, ...newUploadedUrls],
+                          image_url: f.image_url || newUploadedUrls[0] || "",
+                        };
+                      });
+                      toast.success(
+                        `Successfully uploaded ${newUploadedUrls.length} photo${newUploadedUrls.length === 1 ? "" : "s"}!`,
+                        { id: "uploading-product-photo" }
+                      );
+                    } else {
+                      toast.dismiss("uploading-product-photo");
+                    }
+                  } catch (err: any) {
+                    console.error("Photo upload error:", err);
+                    toast.error(err?.message || "Failed to upload photo to storage.", {
+                      id: "uploading-product-photo",
                     });
-                    toast.success(
-                      `Added ${newUrls.length} image${newUrls.length === 1 ? "" : "s"} to product!`
-                    );
+                  } finally {
+                    setUploadingImage(false);
+                    if (productImageInputRef.current) productImageInputRef.current.value = "";
                   }
-                  setUploadingImage(false);
                 }}
               />
 
