@@ -93,6 +93,8 @@ import {
   FileText,
   Grid,
   List,
+  Save,
+  RotateCcw,
 } from "lucide-react";
 
 export type AdminSearch = {
@@ -393,6 +395,7 @@ function AdminShopLayoutManager({
   }>;
   onRefresh: () => Promise<unknown>;
 }) {
+  const queryClient = useQueryClient();
   const saveCategoryOrderFn = useServerFn(saveCategoryOrder);
   const saveProductSequenceFn = useServerFn(saveProductSequence);
 
@@ -407,16 +410,19 @@ function AdminShopLayoutManager({
   );
 
   const [expandedCat, setExpandedCat] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Keep in sync with server data
+  // Only sync with server data when there are NO unsaved local edits
   useEffect(() => {
-    setCategoriesList([...initialCategories].sort((a, b) => a.sort_order - b.sort_order));
-    setProductsList([...initialProducts].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name)));
-  }, [initialCategories, initialProducts]);
+    if (!isDirty) {
+      setCategoriesList([...initialCategories].sort((a, b) => a.sort_order - b.sort_order));
+      setProductsList([...initialProducts].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name)));
+    }
+  }, [initialCategories, initialProducts, isDirty]);
 
-  // Reorder Category Up / Down
-  const moveCategory = async (index: number, direction: "up" | "down") => {
+  // Reorder Category Up / Down (Instant Local State)
+  const moveCategory = (index: number, direction: "up" | "down") => {
     const targetIndex = direction === "up" ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= categoriesList.length) return;
 
@@ -431,58 +437,20 @@ function AdminShopLayoutManager({
     }));
 
     setCategoriesList(withSortOrder);
-
-    try {
-      setIsSaving(true);
-      await saveCategoryOrderFn({
-        data: {
-          categories: withSortOrder.map((c) => ({
-            id: c.id,
-            sort_order: c.sort_order,
-            layout_rows: c.layout_rows ?? 1,
-            slug: c.slug,
-          })),
-        },
-      });
-      toast.success(`Category "${moved!.name}" moved ${direction}!`);
-      await onRefresh();
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to update category order");
-    } finally {
-      setIsSaving(false);
-    }
+    setIsDirty(true);
   };
 
-  // Change Category Layout Rows
-  const changeCategoryRows = async (categoryId: string, rows: number) => {
+  // Change Category Layout Rows (Instant Local State)
+  const changeCategoryRows = (categoryId: string, rows: number) => {
     const updated = categoriesList.map((cat) =>
       cat.id === categoryId ? { ...cat, layout_rows: rows } : cat
     );
     setCategoriesList(updated);
-
-    try {
-      setIsSaving(true);
-      await saveCategoryOrderFn({
-        data: {
-          categories: updated.map((c) => ({
-            id: c.id,
-            sort_order: c.sort_order,
-            layout_rows: c.layout_rows ?? 1,
-            slug: c.slug,
-          })),
-        },
-      });
-      toast.success(`Updated "${categoriesList.find((c) => c.id === categoryId)?.name}" layout to ${rows} ${rows === 1 ? "row" : "rows"}!`);
-      await onRefresh();
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to update category layout");
-    } finally {
-      setIsSaving(false);
-    }
+    setIsDirty(true);
   };
 
-  // Reorder Product within category Up / Down
-  const moveProduct = async (categoryId: string, prodIndexInCat: number, direction: "up" | "down") => {
+  // Reorder Product within category Up / Down (Instant Local State)
+  const moveProduct = (categoryId: string, prodIndexInCat: number, direction: "up" | "down") => {
     const cat = categoriesList.find((c) => c.id === categoryId);
     const catSlug = cat?.slug;
     const catProducts = productsList.filter(
@@ -509,31 +477,70 @@ function AdminShopLayoutManager({
     }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
 
     setProductsList(updatedAllProducts);
+    setIsDirty(true);
+  };
 
+  // Save All Changes to Server & Disk
+  const handleSaveAll = async () => {
     try {
       setIsSaving(true);
-      await saveProductSequenceFn({
+
+      // 1. Save category ordering and layout rows
+      await saveCategoryOrderFn({
         data: {
-          products: updatedCatProducts.map((p, idx) => ({
-            id: p.id,
+          categories: categoriesList.map((c, idx) => ({
+            id: c.id,
             sort_order: idx + 1,
-            slug: p.slug,
+            layout_rows: c.layout_rows ?? 1,
+            slug: c.slug,
           })),
         },
       });
-      toast.success(`Product "${moved!.name}" moved ${direction}!`);
+
+      // 2. Save product sequencing within each category
+      const productsPayload = categoriesList.flatMap((cat) => {
+        const catProducts = productsList.filter(
+          (p) => p.category_id === cat.id || (cat.slug && p.category_slug === cat.slug) || (cat.slug && p.category_id === `cat_${cat.slug}`)
+        );
+        return catProducts.map((p, idx) => ({
+          id: p.id,
+          sort_order: idx + 1,
+          slug: p.slug,
+        }));
+      });
+
+      if (productsPayload.length > 0) {
+        await saveProductSequenceFn({
+          data: {
+            products: productsPayload,
+          },
+        });
+      }
+
+      setIsDirty(false);
+      await queryClient.invalidateQueries({ queryKey: ["catalog"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-data"] });
+      toast.success("✨ Category rows & shop layout permanently saved & published live!");
       await onRefresh();
     } catch (err: any) {
-      toast.error(err?.message || "Failed to update product sequence");
+      toast.error(err?.message || "Failed to save layout");
     } finally {
       setIsSaving(false);
     }
   };
 
+  // Discard local changes and reset to current server state
+  const handleDiscard = () => {
+    setCategoriesList([...initialCategories].sort((a, b) => a.sort_order - b.sort_order));
+    setProductsList([...initialProducts].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name)));
+    setIsDirty(false);
+    toast.info("Layout changes discarded, restored to saved state.");
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header Info Box */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
+    <div className="space-y-6 pb-20">
+      {/* Header Info & Action Box */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border border-border/70 bg-card p-5 sm:p-6 shadow-soft">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="flex size-7 items-center justify-center rounded-xl bg-berry/10 text-berry">
@@ -542,16 +549,55 @@ function AdminShopLayoutManager({
             <h2 className="font-display text-xl font-bold text-cocoa">
               Shop Category & Product Layout Controls
             </h2>
+            {isDirty ? (
+              <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-400 animate-pulse">
+                Unsaved Changes
+              </span>
+            ) : (
+              <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
+                All Saved Live
+              </span>
+            )}
           </div>
           <p className="text-xs text-muted-foreground max-w-xl leading-relaxed">
-            Control which category appears first on the shop page, configure whether each category renders 1, 2, 3, or 4 rows of 4 cards on desktop, and sequence products within each category.
+            Configure how each category appears on the storefront: sequence category order, select 1–4 desktop rows (4 cards/row), and reorder products within each category. Click <strong>Save Layout Changes</strong> to preserve your setup.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[11px] font-semibold text-muted-foreground bg-secondary/80 px-3 py-1 rounded-full border border-border/60">
-            {categoriesList.length} Categories
-          </span>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <Link
+            to="/shop"
+            target="_blank"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-secondary/60 hover:bg-secondary text-cocoa h-9 px-3.5 text-xs font-semibold transition-colors cursor-pointer"
+          >
+            <ExternalLink className="size-3.5" />
+            <span>Preview Storefront</span>
+          </Link>
+
+          {isDirty && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDiscard}
+              disabled={isSaving}
+              className="rounded-xl text-xs font-semibold h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20 cursor-pointer"
+            >
+              <RotateCcw className="size-3.5 mr-1" />
+              Discard
+            </Button>
+          )}
+
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSaveAll}
+            disabled={!isDirty || isSaving}
+            className="rounded-xl text-xs font-bold h-9 bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft cursor-pointer disabled:opacity-50"
+          >
+            <Save className="size-3.5 mr-1.5" />
+            {isSaving ? "Saving Layout…" : isDirty ? "Save Layout Changes" : "Saved"}
+          </Button>
         </div>
       </div>
 
@@ -737,6 +783,49 @@ function AdminShopLayoutManager({
           );
         })}
       </div>
+
+      {/* Sticky Bottom Save Action Bar */}
+      {isDirty && (
+        <div className="sticky bottom-4 z-40 rounded-3xl border-2 border-berry/40 bg-card/95 backdrop-blur-md p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 animate-in slide-in-from-bottom-3 duration-300">
+          <div className="flex items-center gap-3">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-berry/15 text-berry text-lg font-bold">
+              ⚡
+            </span>
+            <div>
+              <p className="text-xs sm:text-sm font-bold text-cocoa">
+                You have unsaved layout modifications
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Click "Save Layout Changes" to update row counts and category sequence on the live website.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDiscard}
+              disabled={isSaving}
+              className="rounded-xl text-xs font-semibold h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/20 cursor-pointer"
+            >
+              <RotateCcw className="size-3.5 mr-1" />
+              Discard
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleSaveAll}
+              disabled={isSaving}
+              className="rounded-xl text-xs font-bold h-9 bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft cursor-pointer"
+            >
+              <Save className="size-3.5 mr-1.5" />
+              {isSaving ? "Saving Changes…" : "Save Layout Changes"}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
