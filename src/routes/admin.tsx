@@ -744,6 +744,12 @@ function AdminDashboard() {
   const rescheduleFn = useServerFn(rescheduleOrderAdmin);
   const uploadImageFn = useServerFn(uploadProductImageAdmin);
 
+  // Tab, navigation & search states
+  const [activeTab, setActiveTab] = useState<string>("overview");
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [manualUrlInput, setManualUrlInput] = useState<string>("");
+
+  // Product & offer forms
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
   const [offerForm, setOfferForm] = useState<OfferCodeForm>(EMPTY_OFFER_FORM);
   const [blackoutDate, setBlackoutDate] = useState("");
@@ -751,6 +757,22 @@ function AdminDashboard() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [manualUrlMode, setManualUrlMode] = useState(false);
   const productImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Orders tab filter states
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
+  const [orderSortBy, setOrderSortBy] = useState<string>("priority");
+  const [orderSearchQuery, setOrderSearchQuery] = useState<string>("");
+  const [bakeSheetOpen, setBakeSheetOpen] = useState<boolean>(false);
+
+  // Users tab filter states
+  const [userSearchQuery, setUserSearchQuery] = useState<string>("");
+  const [userVerifiedFilter, setUserVerifiedFilter] = useState<"all" | "verified" | "unverified">("all");
+
+  // Inventory tab filter states
+  const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState<string>("all");
+  const [inventorySortBy, setInventorySortBy] = useState<string>("name_asc");
+  const [inventorySearchQuery, setInventorySearchQuery] = useState<string>("");
+  const [inventoryStatusFilter, setInventoryStatusFilter] = useState<string>("all");
 
   // Postpone / Reschedule Dialog state
   const [reschedulingOrder, setReschedulingOrder] = useState<any>(null);
@@ -806,18 +828,6 @@ function AdminDashboard() {
       </div>
     );
   }
-
-  const [activeTab, setActiveTab] = useState<string>("overview");
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
-  const [manualUrlInput, setManualUrlInput] = useState<string>("");
-
-  const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
-  const [orderSortBy, setOrderSortBy] = useState<string>("priority");
-  const [orderSearchQuery, setOrderSearchQuery] = useState<string>("");
-  const [bakeSheetOpen, setBakeSheetOpen] = useState<boolean>(false);
-
-  const [userSearchQuery, setUserSearchQuery] = useState<string>("");
-  const [userVerifiedFilter, setUserVerifiedFilter] = useState<"all" | "verified" | "unverified">("all");
 
   const todayISO = toISODate(new Date());
   const pending = data.orders.filter((o) => o.status === "pending_approval").length;
@@ -884,11 +894,6 @@ function AdminDashboard() {
     }
     return 0;
   });
-
-  const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState<string>("all");
-  const [inventorySortBy, setInventorySortBy] = useState<string>("name_asc");
-  const [inventorySearchQuery, setInventorySearchQuery] = useState<string>("");
-  const [inventoryStatusFilter, setInventoryStatusFilter] = useState<string>("all");
 
   const categoryMap = new Map<string, string>();
   for (const c of data.categories) {

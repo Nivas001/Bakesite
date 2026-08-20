@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -151,6 +152,8 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const customFonts = useFlag("ff_custom_bakery_fonts");
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isAdminRoute = pathname.startsWith("/admin");
 
   useEffect(() => {
     if (typeof document !== "undefined") {
@@ -161,6 +164,19 @@ function RootComponent() {
       }
     }
   }, [customFonts]);
+
+  if (isAdminRoute) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <CartProvider>
+          <div className="min-h-screen w-full bg-background">
+            <Outlet />
+          </div>
+          <Toaster position="bottom-center" />
+        </CartProvider>
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
