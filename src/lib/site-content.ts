@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getSiteContent, saveSiteContent, resetSiteContent } from "./site-content.functions";
 
 export interface SectionContent {
   badge: string;
@@ -95,21 +98,49 @@ export function resetStoredSiteContent(): void {
 
 export function useSiteContent(): {
   content: SiteContent;
-  updateContent: (newContent: SiteContent) => void;
-  resetContent: () => void;
+  updateContent: (newContent: SiteContent) => Promise<void>;
+  resetContent: () => Promise<void>;
+  isLoading: boolean;
 } {
-  const [content, setContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
+  const queryClient = useQueryClient();
+  const fetchFn = useServerFn(getSiteContent);
+  const saveFn = useServerFn(saveSiteContent);
+  const resetFn = useServerFn(resetSiteContent);
+
+  const { data: serverContent, isLoading } = useQuery({
+    queryKey: ["site-content"],
+    queryFn: async () => {
+      try {
+        const res = await fetchFn();
+        if (res) {
+          saveStoredSiteContent(res);
+          return res;
+        }
+      } catch (err) {
+        console.warn("Falling back to local site content:", err);
+      }
+      return getStoredSiteContent();
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes fresh
+  });
+
+  const [localContent, setLocalContent] = useState<SiteContent>(() => {
+    return getStoredSiteContent();
+  });
 
   useEffect(() => {
-    // Initial load from localStorage on client mount
-    setContent(getStoredSiteContent());
+    if (serverContent) {
+      setLocalContent(serverContent);
+    }
+  }, [serverContent]);
 
+  useEffect(() => {
     const handleSync = (e: Event) => {
       const customEvent = e as CustomEvent<SiteContent>;
       if (customEvent.detail) {
-        setContent(customEvent.detail);
+        setLocalContent(customEvent.detail);
       } else {
-        setContent(getStoredSiteContent());
+        setLocalContent(getStoredSiteContent());
       }
     };
 
@@ -122,15 +153,29 @@ export function useSiteContent(): {
     };
   }, []);
 
-  const updateContent = (newContent: SiteContent) => {
-    setContent(newContent);
+  const activeContent: SiteContent = serverContent || localContent || DEFAULT_SITE_CONTENT;
+
+  const updateContent = async (newContent: SiteContent) => {
+    setLocalContent(newContent);
     saveStoredSiteContent(newContent);
+    try {
+      await saveFn({ data: newContent });
+      await queryClient.invalidateQueries({ queryKey: ["site-content"] });
+    } catch (err) {
+      console.warn("Failed to persist site content to server:", err);
+    }
   };
 
-  const resetContent = () => {
-    setContent(DEFAULT_SITE_CONTENT);
+  const resetContent = async () => {
+    setLocalContent(DEFAULT_SITE_CONTENT);
     resetStoredSiteContent();
+    try {
+      await resetFn();
+      await queryClient.invalidateQueries({ queryKey: ["site-content"] });
+    } catch (err) {
+      console.warn("Failed to reset site content on server:", err);
+    }
   };
 
-  return { content, updateContent, resetContent };
+  return { content: activeContent, updateContent, resetContent, isLoading };
 }

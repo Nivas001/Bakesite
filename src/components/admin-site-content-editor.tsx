@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sparkles,
   HelpCircle,
@@ -89,13 +89,20 @@ const SECTION_CONFIGS: SectionConfig[] = [
 ];
 
 export function AdminSiteContentEditor() {
-  const { content, updateContent, resetContent } = useSiteContent();
+  const { content, updateContent, resetContent, isLoading } = useSiteContent();
   const [activeSectionKey, setActiveSectionKey] = useState<SectionKey>("home_lab");
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile">("desktop");
   const [formState, setFormState] = useState<SiteContent>(content);
   const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Sync internal state when external content changes if not dirty
+  // Sync internal state when server content changes if not dirty
+  useEffect(() => {
+    if (!isDirty && content) {
+      setFormState(content);
+    }
+  }, [content, isDirty]);
+
   const activeConfig = SECTION_CONFIGS.find((c) => c.key === activeSectionKey)!;
   const currentSection = formState[activeSectionKey] || DEFAULT_SITE_CONTENT[activeSectionKey];
 
@@ -110,10 +117,17 @@ export function AdminSiteContentEditor() {
     setIsDirty(true);
   };
 
-  const handleSave = () => {
-    updateContent(formState);
-    setIsDirty(false);
-    toast.success("✨ Website text updated and synchronized live!");
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      await updateContent(formState);
+      setIsDirty(false);
+      toast.success("✨ Website text updated & permanently synchronized live!");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to save site text to server");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleResetSection = () => {
@@ -125,12 +139,19 @@ export function AdminSiteContentEditor() {
     toast.info(`Reset "${activeConfig.name}" to default copy.`);
   };
 
-  const handleResetAll = () => {
+  const handleResetAll = async () => {
     if (confirm("Reset all website section texts back to factory defaults?")) {
-      resetContent();
-      setFormState(DEFAULT_SITE_CONTENT);
-      setIsDirty(false);
-      toast.success("All sections restored to factory defaults.");
+      try {
+        setIsSaving(true);
+        await resetContent();
+        setFormState(DEFAULT_SITE_CONTENT);
+        setIsDirty(false);
+        toast.success("All sections restored to factory defaults.");
+      } catch (err: any) {
+        toast.error(err?.message || "Failed to reset site text");
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -185,11 +206,11 @@ export function AdminSiteContentEditor() {
             type="button"
             size="sm"
             onClick={handleSave}
-            disabled={!isDirty}
+            disabled={!isDirty || isSaving}
             className="rounded-xl text-xs font-bold h-9 bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft cursor-pointer disabled:opacity-50"
           >
             <Save className="size-3.5 mr-1.5" />
-            {isDirty ? "Save Changes" : "Saved"}
+            {isSaving ? "Saving to Server…" : isDirty ? "Save Changes" : "Saved"}
           </Button>
         </div>
       </div>

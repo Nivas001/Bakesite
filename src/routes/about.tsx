@@ -1289,15 +1289,15 @@ export function AboutUsPage() {
             <div className="relative mx-auto max-w-2xl space-y-4">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 px-3.5 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-300 shadow-xs">
                 <Sparkles className="size-3.5 text-amber-300" />
-                <span>Interactive WebGL 3D Experience</span>
+                <span>{siteContent?.about_3d?.badge || "Interactive WebGL 3D Experience"}</span>
               </span>
 
               <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-white uppercase tracking-wide leading-tight">
-                See how our cakes look in real world 3D
+                {siteContent?.about_3d?.title || "See how our cakes look in real world 3D"}
               </h2>
 
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-lg mx-auto">
-                Rotate, orbit, zoom, and inspect every hand-piped caramel rosette, 24K gold foil crumb, and dietary macro telemetry in our real-time 3D studio.
+                {siteContent?.about_3d?.description || "Rotate, orbit, zoom, and inspect every hand-piped caramel rosette, 24K gold foil crumb, and dietary macro telemetry in our real-time 3D studio."}
               </p>
 
               {/* Center Launch Button */}

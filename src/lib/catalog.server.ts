@@ -540,37 +540,27 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
 ];
 
 // In-memory / persistent config store for category and product layout overrides
-const categoryConfigOverrides = new Map<string, { sort_order?: number; layout_rows?: number }>();
-const productSequenceOverrides = new Map<string, number>();
+import {
+  getCategoryLayoutOverrides,
+  saveCategoryLayoutOverrides,
+  getProductSequenceOverrides,
+  saveProductSequenceOverrides,
+  getProductWeightOverrides,
+  saveProductWeightOverrides,
+  type ProductWeightConfig,
+} from "./server-storage.server";
 
 export function updateCategoryConfigOverrides(
-  categories: Array<{ id: string; sort_order: number; layout_rows?: number }>,
+  categories: Array<{ id: string; sort_order: number; layout_rows?: number; slug?: string }>,
 ) {
-  for (const c of categories) {
-    const existing = categoryConfigOverrides.get(c.id) ?? {};
-    categoryConfigOverrides.set(c.id, {
-      ...existing,
-      sort_order: c.sort_order,
-      layout_rows: c.layout_rows ?? existing.layout_rows ?? 1,
-    });
-  }
+  saveCategoryLayoutOverrides(categories);
 }
 
 export function updateProductSequenceOverrides(
-  products: Array<{ id: string; sort_order: number }>,
+  products: Array<{ id: string; sort_order: number; slug?: string }>,
 ) {
-  for (const p of products) {
-    productSequenceOverrides.set(p.id, p.sort_order);
-  }
+  saveProductSequenceOverrides(products);
 }
-
-const productWeightConfigOverrides = new Map<string, {
-  item_type?: "weight" | "unit" | "pack" | null;
-  unit_weight_grams?: number | null;
-  serving_yield?: string | null;
-  weight_variants?: ProductWeightVariant[] | null;
-  images?: string[] | null;
-}>();
 
 export function updateProductWeightOverrides(
   productId: string,
@@ -581,8 +571,40 @@ export function updateProductWeightOverrides(
     weight_variants?: ProductWeightVariant[] | null;
     images?: string[] | null;
   },
+  slug?: string,
 ) {
-  productWeightConfigOverrides.set(productId, config);
+  saveProductWeightOverrides(productId, config, slug);
+}
+
+function findCategoryOverride(id: string, slug?: string | null) {
+  const overrides = getCategoryLayoutOverrides();
+  if (overrides[id]) return overrides[id];
+  if (slug && overrides[slug]) return overrides[slug];
+  if (slug && overrides[`cat_${slug}`]) return overrides[`cat_${slug}`];
+  if (id.startsWith("cat_") && overrides[id.replace(/^cat_/, "")]) {
+    return overrides[id.replace(/^cat_/, "")];
+  }
+  return undefined;
+}
+
+function findProductSequenceOverride(id: string, slug?: string | null) {
+  const overrides = getProductSequenceOverrides();
+  if (overrides[id] !== undefined) return overrides[id];
+  if (slug && overrides[slug] !== undefined) return overrides[slug];
+  if (slug && overrides[`prod_${slug.replace(/-/g, "_")}`] !== undefined) {
+    return overrides[`prod_${slug.replace(/-/g, "_")}`];
+  }
+  return undefined;
+}
+
+function findProductWeightOverride(id: string, slug?: string | null) {
+  const overrides = getProductWeightOverrides();
+  if (overrides[id]) return overrides[id];
+  if (slug && overrides[slug]) return overrides[slug];
+  if (slug && overrides[`prod_${slug.replace(/-/g, "_")}`]) {
+    return overrides[`prod_${slug.replace(/-/g, "_")}`];
+  }
+  return undefined;
 }
 
 export function mapProduct(
@@ -590,8 +612,8 @@ export function mapProduct(
   categories: Doc<CategoryDoc>[] = [],
 ): CatalogProduct {
   const category = categories.find((c) => c.$id === doc.category_id) ?? null;
-  const customOrder = productSequenceOverrides.get(doc.$id);
-  const weightOverride = productWeightConfigOverrides.get(doc.$id);
+  const customOrder = findProductSequenceOverride(doc.$id, doc.slug);
+  const weightOverride = findProductWeightOverride(doc.$id, doc.slug);
 
   const catSlug = (category?.slug || "").toLowerCase();
   const prodName = (doc.name || "").toLowerCase();
@@ -679,7 +701,7 @@ export function mapProduct(
 }
 
 export function mapCategory(doc: Doc<CategoryDoc>) {
-  const override = categoryConfigOverrides.get(doc.$id);
+  const override = findCategoryOverride(doc.$id, doc.slug);
   return {
     id: doc.$id,
     name: doc.name,
@@ -719,23 +741,23 @@ export async function loadCatalog() {
     // Fall back to seed catalog
   }
 
-  // Seamless fallback with active overrides
-  const mappedSeedCats = SEED_CATEGORIES.map((c) => {
+  // Seamless fallback with persistent active overrides
+  const mappedSeedCats = SEED_CATEGORIES.map((c, idx) => {
     const id = `cat_${c.slug}`;
-    const override = categoryConfigOverrides.get(id);
+    const override = findCategoryOverride(id, c.slug);
     return {
       id,
       name: c.name,
       slug: c.slug,
       description: c.description,
-      sort_order: override?.sort_order ?? c.sort_order,
+      sort_order: override?.sort_order ?? c.sort_order ?? idx + 1,
       layout_rows: override?.layout_rows ?? (c.layout_rows || 1),
     };
   }).sort((a, b) => a.sort_order - b.sort_order);
 
   const mappedSeedProds = SEED_PRODUCTS.map((p, idx) => {
-    const customOrder = productSequenceOverrides.get(p.id);
-    const weightOverride = productWeightConfigOverrides.get(p.id);
+    const customOrder = findProductSequenceOverride(p.id, p.slug);
+    const weightOverride = findProductWeightOverride(p.id, p.slug);
     const isCake = p.category_slug === "cakes" || p.category_slug === "cheesecakes";
 
     let itemType: "weight" | "unit" | "pack" = weightOverride?.item_type || (isCake ? "weight" : "unit");

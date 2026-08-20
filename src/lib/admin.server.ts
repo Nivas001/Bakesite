@@ -230,7 +230,7 @@ export async function fetchAdminProducts() {
 }
 
 export async function saveCategoryOrderingAdmin(input: {
-  categories: Array<{ id: string; sort_order: number; layout_rows?: number }>;
+  categories: Array<{ id: string; sort_order: number; layout_rows?: number; slug?: string }>;
 }) {
   const { updateCategoryConfigOverrides } = await import("./catalog.server");
   updateCategoryConfigOverrides(input.categories);
@@ -240,7 +240,10 @@ export async function saveCategoryOrderingAdmin(input: {
       try {
         const payload: Record<string, unknown> = { sort_order: cat.sort_order };
         if (cat.layout_rows) payload['layout_rows'] = cat.layout_rows;
-        await updateDoc(COLLECTIONS.categories, cat.id, payload).catch(() => null);
+        await updateDoc(COLLECTIONS.categories, cat.id, payload).catch(async () => {
+          // If layout_rows attribute is not in collection schema, update sort_order only
+          await updateDoc(COLLECTIONS.categories, cat.id, { sort_order: cat.sort_order }).catch(() => null);
+        });
       } catch {}
     }
   }
@@ -248,7 +251,7 @@ export async function saveCategoryOrderingAdmin(input: {
 }
 
 export async function saveProductSequenceAdmin(input: {
-  products: Array<{ id: string; sort_order: number }>;
+  products: Array<{ id: string; sort_order: number; slug?: string }>;
 }) {
   const { updateProductSequenceOverrides } = await import("./catalog.server");
   updateProductSequenceOverrides(input.products);
@@ -332,13 +335,17 @@ export async function upsertProduct(input: ProductInput) {
     }
 
     if (savedId) {
-      updateProductWeightOverrides(savedId, {
-        item_type: input.item_type ?? null,
-        unit_weight_grams: input.unit_weight_grams ?? null,
-        serving_yield: input.serving_yield ?? null,
-        weight_variants: (input.weight_variants as any) ?? null,
-        images: input.images ? input.images.filter(Boolean) : (primaryCoverImage ? [primaryCoverImage] : []),
-      });
+      updateProductWeightOverrides(
+        savedId,
+        {
+          item_type: input.item_type ?? null,
+          unit_weight_grams: input.unit_weight_grams ?? null,
+          serving_yield: input.serving_yield ?? null,
+          weight_variants: (input.weight_variants as any) ?? null,
+          images: input.images ? input.images.filter(Boolean) : (primaryCoverImage ? [primaryCoverImage] : []),
+        },
+        input.slug,
+      );
     }
 
     return { ok: true as const, id: savedId };

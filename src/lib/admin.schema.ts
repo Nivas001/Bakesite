@@ -103,6 +103,7 @@ export const categoryOrderSchema = z.object({
       id: z.string().trim().min(1),
       sort_order: z.number().int().min(0),
       layout_rows: z.number().int().min(1).max(4).optional(),
+      slug: z.string().trim().optional(),
     }),
   ),
 });
@@ -117,6 +118,7 @@ export const productSequenceSchema = z.object({
     z.object({
       id: z.string().trim().min(1),
       sort_order: z.number().int().min(0),
+      slug: z.string().trim().optional(),
     }),
   ),
 });

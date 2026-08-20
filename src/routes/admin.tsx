@@ -440,6 +440,7 @@ function AdminShopLayoutManager({
             id: c.id,
             sort_order: c.sort_order,
             layout_rows: c.layout_rows ?? 1,
+            slug: c.slug,
           })),
         },
       });
@@ -467,6 +468,7 @@ function AdminShopLayoutManager({
             id: c.id,
             sort_order: c.sort_order,
             layout_rows: c.layout_rows ?? 1,
+            slug: c.slug,
           })),
         },
       });
@@ -515,6 +517,7 @@ function AdminShopLayoutManager({
           products: updatedCatProducts.map((p, idx) => ({
             id: p.id,
             sort_order: idx + 1,
+            slug: p.slug,
           })),
         },
       });

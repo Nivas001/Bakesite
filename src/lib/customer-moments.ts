@@ -1,4 +1,11 @@
 import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  getCustomerMomentsServerFn,
+  saveCustomerMomentsServerFn,
+  resetCustomerMomentsServerFn,
+} from "./customer-moments.functions";
 
 export interface CustomerMoment {
   id: string;
@@ -85,13 +92,41 @@ export function saveCustomerMoments(moments: CustomerMoment[]) {
 }
 
 export function useCustomerMoments() {
-  const [moments, setMoments] = useState<CustomerMoment[]>(DEFAULT_MOMENTS);
+  const queryClient = useQueryClient();
+  const fetchFn = useServerFn(getCustomerMomentsServerFn);
+  const saveFn = useServerFn(saveCustomerMomentsServerFn);
+  const resetFn = useServerFn(resetCustomerMomentsServerFn);
+
+  const { data: serverMoments } = useQuery({
+    queryKey: ["customer-moments"],
+    queryFn: async () => {
+      try {
+        const res = await fetchFn();
+        if (res && Array.isArray(res) && res.length > 0) {
+          saveCustomerMoments(res);
+          return res;
+        }
+      } catch (err) {
+        console.warn("Failed to fetch customer moments from server:", err);
+      }
+      return getCustomerMoments();
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const [localMoments, setLocalMoments] = useState<CustomerMoment[]>(() => {
+    return getCustomerMoments();
+  });
 
   useEffect(() => {
-    setMoments(getCustomerMoments());
+    if (serverMoments && Array.isArray(serverMoments)) {
+      setLocalMoments(serverMoments);
+    }
+  }, [serverMoments]);
 
+  useEffect(() => {
     const handleUpdate = () => {
-      setMoments(getCustomerMoments());
+      setLocalMoments(getCustomerMoments());
     };
 
     window.addEventListener("storage", handleUpdate);
@@ -103,16 +138,30 @@ export function useCustomerMoments() {
     };
   }, []);
 
+  const activeMomentsList = serverMoments || localMoments || DEFAULT_MOMENTS;
+
   return {
-    moments,
-    activeMoments: moments.filter((m) => m.isActive),
-    save: (newMoments: CustomerMoment[]) => {
+    moments: activeMomentsList,
+    activeMoments: activeMomentsList.filter((m) => m.isActive),
+    save: async (newMoments: CustomerMoment[]) => {
       saveCustomerMoments(newMoments);
-      setMoments(newMoments);
+      setLocalMoments(newMoments);
+      try {
+        await saveFn({ data: newMoments });
+        await queryClient.invalidateQueries({ queryKey: ["customer-moments"] });
+      } catch (err) {
+        console.warn("Failed to save customer moments to server:", err);
+      }
     },
-    resetDefaults: () => {
+    resetDefaults: async () => {
       saveCustomerMoments(DEFAULT_MOMENTS);
-      setMoments(DEFAULT_MOMENTS);
+      setLocalMoments(DEFAULT_MOMENTS);
+      try {
+        await resetFn();
+        await queryClient.invalidateQueries({ queryKey: ["customer-moments"] });
+      } catch (err) {
+        console.warn("Failed to reset customer moments on server:", err);
+      }
     },
   };
 }
