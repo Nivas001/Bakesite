@@ -3535,6 +3535,11 @@ function AdminDashboard() {
         </TabsContent>
       </Tabs>
       </main>
+
+      {/* Dev Tools Panel inside main column footer */}
+      <div className="mt-auto px-4 sm:px-6 lg:px-8 pb-6">
+        <DevPanel />
+      </div>
       </div>
 
       {/* Postpone / Reschedule Slot Dialog */}
@@ -3744,7 +3749,6 @@ function AdminDashboard() {
         orders={data.orders}
         products={data.products}
       />
-      <DevPanel />
     </div>
   );
 }
