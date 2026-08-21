@@ -5,9 +5,17 @@ import { getCatalog } from "@/lib/catalog.functions";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { MagicInput } from "@/components/godui/magic-input";
+import { Combobox, type ComboboxOption } from "@/components/godui/combobox";
 import { useFlag } from "@/lib/feature-flags";
 import { Search, X, ArrowUpDown, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import type { CatalogProduct } from "@/lib/pricing";
+
+const SORT_OPTIONS: ComboboxOption[] = [
+  { label: "Featured", value: "featured", description: "Curated bakery highlights" },
+  { label: "Price: Low to High", value: "price_asc", description: "Most affordable treats first" },
+  { label: "Price: High to Low", value: "price_desc", description: "Signature gourmet specials" },
+  { label: "Name: A to Z", value: "name_asc", description: "Alphabetical catalog order" },
+];
 
 const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCatalog() });
 
@@ -294,19 +302,17 @@ function Shop() {
             </div>
           )}
 
-          {/* Sort Dropdown */}
-          <div className="relative shrink-0">
-            <select
+          {/* Sort Dropdown with GodUI Combobox */}
+          <div className="shrink-0">
+            <Combobox
+              options={SORT_OPTIONS}
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="h-8.5 rounded-full border-2 border-[#2C1810]/20 bg-card pl-3.5 pr-8 text-xs font-bold text-cocoa shadow-2xs hover:border-[#2C1810]/50 focus:outline-none focus:border-[#2C1810] cursor-pointer appearance-none transition-all"
-            >
-              <option value="featured">Sort: Featured</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="name_asc">Name: A to Z</option>
-            </select>
-            <ArrowUpDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3 text-[#2C1810]/60 pointer-events-none" />
+              onChange={(val) => setSortBy(val as any)}
+              searchable={false}
+              icon={<ArrowUpDown className="size-3.5" />}
+              placeholder="Sort bakes…"
+              className="w-auto"
+            />
           </div>
         </div>
       </div>
