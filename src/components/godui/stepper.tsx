@@ -109,7 +109,7 @@ export const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
     const Label = ({ step, state }: { step: Step; state: StepState }) => (
       <>
         <div
-          className={`text-xs sm:text-sm font-bold ${
+          className={`text-xs sm:text-sm font-bold whitespace-nowrap select-none ${
             state === "upcoming" ? "text-muted-foreground/80" : "text-cocoa"
           }`}
         >

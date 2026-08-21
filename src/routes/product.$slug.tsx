@@ -54,9 +54,9 @@ const TRUST_BADGES = [
 ];
 
 const ORDER_PIPELINE_STEPS: Step[] = [
-  { label: "1. Choose Cake", description: "Pick flavor & baking slot" },
-  { label: "2. Pay", description: "Instant secure checkout" },
-  { label: "3. Delivery", description: "Doorstep drop or pickup" },
+  { label: "Choose Cake" },
+  { label: "Pay" },
+  { label: "Delivery" },
 ];
 
 const EXPLORE_CATEGORIES = [
