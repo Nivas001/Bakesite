@@ -6,9 +6,47 @@ import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { MagicInput } from "@/components/godui/magic-input";
 import { Combobox, type ComboboxOption } from "@/components/godui/combobox";
+import { MultiButton, type MultiButtonItem } from "@/components/godui/multi-button";
 import { useFlag } from "@/lib/feature-flags";
-import { Search, X, ArrowUpDown, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import {
+  Search,
+  X,
+  ArrowUpDown,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  Store,
+  Flame,
+  PieChart,
+  Cake,
+  Coffee,
+  Croissant,
+  Wheat,
+  Cookie,
+} from "lucide-react";
 import type { CatalogProduct } from "@/lib/pricing";
+
+function getCategoryIcon(slug: string | null) {
+  switch (slug) {
+    case "brownies":
+      return Flame;
+    case "cheesecakes":
+      return PieChart;
+    case "cakes":
+      return Cake;
+    case "tea-cakes":
+      return Coffee;
+    case "pastries":
+      return Croissant;
+    case "breads":
+      return Wheat;
+    case "cookies":
+      return Cookie;
+    default:
+      return Store;
+  }
+}
 
 const SORT_OPTIONS: ComboboxOption[] = [
   { label: "Featured", value: "featured", description: "Curated bakery highlights" },
@@ -234,6 +272,24 @@ function Shop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  const categoryItems: MultiButtonItem[] = useMemo(() => {
+    const allItem: MultiButtonItem = {
+      id: "all",
+      icon: Store,
+      label: "All",
+      onClick: () => handleCategoryChange(null),
+    };
+
+    const dynamicItems: MultiButtonItem[] = data.categories.map((c) => ({
+      id: c.slug,
+      icon: getCategoryIcon(c.slug),
+      label: c.name,
+      onClick: () => handleCategoryChange(c.slug),
+    }));
+
+    return [allItem, ...dynamicItems];
+  }, [data.categories]);
+
   const isLaneMode = active === null && !search.trim() && sortBy === "featured";
 
   const activeCategoryObj = useMemo(() => {
@@ -258,29 +314,18 @@ function Shop() {
         </p>
       </div>
 
-      {/* Filters Row: Category pills + Search + Sort */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-4 justify-between border-b border-border/60 pb-4">
-        {/* Category Pills */}
-        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar shrink-0">
-          <Button
-            variant={active === null ? "default" : "outline"}
+      {/* Filters Row: Category MultiButton Rail + Search + Sort */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4 justify-between border-b border-border/60 pb-4">
+        {/* Category MultiButton Action Rail */}
+        <div className="overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar shrink-0">
+          <MultiButton
+            items={categoryItems}
+            selectedId={active ?? "all"}
             size="sm"
-            className="rounded-full text-xs shrink-0 h-8 px-3.5 transition-all cursor-pointer"
-            onClick={() => handleCategoryChange(null)}
-          >
-            All Categories
-          </Button>
-          {data.categories.map((category) => (
-            <Button
-              key={category.id}
-              variant={active === category.slug ? "default" : "outline"}
-              size="sm"
-              className="rounded-full text-xs shrink-0 h-8 px-3.5 transition-all cursor-pointer"
-              onClick={() => handleCategoryChange(category.slug)}
-            >
-              {category.name}
-            </Button>
-          ))}
+            variant="outline"
+            highlightColor="var(--berry)"
+            className="shrink-0"
+          />
         </div>
 
         {/* Search & Sort Controls */}
