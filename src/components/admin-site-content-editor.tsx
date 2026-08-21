@@ -15,6 +15,12 @@ import {
   FileText,
   Compass,
   CheckCircle2,
+  ImageIcon,
+  Plus,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  Camera,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,8 +30,9 @@ import { Label } from "@/components/ui/label";
 import {
   useSiteContent,
   DEFAULT_SITE_CONTENT,
-  SiteContent,
-  SectionContent,
+  type SiteContent,
+  type SectionContent,
+  type GalleryPhoto,
 } from "@/lib/site-content";
 
 type SectionKey = keyof SiteContent;
@@ -86,6 +93,15 @@ const SECTION_CONFIGS: SectionConfig[] = [
     descLabel: "Packaging Description",
     icon: ShieldCheck,
   },
+  {
+    key: "about_gallery",
+    page: "About Page",
+    name: "6. Atelier & Bakes Inertia Gallery",
+    badgeLabel: "Badge Text",
+    titleLabel: "Gallery Headline",
+    descLabel: "Gallery Description",
+    icon: ImageIcon,
+  },
 ];
 
 export function AdminSiteContentEditor() {
@@ -117,6 +133,76 @@ export function AdminSiteContentEditor() {
     setIsDirty(true);
   };
 
+  // Gallery Photos Handlers
+  const galleryPhotos = formState.about_gallery?.photos || DEFAULT_SITE_CONTENT.about_gallery.photos;
+
+  const handleAddGalleryPhoto = () => {
+    const newPhoto: GalleryPhoto = {
+      id: `shot-${Date.now()}`,
+      label: "Fresh Oven Bake",
+      image: "/products/fudge-brownies.jpg",
+      tag: "Fresh Bake",
+    };
+    setFormState((prev) => ({
+      ...prev,
+      about_gallery: {
+        ...prev.about_gallery,
+        photos: [...(prev.about_gallery?.photos || []), newPhoto],
+      },
+    }));
+    setIsDirty(true);
+    toast.success("Added new photo slot to gallery. Fill in details and click Save.");
+  };
+
+  const handleUpdateGalleryPhoto = (index: number, updated: Partial<GalleryPhoto>) => {
+    const newPhotos = [...galleryPhotos];
+    const item = newPhotos[index];
+    if (!item) return;
+    newPhotos[index] = { ...item, ...updated };
+    setFormState((prev) => ({
+      ...prev,
+      about_gallery: {
+        ...prev.about_gallery,
+        photos: newPhotos,
+      },
+    }));
+    setIsDirty(true);
+  };
+
+  const handleRemoveGalleryPhoto = (index: number) => {
+    if (galleryPhotos.length <= 1) {
+      toast.error("Gallery must contain at least 1 photo.");
+      return;
+    }
+    const newPhotos = galleryPhotos.filter((_, i) => i !== index);
+    setFormState((prev) => ({
+      ...prev,
+      about_gallery: {
+        ...prev.about_gallery,
+        photos: newPhotos,
+      },
+    }));
+    setIsDirty(true);
+    toast.info("Photo removed from gallery draft.");
+  };
+
+  const handleMoveGalleryPhoto = (index: number, direction: "up" | "down") => {
+    const targetIdx = direction === "up" ? index - 1 : index + 1;
+    if (targetIdx < 0 || targetIdx >= galleryPhotos.length) return;
+    const newPhotos = [...galleryPhotos];
+    const temp = newPhotos[index]!;
+    newPhotos[index] = newPhotos[targetIdx]!;
+    newPhotos[targetIdx] = temp;
+    setFormState((prev) => ({
+      ...prev,
+      about_gallery: {
+        ...prev.about_gallery,
+        photos: newPhotos,
+      },
+    }));
+    setIsDirty(true);
+  };
+
   const handleSave = async () => {
     try {
       setIsSaving(true);
@@ -140,58 +226,39 @@ export function AdminSiteContentEditor() {
   };
 
   const handleResetAll = async () => {
-    if (confirm("Reset all website section texts back to factory defaults?")) {
+    if (window.confirm("Are you sure you want to reset ALL sections to their initial defaults?")) {
       try {
-        setIsSaving(true);
         await resetContent();
         setFormState(DEFAULT_SITE_CONTENT);
         setIsDirty(false);
-        toast.success("All sections restored to factory defaults.");
-      } catch (err: any) {
-        toast.error(err?.message || "Failed to reset site text");
-      } finally {
-        setIsSaving(false);
+        toast.success("All sections restored to factory artisan copy.");
+      } catch (err) {
+        toast.error("Failed to reset site content");
       }
     }
   };
 
-  const handleCopyJson = () => {
-    navigator.clipboard.writeText(JSON.stringify(formState, null, 2));
-    toast.success("Site content JSON copied to clipboard!");
-  };
-
   return (
     <div className="space-y-6">
-      {/* Top Banner / Introduction */}
-      <div className="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      {/* Studio Header Bar */}
+      <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-xl bg-berry/10 text-berry font-bold">
-              <FileText className="size-4" />
-            </span>
-            <h2 className="font-display text-xl font-bold text-cocoa">
-              Page Text & Copywriting Studio
-            </h2>
-            <span className="rounded-full bg-secondary/80 px-2.5 py-0.5 text-[11px] font-bold text-muted-foreground">
-              Advanced Tool
+            <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-berry">
+              Live Copywriting & Content Studio
             </span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1 max-w-2xl">
-            Customize key headlines, subtitles, and badges for the Homepage and About Page with live split-screen preview.
+          <h2 className="font-blogh text-2xl font-bold text-cocoa uppercase tracking-wide">
+            Homepage & About Page Copy Editor
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Edit headlines, dietary labels, descriptions, and gallery portraits across the live storefront.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCopyJson}
-            className="rounded-xl text-xs font-semibold h-9 cursor-pointer"
-          >
-            <Copy className="size-3.5 mr-1.5" />
-            Copy JSON
-          </Button>
+        {/* Global Action Buttons */}
+        <div className="flex items-center gap-2">
           <Button
             type="button"
             variant="outline"
@@ -216,7 +283,7 @@ export function AdminSiteContentEditor() {
       </div>
 
       {/* Section Switcher Tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
         {SECTION_CONFIGS.map((sec) => {
           const Icon = sec.icon;
           const isActive = activeSectionKey === sec.key;
@@ -249,7 +316,7 @@ export function AdminSiteContentEditor() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Side: Form Editor (5 Columns) */}
-        <div className="lg:col-span-5 rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft space-y-5">
+        <div className="lg:col-span-6 rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft space-y-5">
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-berry">
@@ -285,7 +352,7 @@ export function AdminSiteContentEditor() {
               <Input
                 id="sec-badge"
                 value={currentSection.badge || ""}
-                placeholder="e.g. Pure Craft & Cold Fermentation"
+                placeholder="e.g. Atelier & Hearth Moments"
                 className="mt-1.5 h-10 rounded-xl text-xs"
                 onChange={(e) => handleFieldChange("badge", e.target.value)}
               />
@@ -304,7 +371,7 @@ export function AdminSiteContentEditor() {
               <Input
                 id="sec-title"
                 value={currentSection.title || ""}
-                placeholder="e.g. The artisan bakery laboratory"
+                placeholder="e.g. Portraits of our daily oven craft"
                 className="mt-1.5 h-10 rounded-xl text-xs font-semibold"
                 onChange={(e) => handleFieldChange("title", e.target.value)}
               />
@@ -322,13 +389,115 @@ export function AdminSiteContentEditor() {
               </div>
               <Textarea
                 id="sec-desc"
-                rows={4}
+                rows={3}
                 value={currentSection.description || ""}
                 placeholder="Supporting description or explanation copy…"
                 className="mt-1.5 rounded-xl text-xs leading-relaxed"
                 onChange={(e) => handleFieldChange("description", e.target.value)}
               />
             </div>
+
+            {/* Special Gallery Photo Manager (Only shown for about_gallery) */}
+            {activeSectionKey === "about_gallery" && (
+              <div className="pt-3 border-t border-border/60 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Camera className="size-4 text-berry" />
+                    <Label className="text-xs font-extrabold text-cocoa">
+                      Gallery Portrait Photos ({galleryPhotos.length} Shots)
+                    </Label>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleAddGalleryPhoto}
+                    className="h-8 rounded-xl bg-cocoa text-background hover:bg-cocoa/90 text-xs font-bold gap-1 px-3 cursor-pointer"
+                  >
+                    <Plus className="size-3.5" />
+                    <span>Add Photo</span>
+                  </Button>
+                </div>
+
+                <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1 no-scrollbar">
+                  {galleryPhotos.map((photo, index) => (
+                    <div
+                      key={photo.id || index}
+                      className="rounded-2xl border border-border/70 bg-card p-3 shadow-2xs space-y-2.5 hover:border-berry/30 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={photo.image}
+                          alt={photo.label}
+                          className="size-14 rounded-xl object-cover border border-border/60 shrink-0 bg-muted"
+                        />
+                        <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-[10px] font-bold text-muted-foreground">Pill Badge Label</span>
+                            <Input
+                              value={photo.label}
+                              placeholder="e.g. Belgian Brownie"
+                              className="h-8 rounded-lg text-xs mt-0.5"
+                              onChange={(e) => handleUpdateGalleryPhoto(index, { label: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold text-muted-foreground">Top Tag (Optional)</span>
+                            <Input
+                              value={photo.tag || ""}
+                              placeholder="e.g. Signature"
+                              className="h-8 rounded-lg text-xs mt-0.5"
+                              onChange={(e) => handleUpdateGalleryPhoto(index, { tag: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/40">
+                        <div className="flex-1 min-w-0">
+                          <Input
+                            value={photo.image}
+                            placeholder="Image URL or /products/photo.jpg"
+                            className="h-7 text-[11px] font-mono rounded-lg"
+                            onChange={(e) => handleUpdateGalleryPhoto(index, { image: e.target.value })}
+                          />
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            disabled={index === 0}
+                            onClick={() => handleMoveGalleryPhoto(index, "up")}
+                            className="size-7 p-0 rounded-lg text-muted-foreground hover:text-cocoa disabled:opacity-30"
+                          >
+                            <ArrowUp className="size-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            disabled={index === galleryPhotos.length - 1}
+                            onClick={() => handleMoveGalleryPhoto(index, "down")}
+                            className="size-7 p-0 rounded-lg text-muted-foreground hover:text-cocoa disabled:opacity-30"
+                          >
+                            <ArrowDown className="size-3.5" />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleRemoveGalleryPhoto(index)}
+                            className="size-7 p-0 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="pt-2 flex items-center justify-between">
@@ -348,52 +517,53 @@ export function AdminSiteContentEditor() {
           </div>
         </div>
 
-        {/* Right Side: Live Interactive Viewport Preview (7 Columns) */}
-        <div className="lg:col-span-7 space-y-3 sticky top-24">
-          <div className="flex items-center justify-between px-1">
+        {/* Right Side: Live Device Mockup Preview (6 Columns) */}
+        <div className="lg:col-span-6 rounded-3xl border border-border/80 bg-secondary/30 p-5 sm:p-6 shadow-soft space-y-4">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div className="flex items-center gap-2">
-              <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-wider text-cocoa">
-                Live Rendered Preview
+              <Eye className="size-4 text-berry" />
+              <span className="text-xs font-extrabold uppercase tracking-wide text-cocoa">
+                Live Storefront Preview
               </span>
             </div>
 
-            <div className="flex items-center gap-1 bg-secondary/80 p-1 rounded-xl border border-border/60">
+            {/* Device Switcher Toggle */}
+            <div className="flex items-center gap-1 bg-card rounded-xl p-1 border border-border/80 shadow-2xs">
               <button
                 type="button"
                 onClick={() => setPreviewDevice("desktop")}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   previewDevice === "desktop"
-                    ? "bg-card text-foreground shadow-2xs font-bold"
+                    ? "bg-berry text-berry-foreground shadow-2xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Monitor className="size-3.5" />
-                <span>Desktop</span>
+                <span className="hidden sm:inline">Desktop</span>
               </button>
               <button
                 type="button"
                 onClick={() => setPreviewDevice("mobile")}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   previewDevice === "mobile"
-                    ? "bg-card text-foreground shadow-2xs font-bold"
+                    ? "bg-berry text-berry-foreground shadow-2xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Smartphone className="size-3.5" />
-                <span>Mobile</span>
+                <span className="hidden sm:inline">Mobile</span>
               </button>
             </div>
           </div>
 
-          {/* Device Frame */}
+          {/* Browser / Phone Device Frame */}
           <div
-            className={`mx-auto rounded-3xl border-2 border-border/80 bg-background overflow-hidden shadow-lift transition-all duration-300 ${
-              previewDevice === "mobile" ? "max-w-sm" : "w-full"
+            className={`mx-auto rounded-2xl border-2 border-border/80 bg-card shadow-2xl transition-all duration-300 ${
+              previewDevice === "mobile" ? "max-w-[340px]" : "w-full"
             }`}
           >
-            {/* Mock Browser Header */}
-            <div className="h-8 bg-secondary/60 border-b border-border/60 px-3 flex items-center justify-between">
+            {/* Mock URL / Status Bar */}
+            <div className="flex items-center justify-between border-b border-border/70 bg-secondary/60 px-3.5 py-2">
               <div className="flex items-center gap-1.5">
                 <span className="size-2 rounded-full bg-rose-400" />
                 <span className="size-2 rounded-full bg-amber-400" />
@@ -525,6 +695,35 @@ export function AdminSiteContentEditor() {
                     <CheckCircle2 className="size-3.5" />
                     <span>Standard on every order</span>
                   </div>
+                </div>
+              )}
+
+              {/* Preview 6: Atelier & Bakes Inertia Gallery */}
+              {activeSectionKey === "about_gallery" && (
+                <div className="rounded-2xl border border-border/80 bg-card p-5 space-y-3 shadow-soft text-center">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-berry">
+                    <Sparkles className="size-3 text-berry" />
+                    <span>{currentSection.badge || "Atelier & Hearth Portraits"}</span>
+                  </span>
+                  <h2 className="font-blogh text-lg sm:text-xl font-bold text-cocoa leading-tight uppercase tracking-wide">
+                    {currentSection.title || "Portraits of our daily oven craft"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
+                    {currentSection.description || "A peek behind the proofing racks. Slow lamination, 24K gold gilding, and pure bakes."}
+                  </p>
+                  <div className="flex gap-2 justify-center overflow-x-hidden pt-2">
+                    {galleryPhotos.slice(0, 3).map((photo, i) => (
+                      <div key={i} className="relative w-24 aspect-[3/4] rounded-xl overflow-hidden border border-border/60 shadow-md shrink-0">
+                        <img src={photo.image} alt={photo.label} className="size-full object-cover" />
+                        <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-black/60 backdrop-blur-xs rounded-md px-1.5 py-0.5 text-[9px] font-bold text-white truncate">
+                          {photo.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground font-mono">
+                    ‹ 1 / {galleryPhotos.length} › (Interactive Momentum Throw on page)
+                  </p>
                 </div>
               )}
 

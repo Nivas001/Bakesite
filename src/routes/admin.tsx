@@ -1490,6 +1490,15 @@ function AdminDashboard() {
           keywords: ["content", "editor", "text", "hero text", "story", "copywriting", "copy"],
           onSelect: () => setActiveTab("content_editor"),
         },
+        {
+          id: "nav-gallery",
+          label: "Atelier & Bakes Inertia Gallery",
+          description: "Manage About Page gallery portraits, badges, and photo order",
+          icon: <ImageIcon className="size-4" />,
+          shortcut: "G G",
+          keywords: ["gallery", "photos", "shots", "images", "about gallery", "pictures", "atelier photos", "inertia gallery", "portraits"],
+          onSelect: () => setActiveTab("content_editor"),
+        },
       ],
     };
 

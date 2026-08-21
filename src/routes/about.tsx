@@ -23,10 +23,12 @@ import {
   Compass,
   Box,
   CheckCircle,
+  Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Cake3dModelViewer } from "@/components/cake-3d-model-viewer";
 import { DeliverySecurityShowcase } from "@/components/delivery-security-showcase";
+import { InertiaGallery, GalleryShot } from "@/components/godui/inertia-gallery";
 import { useSiteContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/about")({
@@ -1340,7 +1342,45 @@ export function AboutUsPage() {
       {/* 5. Safe & Secure Delivery Packaging Showcase */}
       <DeliverySecurityShowcase />
 
-      {/* 5. Bottom Bakery Call-To-Action */}
+      {/* 6. Atelier & Hearth Inertia Gallery Showcase */}
+      <section className="py-14 sm:py-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-8 overflow-hidden">
+        <div className="text-center max-w-2xl mx-auto space-y-3">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-berry shadow-2xs">
+            <Sparkles className="size-3.5 text-berry" />
+            <span>{siteContent?.about_gallery?.badge || "Atelier & Hearth Portraits"}</span>
+          </span>
+
+          <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight">
+            {siteContent?.about_gallery?.title || "Portraits of our daily oven craft"}
+          </h2>
+
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            {siteContent?.about_gallery?.description ||
+              "A peek behind the proofing racks. Slow lamination, 24K gold gilding, and the purest single-origin bakes straight from our dawn ovens."}
+          </p>
+        </div>
+
+        {/* Inertia Gallery Motion Track with Momentum Drag & Rubberband Snap */}
+        <div className="w-full">
+          <InertiaGallery
+            snap
+            itemWidth={270}
+            gap={24}
+            className="w-full"
+          >
+            {(siteContent?.about_gallery?.photos || []).map((photo) => (
+              <GalleryShot
+                key={photo.id}
+                image={photo.image}
+                label={photo.label}
+                tag={photo.tag}
+              />
+            ))}
+          </InertiaGallery>
+        </div>
+      </section>
+
+      {/* 7. Bottom Bakery Call-To-Action */}
       <section className="py-10 px-4 sm:px-6 max-w-4xl mx-auto text-center">
         <div className="rounded-3xl border-2 border-border/80 bg-card p-8 sm:p-12 shadow-soft space-y-4">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-berry">
