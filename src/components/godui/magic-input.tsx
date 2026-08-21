@@ -358,12 +358,6 @@ export const MagicInput = React.forwardRef<HTMLInputElement, MagicInputProps>(
         ? `${ICON_BASE} opacity-100 [transform:scale(1)_rotate(0deg)]`
         : `${ICON_BASE} opacity-0 [transform:scale(0.4)_rotate(-35deg)]`;
 
-    const leftIconTransform = hasStatus
-      ? "-translate-y-[3px]"
-      : depth === "always"
-        ? "-translate-y-[3px] group-focus-within:-translate-y-[4px]"
-        : "translate-y-0 group-focus-within:-translate-y-[3px]";
-
     return (
       <div
         data-slot="magic-input"
@@ -388,7 +382,8 @@ export const MagicInput = React.forwardRef<HTMLInputElement, MagicInputProps>(
 
         {icon && (
           <span
-            className={`absolute left-3 top-1/2 -translate-y-1/2 z-[2] pointer-events-none text-muted-foreground/80 group-focus-within:text-berry transition-all duration-300 ${leftIconTransform}`}
+            className={`absolute inset-y-0 left-0 pl-3 flex items-center justify-center z-[2] pointer-events-none text-muted-foreground/70 group-focus-within:text-berry [transition:translate_600ms_cubic-bezier(0.3,0.7,0.4,1),color_200ms_ease] ${frontTransform}`}
+            aria-hidden="true"
           >
             {icon}
           </span>
