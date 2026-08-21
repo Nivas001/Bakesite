@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Sparkles, Clock, ShieldCheck, Flame, Lock, Unlock, Copy, Check, Thermometer, Wind, Droplets } from "lucide-react";
 import { toast } from "sonner";
 import { useSiteContent } from "@/lib/site-content";
+import { TextAnimate } from "@/components/godui/text-animate";
 
 interface FermentStage {
   stage: string;
@@ -107,9 +108,14 @@ export function BakerLaboratoryBento() {
             <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry block mb-1">
               {siteContent.home_lab.badge || "Pure Craft & Cold Fermentation"}
             </span>
-            <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide">
+            <TextAnimate
+              as="h2"
+              animation="blurInUp"
+              by="word"
+              className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide"
+            >
               {siteContent.home_lab.title || "The artisan bakery laboratory"}
-            </h2>
+            </TextAnimate>
           </div>
           <p className="max-w-md text-xs sm:text-sm text-muted-foreground">
             {siteContent.home_lab.description || "No shortcuts, zero chemical improvers. Just wild fermentation, stone-ground flour, and real French butter."}

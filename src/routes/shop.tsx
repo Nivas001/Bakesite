@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { MagicInput } from "@/components/godui/magic-input";
 import { Combobox, type ComboboxOption } from "@/components/godui/combobox";
 import { MultiButton, type MultiButtonItem } from "@/components/godui/multi-button";
+import { TextAnimate } from "@/components/godui/text-animate";
 import { useFlag } from "@/lib/feature-flags";
 import {
   Search,
@@ -306,9 +307,14 @@ function Shop() {
           <Sparkles className="size-3.5" />
           <span>Fresh Small-Batch Counter</span>
         </div>
-        <h1 className="font-blogh text-3xl sm:text-5xl lg:text-6xl font-bold text-cocoa uppercase tracking-wide leading-tight">
+        <TextAnimate
+          as="h1"
+          animation="blurInUp"
+          by="word"
+          className="font-blogh text-3xl sm:text-5xl lg:text-6xl font-bold text-cocoa uppercase tracking-wide leading-tight"
+        >
           The bakery counter
-        </h1>
+        </TextAnimate>
         <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
           Explore our signature brownies, velvety cheesecakes, celebration cakes, and morning tea cakes baked fresh on the day of your slot.
         </p>

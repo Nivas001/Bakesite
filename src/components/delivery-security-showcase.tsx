@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSiteContent } from "@/lib/site-content";
+import { TextAnimate } from "@/components/godui/text-animate";
 
 export interface PackagingSlide {
   id: string;
@@ -139,9 +140,14 @@ export function DeliverySecurityShowcase() {
             <ShieldCheck className="size-3.5 text-sky-600" />
             <span>{siteContent.about_delivery.badge || "Safe & Damage-Proof Courier Shield"}</span>
           </div>
-          <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide">
+          <TextAnimate
+            as="h2"
+            animation="blurInUp"
+            by="word"
+            className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide text-center"
+          >
             {siteContent.about_delivery.title || "How we deliver your bakes 100% safe & intact"}
-          </h2>
+          </TextAnimate>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
             {siteContent.about_delivery.description || "Delicate croissants, moist multi-layer cakes, and artisanal brownie slabs require precision engineering to travel from our dawn hearth to your celebration table."}
           </p>

@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Cake3dModelViewer } from "@/components/cake-3d-model-viewer";
 import { DeliverySecurityShowcase } from "@/components/delivery-security-showcase";
 import { InertiaGallery, GalleryShot } from "@/components/godui/inertia-gallery";
+import { TextAnimate } from "@/components/godui/text-animate";
 import { useSiteContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/about")({
@@ -1294,9 +1295,14 @@ export function AboutUsPage() {
                 <span>{siteContent?.about_3d?.badge || "Interactive WebGL 3D Experience"}</span>
               </span>
 
-              <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-white uppercase tracking-wide leading-tight">
+              <TextAnimate
+                as="h2"
+                animation="blurInUp"
+                by="word"
+                className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold text-white uppercase tracking-wide leading-tight text-center"
+              >
                 {siteContent?.about_3d?.title || "See how our cakes look in real world 3D"}
-              </h2>
+              </TextAnimate>
 
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-lg mx-auto">
                 {siteContent?.about_3d?.description || "Rotate, orbit, zoom, and inspect every hand-piped caramel rosette, 24K gold foil crumb, and dietary macro telemetry in our real-time 3D studio."}
@@ -1350,9 +1356,14 @@ export function AboutUsPage() {
             <span>{siteContent?.about_gallery?.badge || "Atelier & Hearth Portraits"}</span>
           </span>
 
-          <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight">
+          <TextAnimate
+            as="h2"
+            animation="blurInUp"
+            by="word"
+            className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight text-center"
+          >
             {siteContent?.about_gallery?.title || "Portraits of our daily oven craft"}
-          </h2>
+          </TextAnimate>
 
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             {siteContent?.about_gallery?.description ||
