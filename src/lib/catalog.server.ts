@@ -756,79 +756,22 @@ export async function loadCatalog() {
         listDocs<CategoryDoc>(COLLECTIONS.categories, [Q.orderAsc("sort_order"), Q.limit(50)]),
       ]);
 
-      if (products.length > 0 || categories.length > 0) {
-        // Merge missing seed categories (e.g. Brownies)
-        const existingCatSlugs = new Set(categories.map((c) => (c.slug || "").toLowerCase()));
-        const mergedCategories = [...categories];
+      // When Appwrite is configured, always return only real DB data — no seed merging.
+      const mappedCats = categories
+        .map(mapCategory)
+        .sort((a, b) => a.sort_order - b.sort_order);
 
-        for (const seedCat of SEED_CATEGORIES) {
-          if (!existingCatSlugs.has(seedCat.slug.toLowerCase())) {
-            mergedCategories.push({
-              $id: `cat_${seedCat.slug}`,
-              $createdAt: new Date().toISOString(),
-              $updatedAt: new Date().toISOString(),
-              $permissions: [],
-              $collectionId: COLLECTIONS.categories,
-              $databaseId: "",
-              name: seedCat.name,
-              slug: seedCat.slug,
-              description: seedCat.description,
-              sort_order: seedCat.sort_order,
-              layout_rows: seedCat.layout_rows ?? 1,
-            } as Doc<CategoryDoc>);
-          }
-        }
+      const mappedProds = products
+        .map((p) => mapProduct(p, categories))
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
 
-        const mappedCats = mergedCategories
-          .map(mapCategory)
-          .sort((a, b) => a.sort_order - b.sort_order);
-
-        // Merge missing seed products (e.g. Signature Belgian Truffle Fudge Brownie, etc.)
-        const existingProdSlugs = new Set(products.map((p) => (p.slug || "").toLowerCase()));
-        const mergedProducts = [...products];
-
-        for (const seedProd of SEED_PRODUCTS) {
-          if (!existingProdSlugs.has(seedProd.slug.toLowerCase())) {
-            mergedProducts.push({
-              $id: seedProd.id,
-              $createdAt: new Date().toISOString(),
-              $updatedAt: new Date().toISOString(),
-              $permissions: [],
-              $collectionId: COLLECTIONS.products,
-              $databaseId: "",
-              name: seedProd.name,
-              slug: seedProd.slug,
-              description: seedProd.description,
-              price: seedProd.price,
-              discount_type: seedProd.discount_type,
-              discount_value: seedProd.discount_value,
-              image_url: seedProd.image_url,
-              images: seedProd.images,
-              stock: seedProd.stock,
-              is_active: seedProd.is_active,
-              category_id: seedProd.category_id,
-              category_slug: seedProd.category_slug,
-              sort_order: seedProd.sort_order,
-              item_type: seedProd.item_type,
-              unit_weight_grams: seedProd.unit_weight_grams,
-              serving_yield: seedProd.serving_yield,
-              weight_variants_json: seedProd.weight_variants_json,
-            } as unknown as Doc<ProductDoc>);
-          }
-        }
-
-        const mappedProds = mergedProducts
-          .map((p) => mapProduct(p, mergedCategories))
-          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
-
-        return {
-          products: mappedProds,
-          categories: mappedCats,
-        };
-      }
+      return { products: mappedProds, categories: mappedCats };
     }
-  } catch {
-    // Fall back to seed catalog
+  } catch (err) {
+    console.error("Failed to load catalog from Appwrite:", err);
+    if (isAppwriteConfigured()) {
+      return { products: [], categories: [] };
+    }
   }
 
   // Seamless fallback with persistent active overrides
