@@ -92,7 +92,7 @@ function CartPage() {
               >
                 {/* 1. Product Thumbnail */}
                 <Link
-                  to="/product/$slug"
+                  to="/shop/$slug"
                   params={{ slug: line.slug }}
                   className="shrink-0 overflow-hidden rounded-xl sm:rounded-2xl border border-border/50 bg-secondary/40 group"
                 >
@@ -110,7 +110,7 @@ function CartPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <Link
-                        to="/product/$slug"
+                        to="/shop/$slug"
                         params={{ slug: line.slug }}
                         className="font-display font-semibold text-xs sm:text-base text-cocoa hover:text-berry transition-colors line-clamp-1"
                       >

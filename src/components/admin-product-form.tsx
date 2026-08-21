@@ -147,7 +147,7 @@ export function AdminProductForm({
 
           <div>
             <Label htmlFor="side-slug" className="text-[11px] font-semibold">
-              URL Slug <span className="text-muted-foreground font-normal">(/product/...)</span>
+              URL Slug <span className="text-muted-foreground font-normal">(/shop/...)</span>
             </Label>
             <Input
               id="side-slug"

@@ -142,7 +142,7 @@ export function FeaturedProducts({ products }: { products: CatalogProduct[] }) {
               className="glass-panel group flex w-[72%] xs:w-[62%] shrink-0 snap-start flex-col rounded-2xl p-2.5 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-lift sm:w-[42%] sm:rounded-[2rem] sm:p-4 lg:w-[31.5%]"
             >
               <Link
-                to="/product/$slug"
+                to="/shop/$slug"
                 params={{ slug: product.slug }}
                 className="relative block overflow-hidden rounded-xl sm:rounded-2xl"
               >
@@ -176,7 +176,7 @@ export function FeaturedProducts({ products }: { products: CatalogProduct[] }) {
                   {product.category_name}
                 </p>
                 <h3 className="font-blogh uppercase tracking-wide text-sm sm:text-lg font-bold leading-snug line-clamp-1 sm:line-clamp-2 text-cocoa">
-                  <Link to="/product/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
+                  <Link to="/shop/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
                     {product.name}
                   </Link>
                 </h3>

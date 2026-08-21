@@ -54,7 +54,7 @@ function Offers() {
     return data.products.map((p) => ({
       image: p.image_url || "/hero/hero-3d-cookie.jpg",
       title: p.name,
-      href: `/product/${p.slug}`,
+      href: `/shop/${p.slug}`,
       price: p.price,
     }));
   }, [data.products]);

@@ -25,7 +25,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
     <article className="group flex flex-col justify-between h-full rounded-[1.6rem] sm:rounded-[2rem] border-2 border-[#2C1810]/15 hover:border-[#2C1810]/40 bg-[#FFFDF9] dark:bg-[#1E110A] p-3 sm:p-4 shadow-[0_6px_20px_rgba(44,24,16,0.06)] hover:shadow-[0_12px_28px_rgba(44,24,16,0.12)] transition-all duration-300 hover:-translate-y-1">
       {/* Top Product Image */}
       <Link
-        to="/product/$slug"
+        to="/shop/$slug"
         params={{ slug: product.slug }}
         className="relative block overflow-hidden rounded-[1.25rem] sm:rounded-[1.5rem] border border-black/10 bg-black/5 shrink-0"
       >
@@ -71,7 +71,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
 
           {/* Product Name (Strict 2-Line Fixed Height Box so 1-line and 2-line titles align identically) */}
           <h3 className="font-blogh uppercase tracking-wide text-xs sm:text-sm font-bold leading-snug line-clamp-2 mt-1 text-cocoa h-[2.25rem] sm:h-[2.6rem] flex items-start">
-            <Link to="/product/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
+            <Link to="/shop/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
               {product.name}
             </Link>
           </h3>

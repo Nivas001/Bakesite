@@ -182,7 +182,7 @@ export function ProductEditorDialog({
 
               <div>
                 <Label htmlFor="dlg-slug" className="text-xs font-semibold">
-                  URL Slug <span className="text-muted-foreground font-normal">(/product/...)</span>
+                  URL Slug <span className="text-muted-foreground font-normal">(/shop/...)</span>
                 </Label>
                 <Input
                   id="dlg-slug"

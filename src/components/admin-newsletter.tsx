@@ -120,7 +120,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
     setShowcaseTag(`${formatCurrency(Number(p.price))} · Fresh Bake`);
     setShowcaseDesc(p.description || "Baked with pure butter and premium ingredients the morning of your chosen slot.");
     setShowcaseImage(p.image_url || "/products/croissant.jpg");
-    setShowcaseLink(`https://anibakes.app/product/${p.slug}`);
+    setShowcaseLink(`https://anibakes.app/shop/${p.slug}`);
     toast.success(`Loaded "${p.name}" into showcase!`);
   }
 
