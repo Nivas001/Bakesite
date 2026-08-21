@@ -8,4 +8,5 @@ export const Route = createFileRoute("/product/$slug")({
       statusCode: 301,
     });
   },
+  component: () => null,
 });

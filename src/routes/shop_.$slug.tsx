@@ -28,7 +28,7 @@ import { useFlag } from "@/lib/feature-flags";
 import { Stepper, type Step } from "@/components/godui/stepper";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/shop/$slug")({
+export const Route = createFileRoute("/shop_/$slug")({
   loader: async ({ params }) => {
     return getProductBySlug({ data: params.slug });
   },
