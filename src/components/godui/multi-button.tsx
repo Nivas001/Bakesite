@@ -64,13 +64,13 @@ const SIZE_CONFIG: Record<
   MultiButtonSize,
   { cell: number; icon: string; minHeight: string; text: string }
 > = {
-  sm: { cell: 36, icon: "size-3.5", minHeight: "h-9", text: "text-xs" },
-  md: { cell: 40, icon: "size-4", minHeight: "h-10", text: "text-xs sm:text-sm" },
+  sm: { cell: 34, icon: "size-4", minHeight: "h-10", text: "text-xs font-bold" },
+  md: { cell: 38, icon: "size-4", minHeight: "h-11", text: "text-xs sm:text-sm font-bold" },
   lg: {
-    cell: 44,
+    cell: 42,
     icon: "size-[18px]",
-    minHeight: "h-11",
-    text: "text-sm",
+    minHeight: "h-12",
+    text: "text-sm font-bold",
   },
 };
 
@@ -149,7 +149,7 @@ const GOOEY_ITEM_TRANSITION_CLASSES = {
 
 const GOOEY_ICON_TRANSITION_CLASSES = {
   expanded: "[transition:transform_300ms_cubic-bezier(0.3,0.7,0.4,1.5)]",
-  collapsed: "[transition:transform_200ms_bezier(0.3,0.7,0.4,1)]",
+  collapsed: "[transition:transform_200ms_cubic-bezier(0.3,0.7,0.4,1)]",
 } as const;
 
 const GOOEY_DIVIDER_TRANSITION_CLASSES = {
@@ -193,7 +193,7 @@ function railClassName({
       : "[transition:width_200ms_ease-out]"
     : "";
 
-  return `relative inline-flex items-stretch rounded-full ${minHeight} ${surface} ${widthTransition} motion-reduce:[transition:none] ${className ?? ""}`;
+  return `relative inline-flex items-center p-1 rounded-full ${minHeight} ${surface} ${widthTransition} motion-reduce:[transition:none] ${className ?? ""}`;
 }
 
 function useMultiButtonInteractions() {
@@ -240,8 +240,8 @@ function labelText(label: React.ReactNode) {
 }
 
 function estimateLabelWidth(label: React.ReactNode, size: MultiButtonSize) {
-  const textWidth = labelText(label).length * (size === "sm" ? 7 : 8);
-  return Math.ceil(textWidth) + (size === "lg" ? 14 : size === "md" ? 12 : 10);
+  const textWidth = labelText(label).length * (size === "sm" ? 8.5 : 9.5);
+  return Math.ceil(textWidth) + (size === "lg" ? 28 : size === "md" ? 24 : 20);
 }
 
 function maxLabelWidth(items: MultiButtonItem[], size: MultiButtonSize) {
@@ -280,7 +280,7 @@ function measuredLabelWidth(
   const measured = Math.ceil(
     element.getBoundingClientRect().width + marginLeft + marginRight,
   );
-  return measured > 0 ? measured : fallback;
+  return measured > 0 ? Math.max(measured, fallback) : fallback;
 }
 
 function itemAriaLabel(item: MultiButtonItem) {
@@ -411,7 +411,7 @@ function MultiButtonLabelMeasurement({
         <span
           key={`item-${item.id}`}
           data-slot="multi-button-item-label-measure"
-          className={`-ml-1 shrink-0 whitespace-nowrap pr-2 font-bold leading-none ${SIZE_CONFIG[size].text}`}
+          className={`-ml-0.5 shrink-0 whitespace-nowrap pr-3.5 pl-0.5 font-bold leading-none ${SIZE_CONFIG[size].text}`}
         >
           {item.label}
         </span>
@@ -420,7 +420,7 @@ function MultiButtonLabelMeasurement({
         <span
           key={`reserve-${item.id}`}
           data-slot="multi-button-reserve-label-measure"
-          className={`-ml-1 shrink-0 whitespace-nowrap pr-2 font-bold leading-none ${SIZE_CONFIG[size].text}`}
+          className={`-ml-0.5 shrink-0 whitespace-nowrap pr-3.5 pl-0.5 font-bold leading-none ${SIZE_CONFIG[size].text}`}
         >
           {item.label}
         </span>
@@ -438,21 +438,15 @@ function actionWidth(
   reservedLabelWidth: number,
 ) {
   if (activeId === null) {
-    return itemCount > 0
-      ? cellWidth + reservedLabelWidth / itemCount
-      : cellWidth;
+    return cellWidth;
   }
 
   const activeLabelWidth = labelWidths[activeId] ?? reservedLabelWidth;
-  if (item.id === activeId) return cellWidth + activeLabelWidth;
+  if (item.id === activeId) {
+    return cellWidth + activeLabelWidth;
+  }
 
-  const remainingLabelSpace = Math.max(
-    0,
-    reservedLabelWidth - activeLabelWidth,
-  );
-  return itemCount > 1
-    ? cellWidth + remainingLabelSpace / (itemCount - 1)
-    : cellWidth;
+  return cellWidth;
 }
 
 type MultiButtonBlobGeometry = {
@@ -478,11 +472,12 @@ function useMultiButtonLayout({
   const { labelWidths, reservedLabelWidth, measurementRef, reserveItems } =
     useLabelWidths(items, syncWidthTo, size);
   const effectiveLabelWidth = reserveLabelSpace ? reservedLabelWidth : 0;
+  const activeLabelWidth = activeId ? (labelWidths[activeId] ?? effectiveLabelWidth) : 0;
   const dividerWidth = Math.max(0, items.length - 1);
   const expandedWidth =
     items.length > 0
-      ? items.length * cfg.cell + effectiveLabelWidth + dividerWidth
-      : cfg.cell;
+      ? items.length * cfg.cell + activeLabelWidth + dividerWidth + 8
+      : cfg.cell + 8;
   const itemWidths = items.map((item) =>
     actionWidth(
       item,
@@ -642,7 +637,7 @@ const MultiButtonLabel = React.forwardRef<
   <motion.span
     ref={ref}
     {...labelMotion(reduceMotion)}
-    className={`relative z-raised -ml-1 shrink-0 whitespace-nowrap pr-2.5 font-bold leading-none ${textClass}`}
+    className={`relative z-raised -ml-0.5 shrink-0 whitespace-nowrap pr-3.5 pl-0.5 font-bold leading-none select-none ${textClass}`}
   >
     {item.label}
   </motion.span>
@@ -771,8 +766,8 @@ function MultiButtonItemButton({
   const phase = gooeyPhase(gooeyExpanded);
 
   const selectedBgClass = isSelected
-    ? "bg-berry text-white font-bold"
-    : "";
+    ? "bg-berry text-white font-bold shadow-xs"
+    : "text-cocoa font-semibold";
 
   return (
     <motion.button
@@ -805,7 +800,7 @@ function MultiButtonItemButton({
       }
       transition={gooeyMotionTransition(reduceMotion, gooeyExpanded)}
       style={{ width: `${width}px` }}
-      className={`relative isolate flex shrink-0 cursor-pointer items-center justify-start overflow-hidden rounded-full ${cfg.minHeight} focus:outline-none focus-visible:z-raised focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:[transition:none] ${accessible ? "" : "pointer-events-none"} ${gooey ? GOOEY_ITEM_TRANSITION_CLASSES[phase] : "[transition:width_220ms_cubic-bezier(0.16,1,0.3,1),background-color_150ms_ease,color_150ms_ease,scale_120ms_ease]"} ${reduceMotion ? "" : "active:scale-[0.96]"} ${selectedBgClass} ${transparent ? "" : !isSelected ? ITEM_HOVER_CLASSES[variant] : ""} ${item.hoverClassName ?? ""} ${item.className ?? ""}`}
+      className={`relative isolate flex shrink-0 cursor-pointer items-center justify-start overflow-hidden rounded-full h-full focus:outline-none focus-visible:z-raised focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:[transition:none] ${accessible ? "" : "pointer-events-none"} ${gooey ? GOOEY_ITEM_TRANSITION_CLASSES[phase] : "[transition:width_240ms_cubic-bezier(0.16,1,0.3,1),background-color_150ms_ease,color_150ms_ease,scale_120ms_ease]"} ${reduceMotion ? "" : "active:scale-[0.96]"} ${selectedBgClass} ${transparent ? "" : !isSelected ? ITEM_HOVER_CLASSES[variant] : ""} ${item.hoverClassName ?? ""} ${item.className ?? ""}`}
     >
       <span
         data-slot="multi-button-highlight"
@@ -824,7 +819,7 @@ function MultiButtonItemButton({
         showRestIcon={showRestIcon}
       />
       <AnimatePresence initial={false} mode="popLayout">
-        {(active || isSelected) && (
+        {active && (
           <MultiButtonLabel
             key={item.id}
             item={item}
@@ -843,18 +838,23 @@ function MultiButtonDivider({
   expanded,
   gooey,
   variant,
+  prevActive,
+  nextActive,
 }: {
   activeId: string | null;
   compact: boolean;
   expanded: boolean;
   gooey: boolean;
   variant: MultiButtonVariant;
+  prevActive?: boolean;
+  nextActive?: boolean;
 }) {
+  const isHidden = prevActive || nextActive || activeId !== null;
   if (!compact) {
     return (
       <span
         aria-hidden="true"
-        className={`my-2 w-px shrink-0 transition-opacity duration-150 motion-reduce:[transition:none] ${DIVIDER_CLASSES[variant]} ${activeId ? "opacity-0" : "opacity-80"}`}
+        className={`my-1.5 w-px shrink-0 transition-opacity duration-150 motion-reduce:[transition:none] ${DIVIDER_CLASSES[variant]} ${isHidden ? "opacity-0" : "opacity-70"}`}
       />
     );
   }
@@ -866,9 +866,9 @@ function MultiButtonDivider({
       aria-hidden="true"
       style={{
         width: `${expanded ? 1 : 0}px`,
-        opacity: expanded && activeId === null ? 1 : 0,
+        opacity: expanded && !isHidden ? 1 : 0,
       }}
-      className={`my-2 shrink-0 motion-reduce:[transition:none] ${gooey ? GOOEY_DIVIDER_TRANSITION_CLASSES[phase] : "[transition:width_200ms_ease-out,opacity_200ms_ease-out]"} ${DIVIDER_CLASSES[variant]}`}
+      className={`my-1.5 shrink-0 motion-reduce:[transition:none] ${gooey ? GOOEY_DIVIDER_TRANSITION_CLASSES[phase] : "[transition:width_200ms_ease-out,opacity_200ms_ease-out]"} ${DIVIDER_CLASSES[variant]}`}
     />
   );
 }
@@ -919,7 +919,10 @@ function MultiButtonItems({
 
   return items.map((item, index) => {
     const isSelected = selectedId === item.id;
-    const active = activeId === item.id || (!activeId && isSelected);
+    const active = activeId === item.id;
+    const prevItem = items[index - 1];
+    const prevActive = prevItem ? activeId === prevItem.id || selectedId === prevItem.id : false;
+    const nextActive = active || isSelected;
     const width =
       compact && !expanded
         ? isSelected
@@ -942,6 +945,8 @@ function MultiButtonItems({
             expanded={expanded}
             gooey={gooey}
             variant={variant}
+            prevActive={prevActive}
+            nextActive={nextActive}
           />
         )}
         <MultiButtonItemButton
@@ -1186,7 +1191,7 @@ export const MultiButton = React.forwardRef<HTMLDivElement, MultiButtonProps>(
       setTouchExpandedId,
       touchExpandedId,
     } = useMultiButtonInteractions();
-    const activeId = hoveredId ?? touchExpandedId;
+    const activeId = hoveredId ?? touchExpandedId ?? (selectedId || null);
     const {
       blobGeometries,
       cfg,
