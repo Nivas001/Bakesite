@@ -45,6 +45,7 @@ import { DevPanel } from "@/components/dev-panel";
 import { AdminNewsletter } from "@/components/admin-newsletter";
 import { AdminCustomerMoments } from "@/components/admin-customer-moments";
 import { AdminSiteContentEditor } from "@/components/admin-site-content-editor";
+import { AdminGalleryEditor } from "@/components/admin-gallery-editor";
 import {
   type ProductForm,
   EMPTY_FORM,
@@ -1375,6 +1376,13 @@ function AdminDashboard() {
         },
         { id: "analytics", label: "Analytics", icon: BarChart3, badge: null },
         {
+          id: "gallery",
+          label: "Gallery Atelier",
+          icon: Camera,
+          badge: "12 Shots",
+          badgeColor: "bg-berry/15 text-berry font-bold",
+        },
+        {
           id: "content_editor",
           label: "Page Text & Copy",
           icon: FileText,
@@ -1492,12 +1500,12 @@ function AdminDashboard() {
         },
         {
           id: "nav-gallery",
-          label: "Atelier & Bakes Inertia Gallery",
-          description: "Manage About Page gallery portraits, badges, and photo order",
-          icon: <ImageIcon className="size-4" />,
+          label: "Atelier & Bakes Gallery Studio",
+          description: "Drag-and-swap 360° photo sequence, edit pill labels and photos",
+          icon: <Camera className="size-4" />,
           shortcut: "G G",
-          keywords: ["gallery", "photos", "shots", "images", "about gallery", "pictures", "atelier photos", "inertia gallery", "portraits"],
-          onSelect: () => setActiveTab("content_editor"),
+          keywords: ["gallery", "photos", "shots", "images", "about gallery", "pictures", "atelier photos", "inertia gallery", "portraits", "reorder", "swap"],
+          onSelect: () => setActiveTab("gallery"),
         },
       ],
     };
@@ -1722,6 +1730,7 @@ function AdminDashboard() {
                   {activeTab === "newsletter" && "Newsletter Subscribers"}
                   {activeTab === "reviews" && "Customer Reviews & Community"}
                   {activeTab === "analytics" && "Bakery Analytics & Reports"}
+                  {activeTab === "gallery" && "About Page Gallery Atelier"}
                   {activeTab === "content_editor" && "Page Text & Copywriting Studio"}
                 </h1>
                 <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
@@ -3845,6 +3854,10 @@ function AdminDashboard() {
 
         <TabsContent value="reviews" className="mt-0">
           <AdminCustomerMoments />
+        </TabsContent>
+
+        <TabsContent value="gallery" className="mt-0">
+          <AdminGalleryEditor />
         </TabsContent>
 
         <TabsContent value="content_editor" className="mt-0">
