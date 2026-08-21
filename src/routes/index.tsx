@@ -21,12 +21,7 @@ import heroImage from "@/assets/hero-bakery.jpg";
 import { getCatalog } from "@/lib/catalog.functions";
 import { FeaturedProducts } from "@/components/featured-products";
 import { Button } from "@/components/ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion } from "@/components/godui/accordion";
 import { CakeStudioCarousel } from "@/components/cake-studio-carousel";
 import { CakeBuilderWidget } from "@/components/cake-builder-widget";
 import { BakerLaboratoryBento } from "@/components/baker-laboratory-bento";
@@ -215,24 +210,19 @@ function Home() {
                 ))}
               </div>
 
-              {/* Single-Column Accordion */}
+              {/* Single-Column GodUI Spring Accordion */}
               <div className="mx-auto max-w-3xl">
-                <Accordion type="single" collapsible className="space-y-2.5">
-                  {filteredFaqs.map((faq, i) => (
-                    <AccordionItem
-                      key={`${selectedFaqCategory}-${i}`}
-                      value={`faq-${i}`}
-                      className="overflow-hidden rounded-xl sm:rounded-2xl border border-border/80 bg-card/95 px-4 py-1 sm:px-6 shadow-2xs transition-all hover:border-berry/40 backdrop-blur-xs"
-                    >
-                      <AccordionTrigger className="py-3.5 text-left font-sans text-sm font-bold text-cocoa hover:no-underline sm:text-base">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="pb-3.5 text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                <Accordion
+                  type="single"
+                  collapsible
+                  animation="spring"
+                  items={filteredFaqs.map((faq, i) => ({
+                    value: `faq-${selectedFaqCategory}-${i}`,
+                    title: faq.question,
+                    content: faq.answer,
+                  }))}
+                  className="rounded-2xl sm:rounded-3xl border-2 border-[#2C1810]/15 dark:border-border/80 bg-card/95 shadow-soft backdrop-blur-md divide-y divide-border/60"
+                />
               </div>
             </div>
           </section>
