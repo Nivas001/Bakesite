@@ -4,6 +4,7 @@ import { useState, useMemo, useRef } from "react";
 import { getCatalog } from "@/lib/catalog.functions";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
+import { MagicInput } from "@/components/godui/magic-input";
 import { useFlag } from "@/lib/feature-flags";
 import { Search, X, ArrowUpDown, ArrowRight, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import type { CatalogProduct } from "@/lib/pricing";
@@ -276,26 +277,20 @@ function Shop() {
 
         {/* Search & Sort Controls */}
         <div className="flex items-center gap-3 sm:ml-auto w-full sm:w-auto">
-          {/* Search Bar */}
+          {/* Search Bar with GodUI 3D MagicInput */}
           {showSearch && (
-            <div className="relative flex-1 sm:w-48 lg:w-56 flex items-center border-b-2 border-[#2C1810]/30 hover:border-[#2C1810]/60 focus-within:border-[#2C1810] transition-colors pb-1 shrink-0">
-              <Search className="size-3.5 text-[#2C1810]/60 mr-2 shrink-0 pointer-events-none" />
-              <input
-                type="search"
+            <div className="w-full sm:w-52 lg:w-60 shrink-0">
+              <MagicInput
+                size="sm"
+                rainbow
+                depth="focus"
+                icon={<Search className="size-3.5" />}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search menu…"
-                className="w-full bg-transparent text-xs font-semibold text-cocoa placeholder:text-muted-foreground/70 focus:outline-none"
+                onClear={() => setSearch("")}
+                placeholder="Search any products..."
+                className="w-full text-xs font-semibold text-cocoa"
               />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-1"
-                >
-                  <X className="size-3.5" />
-                </button>
-              )}
             </div>
           )}
 
