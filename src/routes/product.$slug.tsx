@@ -25,6 +25,7 @@ import { useCart } from "@/lib/cart";
 import { formatCurrency, finalPrice, hasDiscount, discountLabel, type ProductWeightVariant } from "@/lib/pricing";
 import { getProductBySlug } from "@/lib/catalog.functions";
 import { useFlag } from "@/lib/feature-flags";
+import { Stepper, type Step } from "@/components/godui/stepper";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -52,10 +53,10 @@ const TRUST_BADGES = [
   { icon: HeartHandshake, label: "Eco Packaging", color: "text-sky-600" },
 ];
 
-const HOW_STEPS = [
-  { emoji: "📅", title: "Choose a slot", desc: "Pick your delivery date & time window" },
-  { emoji: "🧑‍🍳", title: "Baker prepares", desc: "Fresh-baked the morning of your slot" },
-  { emoji: "📦", title: "Delivered or Pickup", desc: "At your door or collect from counter" },
+const ORDER_PIPELINE_STEPS: Step[] = [
+  { label: "1. Choose Cake", description: "Pick flavor & baking slot" },
+  { label: "2. Pay", description: "Instant secure checkout" },
+  { label: "3. Delivery", description: "Doorstep drop or pickup" },
 ];
 
 const EXPLORE_CATEGORIES = [
@@ -395,29 +396,23 @@ function ProductDetailPage() {
             </p>
           )}
 
-          {/* "How it gets to you" Pipeline */}
+          {/* GodUI Dynamic Stepper: "1. Choose cake, 2. Pay, 3. Delivery" */}
           {showHowItWorks && (
-            <div className="rounded-2xl border border-border/60 bg-secondary/30 p-3 sm:p-3.5">
-              <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                How It Gets To You
-              </p>
-              <div className="flex items-start gap-1 sm:gap-2">
-                {HOW_STEPS.map((step, i) => (
-                  <div key={step.title} className="flex-1 flex flex-col items-center text-center relative">
-                    {/* Connector line */}
-                    {i < HOW_STEPS.length - 1 && (
-                      <div className="absolute top-3.5 left-1/2 w-full h-px bg-border/80" />
-                    )}
-                    <span className="relative z-10 flex size-7 sm:size-8 items-center justify-center rounded-full bg-card border border-border/70 text-xs sm:text-sm shadow-2xs">
-                      {step.emoji}
-                    </span>
-                    <p className="mt-1 text-[10px] sm:text-[11px] font-bold text-cocoa leading-tight">{step.title}</p>
-                    <p className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground leading-snug hidden sm:block">
-                      {step.desc}
-                    </p>
-                  </div>
-                ))}
+            <div className="rounded-3xl border border-border/80 bg-card/80 p-4 sm:p-5 shadow-soft space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10.5px] sm:text-xs font-bold uppercase tracking-wider text-berry flex items-center gap-1.5">
+                  <Sparkles className="size-3.5" />
+                  <span>How It Gets To You</span>
+                </span>
+                <span className="text-[10.5px] text-muted-foreground font-semibold">
+                  {quantityInCart > 0 ? "Step 2 of 3" : "Step 1 of 3"}
+                </span>
               </div>
+              <Stepper
+                steps={ORDER_PIPELINE_STEPS}
+                active={quantityInCart > 0 ? 1 : 0}
+                className="w-full pt-1"
+              />
             </div>
           )}
 
