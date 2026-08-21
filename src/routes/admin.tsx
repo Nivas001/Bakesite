@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { RequireAuth } from "@/components/require-auth";
 import { Button } from "@/components/ui/button";
@@ -95,7 +95,9 @@ import {
   List,
   Save,
   RotateCcw,
+  Search,
 } from "lucide-react";
+import { CommandPalette, type CommandGroup } from "@/components/godui/command-palette";
 
 export type AdminSearch = {
   tab?: string | undefined;
@@ -1383,6 +1385,194 @@ function AdminDashboard() {
     },
   ];
 
+  const [commandOpen, setCommandOpen] = useState(false);
+
+  const commandGroups: CommandGroup[] = useMemo(() => {
+    const navigationGroup: CommandGroup = {
+      heading: "Navigation & Tabs",
+      items: [
+        {
+          id: "nav-overview",
+          label: "Atelier Dashboard Overview",
+          description: "Revenue, today's schedule, and performance stats",
+          icon: <LayoutDashboard className="size-4" />,
+          shortcut: "G O",
+          keywords: ["home", "dashboard", "stats", "metrics", "summary", "overview"],
+          onSelect: () => setActiveTab("overview"),
+        },
+        {
+          id: "nav-orders",
+          label: "Orders & Kitchen Slots",
+          description: "Customer orders, kitchen slots, and approvals",
+          icon: <ShoppingBag className="size-4" />,
+          shortcut: "G S",
+          keywords: ["orders", "slots", "pending", "approvals", "deliveries", "schedule", "kitchen review"],
+          onSelect: () => setActiveTab("orders"),
+        },
+        {
+          id: "nav-inventory",
+          label: "Products, Menu & Pricing",
+          description: "Edit bakes, set prices, manage discounts, upload images",
+          icon: <Package className="size-4" />,
+          shortcut: "G P",
+          keywords: ["inventory", "products", "items", "bakes", "dishes", "menu", "edit products", "pricing", "catalog"],
+          onSelect: () => setActiveTab("inventory"),
+        },
+        {
+          id: "nav-layout",
+          label: "Shop Page & Category Arrangement",
+          description: "Reorder categories, set desktop rows, and sequence products",
+          icon: <Layers className="size-4" />,
+          shortcut: "G L",
+          keywords: ["layout", "categories", "rows", "sequencing", "reorder", "shop layout"],
+          onSelect: () => setActiveTab("shop_layout"),
+        },
+        {
+          id: "nav-offers",
+          label: "Promotions & Discount Codes",
+          description: "Create and manage customer promo codes and coupons",
+          icon: <Tag className="size-4" />,
+          shortcut: "G D",
+          keywords: ["coupons", "discounts", "promo codes", "offers", "vouchers", "promotions"],
+          onSelect: () => setActiveTab("offers"),
+        },
+        {
+          id: "nav-calendar",
+          label: "Holiday & Closed Kitchen Dates",
+          description: "Set blackout dates and closure periods",
+          icon: <Calendar className="size-4" />,
+          shortcut: "G C",
+          keywords: ["calendar", "closed dates", "holidays", "blackout", "off days", "kitchen closed"],
+          onSelect: () => setActiveTab("calendar"),
+        },
+        {
+          id: "nav-users",
+          label: "Customer Accounts & Profiles",
+          description: "View customer profiles, orders, and contact details",
+          icon: <Users className="size-4" />,
+          shortcut: "G U",
+          keywords: ["users", "customers", "accounts", "profiles", "members"],
+          onSelect: () => setActiveTab("users"),
+        },
+        {
+          id: "nav-newsletter",
+          label: "Newsletter Subscribers & Broadcasts",
+          description: "Email subscriber list and broadcast campaigns",
+          icon: <Mail className="size-4" />,
+          shortcut: "G N",
+          keywords: ["newsletter", "subscribers", "broadcast", "email marketing"],
+          onSelect: () => setActiveTab("newsletter"),
+        },
+        {
+          id: "nav-reviews",
+          label: "Customer Moments & Reviews",
+          description: "Moderate customer review submissions and stories",
+          icon: <Star className="size-4" />,
+          shortcut: "G R",
+          keywords: ["reviews", "ratings", "feedback", "testimonials", "moments"],
+          onSelect: () => setActiveTab("reviews"),
+        },
+        {
+          id: "nav-analytics",
+          label: "Bakery Analytics & Reports",
+          description: "Sales trends, top sellers, and revenue breakdowns",
+          icon: <BarChart3 className="size-4" />,
+          shortcut: "G A",
+          keywords: ["analytics", "revenue", "sales", "earnings", "reports", "charts"],
+          onSelect: () => setActiveTab("analytics"),
+        },
+        {
+          id: "nav-content",
+          label: "Copywriting Studio & Page Text",
+          description: "Edit hero banners, brand story, and page copy",
+          icon: <FileText className="size-4" />,
+          shortcut: "G T",
+          keywords: ["content", "editor", "text", "hero text", "story", "copywriting", "copy"],
+          onSelect: () => setActiveTab("content_editor"),
+        },
+      ],
+    };
+
+    const actionsGroup: CommandGroup = {
+      heading: "Quick Actions",
+      items: [
+        {
+          id: "action-new-bake",
+          label: "Create New Bake / Product",
+          description: "Open the creation form to add a new delicious item",
+          icon: <Plus className="size-4 text-emerald-600" />,
+          shortcut: "⌘N",
+          keywords: ["new", "create", "add product", "new bake", "add item", "new cake", "new brownie"],
+          onSelect: () => {
+            setForm(EMPTY_FORM);
+            setEditingProductId(null);
+            setActiveTab("inventory");
+            setTimeout(() => {
+              const el = document.getElementById("side-name");
+              if (el) { el.focus(); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+            }, 120);
+          },
+        },
+        {
+          id: "action-bakesheet",
+          label: "Open Kitchen Bake Sheet",
+          description: "View and print today's production list for the kitchen",
+          icon: <Printer className="size-4 text-berry" />,
+          shortcut: "⌘P",
+          keywords: ["bake sheet", "kitchen sheet", "print", "production sheet", "daily bakes"],
+          onSelect: () => setBakeSheetOpen(true),
+        },
+        {
+          id: "action-new-coupon",
+          label: "Create New Promo Code",
+          description: "Jump to discount codes to generate a new voucher",
+          icon: <Tag className="size-4 text-purple-600" />,
+          keywords: ["create coupon", "add discount", "new promo", "new offer"],
+          onSelect: () => setActiveTab("offers"),
+        },
+        {
+          id: "action-new-blackout",
+          label: "Add Kitchen Closed Date",
+          description: "Block out delivery and pickup slots on the calendar",
+          icon: <Calendar className="size-4 text-rose-600" />,
+          keywords: ["add holiday", "close kitchen", "blackout date", "day off"],
+          onSelect: () => setActiveTab("calendar"),
+        },
+        {
+          id: "action-preview-store",
+          label: "Open Public Storefront",
+          description: "Preview the customer-facing bakery shop in a new tab",
+          icon: <ExternalLink className="size-4 text-sky-600" />,
+          keywords: ["storefront", "preview", "shop", "public site", "customer view"],
+          onSelect: () => window.open("/shop", "_blank"),
+        },
+        {
+          id: "action-refresh",
+          label: "Refresh Live Catalog & Orders",
+          description: "Sync latest data from database",
+          icon: <RefreshCw className="size-4 text-muted-foreground" />,
+          shortcut: "⌘R",
+          keywords: ["refresh", "reload", "sync", "fetch"],
+          onSelect: () => refresh(),
+        },
+      ],
+    };
+
+    const productsGroup: CommandGroup = {
+      heading: "Catalog Bakes & Products",
+      items: data.products.map((p) => ({
+        id: `prod-${p.id}`,
+        label: p.name,
+        description: `₹${p.price} • ${p.category_name ?? "Bakery"} • /${p.slug}`,
+        icon: <Package className="size-4 text-berry" />,
+        keywords: [p.name, p.slug, p.category_name ?? "", "edit", "product", "bake", "price"],
+        onSelect: () => handleEditProduct(p),
+      })),
+    };
+
+    return [navigationGroup, actionsGroup, productsGroup];
+  }, [data.products, setActiveTab, setForm, setEditingProductId, setBakeSheetOpen, refresh, handleEditProduct]);
+
   return (
     <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">
       {/* Mobile Drawer Backdrop */}
@@ -1536,14 +1726,31 @@ function AdminDashboard() {
             </div>
           </div>
 
-          {/* Top Quick Actions */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Center/Right: Quick Command Palette Search Trigger & Actions */}
+          <div className="flex items-center gap-2.5 shrink-0 ml-auto">
+            <button
+              type="button"
+              onClick={() => setCommandOpen(true)}
+              className="flex items-center gap-2 rounded-2xl border border-border/80 bg-secondary/50 hover:bg-secondary/90 px-3 py-1.5 text-xs text-muted-foreground transition-all duration-150 shadow-2xs hover:border-berry/40 cursor-pointer w-36 sm:w-56 md:w-64 justify-between"
+              title="Open Command Palette (⌘K / Ctrl+K)"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Search className="size-3.5 text-berry shrink-0" />
+                <span className="truncate font-medium text-cocoa/80 text-left text-[11px] sm:text-xs">
+                  Search bakes, tabs…
+                </span>
+              </div>
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-md border border-border/70 bg-card px-1.5 py-0.5 text-[10px] font-mono font-bold text-muted-foreground shadow-2xs shrink-0">
+                ⌘K
+              </kbd>
+            </button>
+
             <Button
               type="button"
               size="sm"
               variant="outline"
               onClick={() => refresh()}
-              className="rounded-2xl h-9 px-3 text-xs font-semibold hover:border-berry/40 flex items-center gap-1.5 cursor-pointer"
+              className="rounded-2xl h-9 px-2.5 sm:px-3 text-xs font-semibold hover:border-berry/40 flex items-center gap-1.5 cursor-pointer"
             >
               <RefreshCw className="size-3.5 text-muted-foreground" />
               <span className="hidden md:inline">Refresh</span>
@@ -1561,10 +1768,10 @@ function AdminDashboard() {
                   if (el) { el.focus(); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
                 }, 120);
               }}
-              className="rounded-2xl h-9 px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
+              className="rounded-2xl h-9 px-3 sm:px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
             >
               <Plus className="size-4" />
-              <span>New Bake</span>
+              <span className="hidden sm:inline">New Bake</span>
             </Button>
           </div>
         </header>
@@ -3849,6 +4056,12 @@ function AdminDashboard() {
         onOpenChange={setBakeSheetOpen}
         orders={data.orders}
         products={data.products}
+      />
+      <CommandPalette
+        open={commandOpen}
+        onOpenChange={setCommandOpen}
+        groups={commandGroups}
+        placeholder="Type a command, bake name, or tab… (⌘K)"
       />
     </div>
   );
