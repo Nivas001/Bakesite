@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Radial Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FFF1F3" />
+      <stop offset="60%" stop-color="#FFE4E8" />
+      <stop offset="100%" stop-color="#FCD5DC" />
+    </radialGradient>
+
+    <!-- Berry Gradient -->
+    <linearGradient id="berryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E11D48" />
+      <stop offset="100%" stop-color="#9F1239" />
+    </linearGradient>
+
+    <!-- Cake Sponge Top Gradient -->
+    <linearGradient id="frostingTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FFF0F5" />
+    </linearGradient>
+
+    <!-- Cake Middle Tier Gradient -->
+    <linearGradient id="cakeTier" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCE7EC" />
+      <stop offset="50%" stop-color="#F4A7B9" />
+      <stop offset="100%" stop-color="#E87A90" />
+    </linearGradient>
+
+    <!-- Cocoa Base Gradient -->
+    <linearGradient id="cocoaBase" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5C3A21" />
+      <stop offset="100%" stop-color="#2C1810" />
+    </linearGradient>
+
+    <!-- Gold Flame Gradient -->
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="50%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#FEF08A" />
+    </linearGradient>
+
+    <!-- Soft Drop Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#2C1810" flood-opacity="0.18" />
+    </filter>
+    
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Circular Container Frame with Rich Bakery Glow -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  <rect width="496" height="496" x="8" y="8" rx="120" fill="none" stroke="#E11D48" stroke-width="4" stroke-opacity="0.25" />
+
+  <!-- Cake Stand / Ceramic Plate -->
+  <g filter="url(#shadow)">
+    <!-- Stand Base -->
+    <path d="M 206 430 L 306 430 L 290 410 L 222 410 Z" fill="url(#cocoaBase)" opacity="0.85" />
+    <!-- Stand Plate Oval -->
+    <ellipse cx="256" cy="410" rx="170" ry="24" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="3" />
+    <ellipse cx="256" cy="408" rx="156" ry="18" fill="#FFF5F7" />
+  </g>
+
+  <!-- Bottom Tier (Rich Cocoa & Berry Sponge) -->
+  <g filter="url(#shadow)">
+    <path d="M 130 310 Q 130 380 256 380 Q 382 380 382 310 L 382 270 Q 256 310 130 270 Z" fill="url(#cakeTier)" />
+    <!-- Bottom Drip Effect -->
+    <path d="M 130 270 
+             C 145 295, 160 295, 175 270 
+             C 190 300, 210 300, 225 270 
+             C 240 305, 260 305, 275 270 
+             C 290 300, 310 300, 325 270 
+             C 340 295, 365 295, 382 270 
+             L 382 250 Q 256 285 130 250 Z" fill="#FFFFFF" />
+  </g>
+
+  <!-- Top Tier (Velvet Cream Layer) -->
+  <g filter="url(#shadow)">
+    <path d="M 170 230 Q 170 290 256 290 Q 342 290 342 230 L 342 195 Q 256 225 170 195 Z" fill="url(#cakeTier)" />
+    <!-- Top Tier Drips -->
+    <path d="M 170 195 
+             C 185 220, 200 220, 212 195 
+             C 225 225, 245 225, 256 195 
+             C 268 225, 288 225, 300 195 
+             C 315 220, 330 220, 342 195 
+             L 342 180 Q 256 205 170 180 Z" fill="#FFFFFF" />
+    <!-- Top Frosting Crown -->
+    <ellipse cx="256" cy="180" rx="86" ry="24" fill="url(#frostingTop)" stroke="#FCE7EC" stroke-width="2" />
+  </g>
+
+  <!-- Fresh Raspberries / Strawberries on Top -->
+  <!-- Left Berry -->
+  <ellipse cx="220" cy="165" rx="18" ry="22" fill="url(#berryGrad)" />
+  <circle cx="216" cy="158" r="4" fill="#FFFFFF" opacity="0.6" />
+  
+  <!-- Right Berry -->
+  <ellipse cx="292" cy="165" rx="18" ry="22" fill="url(#berryGrad)" />
+  <circle cx="288" cy="158" r="4" fill="#FFFFFF" opacity="0.6" />
+
+  <!-- Center Celebration Candle -->
+  <g filter="url(#glow)">
+    <!-- Candle Stick -->
+    <rect x="250" y="115" width="12" height="50" rx="4" fill="#E11D48" stroke="#FFFFFF" stroke-width="1.5" />
+    <line x1="256" y1="115" x2="256" y2="105" stroke="#2C1810" stroke-width="2.5" stroke-linecap="round" />
+    
+    <!-- Radiant Flame -->
+    <path d="M 256 70 C 244 90, 246 102, 256 106 C 266 102, 268 90, 256 70 Z" fill="url(#flameGrad)" />
+    <circle cx="256" cy="94" r="4" fill="#FFFFFF" opacity="0.9" />
+  </g>
+
+  <!-- Gold Stars / Magic Sparkles -->
+  <path d="M 120 130 Q 120 145 105 145 Q 120 145 120 160 Q 120 145 135 145 Q 120 145 120 130 Z" fill="#F59E0B" />
+  <path d="M 395 140 Q 395 152 383 152 Q 395 152 395 164 Q 395 152 407 152 Q 395 152 395 140 Z" fill="#F59E0B" />
+  <path d="M 380 340 Q 380 350 370 350 Q 380 350 380 360 Q 380 350 390 350 Q 380 350 380 340 Z" fill="#E11D48" opacity="0.7" />
+</svg>
