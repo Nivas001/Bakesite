@@ -1,459 +1,425 @@
 import { useState } from "react";
-import { Sparkles, MessageCircle, Check, Wand2, Users, Heart, ShieldCheck, Flame, Leaf } from "lucide-react";
+import { Check, Leaf, MessageCircle, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/motion/reveal";
+import { CakePreview, type CakeShape } from "@/components/cake-studio/cake-preview";
+import { formatCurrency } from "@/lib/pricing";
+import { cn } from "@/lib/utils";
 
 interface SizeOption {
   id: string;
   name: string;
   serves: string;
   basePrice: number;
-  icon: string;
+  shape: CakeShape;
+  blurb: string;
 }
 
-interface FlavorOption {
+interface SpongeOption {
+  id: string;
+  name: string;
+  desc: string;
+  colour: string;
+}
+
+interface FlavourOption {
   id: string;
   name: string;
   cream: string;
-  image: string;
   badge: string;
-  accent: string;
+  frosting: string;
+  frostingLight: string;
+  drip: string;
+}
+
+interface AddonOption {
+  id: string;
+  name: string;
+  price: number;
+  icon: string;
 }
 
 const SIZES: SizeOption[] = [
   {
     id: "bento",
-    name: '4" Bento Cake',
-    serves: "2–3 Guests",
+    name: '4" Bento',
+    serves: "2–3 guests",
     basePrice: 550,
-    icon: "🧁",
+    shape: "bento",
+    blurb: "One tier, just for two",
   },
   {
     id: "layer6",
-    name: '6" Layer Cake',
-    serves: "6–8 Guests",
+    name: '6" Layer',
+    serves: "6–8 guests",
     basePrice: 1250,
-    icon: "🎂",
+    shape: "double",
+    blurb: "Two tiers, the classic",
   },
   {
     id: "feast8",
-    name: '8" Grand Feast',
-    serves: "12–16 Guests",
+    name: '8" Grand',
+    serves: "12–16 guests",
     basePrice: 1850,
-    icon: "👑",
+    shape: "triple",
+    blurb: "Three tiers, full occasion",
   },
   {
     id: "slab",
-    name: "Brownie Feast Slab",
-    serves: "10–14 Guests",
+    name: "Feast Slab",
+    serves: "10–14 guests",
     basePrice: 1450,
-    icon: "🍫",
+    shape: "slab",
+    blurb: "Low, wide, brownie-dense",
   },
 ];
 
-const SPONGES = [
-  { id: "chiffon", name: "Fluffy Chiffon", desc: "Airy & light" },
-  { id: "butter", name: "Heritage Butter", desc: "Velvety crumb" },
-  { id: "fudge", name: "Belgian Dark Fudge", desc: "Rich chocolate" },
+const SPONGES: SpongeOption[] = [
+  { id: "chiffon", name: "Fluffy Chiffon", desc: "Airy and light", colour: "#F5E3C8" },
+  { id: "butter", name: "Heritage Butter", desc: "Velvety crumb", colour: "#EED9AE" },
+  { id: "fudge", name: "Belgian Dark Fudge", desc: "Rich chocolate", colour: "#4A2C18" },
 ];
 
-const FLAVORS: FlavorOption[] = [
+const FLAVOURS: FlavourOption[] = [
   {
     id: "strawberry",
     name: "Strawberry Vanilla",
-    cream: "Whipped Berry Mascarpone",
-    image: "/cakes/pink-bento-cake.webp",
-    badge: "Signature Romance",
-    accent: "bg-rose-500",
+    cream: "Whipped berry mascarpone",
+    badge: "Signature romance",
+    frosting: "#F7C9D3",
+    frostingLight: "#FFE9EF",
+    drip: "#E05A7A",
   },
   {
     id: "truffle",
     name: "70% Belgian Truffle",
-    cream: "Dark Cocoa Ganache Drip",
-    image: "/cakes/belgian-truffle-cake.webp",
-    badge: "Rich Decadence",
-    accent: "bg-amber-600",
+    cream: "Dark cocoa ganache drip",
+    badge: "Rich decadence",
+    frosting: "#7A5638",
+    frostingLight: "#A87F57",
+    drip: "#2A150C",
   },
   {
     id: "lavender",
     name: "Lavender Pearl",
-    cream: "French Buttercream & Berries",
-    image: "/cakes/butterfly-lilac-cake.webp",
-    badge: "Artisan Floral",
-    accent: "bg-purple-500",
+    cream: "French buttercream and berries",
+    badge: "Artisan floral",
+    frosting: "#CDBDE6",
+    frostingLight: "#EBE2F8",
+    drip: "#7C5FA8",
   },
   {
     id: "biscoff",
     name: "Pistachio Biscoff",
-    cream: "Caramel Lotus Feathering",
-    image: "/cakes/biscoff-herringbone-cake.webp",
-    badge: "Celebration Crunch",
-    accent: "bg-orange-500",
+    cream: "Caramel lotus feathering",
+    badge: "Celebration crunch",
+    frosting: "#E3B57E",
+    frostingLight: "#F8E2C2",
+    drip: "#9C5B22",
   },
 ];
 
-const DECOR_ADDONS = [
-  { id: "berries", name: "Fresh Berries", price: 100, icon: "🍓" },
-  { id: "gold", name: "24K Gold Leaf", price: 120, icon: "✨" },
-  { id: "blossoms", name: "Buttercream Blossoms", price: 80, icon: "🌸" },
-  { id: "pearls", name: "Sugar Pearls", price: 50, icon: "🦪" },
-  { id: "spheres", name: "Truffle Spheres", price: 150, icon: "👑" },
-  { id: "candles", name: "Pastel Candles", price: 40, icon: "🕯️" },
+const ADDONS: AddonOption[] = [
+  { id: "berries", name: "Fresh berries", price: 100, icon: "🍓" },
+  { id: "gold", name: "24K gold leaf", price: 120, icon: "✨" },
+  { id: "blossoms", name: "Buttercream blossoms", price: 80, icon: "🌸" },
+  { id: "pearls", name: "Sugar pearls", price: 50, icon: "🦪" },
+  { id: "spheres", name: "Truffle spheres", price: 150, icon: "🍫" },
+  { id: "candles", name: "Pastel candles", price: 40, icon: "🕯️" },
 ];
 
-const PRESET_MESSAGES = [
-  "Happy Birthday 💕",
-  "Happy Anniversary 💍",
-  "Congratulations 🎉",
-  "Best Mom Ever ✨",
-];
+const PRESET_MESSAGES = ["Happy Birthday", "Happy Anniversary", "Congratulations", "Best Mum Ever"];
+
+const EGGLESS_SURCHARGE = 60;
+const MAX_MESSAGE = 26;
 
 export function CakeBuilderWidget() {
-  const [selectedSize, setSelectedSize] = useState<SizeOption>(SIZES[0]!);
-  const [selectedSponge, setSelectedSponge] = useState(SPONGES[0]!);
-  const [selectedFlavor, setSelectedFlavor] = useState<FlavorOption>(FLAVORS[0]!);
-  const [selectedAddons, setSelectedAddons] = useState<string[]>(["berries", "gold"]);
-  const [isEggless, setIsEggless] = useState(false);
-  const [cakeMessage, setCakeMessage] = useState("Happy Birthday");
+  const [size, setSize] = useState<SizeOption>(SIZES[1]!);
+  const [sponge, setSponge] = useState<SpongeOption>(SPONGES[0]!);
+  const [flavour, setFlavour] = useState<FlavourOption>(FLAVOURS[0]!);
+  const [addons, setAddons] = useState<string[]>(["berries", "gold"]);
+  const [eggless, setEggless] = useState(false);
+  const [message, setMessage] = useState("Happy Birthday");
 
   function toggleAddon(id: string) {
-    setSelectedAddons((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setAddons((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
-  const addonTotal = selectedAddons.reduce((sum, id) => {
-    const addon = DECOR_ADDONS.find((a) => a.id === id);
-    return sum + (addon ? addon.price : 0);
-  }, 0);
+  const addonTotal = addons.reduce(
+    (sum, id) => sum + (ADDONS.find((a) => a.id === id)?.price ?? 0),
+    0,
+  );
+  const total = size.basePrice + addonTotal + (eggless ? EGGLESS_SURCHARGE : 0);
 
-  const totalEstimate = selectedSize.basePrice + addonTotal;
-
-  const activeAddonNames = selectedAddons
-    .map((id) => DECOR_ADDONS.find((a) => a.id === id)?.name)
+  const addonNames = addons
+    .map((id) => ADDONS.find((a) => a.id === id)?.name)
     .filter(Boolean)
     .join(", ");
 
   const whatsappText = encodeURIComponent(
-    `Hi Ani Bakes! 🎂 I customized a bespoke celebration cake on your studio:\n\n` +
-      `• Size & Servings: ${selectedSize.name} (${selectedSize.serves})\n` +
-      `• Base Sponge: ${selectedSponge.name}\n` +
-      `• Flavor Profile: ${selectedFlavor.name} (${selectedFlavor.cream})\n` +
-      `• Artisan Add-ons: ${activeAddonNames || "Standard Finish"}\n` +
-      `• Dietary: ${isEggless ? "100% Eggless Vegetarian" : "Standard Farm Fresh Egg"}\n` +
-      `• Hand-Piped Message: "${cakeMessage || "No Inscription"}"\n` +
-      `• Estimated Total: ₹${totalEstimate}\n\n` +
-      `Could you confirm slot availability for my upcoming celebration?`
+    `Hi Ani Bakes! I designed a cake in your studio:\n\n` +
+      `• Size: ${size.name} (${size.serves})\n` +
+      `• Sponge: ${sponge.name}\n` +
+      `• Flavour: ${flavour.name} — ${flavour.cream}\n` +
+      `• Finishing: ${addonNames || "Clean finish"}\n` +
+      `• Dietary: ${eggless ? "Eggless" : "Standard egg recipe"}\n` +
+      `• Inscription: "${message.trim() || "None"}"\n` +
+      `• Estimate: ${formatCurrency(total)}\n\n` +
+      `Could you confirm slot availability?`,
   );
 
   return (
-    <section className="py-12 sm:py-16">
+    <section className="py-10 sm:py-16">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
-          <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 px-3.5 py-1 text-xs font-extrabold uppercase tracking-wider text-amber-900 dark:text-amber-300 mb-2">
+        <Reveal variant="fade-up">
+          <div className="mb-7 max-w-2xl sm:mb-10">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-amber-900 dark:text-amber-300">
               <Wand2 className="size-3.5" />
-              <span>Bespoke Cake Atelier</span>
-            </div>
-            <h2 className="font-nimbus text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight">
-              Interactive Cake Studio
+              Design your cake
+            </span>
+            <h2 className="mt-3 font-nimbus text-3xl font-bold leading-[1.1] text-cocoa sm:text-5xl">
+              Build it here. We bake it at dawn.
             </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+              Every choice below redraws the cake on the left. When it looks right, send it over on
+              WhatsApp and we will confirm your slot.
+            </p>
           </div>
-          <p className="text-xs sm:text-sm text-muted-foreground sm:text-right max-w-sm">
-            Handcrafted with 100% pure butter and Belgian couverture chocolate the morning of your event.
-          </p>
-        </div>
+        </Reveal>
 
-        {/* Single-Screen Desktop Layout (6 Cols Left / 6 Cols Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-          
-          {/* LEFT: Bento Controls (6 Columns) */}
-          <div className="lg:col-span-6 flex flex-col justify-between gap-3.5">
-            
-            {/* Bento Card 1: Canvas Size & Base Sponge */}
-            <div className="rounded-3xl border border-border/80 bg-card p-4 sm:p-5 shadow-soft space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="flex size-5 items-center justify-center rounded-full bg-cocoa text-background text-[11px] font-bold">1</span>
-                  <h3 className="font-sans font-bold text-sm text-foreground">Cake Size & Servings</h3>
-                </div>
-                <span className="text-[11px] font-extrabold text-cocoa bg-cocoa/10 px-2.5 py-0.5 rounded-full">
-                  {selectedSize.serves}
-                </span>
-              </div>
+        <div className="grid gap-5 lg:grid-cols-12 lg:gap-7">
+          {/* ------------------------------------------------- live preview */}
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-24">
+              <div className="relative overflow-hidden rounded-[2rem] border-2 border-[#2C1810]/12 bg-gradient-to-b from-[#FFF8EE] to-[#FBE9DA] shadow-lift dark:border-white/10 dark:from-[#1E120A] dark:to-[#140B05]">
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -top-16 -right-16 size-52 rounded-full bg-amber-300/25 blur-3xl"
+                />
 
-              {/* 4 Size Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {SIZES.map((size) => {
-                  const isSelected = selectedSize.id === size.id;
-                  return (
-                    <button
-                      key={size.id}
-                      type="button"
-                      onClick={() => setSelectedSize(size)}
-                      className={`flex flex-col justify-between p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
-                        isSelected
-                          ? "border-cocoa bg-cocoa/10 ring-2 ring-cocoa shadow-xs"
-                          : "border-border/80 bg-background/50 hover:bg-secondary/40"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-base">{size.icon}</span>
-                        {isSelected && (
-                          <span className="flex size-3.5 items-center justify-center rounded-full bg-cocoa text-background">
-                            <Check className="size-2" />
-                          </span>
-                        )}
-                      </div>
-                      <div className="mt-1.5">
-                        <p className="font-bold text-xs text-foreground truncate">{size.name}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{size.serves}</p>
-                        <p className="text-xs font-extrabold text-cocoa mt-0.5">₹{size.basePrice}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Sponge Crumb Selector */}
-              <div className="pt-2 border-t border-border/50">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Base Sponge Texture
+                <div className="relative flex items-center justify-between gap-3 px-5 pt-5">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                      Live preview
+                    </p>
+                    <p className="font-sans text-sm font-bold leading-tight text-cocoa">
+                      {flavour.name}
+                    </p>
+                  </div>
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+                    <Sparkles className="size-2.5" /> {size.serves}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">{selectedSponge.desc}</span>
                 </div>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {SPONGES.map((sponge) => {
-                    const isSelected = selectedSponge.id === sponge.id;
-                    return (
-                      <button
-                        key={sponge.id}
-                        type="button"
-                        onClick={() => setSelectedSponge(sponge)}
-                        className={`py-1.5 px-2 rounded-xl border text-center transition-all cursor-pointer ${
-                          isSelected
-                            ? "border-cocoa bg-cocoa text-background shadow-xs font-bold text-xs"
-                            : "border-border/70 bg-background/40 hover:bg-secondary text-xs text-foreground"
-                        }`}
-                      >
-                        {sponge.name}
-                      </button>
-                    );
-                  })}
+
+                <div className="relative mx-auto aspect-square w-full max-w-sm px-3">
+                  <CakePreview
+                    shape={size.shape}
+                    frosting={flavour.frosting}
+                    frostingLight={flavour.frostingLight}
+                    drip={flavour.drip}
+                    sponge={sponge.colour}
+                    addons={addons}
+                    message={message}
+                  />
+                </div>
+
+                <div className="relative flex flex-wrap gap-1.5 border-t border-[#2C1810]/10 px-5 py-3.5 dark:border-white/10">
+                  <PreviewChip label={size.name} />
+                  <PreviewChip label={sponge.name} />
+                  {eggless && <PreviewChip label="Eggless" tone="emerald" />}
+                  {addons.length > 0 && <PreviewChip label={`${addons.length} garnishes`} />}
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Bento Card 2: Flavor & Buttercream Pairing */}
-            <div className="rounded-3xl border border-border/80 bg-card p-4 sm:p-5 shadow-soft space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="flex size-5 items-center justify-center rounded-full bg-cocoa text-background text-[11px] font-bold">2</span>
-                  <h3 className="font-sans font-bold text-sm text-foreground">Flavour Pairing</h3>
-                </div>
-                <span className="text-[11px] font-semibold text-muted-foreground truncate">
-                  {selectedFlavor.cream}
-                </span>
+          {/* ----------------------------------------------------- controls */}
+          <div className="space-y-4 lg:col-span-7">
+            <Step index={1} title="Size and servings">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                {SIZES.map((option) => (
+                  <OptionCard
+                    key={option.id}
+                    selected={size.id === option.id}
+                    onClick={() => setSize(option)}
+                  >
+                    <p className="font-sans text-sm font-bold text-foreground">{option.name}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{option.serves}</p>
+                    <p className="mt-1.5 text-sm font-black text-cocoa">
+                      {formatCurrency(option.basePrice)}
+                    </p>
+                    <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+                      {option.blurb}
+                    </p>
+                  </OptionCard>
+                ))}
               </div>
+            </Step>
 
-              <div className="grid grid-cols-2 gap-2">
-                {FLAVORS.map((flavor) => {
-                  const isSelected = selectedFlavor.id === flavor.id;
-                  return (
-                    <button
-                      key={flavor.id}
-                      type="button"
-                      onClick={() => setSelectedFlavor(flavor)}
-                      className={`flex items-center justify-between p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
-                        isSelected
-                          ? "border-cocoa bg-cocoa/10 ring-2 ring-cocoa shadow-xs"
-                          : "border-border/80 bg-background/50 hover:bg-secondary/40"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className={`size-3 rounded-full shrink-0 shadow-xs ${flavor.accent}`} />
-                        <div className="truncate">
-                          <p className="font-bold text-xs text-foreground truncate">{flavor.name}</p>
-                          <p className="text-[10px] text-muted-foreground truncate">{flavor.cream}</p>
-                        </div>
+            <Step index={2} title="Sponge">
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                {SPONGES.map((option) => (
+                  <OptionCard
+                    key={option.id}
+                    selected={sponge.id === option.id}
+                    onClick={() => setSponge(option)}
+                  >
+                    <span
+                      className="mb-2 block size-7 rounded-full border border-black/10 shadow-inner"
+                      style={{ backgroundColor: option.colour }}
+                    />
+                    <p className="font-sans text-sm font-bold text-foreground">{option.name}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{option.desc}</p>
+                  </OptionCard>
+                ))}
+              </div>
+            </Step>
+
+            <Step index={3} title="Flavour and cream">
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                {FLAVOURS.map((option) => (
+                  <OptionCard
+                    key={option.id}
+                    selected={flavour.id === option.id}
+                    onClick={() => setFlavour(option)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span
+                        className="mt-0.5 size-8 shrink-0 rounded-full border-2 border-white shadow-sm"
+                        style={{
+                          background: `linear-gradient(135deg, ${option.frostingLight}, ${option.drip})`,
+                        }}
+                      />
+                      <div className="min-w-0">
+                        <p className="font-sans text-sm font-bold text-foreground">{option.name}</p>
+                        <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
+                          {option.cream}
+                        </p>
+                        <p className="mt-1 text-[10px] font-black uppercase tracking-wider text-berry">
+                          {option.badge}
+                        </p>
                       </div>
-                      {isSelected && <Check className="size-3.5 text-cocoa shrink-0 ml-1" />}
-                    </button>
-                  );
-                })}
+                    </div>
+                  </OptionCard>
+                ))}
               </div>
-            </div>
+            </Step>
 
-            {/* Bento Card 3: Custom Plaque Message */}
-            <div className="rounded-3xl border border-border/80 bg-card p-4 sm:p-5 shadow-soft space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="flex size-5 items-center justify-center rounded-full bg-cocoa text-background text-[11px] font-bold">3</span>
-                  <h3 className="font-sans font-bold text-sm text-foreground">Hand-Piped Inscription</h3>
-                </div>
-                <span className="text-[10px] font-mono text-muted-foreground">
-                  {cakeMessage.length}/30 chars
-                </span>
+            <Step
+              index={4}
+              title="Finishing touches"
+              aside={addonTotal > 0 ? `+${formatCurrency(addonTotal)}` : "Optional"}
+            >
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+                {ADDONS.map((option) => (
+                  <OptionCard
+                    key={option.id}
+                    selected={addons.includes(option.id)}
+                    onClick={() => toggleAddon(option.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl leading-none">{option.icon}</span>
+                      <div className="min-w-0">
+                        <p className="truncate font-sans text-xs font-bold text-foreground">
+                          {option.name}
+                        </p>
+                        <p className="text-xs font-semibold text-cocoa">+₹{option.price}</p>
+                      </div>
+                    </div>
+                  </OptionCard>
+                ))}
               </div>
 
+              <button
+                type="button"
+                onClick={() => setEggless(!eggless)}
+                aria-pressed={eggless}
+                className={cn(
+                  "mt-2.5 flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 text-sm font-bold transition-all",
+                  eggless
+                    ? "border-emerald-600 bg-emerald-600 text-white shadow-xs"
+                    : "border-border/80 bg-background/50 text-foreground hover:bg-secondary/60",
+                )}
+              >
+                <Leaf className={cn("size-4", eggless ? "text-white" : "text-emerald-500")} />
+                {eggless
+                  ? `Eggless recipe · +${formatCurrency(EGGLESS_SURCHARGE)}`
+                  : `Make it eggless · +${formatCurrency(EGGLESS_SURCHARGE)}`}
+              </button>
+            </Step>
+
+            <Step
+              index={5}
+              title="Hand-piped inscription"
+              aside={`${message.length}/${MAX_MESSAGE}`}
+            >
+              <label htmlFor="cake-message" className="sr-only">
+                Message to pipe on the cake
+              </label>
               <input
                 id="cake-message"
                 type="text"
-                maxLength={30}
-                value={cakeMessage}
-                onChange={(e) => setCakeMessage(e.target.value)}
-                placeholder="e.g. Happy 25th Birthday Maya 💕"
-                className="h-10 w-full rounded-xl border border-input bg-background px-3.5 text-xs font-semibold placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-cocoa/30"
+                maxLength={MAX_MESSAGE}
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                placeholder="Happy 25th, Maya"
+                className="h-12 w-full rounded-xl border border-input bg-background px-4 text-base font-semibold placeholder:font-normal placeholder:text-muted-foreground focus:ring-2 focus:ring-cocoa/30 focus:outline-none"
               />
-
-              {/* Preset Chips */}
-              <div className="flex flex-wrap gap-1.5">
-                {PRESET_MESSAGES.map((msg) => (
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                {PRESET_MESSAGES.map((preset) => (
                   <button
-                    key={msg}
+                    key={preset}
                     type="button"
-                    onClick={() => setCakeMessage(msg)}
-                    className="px-2.5 py-0.5 rounded-full bg-secondary/60 hover:bg-secondary text-[10.5px] font-medium text-foreground transition-all cursor-pointer"
+                    onClick={() => setMessage(preset)}
+                    className="min-h-9 cursor-pointer rounded-full bg-secondary/60 px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-secondary"
                   >
-                    {msg}
+                    {preset}
                   </button>
                 ))}
               </div>
-            </div>
+            </Step>
 
-          </div>
-
-          {/* RIGHT: Live Realistic Showcase + Toppings & Order CTA (6 Columns) */}
-          <div className="lg:col-span-6 rounded-3xl border border-border/80 bg-card p-4 sm:p-5 shadow-lift flex flex-col justify-between gap-3.5 overflow-hidden relative">
-            
-            {/* Top Showcase: High-Res Real Cake Photograph with Inscription Plaque */}
-            <div className="flex flex-col gap-3">
-              
-              {/* Header inside right card */}
-              <div className="flex items-center justify-between">
+            {/* ------------------------------------------------- order summary */}
+            {/* Sticky on narrow screens so the running total and the CTA stay
+                in reach while the visitor works through the options. */}
+            <div className="sticky bottom-0 z-20 -mx-4 rounded-t-3xl border-2 border-b-0 border-cocoa/15 bg-card/95 p-5 shadow-lift backdrop-blur-md sm:-mx-6 lg:static lg:mx-0 lg:rounded-3xl lg:border-b-2 lg:bg-card lg:backdrop-blur-none">
+              <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-                    Live Cake Atelier
-                  </span>
-                  <h4 className="font-sans font-bold text-sm sm:text-base text-foreground leading-tight">
-                    {selectedFlavor.name} • {selectedSize.name}
-                  </h4>
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                    Estimated total
+                  </p>
+                  {/* Rendered directly rather than counted up: a price that
+                      reads ₹0 for even a moment is worse than one that simply
+                      changes. */}
+                  <p className="mt-1 font-nimbus text-4xl leading-none font-bold text-cocoa">
+                    {formatCurrency(total)}
+                  </p>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 text-[10px] font-bold">
-                  <Sparkles className="size-2.5" /> Real Studio Bake
-                </span>
-              </div>
-
-              {/* High-Resolution Cake Photograph Container */}
-              <div className="relative w-full h-52 sm:h-64 rounded-2xl overflow-hidden border border-border/80 shadow-md group">
-                <img
-                  src={selectedFlavor.image}
-                  alt={selectedFlavor.name}
-                  className="w-full h-full object-cover transition-all duration-500 ease-out group-hover:scale-105 select-none"
-                />
-
-                {/* Subtle Vignette Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/15 pointer-events-none" />
-
-                {/* Floating Top Badges */}
-                <div className="absolute top-2.5 left-3 right-3 flex items-center justify-between pointer-events-none">
-                  <span className="rounded-full bg-black/65 backdrop-blur-md border border-white/20 px-2.5 py-0.5 text-[10px] font-bold text-white shadow-sm">
-                    {selectedSize.serves}
-                  </span>
-                  <span className="rounded-full bg-amber-400 text-black px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-sm">
-                    {selectedFlavor.badge}
-                  </span>
-                </div>
-
-                {/* Real-time Custom Message Plaque */}
-                <div className="absolute inset-x-3 bottom-3 z-10 flex flex-col items-center">
-                  <div className="w-full rounded-xl bg-black/70 backdrop-blur-md border border-white/30 p-2.5 sm:p-3 text-center shadow-xl">
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-amber-300 mb-0.5">
-                      Hand-Piped Inscription
-                    </p>
-                    <p className="font-sans font-black text-sm sm:text-base lg:text-lg text-white tracking-wide uppercase leading-tight drop-shadow-md break-words">
-                      {cakeMessage.trim() ? cakeMessage : "Your Inscription Here"}
-                    </p>
+                <dl className="text-right text-xs text-muted-foreground">
+                  <div className="flex justify-end gap-2">
+                    <dt>Base</dt>
+                    <dd className="font-semibold text-foreground">
+                      {formatCurrency(size.basePrice)}
+                    </dd>
                   </div>
-                </div>
-              </div>
-
-              {/* Artisan Toppings & Dietary Integrated in Bento */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-                    Artisan Make-Up Toppings ({selectedAddons.length})
-                  </span>
-                  <span className="text-[10px] font-bold text-cocoa">
-                    +₹{addonTotal}
-                  </span>
-                </div>
-
-                {/* 6 Compact Topping Chips */}
-                <div className="grid grid-cols-3 gap-1.5">
-                  {DECOR_ADDONS.map((addon) => {
-                    const isChecked = selectedAddons.includes(addon.id);
-                    return (
-                      <button
-                        key={addon.id}
-                        type="button"
-                        onClick={() => toggleAddon(addon.id)}
-                        className={`flex items-center justify-between px-2.5 py-1.5 rounded-xl border text-left transition-all cursor-pointer ${
-                          isChecked
-                            ? "border-amber-500 bg-amber-500/15 text-foreground ring-1 ring-amber-500 font-bold shadow-2xs"
-                            : "border-border/70 bg-background/50 hover:bg-secondary/60 text-muted-foreground"
-                        }`}
-                      >
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="text-sm shrink-0">{addon.icon}</span>
-                          <span className="text-[10.5px] truncate">{addon.name}</span>
-                        </div>
-                        <span className="text-[9.5px] font-mono font-bold text-cocoa shrink-0 ml-0.5">+₹{addon.price}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Dietary Requirement Pill */}
-                <button
-                  type="button"
-                  onClick={() => setIsEggless(!isEggless)}
-                  className={`w-full py-1.5 px-3.5 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
-                    isEggless
-                      ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
-                      : "bg-background/50 text-foreground border-border/80 hover:bg-secondary/60"
-                  }`}
-                >
-                  <Leaf className={`size-3.5 ${isEggless ? "text-white" : "text-emerald-500"}`} />
-                  <span>{isEggless ? "✓ 100% Eggless Vegetarian Bake" : "Standard Farm Fresh Egg Recipe"}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Total Price & 1-Click WhatsApp Order CTA (Seamlessly Integrated inside Bento) */}
-            <div className="pt-3 border-t border-border/60 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider">
-                    Total Estimated Price
-                  </p>
-                  <p className="font-sans text-2xl sm:text-3xl font-black text-cocoa tracking-tight leading-none mt-0.5">
-                    ₹{totalEstimate}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-[11px] text-muted-foreground font-semibold bg-secondary/80 px-2.5 py-1 rounded-lg border border-border/60">
-                    Base ₹{selectedSize.basePrice} + Toppings ₹{addonTotal}
-                  </span>
-                </div>
+                  <div className="flex justify-end gap-2">
+                    <dt>Finishing</dt>
+                    <dd className="font-semibold text-foreground">{formatCurrency(addonTotal)}</dd>
+                  </div>
+                  {eggless && (
+                    <div className="flex justify-end gap-2">
+                      <dt>Eggless</dt>
+                      <dd className="font-semibold text-foreground">
+                        {formatCurrency(EGGLESS_SURCHARGE)}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
               </div>
 
               <Button
                 asChild
-                size="default"
-                className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs sm:text-sm shadow-lift h-11 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+                className="mt-4 h-12 w-full cursor-pointer rounded-2xl bg-cocoa text-base font-bold text-background shadow-lift transition-transform hover:scale-[1.01] hover:bg-cocoa/90 active:scale-[0.99]"
               >
                 <a
                   href={`https://wa.me/917448724920?text=${whatsappText}`}
@@ -461,17 +427,96 @@ export function CakeBuilderWidget() {
                   rel="noreferrer"
                   className="flex items-center justify-center gap-2"
                 >
-                  <MessageCircle className="size-4.5 text-emerald-400" />
-                  <span>Book This Bespoke Cake via WhatsApp</span>
+                  <MessageCircle className="size-5 text-emerald-400" />
+                  Send this design on WhatsApp
                 </a>
               </Button>
+              <p className="mt-2 text-center text-xs text-muted-foreground">
+                An estimate, not a charge. We confirm the final price and your slot before anything
+                is baked.
+              </p>
             </div>
-
           </div>
-
         </div>
-
       </div>
     </section>
+  );
+}
+
+function PreviewChip({ label, tone }: { label: string; tone?: "emerald" }) {
+  return (
+    <span
+      className={cn(
+        "rounded-full border px-2.5 py-1 text-[11px] font-bold",
+        tone === "emerald"
+          ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300"
+          : "border-border/70 bg-card/80 text-cocoa dark:text-foreground",
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
+function Step({
+  index,
+  title,
+  aside,
+  children,
+}: {
+  index: number;
+  title: string;
+  aside?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Reveal variant="fade-up" delay={index * 40}>
+      <fieldset className="rounded-3xl border border-border/80 bg-card p-4 shadow-soft sm:p-5">
+        <legend className="sr-only">{title}</legend>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-6 items-center justify-center rounded-full bg-cocoa text-xs font-bold text-background">
+              {index}
+            </span>
+            <h3 className="font-sans text-sm font-bold text-foreground sm:text-base">{title}</h3>
+          </div>
+          {aside && (
+            <span className="shrink-0 text-xs font-bold text-muted-foreground">{aside}</span>
+          )}
+        </div>
+        {children}
+      </fieldset>
+    </Reveal>
+  );
+}
+
+function OptionCard({
+  selected,
+  onClick,
+  children,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cn(
+        "relative min-h-11 cursor-pointer rounded-2xl border p-3 text-left transition-all",
+        selected
+          ? "border-cocoa bg-cocoa/10 ring-2 ring-cocoa"
+          : "border-border/80 bg-background/50 hover:border-cocoa/40 hover:bg-secondary/40",
+      )}
+    >
+      {selected && (
+        <span className="absolute top-2 right-2 flex size-4 items-center justify-center rounded-full bg-cocoa text-background">
+          <Check className="size-2.5" />
+        </span>
+      )}
+      {children}
+    </button>
   );
 }

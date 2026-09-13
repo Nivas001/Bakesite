@@ -2,6 +2,7 @@ import {
   Children,
   isValidElement,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -10,6 +11,9 @@ import {
 } from "react";
 import { cn } from "@/lib/utils";
 import { EASE_OUT, usePrefersReducedMotion } from "@/lib/motion";
+
+/** `useLayoutEffect` on the client, `useEffect` on the server (where it is a no-op). */
+const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export type RevealVariant =
   "fade" | "fade-up" | "fade-down" | "fade-left" | "fade-right" | "scale" | "blur-up" | "rise";
@@ -75,6 +79,16 @@ export function Reveal({
   const [shown, setShown] = useState(false);
   const reduced = usePrefersReducedMotion();
 
+  // The server renders children visible, and they stay visible until the client
+  // has actually taken over. Hiding them in the server HTML would mean any
+  // visitor whose JavaScript is slow, blocked or broken sees a blank page —
+  // and search engines would index one too. Arming in a layout effect applies
+  // the hidden state before the browser paints, so there is no flash.
+  const [armed, setArmed] = useState(false);
+  useIsomorphicLayoutEffect(() => {
+    if (!reduced) setArmed(true);
+  }, [reduced]);
+
   useEffect(() => {
     if (reduced) {
       setShown(true);
@@ -113,7 +127,7 @@ export function Reveal({
     };
   }, [reduced, repeat, threshold, rootMargin]);
 
-  const settled = shown || reduced;
+  const settled = !armed || shown || reduced;
 
   return (
     <Tag
@@ -124,9 +138,13 @@ export function Reveal({
         opacity: settled ? 1 : 0,
         transform: settled ? "none" : HIDDEN_TRANSFORM[variant],
         filter: settled ? "none" : (HIDDEN_FILTER[variant] ?? "none"),
-        transition: reduced
-          ? "none"
-          : `opacity ${duration}ms ${EASE_OUT} ${delay}ms, transform ${duration}ms ${EASE_OUT} ${delay}ms, filter ${duration}ms ${EASE_OUT} ${delay}ms`,
+        // Only the settled state carries a transition. The hidden state has
+        // none, so arming (visible -> hidden, on the first client frame) snaps
+        // instead of playing a fade-out before the fade-in.
+        transition:
+          reduced || !settled
+            ? "none"
+            : `opacity ${duration}ms ${EASE_OUT} ${delay}ms, transform ${duration}ms ${EASE_OUT} ${delay}ms, filter ${duration}ms ${EASE_OUT} ${delay}ms`,
         ...style,
       }}
     >
