@@ -42,13 +42,48 @@ export type CategoryDoc = {
 };
 
 const SEED_CATEGORIES: CategoryDoc[] = [
-  { name: "Brownies", slug: "brownies", description: "Rich chocolate in every fudgy bite", sort_order: 1 },
-  { name: "Cheesecakes", slug: "cheesecakes", description: "A perfect harmony of cream cheese and sweetness", sort_order: 2 },
-  { name: "Cakes", slug: "cakes", description: "Celebration cakes, bento boxes, and artisan layered specials", sort_order: 3 },
-  { name: "Tea-Cakes", slug: "tea-cakes", description: "A slice of comfort with every cup of tea (16-18 Pieces / 300g)", sort_order: 4 },
-  { name: "Pastries", slug: "pastries", description: "72-layer French butter laminated croissants & danishes", sort_order: 5 },
-  { name: "Breads", slug: "breads", description: "36-hour wild-fermented crusty sourdough loaves", sort_order: 6 },
-  { name: "Cookies", slug: "cookies", description: "Crisp golden edges, chewy brown-butter centres", sort_order: 7 },
+  {
+    name: "Brownies",
+    slug: "brownies",
+    description: "Rich chocolate in every fudgy bite",
+    sort_order: 1,
+  },
+  {
+    name: "Cheesecakes",
+    slug: "cheesecakes",
+    description: "A perfect harmony of cream cheese and sweetness",
+    sort_order: 2,
+  },
+  {
+    name: "Cakes",
+    slug: "cakes",
+    description: "Celebration cakes, bento boxes, and artisan layered specials",
+    sort_order: 3,
+  },
+  {
+    name: "Tea-Cakes",
+    slug: "tea-cakes",
+    description: "A slice of comfort with every cup of tea (16-18 Pieces / 300g)",
+    sort_order: 4,
+  },
+  {
+    name: "Pastries",
+    slug: "pastries",
+    description: "72-layer French butter laminated croissants & danishes",
+    sort_order: 5,
+  },
+  {
+    name: "Breads",
+    slug: "breads",
+    description: "36-hour wild-fermented crusty sourdough loaves",
+    sort_order: 6,
+  },
+  {
+    name: "Cookies",
+    slug: "cookies",
+    description: "Crisp golden edges, chewy brown-butter centres",
+    sort_order: 7,
+  },
 ];
 
 const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> = [
@@ -63,7 +98,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_brownies",
     category_slug: "brownies",
     stock: 50,
-    description: "Rich 70% dark Belgian chocolate fudge brownie topped with silky ganache piping, roasted Iranian pistachio nibs, and artisanal chocolate drizzle. Dense, fudgy centre with crackly paper-thin crust.",
+    description:
+      "Rich 70% dark Belgian chocolate fudge brownie topped with silky ganache piping, roasted Iranian pistachio nibs, and artisanal chocolate drizzle. Dense, fudgy centre with crackly paper-thin crust.",
     image_url: "/products/belgian-fudge-brownie-stack.jpg",
     images: [
       "/products/belgian-fudge-brownie-stack.jpg",
@@ -74,9 +110,27 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     unit_weight_grams: 95,
     serving_yield: "Approx. 95g gourmet fudge square",
     weight_variants_json: JSON.stringify([
-      { id: "var_single", label: "Single Square (95g)", price: 95, weight_grams: 95, is_default: true },
-      { id: "var_box4", label: "Gourmet Box of 4 (380g)", price: 360, weight_grams: 380, is_default: false },
-      { id: "var_box9", label: "Grand Tasting Box of 9 (850g)", price: 790, weight_grams: 850, is_default: false },
+      {
+        id: "var_single",
+        label: "Single Square (95g)",
+        price: 95,
+        weight_grams: 95,
+        is_default: true,
+      },
+      {
+        id: "var_box4",
+        label: "Gourmet Box of 4 (380g)",
+        price: 360,
+        weight_grams: 380,
+        is_default: false,
+      },
+      {
+        id: "var_box9",
+        label: "Grand Tasting Box of 9 (850g)",
+        price: 790,
+        weight_grams: 850,
+        is_default: false,
+      },
     ]),
     is_active: true,
   },
@@ -90,7 +144,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_brownies",
     category_slug: "brownies",
     stock: 50,
-    description: "Rich dark Belgian chocolate brownie with crackly paper-thin top and dense fudgy centre.",
+    description:
+      "Rich dark Belgian chocolate brownie with crackly paper-thin top and dense fudgy centre.",
     image_url: "/products/fudge-brownies.jpg",
     is_active: true,
   },
@@ -132,7 +187,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_brownies",
     category_slug: "brownies",
     stock: 30,
-    description: "Fudgy brownie base swirled with caramelized spiced Biscoff spread and crunchy biscuit crown.",
+    description:
+      "Fudgy brownie base swirled with caramelized spiced Biscoff spread and crunchy biscuit crown.",
     image_url: "/cakes/biscoff-nut-brownie.webp",
     is_active: true,
   },
@@ -146,7 +202,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_brownies",
     category_slug: "brownies",
     stock: 30,
-    description: "Generously stuffed and marbled with roasted hazelnut Nutella spread and toasted nuts.",
+    description:
+      "Generously stuffed and marbled with roasted hazelnut Nutella spread and toasted nuts.",
     image_url: "/cakes/royal-gold-brownie.webp",
     is_active: true,
   },
@@ -160,7 +217,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_brownies",
     category_slug: "brownies",
     stock: 25,
-    description: "Topped with Iranian pistachio ganache, sea salt flakes, and roasted crushed emerald pistachios.",
+    description:
+      "Topped with Iranian pistachio ganache, sea salt flakes, and roasted crushed emerald pistachios.",
     image_url: "/packaging/insulated-brownie-box.webp",
     is_active: true,
   },
@@ -174,7 +232,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_brownies",
     category_slug: "brownies",
     stock: 20,
-    description: "Gourmet tasting box containing 1 Classic, 1 Biscoff, 1 Nutella, and 1 Pistachio brownie bite (250g).",
+    description:
+      "Gourmet tasting box containing 1 Classic, 1 Biscoff, 1 Nutella, and 1 Pistachio brownie bite (250g).",
     image_url: "/packaging/insulated-brownie-box.webp",
     is_active: true,
   },
@@ -190,7 +249,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cheesecakes",
     category_slug: "cheesecakes",
     stock: 15,
-    description: "Creamy baked Basque cheesecake topped with slow-simmered strawberry compote and mascarpone rosette.",
+    description:
+      "Creamy baked Basque cheesecake topped with slow-simmered strawberry compote and mascarpone rosette.",
     image_url: "/products/strawberry-cheesecake.jpg",
     is_active: true,
   },
@@ -204,7 +264,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cheesecakes",
     category_slug: "cheesecakes",
     stock: 15,
-    description: "Velvety cold-set Philadelphia cream cheese base topped with wild blueberry reduction.",
+    description:
+      "Velvety cold-set Philadelphia cream cheese base topped with wild blueberry reduction.",
     image_url: "/hero/hero-3d-mango-cheesecake.webp",
     is_active: true,
   },
@@ -218,7 +279,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cheesecakes",
     category_slug: "cheesecakes",
     stock: 12,
-    description: "70% Belgian chocolate folded into rich cream cheese on an Oreo cookie butter crust.",
+    description:
+      "70% Belgian chocolate folded into rich cream cheese on an Oreo cookie butter crust.",
     image_url: "/about/cake-3d-front.webp",
     is_active: true,
   },
@@ -232,7 +294,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cheesecakes",
     category_slug: "cheesecakes",
     stock: 10,
-    description: "Silky hazelnut cheesecake swirled with Nutella and crowned with whole toasted hazelnuts.",
+    description:
+      "Silky hazelnut cheesecake swirled with Nutella and crowned with whole toasted hazelnuts.",
     image_url: "/cakes/belgian-truffle-cake.webp",
     is_active: true,
   },
@@ -246,7 +309,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cheesecakes",
     category_slug: "cheesecakes",
     stock: 10,
-    description: "Speculoos spiced biscuit crust, caramelized Biscoff ribbon layer, and molten cookie butter drizzle.",
+    description:
+      "Speculoos spiced biscuit crust, caramelized Biscoff ribbon layer, and molten cookie butter drizzle.",
     image_url: "/cakes/biscoff-herringbone-cake.webp",
     is_active: true,
   },
@@ -262,7 +326,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 20,
-    description: "Light Madagascar vanilla sponge layered with fluffy buttercream in an artisan bento lunchbox.",
+    description:
+      "Light Madagascar vanilla sponge layered with fluffy buttercream in an artisan bento lunchbox.",
     image_url: "/products/vanilla-cake.jpg",
     is_active: true,
   },
@@ -290,7 +355,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 15,
-    description: "Single-origin Belgian dark chocolate ganache draped over delicate chocolate sponge.",
+    description:
+      "Single-origin Belgian dark chocolate ganache draped over delicate chocolate sponge.",
     image_url: "/cakes/belgian-truffle-cake.webp",
     is_active: true,
   },
@@ -304,7 +370,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 15,
-    description: "Vanilla sponge layered with fresh strawberry crush and pastel pink piped rosettes.",
+    description:
+      "Vanilla sponge layered with fresh strawberry crush and pastel pink piped rosettes.",
     image_url: "/cakes/pink-bento-cake.webp",
     is_active: true,
   },
@@ -332,7 +399,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 12,
-    description: "Tender vanilla cake infused with simmered wild blueberries and lilac cream frosting.",
+    description:
+      "Tender vanilla cake infused with simmered wild blueberries and lilac cream frosting.",
     image_url: "/cakes/butterfly-lilac-cake.webp",
     is_active: true,
   },
@@ -346,7 +414,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 12,
-    description: "Classic chocolate sponge layered with sour cherry compote, fresh cream, and chocolate flakes.",
+    description:
+      "Classic chocolate sponge layered with sour cherry compote, fresh cream, and chocolate flakes.",
     image_url: "/about/hero-3d-caramel-cake.webp",
     is_active: true,
   },
@@ -360,7 +429,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 10,
-    description: "White chocolate curls, vanilla sponge, tart cherry compote, and light whipped frosting.",
+    description:
+      "White chocolate curls, vanilla sponge, tart cherry compote, and light whipped frosting.",
     image_url: "/cakes/coral-heart-cake.webp",
     is_active: true,
   },
@@ -374,7 +444,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 10,
-    description: "Roasted hazelnut praline buttercream, chocolate sponge, and Ferrero-style cocoa glaze.",
+    description:
+      "Roasted hazelnut praline buttercream, chocolate sponge, and Ferrero-style cocoa glaze.",
     image_url: "/cakes/lavender-pearl-cake.webp",
     is_active: true,
   },
@@ -388,7 +459,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 10,
-    description: "Layered with caramelized Lotus spread, biscuit crunch crumb, and gold shimmer accents.",
+    description:
+      "Layered with caramelized Lotus spread, biscuit crunch crumb, and gold shimmer accents.",
     image_url: "/cakes/biscoff-herringbone-cake.webp",
     is_active: true,
   },
@@ -402,7 +474,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 10,
-    description: "Damask rose petal preserve (Gulkand) infused sponge with cardamom cream and pistachios.",
+    description:
+      "Damask rose petal preserve (Gulkand) infused sponge with cardamom cream and pistachios.",
     image_url: "/cakes/coral-heart-cake.webp",
     is_active: true,
   },
@@ -416,7 +489,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 10,
-    description: "Betel leaf infused fragrant sponge layered with sweet fennel and rose petal filling.",
+    description:
+      "Betel leaf infused fragrant sponge layered with sweet fennel and rose petal filling.",
     image_url: "/cakes/butterfly-lilac-cake.webp",
     is_active: true,
   },
@@ -430,7 +504,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cakes",
     category_slug: "cakes",
     stock: 15,
-    description: "Saffron and cardamom infused milk sponge drenched in rabri cream, pistachios, and 24K edible gold.",
+    description:
+      "Saffron and cardamom infused milk sponge drenched in rabri cream, pistachios, and 24K edible gold.",
     image_url: "/products/rasamalai-cake.jpg",
     is_active: true,
   },
@@ -460,7 +535,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_tea_cakes",
     category_slug: "tea-cakes",
     stock: 25,
-    description: "Classic English buttery tea cake loaf (16-18 bite slices, 300g total in 2 boxes).",
+    description:
+      "Classic English buttery tea cake loaf (16-18 bite slices, 300g total in 2 boxes).",
     image_url: "/cakes/trio-snack-loaves.webp",
     is_active: true,
   },
@@ -474,7 +550,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_tea_cakes",
     category_slug: "tea-cakes",
     stock: 25,
-    description: "Fragrant rose essence and green cardamom infused loaf cake with pistachio dust (16-18 slices).",
+    description:
+      "Fragrant rose essence and green cardamom infused loaf cake with pistachio dust (16-18 slices).",
     image_url: "/products/rosemilk-tea-cake.jpg",
     is_active: true,
   },
@@ -488,7 +565,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_tea_cakes",
     category_slug: "tea-cakes",
     stock: 25,
-    description: "Roasted Iranian pistachios folded into buttery sponge for maximum tea-time comfort (16-18 slices).",
+    description:
+      "Roasted Iranian pistachios folded into buttery sponge for maximum tea-time comfort (16-18 slices).",
     image_url: "/products/rosemilk-tea-cake.jpg",
     is_active: true,
   },
@@ -502,7 +580,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_tea_cakes",
     category_slug: "tea-cakes",
     stock: 25,
-    description: "Kashmiri saffron and cardamom infused snack loaves with slivered almonds (16-18 slices).",
+    description:
+      "Kashmiri saffron and cardamom infused snack loaves with slivered almonds (16-18 slices).",
     image_url: "/products/rasamalai-cake.jpg",
     is_active: true,
   },
@@ -546,7 +625,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_breads",
     category_slug: "breads",
     stock: 20,
-    description: "36-hour wild-fermented boule with a crackling blistered crust and open airy crumb.",
+    description:
+      "36-hour wild-fermented boule with a crackling blistered crust and open airy crumb.",
     image_url: "/products/country-sourdough.jpg",
     is_active: true,
   },
@@ -560,7 +640,8 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_id: "cat_cookies",
     category_slug: "cookies",
     stock: 30,
-    description: "Box of six chewy brown-butter cookies with hand-chopped chocolate and sea-salt flakes.",
+    description:
+      "Box of six chewy brown-butter cookies with hand-chopped chocolate and sea-salt flakes.",
     image_url: "/products/choc-chip-cookies.jpg",
     is_active: true,
   },
@@ -638,13 +719,14 @@ export function mapProduct(
   doc: Doc<ProductDoc>,
   categories: Doc<CategoryDoc>[] = [],
 ): CatalogProduct {
-  const category = categories.find(
-    (c) =>
-      c.$id === doc.category_id ||
-      (doc as any).category_slug === c.slug ||
-      doc.category_id === `cat_${c.slug}` ||
-      c.$id === `cat_${(doc as any).category_slug}`
-  ) ?? null;
+  const category =
+    categories.find(
+      (c) =>
+        c.$id === doc.category_id ||
+        (doc as any).category_slug === c.slug ||
+        doc.category_id === `cat_${c.slug}` ||
+        c.$id === `cat_${(doc as any).category_slug}`,
+    ) ?? null;
   const customOrder = findProductSequenceOverride(doc.$id, doc.slug);
   const weightOverride = findProductWeightOverride(doc.$id, doc.slug);
 
@@ -656,7 +738,8 @@ export function mapProduct(
     prodName.includes("cake") ||
     prodName.includes("cheesecake");
 
-  let itemType: "weight" | "unit" | "pack" = weightOverride?.item_type || doc.item_type || (isCakeOrCheesecake ? "weight" : "unit");
+  let itemType: "weight" | "unit" | "pack" =
+    weightOverride?.item_type || doc.item_type || (isCakeOrCheesecake ? "weight" : "unit");
   let unitWeightGrams = weightOverride?.unit_weight_grams ?? doc.unit_weight_grams ?? null;
   let servingYield = weightOverride?.serving_yield ?? doc.serving_yield ?? null;
   let weightVariants: ProductWeightVariant[] | null = weightOverride?.weight_variants ?? null;
@@ -669,7 +752,11 @@ export function mapProduct(
 
   // Parse images gallery
   let images: string[] = [];
-  if (weightOverride?.images && Array.isArray(weightOverride.images) && weightOverride.images.length > 0) {
+  if (
+    weightOverride?.images &&
+    Array.isArray(weightOverride.images) &&
+    weightOverride.images.length > 0
+  ) {
     images = weightOverride.images.filter(Boolean);
   } else if (doc.images && Array.isArray(doc.images) && doc.images.length > 0) {
     images = doc.images.filter(Boolean);
@@ -683,7 +770,8 @@ export function mapProduct(
     images = [doc.image_url];
   }
 
-  const primaryCoverImage: string | null = (doc.image_url ?? (images.length > 0 ? images[0] : null)) ?? null;
+  const primaryCoverImage: string | null =
+    doc.image_url ?? (images.length > 0 ? images[0] : null) ?? null;
 
   // Default portion & weight logic if not custom set
   if (isCakeOrCheesecake) {
@@ -749,17 +837,12 @@ export async function loadCatalog() {
   try {
     if (isAppwriteConfigured()) {
       const [products, categories] = await Promise.all([
-        listDocs<ProductDoc>(COLLECTIONS.products, [
-          Q.equal("is_active", true),
-          Q.limit(200),
-        ]),
+        listDocs<ProductDoc>(COLLECTIONS.products, [Q.equal("is_active", true), Q.limit(200)]),
         listDocs<CategoryDoc>(COLLECTIONS.categories, [Q.orderAsc("sort_order"), Q.limit(50)]),
       ]);
 
       // When Appwrite is configured, always return only real DB data — no seed merging.
-      const mappedCats = categories
-        .map(mapCategory)
-        .sort((a, b) => a.sort_order - b.sort_order);
+      const mappedCats = categories.map(mapCategory).sort((a, b) => a.sort_order - b.sort_order);
 
       const mappedProds = products
         .map((p) => mapProduct(p, categories))
@@ -793,7 +876,8 @@ export async function loadCatalog() {
     const weightOverride = findProductWeightOverride(p.id, p.slug);
     const isCake = p.category_slug === "cakes" || p.category_slug === "cheesecakes";
 
-    let itemType: "weight" | "unit" | "pack" = weightOverride?.item_type || p.item_type || (isCake ? "weight" : "unit");
+    let itemType: "weight" | "unit" | "pack" =
+      weightOverride?.item_type || p.item_type || (isCake ? "weight" : "unit");
     let unitWeightGrams = weightOverride?.unit_weight_grams ?? p.unit_weight_grams ?? null;
     let servingYield = weightOverride?.serving_yield ?? p.serving_yield ?? null;
     let weightVariants: ProductWeightVariant[] | null = weightOverride?.weight_variants ?? null;
@@ -828,8 +912,10 @@ export async function loadCatalog() {
       if (!servingYield) servingYield = "Approx. 95g (72 butter layers)";
     }
 
-    const seedImages: string[] = p.images && p.images.length > 0 ? p.images : (p.image_url ? [p.image_url] : []);
-    const primaryImg: string | null = (p.image_url ?? (seedImages.length > 0 ? seedImages[0] : null)) ?? null;
+    const seedImages: string[] =
+      p.images && p.images.length > 0 ? p.images : p.image_url ? [p.image_url] : [];
+    const primaryImg: string | null =
+      p.image_url ?? (seedImages.length > 0 ? seedImages[0] : null) ?? null;
 
     const mapped: CatalogProduct = {
       id: p.id,
@@ -840,7 +926,10 @@ export async function loadCatalog() {
       discount_type: p.discount_type,
       discount_value: p.discount_value,
       image_url: primaryImg,
-      images: weightOverride?.images && weightOverride.images.length > 0 ? weightOverride.images : seedImages,
+      images:
+        weightOverride?.images && weightOverride.images.length > 0
+          ? weightOverride.images
+          : seedImages,
       pinned_image_url: primaryImg,
       stock: p.stock,
       category_id: p.category_id,
@@ -869,7 +958,10 @@ export async function loadCatalog() {
 export async function loadCatalogForAdmin() {
   if (!isAppwriteConfigured()) {
     // No DB configured — return empty so admin shows nothing to prevent phantom deletes
-    return { products: [] as ReturnType<typeof mapProduct>[], categories: [] as ReturnType<typeof mapCategory>[] };
+    return {
+      products: [] as ReturnType<typeof mapProduct>[],
+      categories: [] as ReturnType<typeof mapCategory>[],
+    };
   }
 
   const [products, categories] = await Promise.all([
@@ -877,9 +969,7 @@ export async function loadCatalogForAdmin() {
     listDocs<CategoryDoc>(COLLECTIONS.categories, [Q.orderAsc("sort_order"), Q.limit(50)]),
   ]);
 
-  const mappedCats = categories
-    .map(mapCategory)
-    .sort((a, b) => a.sort_order - b.sort_order);
+  const mappedCats = categories.map(mapCategory).sort((a, b) => a.sort_order - b.sort_order);
 
   const mappedProds = products
     .map((p) => mapProduct(p, categories))

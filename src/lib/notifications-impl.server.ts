@@ -172,7 +172,7 @@ export async function sendWhatsAppMessage(toPhone: string | null, message: strin
             From: twilioFrom.startsWith("whatsapp:") ? twilioFrom : `whatsapp:${twilioFrom}`,
             Body: message,
           }),
-        }
+        },
       );
       if (!res.ok) {
         console.error(`[twilio whatsapp] send failed [${res.status}]: ${await res.text()}`);
@@ -207,7 +207,7 @@ export async function sendSms(to: string | null, body: string): Promise<void> {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams({ To: to, From: fromNumber, Body: body }),
-      }
+      },
     );
     if (!response.ok) {
       console.error(`[sms] send failed [${response.status}]: ${await response.text()}`);

@@ -87,9 +87,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
           if (isOpen) return collapsible ? [] : current;
           return [value];
         }
-        return isOpen
-          ? current.filter((v) => v !== value)
-          : [...current, value];
+        return isOpen ? current.filter((v) => v !== value) : [...current, value];
       });
     };
 
@@ -121,15 +119,15 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
                   onClick={() => toggle(item.value)}
                   className={`flex flex-1 items-center justify-between gap-4 px-4 sm:px-6 py-4 sm:py-5 text-left text-sm sm:text-base font-bold text-cocoa transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-berry/50 disabled:pointer-events-none disabled:opacity-50 ${
                     isOpen
-                      ? "bg-secondary/30 text-berry"
-                      : "hover:bg-secondary/20 hover:text-berry"
+                      ? "bg-secondary/30 text-berry-deep"
+                      : "hover:bg-secondary/20 hover:text-berry-deep"
                   }`}
                 >
                   <span className="flex-1">{item.title}</span>
                   <div
                     className={`flex size-7 shrink-0 items-center justify-center rounded-full transition-transform duration-300 ${
                       isOpen
-                        ? "rotate-180 bg-berry/15 text-berry"
+                        ? "rotate-180 bg-berry/15 text-berry-deep"
                         : "bg-secondary/70 text-muted-foreground group-hover:text-foreground"
                     }`}
                   >
@@ -167,9 +165,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
                     <motion.div
                       initial={reduceMotion ? false : { y: -preset.lift }}
                       animate={{ y: 0 }}
-                      {...(!reduceMotion
-                        ? { transition: { ...contentSpring, delay: 0.02 } }
-                        : {})}
+                      {...(!reduceMotion ? { transition: { ...contentSpring, delay: 0.02 } } : {})}
                       className="px-4 sm:px-6 pb-4 sm:pb-5 pt-0 text-xs sm:text-sm text-muted-foreground leading-relaxed [text-wrap:pretty]"
                     >
                       {item.content}

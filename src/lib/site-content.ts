@@ -43,8 +43,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   home_faq: {
     badge: "Clear Answers",
     title: "Frequently asked questions",
-    description:
-      "Everything you need to know about freshness, morning slots, and delivery.",
+    description: "Everything you need to know about freshness, morning slots, and delivery.",
   },
   home_cta: {
     badge: "Fresh Mornings",
@@ -167,7 +166,9 @@ export function getStoredSiteContent(): SiteContent {
         ...DEFAULT_SITE_CONTENT.about_gallery,
         ...(parsed.about_gallery || {}),
         photos:
-          parsed.about_gallery?.photos && Array.isArray(parsed.about_gallery.photos) && parsed.about_gallery.photos.length > 0
+          parsed.about_gallery?.photos &&
+          Array.isArray(parsed.about_gallery.photos) &&
+          parsed.about_gallery.photos.length > 0
             ? parsed.about_gallery.photos
             : DEFAULT_SITE_CONTENT.about_gallery.photos,
       },

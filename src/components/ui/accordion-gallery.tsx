@@ -114,13 +114,17 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({
               duration: dur,
               ease,
             },
-            0
+            0,
           );
         }
 
         if (showLabels && label) {
           if (isActive) {
-            tl.to(label, { opacity: 1, y: 0, duration: dur, ease, stagger: prefersReduced ? 0 : stagger }, 0);
+            tl.to(
+              label,
+              { opacity: 1, y: 0, duration: dur, ease, stagger: prefersReduced ? 0 : stagger },
+              0,
+            );
           } else {
             tl.to(label, { opacity: 0, y: 10, duration: dur * 0.6, ease }, 0);
           }
@@ -142,7 +146,7 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({
       showLabels,
       stagger,
       prefersReduced,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -174,7 +178,7 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({
     () => () => {
       tlRef.current?.kill();
     },
-    []
+    [],
   );
 
   const handleEnter = (i: number) => {
@@ -243,7 +247,11 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({
                   mediaRefs.current[i] = el;
                 }}
               >
-                <img src={item.image} alt={item.alt || item.customer || item.label || ""} draggable="false" />
+                <img
+                  src={item.image}
+                  alt={item.alt || item.customer || item.label || ""}
+                  draggable="false"
+                />
               </span>
               <span className="ag-panel__overlay" aria-hidden="true" />
             </span>
@@ -263,15 +271,11 @@ export const AccordionGallery: React.FC<AccordionGalleryProps> = ({
                 }}
                 aria-hidden="true"
               >
-                {item.occasion && (
-                  <span className="ag-panel__occasion">{item.occasion}</span>
-                )}
+                {item.occasion && <span className="ag-panel__occasion">{item.occasion}</span>}
                 {item.customer && (
                   <span className="ag-panel__customer font-blogh">{item.customer}</span>
                 )}
-                {item.note && (
-                  <span className="ag-panel__note font-sans">"{item.note}"</span>
-                )}
+                {item.note && <span className="ag-panel__note font-sans">"{item.note}"</span>}
               </span>
             )}
           </Tag>

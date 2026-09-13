@@ -3,10 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  formatCurrency,
-  generateSmartCakeWeightVariants,
-} from "@/lib/pricing";
+import { formatCurrency, generateSmartCakeWeightVariants } from "@/lib/pricing";
 import {
   Camera,
   Pin,
@@ -69,11 +66,7 @@ export function AdminProductForm({
   }
 
   const attachedImages =
-    form.images && form.images.length > 0
-      ? form.images
-      : form.image_url
-        ? [form.image_url]
-        : [];
+    form.images && form.images.length > 0 ? form.images : form.image_url ? [form.image_url] : [];
 
   return (
     <div className="rounded-3xl border border-border/70 bg-card p-4 sm:p-5 shadow-soft h-fit sticky top-20 space-y-4">
@@ -99,7 +92,7 @@ export function AdminProductForm({
             size="sm"
             variant="ghost"
             onClick={onCancel}
-            className="h-7 px-2 text-[11px] font-bold text-berry hover:bg-berry/10 rounded-lg cursor-pointer flex items-center gap-1"
+            className="h-7 px-2 text-[11px] font-bold text-berry-deep hover:bg-berry/10 rounded-lg cursor-pointer flex items-center gap-1"
             title="Clear and switch to new bake mode"
           >
             <Plus className="size-3" />
@@ -116,13 +109,13 @@ export function AdminProductForm({
         {/* SECTION 1: Basic Info */}
         <div className="space-y-3 rounded-2xl bg-secondary/20 p-3.5 border border-border/60">
           <div className="flex items-center gap-1.5 font-bold text-cocoa uppercase tracking-wider text-[11px]">
-            <Sparkles className="size-3.5 text-berry" />
+            <Sparkles className="size-3.5 text-berry-deep" />
             <span>1. Basic Info</span>
           </div>
 
           <div>
             <Label htmlFor="side-name" className="text-[11px] font-semibold">
-              Product Name <span className="text-berry">*</span>
+              Product Name <span className="text-berry-deep">*</span>
             </Label>
             <Input
               id="side-name"
@@ -224,10 +217,10 @@ export function AdminProductForm({
         <div className="space-y-3 rounded-2xl bg-secondary/20 p-3.5 border border-border/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 font-bold text-cocoa uppercase tracking-wider text-[11px]">
-              <Tag className="size-3.5 text-berry" />
+              <Tag className="size-3.5 text-berry-deep" />
               <span>2. Pricing &amp; Discounts</span>
             </div>
-            <span className="font-bold text-berry text-xs">
+            <span className="font-bold text-berry-deep text-xs">
               Pays: {formatCurrency(finalCalculatedPrice)}
             </span>
           </div>
@@ -235,7 +228,7 @@ export function AdminProductForm({
           <div className="grid grid-cols-2 gap-2.5">
             <div>
               <Label htmlFor="side-price" className="text-[11px] font-semibold">
-                Base Price (₹) <span className="text-berry">*</span>
+                Base Price (₹) <span className="text-berry-deep">*</span>
               </Label>
               <Input
                 id="side-price"
@@ -299,7 +292,7 @@ export function AdminProductForm({
         <div className="space-y-3 rounded-2xl bg-secondary/20 p-3.5 border border-border/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 font-bold text-cocoa uppercase tracking-wider text-[11px]">
-              <Layers className="size-3.5 text-berry" />
+              <Layers className="size-3.5 text-berry-deep" />
               <span>3. Sizing Mode</span>
             </div>
             <span className="text-[10px] text-muted-foreground">
@@ -325,7 +318,7 @@ export function AdminProductForm({
               }}
               className={`flex items-center justify-center gap-1 p-2 rounded-xl border text-[11px] font-bold transition-all cursor-pointer ${
                 form.item_type === "weight"
-                  ? "border-berry bg-berry/15 text-berry ring-1 ring-berry"
+                  ? "border-berry bg-berry/15 text-berry-deep ring-1 ring-berry"
                   : "border-border/70 bg-card text-muted-foreground hover:bg-secondary"
               }`}
             >
@@ -344,7 +337,7 @@ export function AdminProductForm({
               }}
               className={`flex items-center justify-center gap-1 p-2 rounded-xl border text-[11px] font-bold transition-all cursor-pointer ${
                 form.item_type !== "weight"
-                  ? "border-berry bg-berry/15 text-berry ring-1 ring-berry"
+                  ? "border-berry bg-berry/15 text-berry-deep ring-1 ring-berry"
                   : "border-border/70 bg-card text-muted-foreground hover:bg-secondary"
               }`}
             >
@@ -355,9 +348,7 @@ export function AdminProductForm({
           {form.item_type === "weight" ? (
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-muted-foreground">
-                  Tiered volume discounts
-                </span>
+                <span className="text-[10px] text-muted-foreground">Tiered volume discounts</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -366,7 +357,7 @@ export function AdminProductForm({
                     setForm((f) => ({ ...f, weight_variants: calculated }));
                     toast.success(`Tiers recalculated for ₹${base} base!`);
                   }}
-                  className="text-[10px] font-bold text-berry hover:underline cursor-pointer"
+                  className="text-[10px] font-bold text-berry-deep hover:underline cursor-pointer"
                 >
                   ⚡ Auto Tiers
                 </button>
@@ -448,7 +439,7 @@ export function AdminProductForm({
         <div className="space-y-3 rounded-2xl bg-secondary/20 p-3.5 border border-border/60">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 font-bold text-cocoa uppercase tracking-wider text-[11px]">
-              <ImageIcon className="size-3.5 text-berry" />
+              <ImageIcon className="size-3.5 text-berry-deep" />
               <span>4. Photos ({attachedImages.length})</span>
             </div>
             <span className="text-[10px] text-muted-foreground">
@@ -492,7 +483,7 @@ export function AdminProductForm({
                             setForm((f) => ({ ...f, image_url: img }));
                             toast.success(`Photo #${idx + 1} pinned as cover!`);
                           }}
-                          className="text-[9px] font-bold text-berry hover:underline cursor-pointer"
+                          className="text-[9px] font-bold text-berry-deep hover:underline cursor-pointer"
                         >
                           Pin
                         </button>
@@ -505,9 +496,9 @@ export function AdminProductForm({
                         title="Delete Photo"
                         onClick={() => {
                           setForm((f) => {
-                            const imgs = (f.images && f.images.length > 0 ? f.images : [f.image_url]).filter(
-                              (_, i) => i !== idx
-                            );
+                            const imgs = (
+                              f.images && f.images.length > 0 ? f.images : [f.image_url]
+                            ).filter((_, i) => i !== idx);
                             const newCover = isPinned ? imgs[0] || "" : f.image_url;
                             return { ...f, images: imgs, image_url: newCover };
                           });
@@ -577,7 +568,11 @@ export function AdminProductForm({
                   if (newUploadedUrls.length > 0) {
                     setForm((f) => {
                       const current =
-                        f.images && f.images.length > 0 ? f.images : f.image_url ? [f.image_url] : [];
+                        f.images && f.images.length > 0
+                          ? f.images
+                          : f.image_url
+                            ? [f.image_url]
+                            : [];
                       return {
                         ...f,
                         images: [...current, ...newUploadedUrls],
@@ -586,7 +581,7 @@ export function AdminProductForm({
                     });
                     toast.success(
                       `Successfully uploaded ${newUploadedUrls.length} photo${newUploadedUrls.length === 1 ? "" : "s"}!`,
-                      { id: "uploading-side-photo" }
+                      { id: "uploading-side-photo" },
                     );
                   } else {
                     toast.dismiss("uploading-side-photo");
@@ -612,13 +607,15 @@ export function AdminProductForm({
                 onClick={() => productImageInputRef.current?.click()}
                 className="flex-1 rounded-xl h-8 text-[11px] font-semibold hover:border-berry/50 flex items-center justify-center gap-1.5 cursor-pointer bg-background"
               >
-                <Camera className="size-3.5 text-berry" />
-                <span>{uploadingImage ? "Uploading to Storage…" : "+ Upload Photos (Multiple)"}</span>
+                <Camera className="size-3.5 text-berry-deep" />
+                <span>
+                  {uploadingImage ? "Uploading to Storage…" : "+ Upload Photos (Multiple)"}
+                </span>
               </Button>
               <button
                 type="button"
                 onClick={() => setManualUrlMode(!manualUrlMode)}
-                className="text-[11px] text-berry hover:underline font-semibold cursor-pointer"
+                className="text-[11px] text-berry-deep hover:underline font-semibold cursor-pointer"
               >
                 {manualUrlMode ? "Hide URL" : "By URL"}
               </button>
@@ -640,7 +637,11 @@ export function AdminProductForm({
                     const url = manualUrlInput.trim();
                     setForm((f) => {
                       const current =
-                        f.images && f.images.length > 0 ? f.images : f.image_url ? [f.image_url] : [];
+                        f.images && f.images.length > 0
+                          ? f.images
+                          : f.image_url
+                            ? [f.image_url]
+                            : [];
                       return {
                         ...f,
                         images: [...current, url],
@@ -665,7 +666,7 @@ export function AdminProductForm({
             type="checkbox"
             checked={form.is_active}
             onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
-            className="rounded border-input text-berry"
+            className="rounded border-input text-berry-deep"
           />
           <span className="font-semibold text-cocoa">Visible in public shop</span>
         </label>
@@ -678,7 +679,13 @@ export function AdminProductForm({
             onClick={onSave}
             className="flex-1 rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 h-10 font-bold text-xs shadow-soft cursor-pointer"
           >
-            {saving ? "Saving…" : uploadingImage ? "Uploading photo…" : form.id ? "Update Product" : "Create Product"}
+            {saving
+              ? "Saving…"
+              : uploadingImage
+                ? "Uploading photo…"
+                : form.id
+                  ? "Update Product"
+                  : "Create Product"}
           </Button>
 
           {form.id && onCancel && (

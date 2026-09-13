@@ -50,11 +50,7 @@ export type ReorderItemProps<T> = {
   children?: React.ReactNode;
 };
 
-export function ReorderItem<T>({
-  value,
-  className,
-  children,
-}: ReorderItemProps<T>) {
+export function ReorderItem<T>({ value, className, children }: ReorderItemProps<T>) {
   const [dragging, setDragging] = React.useState(false);
   return (
     <Reorder.Item

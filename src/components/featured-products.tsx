@@ -28,7 +28,9 @@ function QuickAdd({ product }: { product: CatalogProduct }) {
         >
           <Minus className="size-2.5 sm:size-3" />
         </button>
-        <span className="w-4 sm:w-5 text-center text-xs font-semibold tabular-nums text-cocoa">{qty}</span>
+        <span className="w-4 sm:w-5 text-center text-xs font-semibold tabular-nums text-cocoa">
+          {qty}
+        </span>
         <button
           type="button"
           aria-label={`Increase ${product.name} quantity`}
@@ -87,7 +89,9 @@ export function FeaturedProducts({ products }: { products: CatalogProduct[] }) {
         let nearest = 0;
         let best = Infinity;
         children.forEach((child, i) => {
-          const dist = Math.abs(child.offsetLeft - track.offsetLeft + child.clientWidth / 2 - center);
+          const dist = Math.abs(
+            child.offsetLeft - track.offsetLeft + child.clientWidth / 2 - center,
+          );
           if (dist < best) {
             best = dist;
             nearest = i;
@@ -176,11 +180,17 @@ export function FeaturedProducts({ products }: { products: CatalogProduct[] }) {
                   {product.category_name}
                 </p>
                 <h3 className="font-blogh uppercase tracking-wide text-sm sm:text-lg font-bold leading-snug line-clamp-1 sm:line-clamp-2 text-cocoa">
-                  <Link to="/shop/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
+                  <Link
+                    to="/shop/$slug"
+                    params={{ slug: product.slug }}
+                    className="hover:text-berry-deep transition-colors"
+                  >
                     {product.name}
                   </Link>
                 </h3>
-                <p className="line-clamp-2 text-xs text-muted-foreground leading-relaxed hidden xs:block">{product.description}</p>
+                <p className="line-clamp-2 text-xs text-muted-foreground leading-relaxed hidden xs:block">
+                  {product.description}
+                </p>
                 <div className="mt-auto pt-2 sm:pt-3">
                   <QuickAdd product={product} />
                 </div>

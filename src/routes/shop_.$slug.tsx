@@ -22,7 +22,13 @@ import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ProductReviews } from "@/components/product-reviews";
 import { useCart } from "@/lib/cart";
-import { formatCurrency, finalPrice, hasDiscount, discountLabel, type ProductWeightVariant } from "@/lib/pricing";
+import {
+  formatCurrency,
+  finalPrice,
+  hasDiscount,
+  discountLabel,
+  type ProductWeightVariant,
+} from "@/lib/pricing";
 import { getProductBySlug } from "@/lib/catalog.functions";
 import { useFlag } from "@/lib/feature-flags";
 import { Stepper, type Step } from "@/components/godui/stepper";
@@ -39,7 +45,8 @@ export const Route = createFileRoute("/shop_/$slug")({
         { title: p ? `${p.name} | Ani Bakes Artisan Bakery` : "Product Details | Ani Bakes" },
         {
           name: "description",
-          content: p?.description ?? "Order artisan fresh-baked treats handcrafted in small batches.",
+          content:
+            p?.description ?? "Order artisan fresh-baked treats handcrafted in small batches.",
         },
       ],
     };
@@ -113,10 +120,9 @@ function ProductDetailPage() {
   const [showSticky, setShowSticky] = useState(false);
   useEffect(() => {
     if (!showStickyBar) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setShowSticky(!entry?.isIntersecting),
-      { threshold: 0.2 }
-    );
+    const observer = new IntersectionObserver(([entry]) => setShowSticky(!entry?.isIntersecting), {
+      threshold: 0.2,
+    });
     if (addBtnRef.current) observer.observe(addBtnRef.current);
     return () => observer.disconnect();
   }, [showStickyBar]);
@@ -124,9 +130,10 @@ function ProductDetailPage() {
   if (!data) return null;
   const { product, related } = data;
 
-  const variants = product.weight_variants && product.weight_variants.length > 0 ? product.weight_variants : null;
+  const variants =
+    product.weight_variants && product.weight_variants.length > 0 ? product.weight_variants : null;
   const [selectedVariant, setSelectedVariant] = useState<ProductWeightVariant | null>(
-    variants ? variants[0] ?? null : null
+    variants ? (variants[0] ?? null) : null,
   );
 
   // Multi-image gallery carousel state
@@ -138,14 +145,21 @@ function ProductDetailPage() {
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const activeImage =
-    galleryImages[activeImageIndex] || galleryImages[0] || product.image_url || "/products/artisan-croissant.jpg";
+    galleryImages[activeImageIndex] ||
+    galleryImages[0] ||
+    product.image_url ||
+    "/products/artisan-croissant.jpg";
 
   const activeBasePrice = selectedVariant ? selectedVariant.price : product.price;
   const price = finalPrice(activeBasePrice, product.discount_type, product.discount_value);
   const discounted = hasDiscount(product.discount_type, product.discount_value);
 
-  const variantKey = selectedVariant ? `${selectedVariant.label}${selectedVariant.serves ? ` (${selectedVariant.serves})` : ""}` : null;
-  const cartLine = lines.find((l) => l.productId === product.id && (variantKey ? l.variantLabel === variantKey : true));
+  const variantKey = selectedVariant
+    ? `${selectedVariant.label}${selectedVariant.serves ? ` (${selectedVariant.serves})` : ""}`
+    : null;
+  const cartLine = lines.find(
+    (l) => l.productId === product.id && (variantKey ? l.variantLabel === variantKey : true),
+  );
   const quantityInCart = cartLine?.quantity ?? 0;
 
   function handleAddToCart() {
@@ -162,14 +176,15 @@ function ProductDetailPage() {
       },
       1,
     );
-    toast.success(`${product.name}${selectedVariant ? ` (${selectedVariant.label})` : ""} added to your cart!`);
+    toast.success(
+      `${product.name}${selectedVariant ? ` (${selectedVariant.label})` : ""} added to your cart!`,
+    );
     setRipple(true);
     setTimeout(() => setRipple(false), 600);
   }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:py-8 pb-24 md:pb-12 space-y-10 sm:space-y-14">
-
       {/* Back link */}
       <div>
         <Link
@@ -183,7 +198,6 @@ function ProductDetailPage() {
 
       {/* 1. Hero: Image + Details Bento Grid */}
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
-        
         {/* Left Column: Product Showcase Photo Frame & Gallery Carousel */}
         <div className="flex flex-col gap-3">
           <div className="relative group overflow-hidden rounded-3xl sm:rounded-4xl border border-border/80 bg-card p-2 sm:p-3 shadow-soft">
@@ -218,7 +232,7 @@ function ProductDetailPage() {
                     aria-label="Previous photo"
                     onClick={() =>
                       setActiveImageIndex((prev) =>
-                        prev === 0 ? galleryImages.length - 1 : prev - 1
+                        prev === 0 ? galleryImages.length - 1 : prev - 1,
                       )
                     }
                     className="absolute left-2.5 top-1/2 -translate-y-1/2 flex size-8 sm:size-9 items-center justify-center rounded-full bg-background/85 text-foreground backdrop-blur-md border border-border/60 shadow-md transition-all hover:bg-background hover:scale-110 active:scale-95 cursor-pointer opacity-90 sm:opacity-0 sm:group-hover:opacity-100"
@@ -232,7 +246,7 @@ function ProductDetailPage() {
                     aria-label="Next photo"
                     onClick={() =>
                       setActiveImageIndex((prev) =>
-                        prev === galleryImages.length - 1 ? 0 : prev + 1
+                        prev === galleryImages.length - 1 ? 0 : prev + 1,
                       )
                     }
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 flex size-8 sm:size-9 items-center justify-center rounded-full bg-background/85 text-foreground backdrop-blur-md border border-border/60 shadow-md transition-all hover:bg-background hover:scale-110 active:scale-95 cursor-pointer opacity-90 sm:opacity-0 sm:group-hover:opacity-100"
@@ -282,7 +296,6 @@ function ProductDetailPage() {
 
         {/* Right Column: Details & Ordering Bento */}
         <div className="flex flex-col justify-center space-y-3 sm:space-y-4">
-          
           <div>
             {/* Category Breadcrumb & Portion Tag */}
             <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -290,7 +303,7 @@ function ProductDetailPage() {
                 {product.category_name ?? "Bakery Atelier"}
               </span>
               {(product.serving_yield || product.unit_weight_grams) && (
-                <span className="rounded-full bg-berry/10 border border-berry/25 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-berry">
+                <span className="rounded-full bg-berry/10 border border-berry/25 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-berry-deep">
                   ⚖️ {product.serving_yield ?? `${product.unit_weight_grams}g`}
                 </span>
               )}
@@ -312,7 +325,7 @@ function ProductDetailPage() {
                 <span className="text-sm sm:text-lg text-muted-foreground line-through font-medium">
                   {formatCurrency(activeBasePrice)}
                 </span>
-                <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[11px] font-bold text-berry">
+                <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[11px] font-bold text-berry-deep">
                   Save {formatCurrency(activeBasePrice - price)}
                 </span>
               </>
@@ -352,7 +365,9 @@ function ProductDetailPage() {
                       }`}
                     >
                       <div className="flex items-center justify-between w-full">
-                        <span className="font-bold text-xs sm:text-[13px] text-cocoa">{v.label}</span>
+                        <span className="font-bold text-xs sm:text-[13px] text-cocoa">
+                          {v.label}
+                        </span>
                         {v.savings_label && (
                           <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 px-1 py-0.5 rounded">
                             {v.savings_label.split(" ")[0]} {v.savings_label.split(" ")[1]}
@@ -363,9 +378,7 @@ function ProductDetailPage() {
                         {formatCurrency(vPrice)}
                       </span>
                       {v.serves && (
-                        <span className="text-[10px] text-muted-foreground mt-0.5">
-                          {v.serves}
-                        </span>
+                        <span className="text-[10px] text-muted-foreground mt-0.5">{v.serves}</span>
                       )}
                     </button>
                   );
@@ -400,7 +413,7 @@ function ProductDetailPage() {
           {showHowItWorks && (
             <div className="rounded-3xl border border-border/80 bg-card/80 p-4 sm:p-5 shadow-soft space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[10.5px] sm:text-xs font-bold uppercase tracking-wider text-berry flex items-center gap-1.5">
+                <span className="text-[10.5px] sm:text-xs font-bold uppercase tracking-wider text-berry-deep flex items-center gap-1.5">
                   <Sparkles className="size-3.5" />
                   <span>How It Gets To You</span>
                 </span>
@@ -491,7 +504,6 @@ function ProductDetailPage() {
             🕐 Fresh morning bake. Small-batch artisan orders require 24 hours advance notice.
           </p>
         </div>
-
       </div>
 
       {/* 2. Related Products ("You Might Also Like") */}
@@ -500,8 +512,8 @@ function ProductDetailPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="size-3.5 sm:size-4 text-berry" />
-                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry">
+                <Sparkles className="size-3.5 sm:size-4 text-berry-deep" />
+                <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry-deep">
                   Paired Recommendations
                 </span>
               </div>
@@ -510,7 +522,12 @@ function ProductDetailPage() {
               </h2>
             </div>
 
-            <Button asChild variant="ghost" size="sm" className="text-xs font-semibold text-berry hover:text-berry/80">
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className="text-xs font-semibold text-berry-deep hover:text-berry-deep/80"
+            >
               <Link to="/shop">
                 <span>View Full Counter</span>
                 <ArrowRight className="size-3.5 ml-1" />
@@ -533,8 +550,8 @@ function ProductDetailPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5">
           <div>
             <div className="flex items-center gap-1.5 mb-1">
-              <Croissant className="size-3.5 sm:size-4 text-berry" />
-              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry">
+              <Croissant className="size-3.5 sm:size-4 text-berry-deep" />
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry-deep">
                 Artisan Collections
               </span>
             </div>
@@ -546,7 +563,11 @@ function ProductDetailPage() {
             </p>
           </div>
 
-          <Button asChild size="sm" className="rounded-full bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft w-fit text-xs">
+          <Button
+            asChild
+            size="sm"
+            className="rounded-full bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft w-fit text-xs"
+          >
             <Link to="/shop">
               <span>All Categories</span>
               <ArrowRight className="size-3.5 ml-1" />
@@ -583,10 +604,10 @@ function ProductDetailPage() {
                 {/* Content */}
                 <div className="mt-2 sm:mt-3 space-y-1">
                   <div className="flex items-center justify-between gap-1">
-                    <h3 className="font-blogh text-sm sm:text-base lg:text-lg font-bold text-cocoa group-hover:text-berry transition-colors truncate">
+                    <h3 className="font-blogh text-sm sm:text-base lg:text-lg font-bold text-cocoa group-hover:text-berry-deep transition-colors truncate">
                       {cat.name}
                     </h3>
-                    <Icon className="size-3.5 text-berry shrink-0 hidden sm:block" />
+                    <Icon className="size-3.5 text-berry-deep shrink-0 hidden sm:block" />
                   </div>
                   <p className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
                     {cat.desc}
@@ -594,7 +615,7 @@ function ProductDetailPage() {
                 </div>
 
                 {/* Footer Action Arrow */}
-                <div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between text-[11px] sm:text-xs font-bold text-berry">
+                <div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between text-[11px] sm:text-xs font-bold text-berry-deep">
                   <span>Explore</span>
                   <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
                 </div>
@@ -611,7 +632,9 @@ function ProductDetailPage() {
       {showStickyBar && (
         <div
           className={`fixed bottom-0 left-0 right-0 z-40 md:hidden border-t border-border/80 bg-background/95 backdrop-blur-md px-4 py-2.5 flex items-center gap-2 transition-all duration-300 shadow-2xl ${
-            showSticky ? "translate-y-0 opacity-100" : "translate-y-full opacity-0 pointer-events-none"
+            showSticky
+              ? "translate-y-0 opacity-100"
+              : "translate-y-full opacity-0 pointer-events-none"
           }`}
         >
           <div className="flex-1 min-w-0">

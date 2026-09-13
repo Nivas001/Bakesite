@@ -18,15 +18,17 @@ export interface CakeScene {
    * @param elapsed seconds since the scene was created, for idle motion
    * @param focusX  how far right of centre to sit, in world units — used to
    *                clear the copy column on wide layouts
+   * @param focusY  how far above centre to sit — used on narrow layouts, where
+   *                the copy panel is anchored to the bottom of the stage
    */
-  update(t: number, elapsed: number, focusX: number): void;
+  update(t: number, elapsed: number, focusX: number, focusY: number): void;
   render(): void;
   resize(width: number, height: number): void;
   dispose(): void;
 }
 
 const PALETTE = {
-  sponge: 0x5a3620,
+  sponge: 0x6b3a18,
   cream: 0xf7e7ce,
   creamPink: 0xf6d3d0,
   ganache: 0x2a150c,
@@ -77,7 +79,9 @@ export function createCakeScene(canvas: HTMLCanvasElement, quality: "high" | "lo
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
 
   // ---------------------------------------------------------------- lighting
-  scene.add(new THREE.AmbientLight(0xfff1de, 1.5));
+  // Kept deliberately low: a bright ambient washes the cocoa tones out to a flat
+  // grey-mauve, so most of the light comes from the key and rim instead.
+  scene.add(new THREE.AmbientLight(0xffe7c4, 0.55));
 
   const key = new THREE.DirectionalLight(0xffd9a8, 3.1);
   key.position.set(4, 7, 5);
@@ -308,8 +312,9 @@ export function createCakeScene(canvas: HTMLCanvasElement, quality: "high" | "lo
 
   // ------------------------------------------------------------ choreography
   let smoothedFocusX = 0;
+  let smoothedFocusY = 0;
 
-  function update(t: number, elapsed: number, focusX: number) {
+  function update(t: number, elapsed: number, focusX: number, focusY: number) {
     // Chapter beats overlap slightly so nothing pops into existence.
     const bSponge = beat(t, 0.0, 0.22);
     const bCream = beat(t, 0.18, 0.42);
@@ -359,21 +364,23 @@ export function createCakeScene(canvas: HTMLCanvasElement, quality: "high" | "lo
     });
 
     root.rotation.y = t * Math.PI * 1.35 + elapsed * 0.08;
-    root.position.y = Math.sin(elapsed * 0.6) * 0.04;
+    root.position.y = smoothedFocusY + Math.sin(elapsed * 0.6) * 0.04;
 
     // Slide toward the requested side rather than snapping, so a resize across
     // the breakpoint reads as a move rather than a jump.
+    //
+    // Only the cake moves. Offsetting the camera by the same amount as well
+    // would keep the cake centred in frame and cancel the whole effect.
     smoothedFocusX += (focusX - smoothedFocusX) * 0.08;
+    smoothedFocusY += (focusY - smoothedFocusY) * 0.08;
     root.position.x = smoothedFocusX;
 
     // Camera pulls back and lifts as the cake completes.
     const dolly = beat(t, 0, 1);
-    camera.position.set(
-      smoothedFocusX + Math.sin(t * 0.6) * 0.6,
-      lerp(-0.2, 1.6, dolly),
-      lerp(6.2, 8.6, dolly),
-    );
-    camera.lookAt(smoothedFocusX, lerp(-0.55, 0.1, dolly), 0);
+    // Far enough back that the offset cake still clears the right edge at the
+    // start of the sequence, where the camera is closest.
+    camera.position.set(Math.sin(t * 0.6) * 0.6, lerp(-0.1, 1.7, dolly), lerp(7.7, 9.4, dolly));
+    camera.lookAt(0, lerp(-0.55, 0.1, dolly), 0);
 
     motes.rotation.y = elapsed * 0.03;
     moteMat.opacity = 0.25 + bCandles * 0.5;

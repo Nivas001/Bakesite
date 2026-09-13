@@ -40,8 +40,7 @@ const SETTLE_SPRING = {
   mass: 0.9,
 } as const;
 
-const clamp = (v: number, lo: number, hi: number) =>
-  Math.max(lo, Math.min(hi, v));
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
 type ItemProps = {
   offset: number;
@@ -63,14 +62,10 @@ const InertiaItem: React.FC<ItemProps> = ({
   children,
 }) => {
   // Normalised distance of this slide's center from the viewport center.
-  const nd = useTransform(x, (xv) =>
-    Math.min(Math.abs(offset + xv) / pitch, 2.6),
-  );
+  const nd = useTransform(x, (xv) => Math.min(Math.abs(offset + xv) / pitch, 2.6));
   const scale = useTransform(nd, (d) => 1 - d * 0.14 * falloff);
   const opacity = useTransform(nd, (d) => clamp(1 - d * 0.32 * falloff, 0.35, 1));
-  const blurPx = useTransform(nd, (d) =>
-    reduce ? 0 : Math.min(d * 3.4, 5) * falloff,
-  );
+  const blurPx = useTransform(nd, (d) => (reduce ? 0 : Math.min(d * 3.4, 5) * falloff));
   const filter = useMotionTemplate`blur(${blurPx}px)`;
 
   return (
@@ -128,8 +123,7 @@ export const InertiaGallery = React.forwardRef<HTMLDivElement, InertiaGalleryPro
     React.useEffect(() => {
       const el = viewportRef.current;
       if (!el) return;
-      const measure = () =>
-        setPad(Math.max(0, (el.clientWidth - itemWidth) / 2));
+      const measure = () => setPad(Math.max(0, (el.clientWidth - itemWidth) / 2));
       measure();
       const ro = new ResizeObserver(measure);
       ro.observe(el);
@@ -224,9 +218,7 @@ export const InertiaGallery = React.forwardRef<HTMLDivElement, InertiaGalleryPro
             style={{ x, gap, paddingLeft: pad, paddingRight: pad }}
             drag="x"
             dragConstraints={
-              count > 1
-                ? { left: -(totalClones - 1) * pitch, right: 0 }
-                : { left: 0, right: 0 }
+              count > 1 ? { left: -(totalClones - 1) * pitch, right: 0 } : { left: 0, right: 0 }
             }
             dragElastic={0.12}
             onDragEnd={handleDragEnd}

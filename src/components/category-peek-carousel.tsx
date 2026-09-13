@@ -1,6 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { Croissant, Sparkles, Leaf, Star, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import {
+  Croissant,
+  Sparkles,
+  Leaf,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export interface CategoryItem {
@@ -115,7 +123,6 @@ export function CategoryPeekCarousel({
   return (
     <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
       <section className="rounded-3xl p-5 sm:p-8 lg:p-10 border border-border/80 bg-card/60 backdrop-blur-md shadow-soft overflow-hidden">
-        
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
@@ -197,11 +204,13 @@ export function CategoryPeekCarousel({
               opacityClass = "opacity-100 z-20 shadow-2xl";
               zIndex = 20;
             } else if (isLeftPeek) {
-              transformClass = "-translate-x-[72%] sm:-translate-x-[78%] lg:-translate-x-[82%] scale-[0.86] sm:scale-[0.88]";
+              transformClass =
+                "-translate-x-[72%] sm:-translate-x-[78%] lg:-translate-x-[82%] scale-[0.86] sm:scale-[0.88]";
               opacityClass = "opacity-60 hover:opacity-85 z-10 cursor-pointer";
               zIndex = 10;
             } else if (isRightPeek) {
-              transformClass = "translate-x-[72%] sm:translate-x-[78%] lg:translate-x-[82%] scale-[0.86] sm:scale-[0.88]";
+              transformClass =
+                "translate-x-[72%] sm:translate-x-[78%] lg:translate-x-[82%] scale-[0.86] sm:scale-[0.88]";
               opacityClass = "opacity-60 hover:opacity-85 z-10 cursor-pointer";
               zIndex = 10;
             }
@@ -242,9 +251,7 @@ export function CategoryPeekCarousel({
                     <span className="inline-block rounded-md bg-amber-400 text-black px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
                       {meta.tag}
                     </span>
-                    <span className="text-[11px] font-bold text-white/80">
-                      {meta.badge}
-                    </span>
+                    <span className="text-[11px] font-bold text-white/80">{meta.badge}</span>
                   </div>
 
                   <h3 className="font-nimbus text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
@@ -276,7 +283,6 @@ export function CategoryPeekCarousel({
                     )}
                   </div>
                 </div>
-
               </div>
             );
           })}
@@ -291,14 +297,11 @@ export function CategoryPeekCarousel({
               aria-label={`Go to ${cat.name}`}
               onClick={() => setActiveIndex(idx)}
               className={`h-2 rounded-full transition-all cursor-pointer ${
-                activeIndex === idx
-                  ? "w-7 bg-cocoa"
-                  : "w-2 bg-border hover:bg-muted-foreground/60"
+                activeIndex === idx ? "w-7 bg-cocoa" : "w-2 bg-border hover:bg-muted-foreground/60"
               }`}
             />
           ))}
         </div>
-
       </section>
     </div>
   );

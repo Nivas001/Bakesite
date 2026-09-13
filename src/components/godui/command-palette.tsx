@@ -69,10 +69,7 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
       [groups, query],
     );
 
-    const flat = React.useMemo(
-      () => filteredGroups.flatMap((g) => g.items),
-      [filteredGroups],
-    );
+    const flat = React.useMemo(() => filteredGroups.flatMap((g) => g.items), [filteredGroups]);
 
     React.useEffect(() => {
       if (!open) return;
@@ -113,9 +110,7 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
         setActiveIndex((i) => (i + 1) % Math.max(flat.length, 1));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setActiveIndex(
-          (i) => (i - 1 + Math.max(flat.length, 1)) % Math.max(flat.length, 1),
-        );
+        setActiveIndex((i) => (i - 1 + Math.max(flat.length, 1)) % Math.max(flat.length, 1));
       } else if (e.key === "Enter") {
         e.preventDefault();
         const item = flat[activeIndex];
@@ -162,7 +157,10 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
             >
               {/* Search Bar Input */}
               <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3 bg-secondary/30">
-                <span aria-hidden className="text-muted-foreground flex items-center justify-center size-5">
+                <span
+                  aria-hidden
+                  className="text-muted-foreground flex items-center justify-center size-5"
+                >
                   <svg
                     aria-hidden="true"
                     viewBox="0 0 24 24"
@@ -198,7 +196,8 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
                     <p className="text-2xl mb-1.5">🔍</p>
                     <p className="font-semibold text-cocoa">No commands found</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Try searching with different keywords like &quot;orders&quot;, &quot;menu&quot;, or &quot;coupons&quot;.
+                      Try searching with different keywords like &quot;orders&quot;,
+                      &quot;menu&quot;, or &quot;coupons&quot;.
                     </p>
                   </div>
                 ) : (
@@ -235,14 +234,12 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
                               />
                             ) : null}
                             {item.icon ? (
-                              <span className="relative flex size-6 items-center justify-center shrink-0 text-berry">
+                              <span className="relative flex size-6 items-center justify-center shrink-0 text-berry-deep">
                                 {item.icon}
                               </span>
                             ) : null}
                             <div className="relative flex flex-col min-w-0 flex-1">
-                              <span className="truncate font-bold text-cocoa">
-                                {item.label}
-                              </span>
+                              <span className="truncate font-bold text-cocoa">{item.label}</span>
                               {item.description && (
                                 <span className="text-[11px] text-muted-foreground font-normal truncate mt-0.5">
                                   {item.description}
@@ -275,7 +272,7 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
                     <span>to select</span>
                   </span>
                 </div>
-                <span className="font-medium text-berry">Ani Bakes Studio</span>
+                <span className="font-medium text-berry-deep">Ani Bakes Studio</span>
               </div>
             </motion.div>
           </div>

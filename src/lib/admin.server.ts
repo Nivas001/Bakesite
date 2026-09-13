@@ -81,7 +81,11 @@ export async function changeOrderStatus(input: z.infer<typeof orderStatusSchema>
     }
   }
 
-  if (input.status === "awaiting_payment" || input.status === "confirmed" || input.status === "rejected") {
+  if (
+    input.status === "awaiting_payment" ||
+    input.status === "confirmed" ||
+    input.status === "rejected"
+  ) {
     let customerEmail: string | undefined = undefined;
     if (data.user_id) {
       const user = await getUserById(data.user_id).catch(() => null);
@@ -186,7 +190,9 @@ export async function fetchStats() {
     totalOrders: orders.length,
     ordersLast30Days: last30,
     revenue,
-    averageOrder: orders.length ? revenue / Math.max(1, orders.filter((o) => paidStatuses.has(o.status)).length) : 0,
+    averageOrder: orders.length
+      ? revenue / Math.max(1, orders.filter((o) => paidStatuses.has(o.status)).length)
+      : 0,
     byStatus,
     topProducts,
   };
@@ -239,10 +245,12 @@ export async function saveCategoryOrderingAdmin(input: {
     if (!cat.id.startsWith("cat_")) {
       try {
         const payload: Record<string, unknown> = { sort_order: cat.sort_order };
-        if (cat.layout_rows) payload['layout_rows'] = cat.layout_rows;
+        if (cat.layout_rows) payload["layout_rows"] = cat.layout_rows;
         await updateDoc(COLLECTIONS.categories, cat.id, payload).catch(async () => {
           // If layout_rows attribute is not in collection schema, update sort_order only
-          await updateDoc(COLLECTIONS.categories, cat.id, { sort_order: cat.sort_order }).catch(() => null);
+          await updateDoc(COLLECTIONS.categories, cat.id, { sort_order: cat.sort_order }).catch(
+            () => null,
+          );
         });
       } catch {}
     }
@@ -259,7 +267,9 @@ export async function saveProductSequenceAdmin(input: {
   for (const prod of input.products) {
     if (!prod.id.startsWith("prod_")) {
       try {
-        await updateDoc(COLLECTIONS.products, prod.id, { sort_order: prod.sort_order }).catch(() => null);
+        await updateDoc(COLLECTIONS.products, prod.id, { sort_order: prod.sort_order }).catch(
+          () => null,
+        );
       } catch {}
     }
   }
@@ -305,7 +315,8 @@ export async function upsertProduct(input: ProductInput) {
   if (input.unit_weight_grams !== undefined && input.unit_weight_grams !== null) {
     extendedRow["unit_weight_grams"] = Number(input.unit_weight_grams);
   }
-  if (input.serving_yield?.trim()) extendedRow["serving_yield"] = input.serving_yield.trim().slice(0, 200);
+  if (input.serving_yield?.trim())
+    extendedRow["serving_yield"] = input.serving_yield.trim().slice(0, 200);
   if (input.weight_variants && input.weight_variants.length > 0) {
     extendedRow["weight_variants_json"] = JSON.stringify(input.weight_variants);
   }
@@ -342,7 +353,11 @@ export async function upsertProduct(input: ProductInput) {
           unit_weight_grams: input.unit_weight_grams ?? null,
           serving_yield: input.serving_yield ?? null,
           weight_variants: (input.weight_variants as any) ?? null,
-          images: input.images ? input.images.filter(Boolean) : (primaryCoverImage ? [primaryCoverImage] : []),
+          images: input.images
+            ? input.images.filter(Boolean)
+            : primaryCoverImage
+              ? [primaryCoverImage]
+              : [],
         },
         input.slug,
       );
@@ -352,8 +367,14 @@ export async function upsertProduct(input: ProductInput) {
   } catch (err: any) {
     console.error("Appwrite upsertProduct failed:", err);
     const msg = err?.message || String(err);
-    if (msg.includes("409") || msg.toLowerCase().includes("already exists") || msg.includes("duplicate")) {
-      throw new Error(`A product with the slug "${input.slug}" already exists. Please choose a different URL slug.`);
+    if (
+      msg.includes("409") ||
+      msg.toLowerCase().includes("already exists") ||
+      msg.includes("duplicate")
+    ) {
+      throw new Error(
+        `A product with the slug "${input.slug}" already exists. Please choose a different URL slug.`,
+      );
     }
     throw new Error(msg || "Failed to save product to database.");
   }
@@ -402,10 +423,14 @@ export type AdminUserData = {
 export async function fetchAdminUsers(): Promise<AdminUserData[]> {
   const [authUsers, profileDocs, orderDocs] = await Promise.all([
     listAppwriteUsers(),
-    listDocs<{ user_id: string; full_name?: string; phone?: string; address?: string; latitude?: number; longitude?: number }>(
-      COLLECTIONS.profiles,
-      [Q.limit(500)],
-    ).catch(() => []),
+    listDocs<{
+      user_id: string;
+      full_name?: string;
+      phone?: string;
+      address?: string;
+      latitude?: number;
+      longitude?: number;
+    }>(COLLECTIONS.profiles, [Q.limit(500)]).catch(() => []),
     listDocs<{ user_id: string }>(COLLECTIONS.orders, [Q.limit(1000)]).catch(() => []),
   ]);
 

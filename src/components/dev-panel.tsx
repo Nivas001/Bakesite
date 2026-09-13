@@ -68,8 +68,8 @@ export function DevPanel() {
 
   const flagsByCategory = CATEGORIES.map((cat) => ({
     cat,
-    flags: (Object.entries(FEATURE_FLAGS) as [FlagKey, typeof FEATURE_FLAGS[FlagKey]][]).filter(
-      ([, def]) => def.category === cat
+    flags: (Object.entries(FEATURE_FLAGS) as [FlagKey, (typeof FEATURE_FLAGS)[FlagKey]][]).filter(
+      ([, def]) => def.category === cat,
     ),
   }));
 
@@ -163,11 +163,15 @@ export function DevPanel() {
               <span>🔗</span> Social &amp; Contact Links
             </p>
             <p className="text-[11px] text-muted-foreground">
-              These links appear in the site footer when the Instagram &amp; Social Links flag is enabled.
+              These links appear in the site footer when the Instagram &amp; Social Links flag is
+              enabled.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div className="space-y-1">
-                <Label htmlFor="dev-instagram" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                <Label
+                  htmlFor="dev-instagram"
+                  className="text-[11px] flex items-center gap-1.5 font-semibold"
+                >
                   <Instagram className="size-3 text-pink-500" /> Instagram URL
                 </Label>
                 <Input
@@ -180,7 +184,10 @@ export function DevPanel() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="dev-whatsapp" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                <Label
+                  htmlFor="dev-whatsapp"
+                  className="text-[11px] flex items-center gap-1.5 font-semibold"
+                >
                   <MessageCircle className="size-3 text-emerald-500" /> WhatsApp URL / Number
                 </Label>
                 <Input
@@ -193,7 +200,10 @@ export function DevPanel() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="dev-email" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                <Label
+                  htmlFor="dev-email"
+                  className="text-[11px] flex items-center gap-1.5 font-semibold"
+                >
                   <Mail className="size-3 text-red-500" /> Gmail / Contact Email
                 </Label>
                 <Input
@@ -207,7 +217,10 @@ export function DevPanel() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="dev-facebook" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                <Label
+                  htmlFor="dev-facebook"
+                  className="text-[11px] flex items-center gap-1.5 font-semibold"
+                >
                   <Facebook className="size-3 text-blue-600" /> Facebook Page URL
                 </Label>
                 <Input
@@ -220,7 +233,10 @@ export function DevPanel() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="dev-x" className="text-[11px] flex items-center gap-1.5 font-semibold">
+                <Label
+                  htmlFor="dev-x"
+                  className="text-[11px] flex items-center gap-1.5 font-semibold"
+                >
                   <span className="text-xs font-bold leading-none">𝕏</span> X (Twitter) URL
                 </Label>
                 <Input

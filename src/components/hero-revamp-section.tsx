@@ -92,15 +92,15 @@ const FLAVORS = [
 
 // Fixed drip positions for the BROWNIE text chocolate drip effect
 const CHOCO_DRIPS = [
-  { left: "5%",  height: 16, delay: "0s",    width: 7  },
-  { left: "16%", height: 24, delay: "0.3s",  width: 6  },
-  { left: "27%", height: 14, delay: "0.6s",  width: 8  },
-  { left: "38%", height: 20, delay: "0.15s", width: 6  },
-  { left: "50%", height: 28, delay: "0.45s", width: 7  },
-  { left: "61%", height: 12, delay: "0.7s",  width: 5  },
-  { left: "72%", height: 22, delay: "0.25s", width: 8  },
-  { left: "83%", height: 18, delay: "0.55s", width: 6  },
-  { left: "93%", height: 26, delay: "0.1s",  width: 7  },
+  { left: "5%", height: 16, delay: "0s", width: 7 },
+  { left: "16%", height: 24, delay: "0.3s", width: 6 },
+  { left: "27%", height: 14, delay: "0.6s", width: 8 },
+  { left: "38%", height: 20, delay: "0.15s", width: 6 },
+  { left: "50%", height: 28, delay: "0.45s", width: 7 },
+  { left: "61%", height: 12, delay: "0.7s", width: 5 },
+  { left: "72%", height: 22, delay: "0.25s", width: 8 },
+  { left: "83%", height: 18, delay: "0.55s", width: 6 },
+  { left: "93%", height: 26, delay: "0.1s", width: 7 },
 ];
 
 export function HeroRevampSection() {
@@ -163,16 +163,13 @@ export function HeroRevampSection() {
 
       {/* Main Vertical Hero Container */}
       <div className="relative z-10 mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-3 sm:gap-5 my-auto text-center">
-
         {/* 1. [TOP]: Prominent Bold Headline */}
         <div className="w-full max-w-[98vw] mx-auto text-center px-2 sm:px-4 overflow-hidden pt-1 sm:pt-2">
           <h1
             style={{ color: activeFlavor.headingText }}
             className="font-blogh tracking-tight leading-[1.05] transition-colors duration-500 drop-shadow-xs text-center text-3xl sm:text-5xl lg:text-[clamp(2.5rem,4.1vw,4.6rem)] lg:whitespace-nowrap"
           >
-            <span className="block lg:inline mr-0 lg:mr-3.5 opacity-90">
-              PURE JOY IN
-            </span>
+            <span className="block lg:inline mr-0 lg:mr-3.5 opacity-90">PURE JOY IN</span>
             <span
               style={{ color: activeFlavor.highlightText }}
               className="transition-colors duration-500 block lg:inline mt-0.5 lg:mt-0"
@@ -185,7 +182,6 @@ export function HeroRevampSection() {
         {/* 2. [MIDDLE]: 3D Pastry + 3D Depth Typography */}
         {/* Bigger container: max-w-4xl (was 3xl), taller min-h */}
         <div className="relative w-full max-w-4xl flex items-center justify-center min-h-[200px] sm:min-h-[310px] lg:min-h-[440px]">
-
           {/* 3D Floating Pastry — bigger: max-w-md → xl → 3xl */}
           <div
             className="relative z-10 w-full max-w-md sm:max-w-2xl lg:max-w-3xl transition-transform duration-200 ease-out"
@@ -201,8 +197,10 @@ export function HeroRevampSection() {
                 className="size-full object-cover transition-all duration-700 pointer-events-none"
                 style={{
                   mixBlendMode: activeFlavor.blendMode as React.CSSProperties["mixBlendMode"],
-                  maskImage: "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
-                  WebkitMaskImage: "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
+                  maskImage:
+                    "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
+                  WebkitMaskImage:
+                    "radial-gradient(ellipse 65% 65% at 50% 50%, black 28%, rgba(0,0,0,0.85) 48%, transparent 72%)",
                 }}
               />
             </div>
@@ -272,7 +270,6 @@ export function HeroRevampSection() {
               )}
             </div>
           </div>
-
         </div>
 
         {/* 3. [BOTTOM]: Flavor Pill Buttons */}
@@ -292,11 +289,7 @@ export function HeroRevampSection() {
                   }`}
                 >
                   <div className="size-6 sm:size-7.5 rounded-full overflow-hidden shrink-0 border border-white/40 shadow-xs mr-2 sm:mr-2.5">
-                    <img
-                      src={flavor.image}
-                      alt={flavor.title}
-                      className="size-full object-cover"
-                    />
+                    <img src={flavor.image} alt={flavor.title} className="size-full object-cover" />
                   </div>
 
                   <span className="font-blogh font-bold text-xs sm:text-sm tracking-wider uppercase drop-shadow-xs">
@@ -311,7 +304,6 @@ export function HeroRevampSection() {
             })}
           </div>
         </div>
-
       </div>
 
       {/* 4. [BOTTOM WAVE]: Kinetic TextLoop Ribbon */}
@@ -336,7 +328,6 @@ export function HeroRevampSection() {
           className="opacity-95"
         />
       </div>
-
     </div>
   );
 }

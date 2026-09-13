@@ -48,9 +48,9 @@ export function SiteFooter() {
       <a
         href={
           social.whatsapp
-            ? (social.whatsapp.startsWith("http")
-                ? social.whatsapp
-                : `https://wa.me/${social.whatsapp.replace(/\D/g, "")}`)
+            ? social.whatsapp.startsWith("http")
+              ? social.whatsapp
+              : `https://wa.me/${social.whatsapp.replace(/\D/g, "")}`
             : "https://wa.me/919944000000"
         }
         target="_blank"
@@ -117,23 +117,22 @@ export function SiteFooter() {
           preserveAspectRatio="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M0,24 L0,0 C20,20 40,20 60,0 C80,20 100,20 120,0 C140,20 160,20 180,0 C200,20 220,20 240,0 C260,20 280,20 300,0 C320,20 340,20 360,0 C380,20 400,20 420,0 C440,20 460,20 480,0 C500,20 520,20 540,0 C560,20 580,20 600,0 C620,20 640,20 660,0 C680,20 700,20 720,0 C740,20 760,20 780,0 C800,20 820,20 840,0 C860,20 880,20 900,0 C920,20 940,20 960,0 C980,20 1000,20 1020,0 C1040,20 1060,20 1080,0 C1100,20 1120,20 1140,0 C1160,20 1180,20 1200,0 L1200,24 Z"
-          />
+          <path d="M0,24 L0,0 C20,20 40,20 60,0 C80,20 100,20 120,0 C140,20 160,20 180,0 C200,20 220,20 240,0 C260,20 280,20 300,0 C320,20 340,20 360,0 C380,20 400,20 420,0 C440,20 460,20 480,0 C500,20 520,20 540,0 C560,20 580,20 600,0 C620,20 640,20 660,0 C680,20 700,20 720,0 C740,20 760,20 780,0 C800,20 820,20 840,0 C860,20 880,20 900,0 C920,20 940,20 960,0 C980,20 1000,20 1020,0 C1040,20 1060,20 1080,0 C1100,20 1120,20 1140,0 C1160,20 1180,20 1200,0 L1200,24 Z" />
         </svg>
       </div>
 
       <div className="bg-secondary/40">
         <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 items-start">
-            
             {/* 1. Brand Bio: Hidden on mobile (<640px), visible on tablet & desktop */}
             <div className="hidden sm:block">
-              <p className="font-nimbus text-2xl font-bold text-cocoa">Ani Bakes<span className="text-berry">.</span></p>
+              <p className="font-nimbus text-2xl font-bold text-cocoa">
+                Ani Bakes<span className="text-berry-deep">.</span>
+              </p>
               <p className="mt-2 max-w-xs text-sm text-muted-foreground">
                 A small-batch neighbourhood bakery. Everything is baked the morning of your slot.
               </p>
-              
+
               {/* Social Links (Desktop) */}
               {showSocial && <div className="mt-4">{socialLinksRow}</div>}
             </div>
@@ -142,9 +141,21 @@ export function SiteFooter() {
             <div className="hidden lg:block text-sm">
               <p className="font-semibold">Browse</p>
               <ul className="mt-3 space-y-2 text-muted-foreground">
-                <li><Link to="/shop" className="hover:text-foreground">All bakes</Link></li>
-                <li><Link to="/offers" className="hover:text-foreground">Offers</Link></li>
-                <li><Link to="/cart" className="hover:text-foreground">Cart</Link></li>
+                <li>
+                  <Link to="/shop" className="hover:text-foreground">
+                    All bakes
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/offers" className="hover:text-foreground">
+                    Offers
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/cart" className="hover:text-foreground">
+                    Cart
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -152,7 +163,8 @@ export function SiteFooter() {
             <div className="hidden lg:block text-sm">
               <p className="font-semibold">How ordering works</p>
               <p className="mt-3 text-muted-foreground">
-                Pick a next-day slot, pay instantly to secure your bake queue, and our head baker prepares your bakes fresh.
+                Pick a next-day slot, pay instantly to secure your bake queue, and our head baker
+                prepares your bakes fresh.
               </p>
             </div>
 
@@ -175,21 +187,21 @@ export function SiteFooter() {
 
               {/* Social Links (Mobile) */}
               {showSocial && (
-                <div className="mt-5 flex justify-center sm:hidden">
-                  {socialLinksRow}
-                </div>
+                <div className="mt-5 flex justify-center sm:hidden">{socialLinksRow}</div>
               )}
             </div>
-
           </div>
         </div>
 
         {/* Trademark / Copyright Bar */}
         <div className="border-t border-border/60 py-4 px-4">
           <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span>© {new Date().getFullYear()} <span className="font-nimbus font-bold text-cocoa text-sm">Ani Bakes</span> Bakery</span>
+            <span>
+              © {new Date().getFullYear()}{" "}
+              <span className="font-nimbus font-bold text-cocoa text-sm">Ani Bakes</span> Bakery
+            </span>
             <span className="flex items-center gap-1.5">
-              Baked with <Heart className="size-3 text-berry animate-pulse" /> in Pondicherry
+              Baked with <Heart className="size-3 text-berry-deep animate-pulse" /> in Pondicherry
             </span>
           </div>
         </div>

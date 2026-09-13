@@ -8,7 +8,9 @@ export function RequireAuth({ title, children }: { title: string; children: Reac
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   if (!ready) {
-    return <div className="mx-auto max-w-3xl px-4 py-24 text-center text-muted-foreground">Loading…</div>;
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-24 text-center text-muted-foreground">Loading…</div>
+    );
   }
 
   if (!user) {

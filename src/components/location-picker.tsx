@@ -20,7 +20,13 @@ const markerIcon = L.divIcon({
   iconAnchor: [9, 9],
 });
 
-export default function LocationPicker({ latitude, longitude, onChange, readonly, className }: Props) {
+export default function LocationPicker({
+  latitude,
+  longitude,
+  onChange,
+  readonly,
+  className,
+}: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -103,7 +109,7 @@ export default function LocationPicker({ latitude, longitude, onChange, readonly
         setLocating(false);
         alert(err.message || "Could not retrieve your location");
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true },
     );
   }
 
@@ -124,7 +130,9 @@ export default function LocationPicker({ latitude, longitude, onChange, readonly
           disabled={locating}
           title="Use my current location"
         >
-          <Locate className={`h-5 w-5 ${locating ? "animate-pulse text-berry" : "text-foreground"}`} />
+          <Locate
+            className={`h-5 w-5 ${locating ? "animate-pulse text-berry-deep" : "text-foreground"}`}
+          />
         </Button>
       )}
     </div>

@@ -80,7 +80,6 @@ export function SiteHeader() {
       } transition-all duration-700`}
     >
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 sm:gap-4 px-3.5 sm:px-6">
-        
         {/* Brand Logo with Liquid Glass Pill */}
         <Link
           to="/"
@@ -93,11 +92,7 @@ export function SiteHeader() {
             Ani Bakes
           </span>
           <span
-            style={
-              isHeroActive && dotColor
-                ? { backgroundColor: dotColor }
-                : undefined
-            }
+            style={isHeroActive && dotColor ? { backgroundColor: dotColor } : undefined}
             className="flex size-2 rounded-full bg-berry animate-pulse transition-colors duration-700"
           />
         </Link>
@@ -126,7 +121,7 @@ export function SiteHeader() {
             >
               {item.label}
               {item.badge && (
-                <span className="ml-1.5 rounded-full bg-berry/15 px-1.5 py-0.2 text-[9px] font-extrabold text-berry">
+                <span className="ml-1.5 rounded-full bg-berry/15 px-1.5 py-0.2 text-[9px] font-extrabold text-berry-deep">
                   {item.badge}
                 </span>
               )}
@@ -150,7 +145,7 @@ export function SiteHeader() {
                   }
                 : undefined
             }
-            className="inline-flex rounded-full border-berry/30 bg-berry/10 text-berry hover:bg-berry/20 text-xs font-semibold h-8 px-2.5 sm:px-3 shadow-2xs backdrop-blur-xs transition-colors duration-700"
+            className="inline-flex rounded-full border-berry/30 bg-berry/10 text-berry-deep hover:bg-berry/20 text-xs font-semibold h-8 px-2.5 sm:px-3 shadow-2xs backdrop-blur-xs transition-colors duration-700"
           >
             <Link to="/admin">
               <ShieldCheck className="mr-1 sm:mr-1.5 size-3.5" />
@@ -236,7 +231,9 @@ export function SiteHeader() {
               }
               className="hidden bg-berry text-berry-foreground hover:bg-berry/90 sm:inline-flex h-8 sm:h-9 px-4 rounded-full text-xs sm:text-sm font-semibold shadow-soft whitespace-nowrap transition-all duration-700"
             >
-              <Link to="/auth" search={{ redirect: undefined }}>Sign in</Link>
+              <Link to="/auth" search={{ redirect: undefined }}>
+                Sign in
+              </Link>
             </Button>
           )}
 
@@ -253,17 +250,19 @@ export function SiteHeader() {
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="flex flex-col justify-between w-72 sm:w-80 p-5 bg-background">
-              
+            <SheetContent
+              side="right"
+              className="flex flex-col justify-between w-72 sm:w-80 p-5 bg-background"
+            >
               {/* Drawer Top Header & Navigation */}
               <div>
                 <div className="flex items-center gap-2 pb-5 mb-4 border-b border-border/60">
-                  <div className="flex size-8 items-center justify-center rounded-xl bg-berry/10 text-berry">
+                  <div className="flex size-8 items-center justify-center rounded-xl bg-berry/10 text-berry-deep">
                     <Sparkles className="size-4" />
                   </div>
                   <div>
                     <p className="font-nimbus text-lg font-bold text-cocoa leading-tight">
-                      Ani Bakes<span className="text-berry">.</span>
+                      Ani Bakes<span className="text-berry-deep">.</span>
                     </p>
                     <p className="text-[10px] text-muted-foreground">Fresh small-batch bakery</p>
                   </div>
@@ -284,13 +283,13 @@ export function SiteHeader() {
                           <div className="flex size-8 items-center justify-center rounded-xl bg-secondary/80 text-muted-foreground transition-colors group-hover:bg-berry group-hover:text-berry-foreground">
                             <Icon className="size-4" />
                           </div>
-                          <span className="text-sm font-medium text-foreground group-hover:text-berry transition-colors">
+                          <span className="text-sm font-medium text-foreground group-hover:text-berry-deep transition-colors">
                             {item.label}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           {item.badge && (
-                            <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[9px] font-bold text-berry">
+                            <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[9px] font-bold text-berry-deep">
                               {item.badge}
                             </span>
                           )}
@@ -311,7 +310,7 @@ export function SiteHeader() {
                       <div className="flex size-8 items-center justify-center rounded-xl bg-secondary/80 text-muted-foreground transition-colors group-hover:bg-berry group-hover:text-berry-foreground">
                         <ShoppingBag className="size-4" />
                       </div>
-                      <span className="text-sm font-medium text-foreground group-hover:text-berry transition-colors">
+                      <span className="text-sm font-medium text-foreground group-hover:text-berry-deep transition-colors">
                         Cart
                       </span>
                     </div>
@@ -332,14 +331,12 @@ export function SiteHeader() {
                     className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-berry/10 active:scale-[0.98]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex size-8 items-center justify-center rounded-xl bg-berry/15 text-berry">
+                      <div className="flex size-8 items-center justify-center rounded-xl bg-berry/15 text-berry-deep">
                         <ShieldCheck className="size-4" />
                       </div>
-                      <span className="text-sm font-semibold text-berry">
-                        Admin Portal
-                      </span>
+                      <span className="text-sm font-semibold text-berry-deep">Admin Portal</span>
                     </div>
-                    <ChevronRight className="size-4 text-berry/50 group-hover:translate-x-0.5 transition-all" />
+                    <ChevronRight className="size-4 text-berry-deep/50 group-hover:translate-x-0.5 transition-all" />
                   </Link>
                 </nav>
               </div>
@@ -354,8 +351,12 @@ export function SiteHeader() {
                       className="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-3 shadow-2xs transition-all hover:border-berry/50 hover:bg-secondary/40 active:scale-[0.98]"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-berry/15 text-berry font-bold text-xs">
-                          {session.name ? session.name.slice(0, 2).toUpperCase() : <User className="size-4" />}
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-berry/15 text-berry-deep font-bold text-xs">
+                          {session.name ? (
+                            session.name.slice(0, 2).toUpperCase()
+                          ) : (
+                            <User className="size-4" />
+                          )}
                         </div>
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-foreground truncate">
@@ -374,7 +375,7 @@ export function SiteHeader() {
                         signOut();
                         setOpen(false);
                       }}
-                      className="flex items-center justify-center gap-2 w-full rounded-xl py-2 text-xs font-medium text-muted-foreground hover:text-berry transition-colors cursor-pointer"
+                      className="flex items-center justify-center gap-2 w-full rounded-xl py-2 text-xs font-medium text-muted-foreground hover:text-berry-deep transition-colors cursor-pointer"
                     >
                       <LogOut className="size-3.5" />
                       <span>Sign out</span>
@@ -397,7 +398,6 @@ export function SiteHeader() {
                   </div>
                 )}
               </div>
-
             </SheetContent>
           </Sheet>
         </div>

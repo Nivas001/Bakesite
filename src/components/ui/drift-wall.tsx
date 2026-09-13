@@ -37,7 +37,9 @@ export interface DriftWallProps {
 }
 
 const DEFAULT_ITEMS: DriftWallItem[] = Array.from({ length: 15 }, (_, i) => {
-  const ids = [1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164];
+  const ids = [
+    1015, 1025, 1039, 1043, 1044, 1050, 1062, 1069, 1074, 1080, 1084, 106, 110, 133, 164,
+  ];
   return {
     image: `https://picsum.photos/id/${ids[i % ids.length]}/600/400`,
     title: `Fresh Bake ${i + 1}`,
@@ -157,7 +159,7 @@ export function DriftWall({
         `rotateX(${tilt + py}deg) rotateY(${turn + px}deg) rotateZ(${roll}deg) ` +
         `translateZ(${-depth}px)`;
     },
-    [tilt, turn, roll, depth]
+    [tilt, turn, roll, depth],
   );
 
   useEffect(() => {
@@ -183,7 +185,8 @@ export function DriftWall({
           const target = (baseVelocities[c] ?? 0) * factor;
 
           const ease = 1 - Math.exp(-dt / (target === 0 ? 0.16 : 0.28));
-          velocitiesRef.current[c] = (velocitiesRef.current[c] ?? 0) + (target - (velocitiesRef.current[c] ?? 0)) * ease;
+          velocitiesRef.current[c] =
+            (velocitiesRef.current[c] ?? 0) + (target - (velocitiesRef.current[c] ?? 0)) * ease;
           let next = (offsetsRef.current[c] ?? 0) + (velocitiesRef.current[c] ?? 0) * dt;
           next = ((next % meta.copyHeight) + meta.copyHeight) % meta.copyHeight;
           offsetsRef.current[c] = next;
@@ -195,7 +198,8 @@ export function DriftWall({
         for (let c = 0; c < trackRefs.current.length; c++) {
           const el = trackRefs.current[c];
           const meta = columnMeta[c];
-          if (el && meta) el.style.transform = `translate3d(0, ${-(offsetsRef.current[c] ?? 0)}px, 0)`;
+          if (el && meta)
+            el.style.transform = `translate3d(0, ${-(offsetsRef.current[c] ?? 0)}px, 0)`;
         }
       }
 
@@ -233,7 +237,9 @@ export function DriftWall({
         };
       }
       const hit = document.elementFromPoint(e.clientX, e.clientY);
-      const tile = (hit && hit.closest ? hit.closest("[data-tile-id]") : null) as HTMLElement | null;
+      const tile = (
+        hit && hit.closest ? hit.closest("[data-tile-id]") : null
+      ) as HTMLElement | null;
       if (!tile) return;
       const id = tile.dataset["tileId"];
       if (!id || id === activeIdRef.current) return;
@@ -241,7 +247,7 @@ export function DriftWall({
       hoveredColRef.current = Number(tile.dataset["col"] ?? -1);
       setActiveId(id);
     },
-    [parallax, reduced]
+    [parallax, reduced],
   );
 
   const handlePointerLeaveWall = useCallback(() => {
@@ -264,7 +270,19 @@ export function DriftWall({
       "--dw-edge": `${Math.max(0, (1 - fade) * 100)}%`,
       ...style,
     }),
-    [tileWidth, tileHeight, gap, radius, perspective, lift, dim, grayscale, overlayColor, fade, style]
+    [
+      tileWidth,
+      tileHeight,
+      gap,
+      radius,
+      perspective,
+      lift,
+      dim,
+      grayscale,
+      overlayColor,
+      fade,
+      style,
+    ],
   );
 
   const renderTile = (item: DriftWallItem, id: string, colIndex: number) => {
@@ -310,7 +328,9 @@ export function DriftWall({
     );
   };
 
-  const rootClass = ["drift-wall", reduced ? "drift-wall--reduced" : "", className].filter(Boolean).join(" ");
+  const rootClass = ["drift-wall", reduced ? "drift-wall--reduced" : "", className]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div
@@ -339,7 +359,9 @@ export function DriftWall({
                 }}
               >
                 {copies.map((_, copyIndex) =>
-                  col.map((item, itemIndex) => renderTile(item, `${c}-${copyIndex}-${itemIndex}`, c))
+                  col.map((item, itemIndex) =>
+                    renderTile(item, `${c}-${copyIndex}-${itemIndex}`, c),
+                  ),
                 )}
               </div>
             </div>

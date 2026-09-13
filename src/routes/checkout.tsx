@@ -128,9 +128,7 @@ function CheckoutPage() {
     }
   }, [slotDate, slotId]);
 
-  const hasValidPhone = Boolean(
-    profile?.phone && profile.phone.replace(/\D/g, "").length >= 10,
-  );
+  const hasValidPhone = Boolean(profile?.phone && profile.phone.replace(/\D/g, "").length >= 10);
   const hasFullName = Boolean(profile?.full_name && profile.full_name.trim().length >= 2);
   const isProfileReady = hasValidPhone && hasFullName;
 
@@ -201,7 +199,9 @@ function CheckoutPage() {
 
     const currentSelectedSlot = TIME_SLOTS.find((s) => s.id === slotId);
     if (!currentSelectedSlot || !isSlotAvailable(slotDate, currentSelectedSlot.start, 24)) {
-      toast.error("Small-batch baking requires at least 24 hours advance notice. Please select an available slot.");
+      toast.error(
+        "Small-batch baking requires at least 24 hours advance notice. Please select an available slot.",
+      );
       setBusy(false);
       return;
     }
@@ -240,7 +240,8 @@ function CheckoutPage() {
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-cocoa">Choose your slot & checkout</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Orders need at least one day of notice. Instant payment secures your slot in our fresh bake queue.
+          Orders need at least one day of notice. Instant payment secures your slot in our fresh
+          bake queue.
         </p>
       </div>
 
@@ -258,7 +259,10 @@ function CheckoutPage() {
                   </p>
                 </div>
                 <div className="size-20 sm:size-24 shrink-0 flex items-center justify-center -mt-2 -mr-2">
-                  <LazyVideo src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1" className="size-full object-contain pointer-events-none drop-shadow-md" />
+                  <LazyVideo
+                    src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1"
+                    className="size-full object-contain pointer-events-none drop-shadow-md"
+                  />
                 </div>
               </div>
               <div className="mt-4 flex gap-2">
@@ -284,7 +288,7 @@ function CheckoutPage() {
             <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Tag className="h-5 w-5 text-berry" />
+                  <Tag className="h-5 w-5 text-berry-deep" />
                   <h2 className="font-display text-lg font-semibold">Have an offer code?</h2>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -300,7 +304,9 @@ function CheckoutPage() {
                         <Check className="h-4 w-4" />
                       </div>
                       <div>
-                        <p className="font-mono font-bold text-xs text-cocoa">{appliedPromo.code}</p>
+                        <p className="font-mono font-bold text-xs text-cocoa">
+                          {appliedPromo.code}
+                        </p>
                         <p className="text-[11px] text-muted-foreground">
                           {appliedPromo.discountType === "percent"
                             ? `${appliedPromo.discountValue}% discount applied`
@@ -352,7 +358,7 @@ function CheckoutPage() {
             <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Calendar className="h-5 w-5 text-berry" />
+                  <Calendar className="h-5 w-5 text-berry-deep" />
                   <h2 className="font-display text-lg font-semibold">Date</h2>
                 </div>
                 <p className="mb-4 text-xs text-muted-foreground">
@@ -440,7 +446,7 @@ function CheckoutPage() {
                               className={`rounded-lg px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors ${
                                 isSelected
                                   ? "bg-berry text-berry-foreground"
-                                  : "bg-muted text-muted-foreground group-hover:text-berry"
+                                  : "bg-muted text-muted-foreground group-hover:text-berry-deep"
                               }`}
                             >
                               {weekdayShort}
@@ -450,7 +456,9 @@ function CheckoutPage() {
                                 <Check className="h-2.5 w-2.5" /> Selected
                               </span>
                             ) : (
-                              <span className="text-[10px] text-muted-foreground">{monthShort}</span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {monthShort}
+                              </span>
                             )}
                           </div>
 
@@ -474,7 +482,7 @@ function CheckoutPage() {
             <section className="rounded-3xl border border-border bg-card p-6 shadow-soft flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="h-5 w-5 text-berry" />
+                  <Clock className="h-5 w-5 text-berry-deep" />
                   <h2 className="font-display text-lg font-semibold">Time window</h2>
                 </div>
                 <p className="mb-4 text-xs text-muted-foreground">
@@ -556,14 +564,14 @@ function CheckoutPage() {
             <section className="flex flex-col rounded-3xl border border-border bg-card p-6 shadow-soft">
               <div className="flex items-center justify-between border-b border-border/80 pb-3 mb-4">
                 <div className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-berry" />
+                  <User className="h-5 w-5 text-berry-deep" />
                   <h2 className="font-display text-lg font-semibold">Contact & Delivery</h2>
                 </div>
                 {profile && (
                   <Link
                     to="/profile"
                     search={{ returnTo: "/checkout" }}
-                    className="text-xs font-semibold text-berry hover:underline flex items-center gap-1"
+                    className="text-xs font-semibold text-berry-deep hover:underline flex items-center gap-1"
                   >
                     <Pencil className="h-3 w-3" /> Edit in profile
                   </Link>
@@ -593,7 +601,7 @@ function CheckoutPage() {
                     <div className="space-y-3 rounded-2xl bg-muted/30 p-4 border border-border/50">
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-xs">
-                          <User className="h-4 w-4 text-berry" />
+                          <User className="h-4 w-4 text-berry-deep" />
                         </div>
                         <div>
                           <p className="text-[11px] text-muted-foreground">Account Name</p>
@@ -602,7 +610,7 @@ function CheckoutPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-xs">
-                          <Phone className="h-4 w-4 text-berry" />
+                          <Phone className="h-4 w-4 text-berry-deep" />
                         </div>
                         <div>
                           <p className="text-[11px] text-muted-foreground">Contact Phone</p>
@@ -612,7 +620,7 @@ function CheckoutPage() {
                       {fulfilmentType === "delivery" && (
                         <div className="flex items-start gap-3 pt-1">
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-xs">
-                            <MapPin className="h-4 w-4 text-berry" />
+                            <MapPin className="h-4 w-4 text-berry-deep" />
                           </div>
                           <div className="w-full">
                             <div className="flex items-center justify-between">
@@ -620,7 +628,7 @@ function CheckoutPage() {
                               <Link
                                 to="/profile"
                                 search={{ returnTo: "/checkout" }}
-                                className="text-[10px] font-semibold text-berry hover:underline"
+                                className="text-[10px] font-semibold text-berry-deep hover:underline"
                               >
                                 Edit
                               </Link>
@@ -632,12 +640,13 @@ function CheckoutPage() {
                               <div className="mt-3">
                                 <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
                                   <span className="inline-flex items-center gap-1 font-semibold text-cocoa">
-                                    <MapPin className="size-3 text-berry" /> Doorstep GPS Pin Set
+                                    <MapPin className="size-3 text-berry-deep" /> Doorstep GPS Pin
+                                    Set
                                   </span>
                                   <Link
                                     to="/profile"
                                     search={{ returnTo: "/checkout" }}
-                                    className="text-[10px] text-berry hover:underline font-semibold"
+                                    className="text-[10px] text-berry-deep hover:underline font-semibold"
                                   >
                                     Adjust Pin on Map ➔
                                   </Link>
@@ -665,7 +674,7 @@ function CheckoutPage() {
                                 <Link
                                   to="/profile"
                                   search={{ returnTo: "/checkout" }}
-                                  className="text-[10px] font-bold text-berry hover:underline shrink-0 ml-2"
+                                  className="text-[10px] font-bold text-berry-deep hover:underline shrink-0 ml-2"
                                 >
                                   Pin on Map →
                                 </Link>
@@ -683,7 +692,7 @@ function CheckoutPage() {
                           type="checkbox"
                           checked={useAlternateContact}
                           onChange={(e) => setUseAlternateContact(e.target.checked)}
-                          className="h-4 w-4 rounded border-input text-berry focus:ring-berry"
+                          className="h-4 w-4 rounded border-input text-berry-deep focus:ring-berry"
                         />
                         <span>Deliver to someone else or alternate contact number</span>
                       </label>
@@ -691,7 +700,10 @@ function CheckoutPage() {
                       {useAlternateContact && (
                         <div className="pt-2 border-t border-border/50 space-y-3 animate-in fade-in duration-200">
                           <div className="space-y-1">
-                            <Label htmlFor="alt-name" className="text-[11px] font-semibold text-muted-foreground">
+                            <Label
+                              htmlFor="alt-name"
+                              className="text-[11px] font-semibold text-muted-foreground"
+                            >
                               Recipient contact name
                             </Label>
                             <Input
@@ -704,7 +716,10 @@ function CheckoutPage() {
                           </div>
 
                           <div className="space-y-1">
-                            <Label htmlFor="alt-phone" className="text-[11px] font-semibold text-muted-foreground">
+                            <Label
+                              htmlFor="alt-phone"
+                              className="text-[11px] font-semibold text-muted-foreground"
+                            >
                               Recipient calling phone number
                             </Label>
                             <Input
@@ -730,7 +745,7 @@ function CheckoutPage() {
             {/* Additional Notes Card with Quick Baker Suggestion Chips */}
             <section className="flex flex-col rounded-3xl border border-border bg-card p-6 shadow-soft">
               <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-5 w-5 text-berry" />
+                <Sparkles className="h-5 w-5 text-berry-deep" />
                 <h2 className="font-display text-lg font-semibold">Baker & Delivery Notes</h2>
               </div>
               <p className="mb-2.5 text-xs text-muted-foreground">
@@ -784,7 +799,7 @@ function CheckoutPage() {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border/80 pb-4">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-berry/10 text-berry">
+                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-berry/10 text-berry-deep">
                   <ShoppingBag className="h-5 w-5" />
                 </div>
                 <div>
@@ -805,7 +820,7 @@ function CheckoutPage() {
             {/* Selected Slot Confirmation Pill (High-Contrast) */}
             {slotDate && (
               <div className="flex items-center gap-2.5 rounded-2xl bg-muted/70 border border-border p-3 text-xs shadow-2xs">
-                <Calendar className="h-4 w-4 shrink-0 text-berry" />
+                <Calendar className="h-4 w-4 shrink-0 text-berry-deep" />
                 <div className="font-sans font-medium text-foreground">
                   <span className="font-bold text-foreground">{formatSlotDate(slotDate)}</span>
                   <span className="mx-1.5 text-muted-foreground font-normal">•</span>
@@ -853,7 +868,7 @@ function CheckoutPage() {
                 className="w-full rounded-xl border-dashed border-border hover:border-berry/40 hover:bg-secondary/40 text-xs font-semibold text-muted-foreground hover:text-foreground py-4"
               >
                 <Link to="/cart">
-                  <Pencil className="mr-1.5 h-3.5 w-3.5 text-berry" />
+                  <Pencil className="mr-1.5 h-3.5 w-3.5 text-berry-deep" />
                   Edit items or add more bakes
                 </Link>
               </Button>
@@ -866,7 +881,7 @@ function CheckoutPage() {
                 <dd className="font-semibold text-foreground">{formatCurrency(subtotal)}</dd>
               </div>
               {discountTotal > 0 && (
-                <div className="flex items-center justify-between font-sans text-berry">
+                <div className="flex items-center justify-between font-sans text-berry-deep">
                   <dt className="flex items-center gap-1.5 font-medium">
                     <Sparkles className="h-3.5 w-3.5" />
                     Special Offers
@@ -895,11 +910,18 @@ function CheckoutPage() {
             <div className="rounded-2xl bg-secondary/40 p-4 border border-border/50 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="size-12 shrink-0 flex items-center justify-center">
-                  <LazyVideo src="/illustration/3d-stickle-credit-card-terminal-pay" className="size-full object-contain pointer-events-none drop-shadow-sm" />
+                  <LazyVideo
+                    src="/illustration/3d-stickle-credit-card-terminal-pay"
+                    className="size-full object-contain pointer-events-none drop-shadow-sm"
+                  />
                 </div>
                 <div>
-                  <p className="font-bold text-cocoa text-xs sm:text-sm">Instant Encrypted Payment</p>
-                  <p className="text-[11px] text-muted-foreground">Secures your morning oven slot</p>
+                  <p className="font-bold text-cocoa text-xs sm:text-sm">
+                    Instant Encrypted Payment
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Secures your morning oven slot
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-2.5 pt-1.5 border-t border-border/40">

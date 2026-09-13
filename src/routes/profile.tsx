@@ -25,9 +25,15 @@ export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
       { title: "Your details — Ani Bakes Bakery" },
-      { name: "description", content: "Save your contact phone number, delivery address and map pin." },
+      {
+        name: "description",
+        content: "Save your contact phone number, delivery address and map pin.",
+      },
       { property: "og:title", content: "Your details — Ani Bakes Bakery" },
-      { property: "og:description", content: "Save your contact phone number, delivery address and map pin." },
+      {
+        property: "og:description",
+        content: "Save your contact phone number, delivery address and map pin.",
+      },
     ],
   }),
   component: () => (
@@ -107,7 +113,6 @@ function ProfilePage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-4 sm:py-8">
-      
       {/* Header: Compact & Clean */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-4 sm:mb-6">
         <div>
@@ -150,14 +155,12 @@ function ProfilePage() {
         </div>
       ) : (
         <form onSubmit={submit} className="space-y-4 sm:space-y-6">
-          
           {/* Main 2-Column Grid: Left Card (Contact), Right Card (Address & Map Pin) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 items-start">
-            
             {/* Card 1: Contact Information */}
             <div className="rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-4 sm:p-5 shadow-soft space-y-3.5">
               <div className="flex items-center gap-2 border-b border-border/60 pb-2.5">
-                <div className="flex size-7 items-center justify-center rounded-lg bg-secondary text-berry">
+                <div className="flex size-7 items-center justify-center rounded-lg bg-secondary text-berry-deep">
                   <User className="size-4" />
                 </div>
                 <h2 className="font-display text-sm sm:text-base font-bold text-cocoa">
@@ -167,7 +170,7 @@ function ProfilePage() {
 
               <div className="space-y-1">
                 <Label htmlFor="full_name" className="text-[11px] sm:text-xs font-semibold">
-                  Full name <span className="text-berry">*</span>
+                  Full name <span className="text-berry-deep">*</span>
                 </Label>
                 <Input
                   id="full_name"
@@ -181,7 +184,7 @@ function ProfilePage() {
 
               <div className="space-y-1">
                 <Label htmlFor="phone" className="text-[11px] sm:text-xs font-semibold">
-                  Mobile phone number <span className="text-berry">*</span>
+                  Mobile phone number <span className="text-berry-deep">*</span>
                 </Label>
                 <Input
                   id="phone"
@@ -219,7 +222,7 @@ function ProfilePage() {
             <div className="rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-4 sm:p-5 shadow-soft space-y-3.5">
               <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
                 <div className="flex items-center gap-2">
-                  <div className="flex size-7 items-center justify-center rounded-lg bg-secondary text-berry">
+                  <div className="flex size-7 items-center justify-center rounded-lg bg-secondary text-berry-deep">
                     <MapPin className="size-4" />
                   </div>
                   <h2 className="font-display text-sm sm:text-base font-bold text-cocoa">
@@ -249,25 +252,32 @@ function ProfilePage() {
 
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <Label className="text-[11px] sm:text-xs font-semibold">
-                    Delivery map pin
-                  </Label>
+                  <Label className="text-[11px] sm:text-xs font-semibold">Delivery map pin</Label>
                   <span className="text-[10px] text-muted-foreground">Tap map to set</span>
                 </div>
-                
-                <ClientOnly fallback={<div className="h-40 sm:h-48 w-full rounded-xl bg-muted animate-pulse" />}>
-                  <Suspense fallback={<div className="h-40 sm:h-48 w-full rounded-xl bg-muted animate-pulse" />}>
+
+                <ClientOnly
+                  fallback={
+                    <div className="h-40 sm:h-48 w-full rounded-xl bg-muted animate-pulse" />
+                  }
+                >
+                  <Suspense
+                    fallback={
+                      <div className="h-40 sm:h-48 w-full rounded-xl bg-muted animate-pulse" />
+                    }
+                  >
                     <LocationPicker
                       latitude={form.latitude}
                       longitude={form.longitude}
-                      onChange={(latitude, longitude) => setForm((f) => ({ ...f, latitude, longitude }))}
+                      onChange={(latitude, longitude) =>
+                        setForm((f) => ({ ...f, latitude, longitude }))
+                      }
                       className="h-40 sm:h-48 rounded-xl"
                     />
                   </Suspense>
                 </ClientOnly>
               </div>
             </div>
-
           </div>
 
           {/* Action Row */}
@@ -282,10 +292,8 @@ function ProfilePage() {
               {busy ? "Saving…" : "Save details"}
             </Button>
           </div>
-
         </form>
       )}
-
     </div>
   );
 }

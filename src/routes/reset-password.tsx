@@ -10,8 +10,8 @@ import { LazyVideo } from "@/components/motion/lazy-video";
 
 export const Route = createFileRoute("/reset-password")({
   validateSearch: (search: Record<string, unknown>) => ({
-    userId: typeof search['userId'] === "string" ? (search['userId'] as string) : undefined,
-    secret: typeof search['secret'] === "string" ? (search['secret'] as string) : undefined,
+    userId: typeof search["userId"] === "string" ? (search["userId"] as string) : undefined,
+    secret: typeof search["secret"] === "string" ? (search["secret"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -48,7 +48,10 @@ function ResetPasswordPage() {
               This password reset link is missing required security tokens or has expired.
             </p>
           </div>
-          <Button asChild className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11">
+          <Button
+            asChild
+            className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11"
+          >
             <Link to="/auth" search={{ redirect: undefined }}>
               Back to Sign In
             </Link>
@@ -78,7 +81,7 @@ function ResetPasswordPage() {
       toast.error(
         err instanceof Error
           ? err.message
-          : "Invalid or expired password reset link. Please request a new one."
+          : "Invalid or expired password reset link. Please request a new one.",
       );
     } finally {
       setBusy(false);
@@ -95,10 +98,14 @@ function ResetPasswordPage() {
           <div>
             <h2 className="font-display text-2xl font-bold text-cocoa">Password Updated!</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Your password has been changed successfully. You can now sign in with your new password.
+              Your password has been changed successfully. You can now sign in with your new
+              password.
             </p>
           </div>
-          <Button asChild className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11">
+          <Button
+            asChild
+            className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11"
+          >
             <Link to="/auth" search={{ redirect: undefined }}>
               Sign In Now
             </Link>
@@ -113,7 +120,10 @@ function ResetPasswordPage() {
       <div className="w-full rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8 space-y-6">
         <div className="text-center">
           <div className="relative mx-auto flex size-36 sm:size-44 md:size-48 items-center justify-center mb-4">
-            <LazyVideo src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware" className="size-full object-contain pointer-events-none drop-shadow-xl" />
+            <LazyVideo
+              src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware"
+              className="size-full object-contain pointer-events-none drop-shadow-xl"
+            />
           </div>
           <h1 className="font-blogh text-2xl sm:text-4xl font-bold text-cocoa uppercase tracking-wide">
             Set New Password
@@ -126,7 +136,7 @@ function ResetPasswordPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="new-pass" className="text-xs font-semibold">
-              New Password <span className="text-berry">*</span>
+              New Password <span className="text-berry-deep">*</span>
             </Label>
             <div className="relative">
               <Input
@@ -152,7 +162,7 @@ function ResetPasswordPage() {
 
           <div className="space-y-1.5">
             <Label htmlFor="confirm-pass" className="text-xs font-semibold">
-              Confirm New Password <span className="text-berry">*</span>
+              Confirm New Password <span className="text-berry-deep">*</span>
             </Label>
             <div className="relative">
               <Input

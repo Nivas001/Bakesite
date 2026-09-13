@@ -25,12 +25,48 @@ interface MemoryCard {
 }
 
 const CARD_PAIRS = [
-  { pairId: 1, name: "Bento Cake", emoji: "🍰", image: "/cakes/pink-bento-cake.webp", bgGradient: "from-pink-500/20 to-rose-500/30" },
-  { pairId: 2, name: "Dark Truffle", emoji: "🍫", image: "/cakes/belgian-truffle-cake.webp", bgGradient: "from-amber-700/20 to-amber-900/30" },
-  { pairId: 3, name: "Chunky Cookie", emoji: "🍪", image: "/hero/hero-3d-cookie.jpg", bgGradient: "from-amber-500/20 to-orange-500/30" },
-  { pairId: 4, name: "French Strawberry", emoji: "🍓", image: "/products/strawberry-cake.jpg", bgGradient: "from-rose-500/20 to-red-500/30" },
-  { pairId: 5, name: "Mango Gateau", emoji: "🥭", image: "/hero/hero-3d-mango-cheesecake.webp", bgGradient: "from-amber-400/20 to-yellow-500/30" },
-  { pairId: 6, name: "Buttercream Blossom", emoji: "🌸", image: "/cakes/butterfly-lilac-cake.webp", bgGradient: "from-purple-400/20 to-pink-500/30" },
+  {
+    pairId: 1,
+    name: "Bento Cake",
+    emoji: "🍰",
+    image: "/cakes/pink-bento-cake.webp",
+    bgGradient: "from-pink-500/20 to-rose-500/30",
+  },
+  {
+    pairId: 2,
+    name: "Dark Truffle",
+    emoji: "🍫",
+    image: "/cakes/belgian-truffle-cake.webp",
+    bgGradient: "from-amber-700/20 to-amber-900/30",
+  },
+  {
+    pairId: 3,
+    name: "Chunky Cookie",
+    emoji: "🍪",
+    image: "/hero/hero-3d-cookie.jpg",
+    bgGradient: "from-amber-500/20 to-orange-500/30",
+  },
+  {
+    pairId: 4,
+    name: "French Strawberry",
+    emoji: "🍓",
+    image: "/products/strawberry-cake.jpg",
+    bgGradient: "from-rose-500/20 to-red-500/30",
+  },
+  {
+    pairId: 5,
+    name: "Mango Gateau",
+    emoji: "🥭",
+    image: "/hero/hero-3d-mango-cheesecake.webp",
+    bgGradient: "from-amber-400/20 to-yellow-500/30",
+  },
+  {
+    pairId: 6,
+    name: "Buttercream Blossom",
+    emoji: "🌸",
+    image: "/cakes/butterfly-lilac-cake.webp",
+    bgGradient: "from-purple-400/20 to-pink-500/30",
+  },
 ];
 
 function shuffleCards(): MemoryCard[] {
@@ -152,27 +188,33 @@ export function MemoryGame({ onWin, claimCouponFn }: MemoryGameProps) {
       {/* Header Info Bar */}
       <div className="flex items-center justify-between border-b border-border/70 pb-4">
         <div className="flex items-center gap-2">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-berry/10 text-berry">
+          <div className="flex size-9 items-center justify-center rounded-xl bg-berry/10 text-berry-deep">
             <Layers className="size-5" />
           </div>
           <div>
             <h3 className="font-blogh text-base sm:text-lg font-bold text-cocoa leading-tight">
               Pastry Memory Match
             </h3>
-            <p className="text-[11px] text-muted-foreground">Match all 6 pairs before time expires to win</p>
+            <p className="text-[11px] text-muted-foreground">
+              Match all 6 pairs before time expires to win
+            </p>
           </div>
         </div>
 
         {/* Timer & Pairs Pill */}
         <div className="flex items-center gap-2">
-          <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
-            timeLeft < 15 ? "bg-rose-500/15 text-rose-600 animate-pulse" : "bg-secondary text-cocoa"
-          }`}>
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
+              timeLeft < 15
+                ? "bg-rose-500/15 text-rose-600 animate-pulse"
+                : "bg-secondary text-cocoa"
+            }`}
+          >
             <Timer className="size-3.5" />
             <span>{timeLeft}s</span>
           </div>
 
-          <div className="rounded-full bg-berry/15 px-3 py-1 text-xs font-bold text-berry">
+          <div className="rounded-full bg-berry/15 px-3 py-1 text-xs font-bold text-berry-deep">
             Pairs: {matchedPairIds.length}/{CARD_PAIRS.length}
           </div>
         </div>
@@ -183,7 +225,8 @@ export function MemoryGame({ onWin, claimCouponFn }: MemoryGameProps) {
           {/* Card Grid (3 cols on mobile, 4 cols on sm+) */}
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
             {cards.map((card, idx) => {
-              const isFlipped = flippedIndices.includes(idx) || matchedPairIds.includes(card.pairId);
+              const isFlipped =
+                flippedIndices.includes(idx) || matchedPairIds.includes(card.pairId);
               const isMatched = matchedPairIds.includes(card.pairId);
 
               return (
@@ -244,13 +287,15 @@ export function MemoryGame({ onWin, claimCouponFn }: MemoryGameProps) {
           </div>
 
           <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
-            <span>Moves: <strong className="text-cocoa">{moves}</strong></span>
+            <span>
+              Moves: <strong className="text-cocoa">{moves}</strong>
+            </span>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={initGame}
-              className="h-7 text-xs text-muted-foreground hover:text-berry"
+              className="h-7 text-xs text-muted-foreground hover:text-berry-deep"
             >
               <RotateCcw className="size-3 mr-1" /> Reset Grid
             </Button>
@@ -260,9 +305,11 @@ export function MemoryGame({ onWin, claimCouponFn }: MemoryGameProps) {
         /* Results Section */
         <div className="mt-6 text-center space-y-5">
           <div className="flex justify-center">
-            <div className={`flex size-16 items-center justify-center rounded-3xl ${
-              isWon ? "bg-amber-500/20 text-amber-500" : "bg-rose-500/20 text-rose-500"
-            }`}>
+            <div
+              className={`flex size-16 items-center justify-center rounded-3xl ${
+                isWon ? "bg-amber-500/20 text-amber-500" : "bg-rose-500/20 text-rose-500"
+              }`}
+            >
               <Trophy className="size-9 animate-bounce" />
             </div>
           </div>

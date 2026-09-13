@@ -88,7 +88,12 @@
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(0,0,0,0.1) 0%, transparent 35%, color-mix(in srgb, var(--ag-overlay) 88%, transparent) 100%),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.1) 0%,
+      transparent 35%,
+      color-mix(in srgb, var(--ag-overlay) 88%, transparent) 100%
+    ),
     color-mix(in srgb, var(--ag-overlay) calc(var(--ag-dim, 0.25) * 100%), transparent);
 }
 

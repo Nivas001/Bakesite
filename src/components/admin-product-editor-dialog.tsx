@@ -16,16 +16,7 @@ import {
   generateSmartCakeWeightVariants,
   type ProductWeightVariant,
 } from "@/lib/pricing";
-import {
-  Camera,
-  Pin,
-  CheckCircle2,
-  Trash2,
-  ImageIcon,
-  Sparkles,
-  Layers,
-  Tag,
-} from "lucide-react";
+import { Camera, Pin, CheckCircle2, Trash2, ImageIcon, Sparkles, Layers, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { uploadProductImageAdmin } from "@/lib/admin.functions";
@@ -111,11 +102,7 @@ export function ProductEditorDialog({
   }
 
   const attachedImages =
-    form.images && form.images.length > 0
-      ? form.images
-      : form.image_url
-        ? [form.image_url]
-        : [];
+    form.images && form.images.length > 0 ? form.images : form.image_url ? [form.image_url] : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -123,7 +110,7 @@ export function ProductEditorDialog({
         <DialogHeader className="border-b border-border/60 pb-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="size-10 rounded-2xl bg-berry/15 text-berry flex items-center justify-center text-xl shadow-2xs">
+              <div className="size-10 rounded-2xl bg-berry/15 text-berry-deep flex items-center justify-center text-xl shadow-2xs">
                 {form.id ? "✏️" : "🎂"}
               </div>
               <div>
@@ -139,7 +126,7 @@ export function ProductEditorDialog({
             </div>
 
             {form.id && (
-              <span className="rounded-full bg-berry/15 border border-berry/30 px-3 py-1 text-xs font-bold text-berry shrink-0">
+              <span className="rounded-full bg-berry/15 border border-berry/30 px-3 py-1 text-xs font-bold text-berry-deep shrink-0">
                 ID: #{form.id.slice(-6)}
               </span>
             )}
@@ -150,14 +137,14 @@ export function ProductEditorDialog({
           {/* SECTION 1: Core Bake Details */}
           <div className="space-y-4 rounded-2xl bg-secondary/20 p-4 border border-border/60">
             <div className="flex items-center gap-2 text-xs font-bold text-cocoa uppercase tracking-wider">
-              <Sparkles className="size-4 text-berry" />
+              <Sparkles className="size-4 text-berry-deep" />
               <span>1. Basic Product Info</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
                 <Label htmlFor="dlg-name" className="text-xs font-semibold">
-                  Product Name <span className="text-berry">*</span>
+                  Product Name <span className="text-berry-deep">*</span>
                 </Label>
                 <Input
                   id="dlg-name"
@@ -260,12 +247,12 @@ export function ProductEditorDialog({
           <div className="space-y-4 rounded-2xl bg-secondary/20 p-4 border border-border/60">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-cocoa uppercase tracking-wider">
-                <Tag className="size-4 text-berry" />
+                <Tag className="size-4 text-berry-deep" />
                 <span>2. Pricing &amp; Discounts</span>
               </div>
               <div className="text-xs font-semibold text-cocoa">
                 Customer Pays:{" "}
-                <span className="font-bold text-berry text-sm">
+                <span className="font-bold text-berry-deep text-sm">
                   {formatCurrency(finalCalculatedPrice)}
                 </span>
               </div>
@@ -274,7 +261,7 @@ export function ProductEditorDialog({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
                 <Label htmlFor="dlg-price" className="text-xs font-semibold">
-                  Base Price (₹) <span className="text-berry">*</span>
+                  Base Price (₹) <span className="text-berry-deep">*</span>
                 </Label>
                 <Input
                   id="dlg-price"
@@ -337,7 +324,7 @@ export function ProductEditorDialog({
           <div className="space-y-4 rounded-2xl bg-secondary/20 p-4 border border-border/60">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-cocoa uppercase tracking-wider">
-                <Layers className="size-4 text-berry" />
+                <Layers className="size-4 text-berry-deep" />
                 <span>3. Portion &amp; Sizing Mode</span>
               </div>
               <span className="text-[11px] font-semibold text-muted-foreground">
@@ -364,7 +351,7 @@ export function ProductEditorDialog({
                 }}
                 className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                   form.item_type === "weight"
-                    ? "border-berry bg-berry/15 text-berry ring-1 ring-berry"
+                    ? "border-berry bg-berry/15 text-berry-deep ring-1 ring-berry"
                     : "border-border/70 bg-card text-muted-foreground hover:bg-secondary"
                 }`}
               >
@@ -383,7 +370,7 @@ export function ProductEditorDialog({
                 }}
                 className={`flex items-center justify-center gap-2 p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                   form.item_type !== "weight"
-                    ? "border-berry bg-berry/15 text-berry ring-1 ring-berry"
+                    ? "border-berry bg-berry/15 text-berry-deep ring-1 ring-berry"
                     : "border-border/70 bg-card text-muted-foreground hover:bg-secondary"
                 }`}
               >
@@ -396,7 +383,8 @@ export function ProductEditorDialog({
               <div className="space-y-2.5 pt-1">
                 <div className="flex items-center justify-between text-xs">
                   <p className="text-[11px] text-muted-foreground">
-                    Auto-volume discounts: <strong>500g is ~5% off</strong>, <strong>1kg is 10% off</strong>, <strong>2kg is 15% off</strong>
+                    Auto-volume discounts: <strong>500g is ~5% off</strong>,{" "}
+                    <strong>1kg is 10% off</strong>, <strong>2kg is 15% off</strong>
                   </p>
                   <button
                     type="button"
@@ -406,7 +394,7 @@ export function ProductEditorDialog({
                       setForm((f) => ({ ...f, weight_variants: calculated }));
                       toast.success(`Generated smart tiers from ₹${base} base (250g)!`);
                     }}
-                    className="text-[11px] font-bold text-berry hover:underline cursor-pointer"
+                    className="text-[11px] font-bold text-berry-deep hover:underline cursor-pointer"
                   >
                     ⚡ Re-calculate Tiers
                   </button>
@@ -492,7 +480,7 @@ export function ProductEditorDialog({
           <div className="space-y-4 rounded-2xl bg-secondary/20 p-4 border border-border/60">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-cocoa uppercase tracking-wider">
-                <ImageIcon className="size-4 text-berry" />
+                <ImageIcon className="size-4 text-berry-deep" />
                 <span>4. Photo Gallery &amp; Pinned Cover</span>
               </div>
               <span className="text-[11px] text-muted-foreground font-semibold">
@@ -501,7 +489,9 @@ export function ProductEditorDialog({
             </div>
 
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Add multiple photos to create an interactive product carousel. Click <strong>Pin as Cover</strong> to select the photo displayed on the storefront catalog cards.
+              Add multiple photos to create an interactive product carousel. Click{" "}
+              <strong>Pin as Cover</strong> to select the photo displayed on the storefront catalog
+              cards.
             </p>
 
             {/* Gallery Grid */}
@@ -546,7 +536,7 @@ export function ProductEditorDialog({
                               setForm((f) => ({ ...f, image_url: img }));
                               toast.success(`Photo #${idx + 1} pinned as primary cover!`);
                             }}
-                            className="inline-flex items-center gap-1 text-[10px] font-bold text-berry hover:underline py-1 px-1 rounded-lg hover:bg-berry/10 cursor-pointer"
+                            className="inline-flex items-center gap-1 text-[10px] font-bold text-berry-deep hover:underline py-1 px-1 rounded-lg hover:bg-berry/10 cursor-pointer"
                           >
                             <Pin className="size-3" />
                             <span>Pin Cover</span>
@@ -566,9 +556,7 @@ export function ProductEditorDialog({
                             onClick={() => {
                               setForm((f) => {
                                 const imgs = [
-                                  ...(f.images && f.images.length > 0
-                                    ? f.images
-                                    : [f.image_url]),
+                                  ...(f.images && f.images.length > 0 ? f.images : [f.image_url]),
                                 ];
                                 const [moved] = imgs.splice(idx, 1);
                                 imgs.splice(idx - 1, 0, moved!);
@@ -586,9 +574,7 @@ export function ProductEditorDialog({
                             onClick={() => {
                               setForm((f) => {
                                 const imgs = [
-                                  ...(f.images && f.images.length > 0
-                                    ? f.images
-                                    : [f.image_url]),
+                                  ...(f.images && f.images.length > 0 ? f.images : [f.image_url]),
                                 ];
                                 const [moved] = imgs.splice(idx, 1);
                                 imgs.splice(idx + 1, 0, moved!);
@@ -605,9 +591,7 @@ export function ProductEditorDialog({
                             onClick={() => {
                               setForm((f) => {
                                 const imgs = (
-                                  f.images && f.images.length > 0
-                                    ? f.images
-                                    : [f.image_url]
+                                  f.images && f.images.length > 0 ? f.images : [f.image_url]
                                 ).filter((_, i) => i !== idx);
                                 const newCover = isPinned ? imgs[0] || "" : f.image_url;
                                 return { ...f, images: imgs, image_url: newCover };
@@ -692,7 +676,7 @@ export function ProductEditorDialog({
                       });
                       toast.success(
                         `Successfully uploaded ${newUploadedUrls.length} photo${newUploadedUrls.length === 1 ? "" : "s"}!`,
-                        { id: "uploading-product-photo" }
+                        { id: "uploading-product-photo" },
                       );
                     } else {
                       toast.dismiss("uploading-product-photo");
@@ -717,7 +701,7 @@ export function ProductEditorDialog({
                   onClick={() => productImageInputRef.current?.click()}
                   className="flex-1 rounded-xl h-9 text-xs font-semibold hover:border-berry/50 flex items-center justify-center gap-1.5 cursor-pointer bg-background"
                 >
-                  <Camera className="size-3.5 text-berry" />
+                  <Camera className="size-3.5 text-berry-deep" />
                   <span>
                     {uploadingImage
                       ? "Uploading to Storage…"
@@ -727,7 +711,7 @@ export function ProductEditorDialog({
                 <button
                   type="button"
                   onClick={() => setManualUrlMode(!manualUrlMode)}
-                  className="text-xs text-berry hover:underline font-semibold px-2 py-1 text-center cursor-pointer"
+                  className="text-xs text-berry-deep hover:underline font-semibold px-2 py-1 text-center cursor-pointer"
                 >
                   {manualUrlMode ? "Hide URL input" : "Or add by URL"}
                 </button>
@@ -778,7 +762,7 @@ export function ProductEditorDialog({
               type="checkbox"
               checked={form.is_active}
               onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
-              className="size-4 rounded border-input text-berry accent-berry cursor-pointer"
+              className="size-4 rounded border-input text-berry-deep accent-berry cursor-pointer"
             />
             <div>
               <p className="text-cocoa font-bold">Visible in the Public Storefront</p>

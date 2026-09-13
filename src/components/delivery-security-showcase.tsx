@@ -133,7 +133,6 @@ export function DeliverySecurityShowcase() {
       <div className="absolute -right-20 bottom-10 size-80 rounded-full bg-berry/10 blur-3xl pointer-events-none" />
 
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-14">
-        
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-sky-500/15 border border-sky-500/30 px-3.5 py-1 text-[10.5px] sm:text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300">
@@ -149,7 +148,8 @@ export function DeliverySecurityShowcase() {
             {siteContent.about_delivery.title || "How we deliver your bakes 100% safe & intact"}
           </TextAnimate>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            {siteContent.about_delivery.description || "Delicate croissants, moist multi-layer cakes, and artisanal brownie slabs require precision engineering to travel from our dawn hearth to your celebration table."}
+            {siteContent.about_delivery.description ||
+              "Delicate croissants, moist multi-layer cakes, and artisanal brownie slabs require precision engineering to travel from our dawn hearth to your celebration table."}
           </p>
         </div>
 
@@ -163,15 +163,15 @@ export function DeliverySecurityShowcase() {
                 className="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft flex flex-col justify-between space-y-3 transition-all hover:scale-[1.01]"
               >
                 <div className="space-y-2.5">
-                  <div className={`size-10 rounded-2xl flex items-center justify-center border ${pillar.color}`}>
+                  <div
+                    className={`size-10 rounded-2xl flex items-center justify-center border ${pillar.color}`}
+                  >
                     <Icon className="size-5" />
                   </div>
                   <h3 className="font-blogh text-base sm:text-lg font-bold text-cocoa uppercase tracking-wide">
                     {pillar.title}
                   </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {pillar.desc}
-                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{pillar.desc}</p>
                 </div>
                 <div className="pt-2 border-t border-border/50 flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
                   <CheckCircle2 className="size-3.5" />
@@ -185,7 +185,6 @@ export function DeliverySecurityShowcase() {
         {/* Interactive Packaging Photography Carousel */}
         <div className="rounded-3xl sm:rounded-4xl border border-border/80 bg-card overflow-hidden shadow-lift">
           <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
-            
             {/* Left/Top: High-Res Photo Stage with Touch & Navigation Controls */}
             <div
               onTouchStart={handleTouchStart}
@@ -243,10 +242,9 @@ export function DeliverySecurityShowcase() {
 
             {/* Right/Bottom: Packaging Specifications & Guarantee */}
             <div className="lg:col-span-5 p-5 sm:p-7 flex flex-col justify-between space-y-5 bg-card">
-              
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-berry">
+                  <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-berry-deep">
                     Step 0{currentSlide + 1} of 0{PACKAGING_SLIDES.length}
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -257,7 +255,9 @@ export function DeliverySecurityShowcase() {
                         aria-label={`Jump to ${slide.title}`}
                         onClick={() => setCurrentSlide(idx)}
                         className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                          currentSlide === idx ? "w-6 bg-berry shadow-2xs" : "w-1.5 bg-border/80 hover:bg-muted-foreground"
+                          currentSlide === idx
+                            ? "w-6 bg-berry shadow-2xs"
+                            : "w-1.5 bg-border/80 hover:bg-muted-foreground"
                         }`}
                       />
                     ))}
@@ -295,16 +295,14 @@ export function DeliverySecurityShowcase() {
                     100% Intact Arrival Guarantee
                   </p>
                   <p className="text-[10.5px] sm:text-xs text-muted-foreground leading-snug">
-                    If anything shifts or gets damaged in transit, we will immediately re-bake and re-deliver free of cost.
+                    If anything shifts or gets damaged in transit, we will immediately re-bake and
+                    re-deliver free of cost.
                   </p>
                 </div>
               </div>
-
             </div>
-
           </div>
         </div>
-
       </div>
     </section>
   );

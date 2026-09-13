@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/lib/motion";
 
 interface LazyVideoProps {
@@ -6,8 +7,7 @@ interface LazyVideoProps {
   src: string;
   /** Extensions to offer, in preference order. */
   formats?: Array<"webm" | "mp4" | "mov">;
-  /** Still frame shown before the clip is fetched, and in place of it when
-   *  the visitor prefers reduced motion. */
+  /** Still frame shown in place of the clip when reduced motion is preferred. */
   poster?: string;
   alt?: string;
   className?: string;
@@ -22,13 +22,15 @@ const MIME: Record<string, string> = {
 /**
  * A decorative looping clip that costs nothing until it is actually on screen.
  *
- * The `<source>` elements only render once the video scrolls into view, so the
- * browser never fetches the file for a section the visitor never reaches — this
- * matters because several of these clips are multi-megabyte HEVC assets.
- * Playback pauses whenever the clip scrolls back out of view.
+ * The `<video>` element itself is only mounted once the wrapper scrolls into
+ * view. That matters twice over: the browser never fetches the file for a
+ * section the visitor does not reach — several of these are multi-megabyte
+ * HEVC assets — and an empty `<video>` renders as a solid black rectangle in
+ * some browsers, which would flash over these transparent illustrations before
+ * their sources attached.
  *
- * When the visitor prefers reduced motion the poster image is shown instead and
- * no video is ever requested.
+ * Playback pauses whenever the clip scrolls back out of view, and visitors who
+ * prefer reduced motion get the poster (or nothing) with no video requested.
  */
 export function LazyVideo({
   src,
@@ -37,13 +39,14 @@ export function LazyVideo({
   alt = "",
   className,
 }: LazyVideoProps) {
+  const wrapRef = useRef<HTMLSpanElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [load, setLoad] = useState(false);
   const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
     if (reduced) return;
-    const el = videoRef.current;
+    const el = wrapRef.current;
     if (!el) return;
 
     const observer = new IntersectionObserver(
@@ -51,11 +54,8 @@ export function LazyVideo({
         if (!entry) return;
         if (entry.isIntersecting) {
           setLoad(true);
-          void el.play().catch(() => {
-            /* autoplay can be refused; the poster still shows */
-          });
         } else {
-          el.pause();
+          videoRef.current?.pause();
         }
       },
       { rootMargin: "200px" },
@@ -77,32 +77,34 @@ export function LazyVideo({
     };
   }, [reduced]);
 
-  // Once the sources appear the element needs an explicit load() to pick them up.
-  useEffect(() => {
-    if (load) videoRef.current?.load();
-  }, [load]);
-
-  if (reduced && poster) {
-    return <img src={poster} alt={alt} className={className} loading="lazy" decoding="async" />;
+  if (reduced) {
+    return poster ? (
+      <img src={poster} alt={alt} className={className} loading="lazy" decoding="async" />
+    ) : (
+      <span className={className} aria-hidden />
+    );
   }
 
   return (
-    <video
-      ref={videoRef}
-      autoPlay
-      loop
-      muted
-      playsInline
-      preload="none"
-      poster={poster}
-      aria-hidden={alt === "" ? true : undefined}
-      aria-label={alt || undefined}
-      className={className}
-    >
-      {load &&
-        formats.map((format) => (
-          <source key={format} src={`${src}.${format}`} type={MIME[format]} />
-        ))}
-    </video>
+    <span ref={wrapRef} className={cn("block", className)}>
+      {load && (
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          poster={poster}
+          aria-hidden={alt === "" ? true : undefined}
+          aria-label={alt || undefined}
+          className="size-full object-contain"
+        >
+          {formats.map((format) => (
+            <source key={format} src={`${src}.${format}`} type={MIME[format]} />
+          ))}
+        </video>
+      )}
+    </span>
   );
 }

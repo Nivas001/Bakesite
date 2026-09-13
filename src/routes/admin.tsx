@@ -46,10 +46,7 @@ import { AdminNewsletter } from "@/components/admin-newsletter";
 import { AdminCustomerMoments } from "@/components/admin-customer-moments";
 import { AdminSiteContentEditor } from "@/components/admin-site-content-editor";
 import { AdminGalleryEditor } from "@/components/admin-gallery-editor";
-import {
-  type ProductForm,
-  EMPTY_FORM,
-} from "@/components/admin-product-editor-dialog";
+import { type ProductForm, EMPTY_FORM } from "@/components/admin-product-editor-dialog";
 import { AdminProductForm } from "@/components/admin-product-form";
 import { ProductAdminCard } from "@/components/admin-product-card";
 import {
@@ -117,10 +114,16 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Bakery admin — Ani Bakes" },
-      { name: "description", content: "Manage orders, inventory and closed dates for Ani Bakes Bakery." },
+      {
+        name: "description",
+        content: "Manage orders, inventory and closed dates for Ani Bakes Bakery.",
+      },
       { name: "robots", content: "noindex" },
       { property: "og:title", content: "Bakery admin — Ani Bakes" },
-      { property: "og:description", content: "Order approvals and inventory for Ani Bakes Bakery." },
+      {
+        property: "og:description",
+        content: "Order approvals and inventory for Ani Bakes Bakery.",
+      },
     ],
   }),
   component: () => (
@@ -211,7 +214,10 @@ function ProductAdminRow({
   const price = Number(product.price);
   const discountType = product.discount_type;
   const discountVal = Number(product.discount_value);
-  const imagesList = (product as any).images && Array.isArray((product as any).images) ? (product as any).images : [];
+  const imagesList =
+    (product as any).images && Array.isArray((product as any).images)
+      ? (product as any).images
+      : [];
 
   let finalPrice = price;
   if (discountType === "percent" && discountVal > 0) {
@@ -221,11 +227,13 @@ function ProductAdminRow({
   }
 
   return (
-    <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border bg-card p-4 shadow-soft transition-all ${
-      product.is_active
-        ? "border-border/70 hover:border-berry/30 hover:shadow-lift"
-        : "border-dashed border-border/60 opacity-85 hover:opacity-100 bg-muted/20"
-    }`}>
+    <div
+      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border bg-card p-4 shadow-soft transition-all ${
+        product.is_active
+          ? "border-border/70 hover:border-berry/30 hover:shadow-lift"
+          : "border-dashed border-border/60 opacity-85 hover:opacity-100 bg-muted/20"
+      }`}
+    >
       {/* Product Image & Details */}
       <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
         <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-secondary border border-border/50 shadow-2xs">
@@ -253,9 +261,7 @@ function ProductAdminRow({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h4 className="font-display text-base font-bold text-cocoa truncate">
-              {product.name}
-            </h4>
+            <h4 className="font-display text-base font-bold text-cocoa truncate">{product.name}</h4>
 
             {/* Fresh to Order / Visibility Badge */}
             {product.is_active ? (
@@ -274,11 +280,11 @@ function ProductAdminRow({
             <div className="flex items-center gap-1.5 font-semibold text-cocoa">
               {discountType !== "none" && discountVal > 0 ? (
                 <>
-                  <span className="text-berry">{formatCurrency(finalPrice)}</span>
+                  <span className="text-berry-deep">{formatCurrency(finalPrice)}</span>
                   <span className="text-xs line-through text-muted-foreground font-normal">
                     {formatCurrency(price)}
                   </span>
-                  <span className="rounded bg-berry/15 px-1 py-0.5 text-[10px] font-bold text-berry">
+                  <span className="rounded bg-berry/15 px-1 py-0.5 text-[10px] font-bold text-berry-deep">
                     {discountType === "percent" ? `${discountVal}% off` : `₹${discountVal} off`}
                   </span>
                 </>
@@ -294,7 +300,7 @@ function ProductAdminRow({
             )}
 
             {(product as any).item_type === "weight" ? (
-              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[10px] font-bold text-berry">
+              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[10px] font-bold text-berry-deep">
                 🎂 Weight-Scaled (250g–2kg)
               </span>
             ) : (product as any).unit_weight_grams || (product as any).serving_yield ? (
@@ -379,7 +385,14 @@ function AdminShopLayoutManager({
   products: initialProducts,
   onRefresh,
 }: {
-  categories: Array<{ id: string; name: string; slug: string; description: string | null; sort_order: number; layout_rows?: number | null }>;
+  categories: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    sort_order: number;
+    layout_rows?: number | null;
+  }>;
   products: Array<{
     id: string;
     name: string;
@@ -404,12 +417,14 @@ function AdminShopLayoutManager({
 
   // Local state for categories ordering and layout
   const [categoriesList, setCategoriesList] = useState(
-    [...initialCategories].sort((a, b) => a.sort_order - b.sort_order)
+    [...initialCategories].sort((a, b) => a.sort_order - b.sort_order),
   );
 
   // Local state for products sequencing
   const [productsList, setProductsList] = useState(
-    [...initialProducts].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name))
+    [...initialProducts].sort(
+      (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name),
+    ),
   );
 
   const [expandedCat, setExpandedCat] = useState<string | null>(null);
@@ -420,7 +435,11 @@ function AdminShopLayoutManager({
   useEffect(() => {
     if (!isDirty) {
       setCategoriesList([...initialCategories].sort((a, b) => a.sort_order - b.sort_order));
-      setProductsList([...initialProducts].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name)));
+      setProductsList(
+        [...initialProducts].sort(
+          (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name),
+        ),
+      );
     }
   }, [initialCategories, initialProducts, isDirty]);
 
@@ -446,7 +465,7 @@ function AdminShopLayoutManager({
   // Change Category Layout Rows (Instant Local State)
   const changeCategoryRows = (categoryId: string, rows: number) => {
     const updated = categoriesList.map((cat) =>
-      cat.id === categoryId ? { ...cat, layout_rows: rows } : cat
+      cat.id === categoryId ? { ...cat, layout_rows: rows } : cat,
     );
     setCategoriesList(updated);
     setIsDirty(true);
@@ -457,7 +476,10 @@ function AdminShopLayoutManager({
     const cat = categoriesList.find((c) => c.id === categoryId);
     const catSlug = cat?.slug;
     const catProducts = productsList.filter(
-      (p) => p.category_id === categoryId || (catSlug && p.category_slug === catSlug) || (catSlug && p.category_id === `cat_${catSlug}`)
+      (p) =>
+        p.category_id === categoryId ||
+        (catSlug && p.category_slug === catSlug) ||
+        (catSlug && p.category_id === `cat_${catSlug}`),
     );
     const targetIndex = direction === "up" ? prodIndexInCat - 1 : prodIndexInCat + 1;
     if (targetIndex < 0 || targetIndex >= catProducts.length) return;
@@ -472,12 +494,14 @@ function AdminShopLayoutManager({
       reorderedCategoryMap.set(p.id, idx + 1);
     });
 
-    const updatedAllProducts = productsList.map((p) => {
-      if (reorderedCategoryMap.has(p.id)) {
-        return { ...p, sort_order: reorderedCategoryMap.get(p.id)! };
-      }
-      return p;
-    }).sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
+    const updatedAllProducts = productsList
+      .map((p) => {
+        if (reorderedCategoryMap.has(p.id)) {
+          return { ...p, sort_order: reorderedCategoryMap.get(p.id)! };
+        }
+        return p;
+      })
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name));
 
     setProductsList(updatedAllProducts);
     setIsDirty(true);
@@ -503,7 +527,10 @@ function AdminShopLayoutManager({
       // 2. Save product sequencing within each category
       const productsPayload = categoriesList.flatMap((cat) => {
         const catProducts = productsList.filter(
-          (p) => p.category_id === cat.id || (cat.slug && p.category_slug === cat.slug) || (cat.slug && p.category_id === `cat_${cat.slug}`)
+          (p) =>
+            p.category_id === cat.id ||
+            (cat.slug && p.category_slug === cat.slug) ||
+            (cat.slug && p.category_id === `cat_${cat.slug}`),
         );
         return catProducts.map((p, idx) => ({
           id: p.id,
@@ -535,7 +562,11 @@ function AdminShopLayoutManager({
   // Discard local changes and reset to current server state
   const handleDiscard = () => {
     setCategoriesList([...initialCategories].sort((a, b) => a.sort_order - b.sort_order));
-    setProductsList([...initialProducts].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name)));
+    setProductsList(
+      [...initialProducts].sort(
+        (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.name.localeCompare(b.name),
+      ),
+    );
     setIsDirty(false);
     toast.info("Layout changes discarded, restored to saved state.");
   };
@@ -546,7 +577,7 @@ function AdminShopLayoutManager({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 rounded-3xl border border-border/70 bg-card p-5 sm:p-6 shadow-soft">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-xl bg-berry/10 text-berry">
+            <span className="flex size-7 items-center justify-center rounded-xl bg-berry/10 text-berry-deep">
               <Sliders className="size-4" />
             </span>
             <h2 className="font-display text-xl font-bold text-cocoa">
@@ -563,7 +594,9 @@ function AdminShopLayoutManager({
             )}
           </div>
           <p className="text-xs text-muted-foreground max-w-xl leading-relaxed">
-            Configure how each category appears on the storefront: sequence category order, select 1–4 desktop rows (4 cards/row), and reorder products within each category. Click <strong>Save Layout Changes</strong> to preserve your setup.
+            Configure how each category appears on the storefront: sequence category order, select
+            1–4 desktop rows (4 cards/row), and reorder products within each category. Click{" "}
+            <strong>Save Layout Changes</strong> to preserve your setup.
           </p>
         </div>
 
@@ -608,7 +641,10 @@ function AdminShopLayoutManager({
       <div className="space-y-3.5">
         {categoriesList.map((cat, catIdx) => {
           const catProducts = productsList.filter(
-            (p) => p.category_id === cat.id || p.category_slug === cat.slug || p.category_id === `cat_${cat.slug}`
+            (p) =>
+              p.category_id === cat.id ||
+              p.category_slug === cat.slug ||
+              p.category_id === `cat_${cat.slug}`,
           );
           const isExpanded = expandedCat === cat.id;
           const currentRows = cat.layout_rows || 1;
@@ -674,7 +710,7 @@ function AdminShopLayoutManager({
                       variant="outline"
                       disabled={catIdx === 0 || isSaving}
                       onClick={() => moveCategory(catIdx, "up")}
-                      className="size-8 p-0 rounded-xl cursor-pointer hover:bg-secondary hover:text-berry"
+                      className="size-8 p-0 rounded-xl cursor-pointer hover:bg-secondary hover:text-berry-deep"
                       title="Move Category Up"
                     >
                       <ArrowUp className="size-4" />
@@ -685,7 +721,7 @@ function AdminShopLayoutManager({
                       variant="outline"
                       disabled={catIdx === categoriesList.length - 1 || isSaving}
                       onClick={() => moveCategory(catIdx, "down")}
-                      className="size-8 p-0 rounded-xl cursor-pointer hover:bg-secondary hover:text-berry"
+                      className="size-8 p-0 rounded-xl cursor-pointer hover:bg-secondary hover:text-berry-deep"
                       title="Move Category Down"
                     >
                       <ArrowDown className="size-4" />
@@ -701,7 +737,11 @@ function AdminShopLayoutManager({
                     className="h-8 px-3 rounded-xl text-xs font-semibold hover:border-berry/40 flex items-center gap-1 cursor-pointer"
                   >
                     <span>Sequence Products ({catProducts.length})</span>
-                    {isExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                    {isExpanded ? (
+                      <ChevronUp className="size-3.5" />
+                    ) : (
+                      <ChevronDown className="size-3.5" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -791,7 +831,7 @@ function AdminShopLayoutManager({
       {isDirty && (
         <div className="sticky bottom-4 z-40 rounded-3xl border-2 border-berry/40 bg-card/95 backdrop-blur-md p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 animate-in slide-in-from-bottom-3 duration-300">
           <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-2xl bg-berry/15 text-berry text-lg font-bold">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-berry/15 text-berry-deep text-lg font-bold">
               ⚡
             </span>
             <div>
@@ -799,7 +839,8 @@ function AdminShopLayoutManager({
                 You have unsaved layout modifications
               </p>
               <p className="text-[11px] text-muted-foreground">
-                Click "Save Layout Changes" to update row counts and category sequence on the live website.
+                Click "Save Layout Changes" to update row counts and category sequence on the live
+                website.
               </p>
             </div>
           </div>
@@ -886,7 +927,9 @@ function AdminDashboard() {
 
   // Users tab filter states
   const [userSearchQuery, setUserSearchQuery] = useState<string>("");
-  const [userVerifiedFilter, setUserVerifiedFilter] = useState<"all" | "verified" | "unverified">("all");
+  const [userVerifiedFilter, setUserVerifiedFilter] = useState<"all" | "verified" | "unverified">(
+    "all",
+  );
 
   // Inventory tab filter states
   const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState<string>("all");
@@ -935,7 +978,9 @@ function AdminDashboard() {
   }
 
   if (isLoading) {
-    return <div className="mx-auto max-w-6xl px-4 py-24 text-center text-muted-foreground">Loading…</div>;
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-24 text-center text-muted-foreground">Loading…</div>
+    );
   }
 
   if (error || !data) {
@@ -975,7 +1020,10 @@ function AdminDashboard() {
     } else {
       // When sorting by Delivery Date in "All Orders", exclude rejected (cancelled/refunded) orders
       // so the baker's delivery queue is clean. (Rejected orders remain viewable under the "Rejected" tab).
-      if ((orderSortBy === "date_asc" || orderSortBy === "date_desc") && order.status === "rejected") {
+      if (
+        (orderSortBy === "date_asc" || orderSortBy === "date_desc") &&
+        order.status === "rejected"
+      ) {
         return false;
       }
     }
@@ -995,7 +1043,10 @@ function AdminDashboard() {
       const pA = STATUS_ORDER_PRIORITY[a.status] ?? 99;
       const pB = STATUS_ORDER_PRIORITY[b.status] ?? 99;
       if (pA !== pB) return pA - pB;
-      return new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime();
+      return (
+        new Date(b.created_at || b.slot_date).getTime() -
+        new Date(a.created_at || a.slot_date).getTime()
+      );
     }
     if (orderSortBy === "date_asc") {
       return a.slot_date.localeCompare(b.slot_date) || a.slot_start.localeCompare(b.slot_start);
@@ -1010,7 +1061,10 @@ function AdminDashboard() {
       return Number(a.total) - Number(b.total);
     }
     if (orderSortBy === "newest") {
-      return new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime();
+      return (
+        new Date(b.created_at || b.slot_date).getTime() -
+        new Date(a.created_at || a.slot_date).getTime()
+      );
     }
     return 0;
   });
@@ -1036,7 +1090,9 @@ function AdminDashboard() {
       const matchName = p.name.toLowerCase().includes(q);
       const matchDesc = (p.description || "").toLowerCase().includes(q);
       const matchSlug = p.slug.toLowerCase().includes(q);
-      const matchCat = (p.category_id ? categoryMap.get(p.category_id) || "" : "").toLowerCase().includes(q);
+      const matchCat = (p.category_id ? categoryMap.get(p.category_id) || "" : "")
+        .toLowerCase()
+        .includes(q);
       return matchName || matchDesc || matchSlug || matchCat;
     }
     return true;
@@ -1055,7 +1111,9 @@ function AdminDashboard() {
     .filter((o) => o.status === "confirmed" || o.status === "completed")
     .reduce((sum, o) => sum + Number(o.total || 0), 0);
 
-  const todayOrders = data.orders.filter((o) => o.slot_date === todayISO && o.status !== "rejected");
+  const todayOrders = data.orders.filter(
+    (o) => o.slot_date === todayISO && o.status !== "rejected",
+  );
   const activeProducts = data.products.filter((p) => p.is_active);
 
   useEffect(() => {
@@ -1092,13 +1150,18 @@ function AdminDashboard() {
   };
 
   const handleEditProduct = (product: any, _updateUrl = true) => {
-    const imagesList = (product as any).images && Array.isArray((product as any).images) ? (product as any).images : [];
+    const imagesList =
+      (product as any).images && Array.isArray((product as any).images)
+        ? (product as any).images
+        : [];
     const isCake =
       product.name.toLowerCase().includes("cake") ||
       product.name.toLowerCase().includes("cheesecake");
     const itemType = (product as any).item_type || (isCake ? "weight" : "unit");
     const variants =
-      (product as any).weight_variants && Array.isArray((product as any).weight_variants) && (product as any).weight_variants.length > 0
+      (product as any).weight_variants &&
+      Array.isArray((product as any).weight_variants) &&
+      (product as any).weight_variants.length > 0
         ? (product as any).weight_variants
         : itemType === "weight"
           ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
@@ -1145,7 +1208,9 @@ function AdminDashboard() {
           ? generateSmartCakeWeightVariants(Number(product.price) || 300, 250)
           : [];
     const imagesList =
-      (product as any).images && Array.isArray((product as any).images) && (product as any).images.length > 0
+      (product as any).images &&
+      Array.isArray((product as any).images) &&
+      (product as any).images.length > 0
         ? (product as any).images
         : product.image_url
           ? [product.image_url]
@@ -1205,7 +1270,9 @@ function AdminDashboard() {
             weight_variants: product.weight_variants,
           },
         }),
-      newStatus ? `"${product.name}" is now visible in the shop!` : `"${product.name}" paused from shop.`
+      newStatus
+        ? `"${product.name}" is now visible in the shop!`
+        : `"${product.name}" paused from shop.`,
     );
   };
 
@@ -1225,92 +1292,95 @@ function AdminDashboard() {
 
     setSavingProduct(true);
     try {
-      await run(async () => {
-        let primaryCover = form.image_url;
-        let finalImages =
-          form.images && form.images.length > 0
-            ? [...form.images]
-            : primaryCover
-              ? [primaryCover]
-              : [];
+      await run(
+        async () => {
+          let primaryCover = form.image_url;
+          let finalImages =
+            form.images && form.images.length > 0
+              ? [...form.images]
+              : primaryCover
+                ? [primaryCover]
+                : [];
 
-        // Auto-upload any remaining data URI images to Appwrite Storage
-        for (let i = 0; i < finalImages.length; i++) {
-          const img = finalImages[i];
-          if (img && img.startsWith("data:")) {
-            const commaIdx = img.indexOf(",");
-            const base64 = commaIdx !== -1 ? img.slice(commaIdx + 1) : img;
-            const matchMime = img.match(/^data:([^;]+);/);
+          // Auto-upload any remaining data URI images to Appwrite Storage
+          for (let i = 0; i < finalImages.length; i++) {
+            const img = finalImages[i];
+            if (img && img.startsWith("data:")) {
+              const commaIdx = img.indexOf(",");
+              const base64 = commaIdx !== -1 ? img.slice(commaIdx + 1) : img;
+              const matchMime = img.match(/^data:([^;]+);/);
+              const mimeType = matchMime ? matchMime[1]! : "image/jpeg";
+              const res = await uploadImageFn({
+                data: {
+                  filename: `product-${form.slug || "image"}-${i + 1}.jpg`,
+                  base64,
+                  mimeType,
+                },
+              });
+              if (res?.imageUrl) {
+                finalImages[i] = res.imageUrl;
+                if (primaryCover === img) {
+                  primaryCover = res.imageUrl;
+                }
+              }
+            }
+          }
+
+          if (primaryCover && primaryCover.startsWith("data:")) {
+            const commaIdx = primaryCover.indexOf(",");
+            const base64 = commaIdx !== -1 ? primaryCover.slice(commaIdx + 1) : primaryCover;
+            const matchMime = primaryCover.match(/^data:([^;]+);/);
             const mimeType = matchMime ? matchMime[1]! : "image/jpeg";
             const res = await uploadImageFn({
               data: {
-                filename: `product-${form.slug || "image"}-${i + 1}.jpg`,
+                filename: `product-${form.slug || "cover"}.jpg`,
                 base64,
                 mimeType,
               },
             });
             if (res?.imageUrl) {
-              finalImages[i] = res.imageUrl;
-              if (primaryCover === img) {
-                primaryCover = res.imageUrl;
-              }
+              primaryCover = res.imageUrl;
             }
           }
-        }
 
-        if (primaryCover && primaryCover.startsWith("data:")) {
-          const commaIdx = primaryCover.indexOf(",");
-          const base64 = commaIdx !== -1 ? primaryCover.slice(commaIdx + 1) : primaryCover;
-          const matchMime = primaryCover.match(/^data:([^;]+);/);
-          const mimeType = matchMime ? matchMime[1]! : "image/jpeg";
-          const res = await uploadImageFn({
+          await persistProduct({
             data: {
-              filename: `product-${form.slug || "cover"}.jpg`,
-              base64,
-              mimeType,
+              ...(form.id ? { id: form.id } : {}),
+              name: form.name.trim(),
+              slug: form.slug.trim(),
+              description: form.description?.trim() || null,
+              price: Math.max(0, Number(form.price) || 0),
+              discount_type: form.discount_type,
+              discount_value: Math.max(0, Number(form.discount_value) || 0),
+              image_url: primaryCover || (finalImages[0] ?? null),
+              images: finalImages.length > 0 ? finalImages : null,
+              stock: Math.max(0, Math.floor(Number(form.stock) || 0)),
+              is_active: form.is_active,
+              category_id: form.category_id?.trim() || null,
+              item_type: form.item_type,
+              unit_weight_grams: form.unit_weight_grams ? Number(form.unit_weight_grams) : null,
+              serving_yield: form.serving_yield?.trim() || null,
+              weight_variants:
+                form.item_type === "weight" && form.weight_variants.length > 0
+                  ? form.weight_variants
+                  : null,
             },
           });
-          if (res?.imageUrl) {
-            primaryCover = res.imageUrl;
-          }
-        }
-
-        await persistProduct({
-          data: {
-            ...(form.id ? { id: form.id } : {}),
-            name: form.name.trim(),
-            slug: form.slug.trim(),
-            description: form.description?.trim() || null,
-            price: Math.max(0, Number(form.price) || 0),
-            discount_type: form.discount_type,
-            discount_value: Math.max(0, Number(form.discount_value) || 0),
-            image_url: primaryCover || (finalImages[0] ?? null),
-            images: finalImages.length > 0 ? finalImages : null,
-            stock: Math.max(0, Math.floor(Number(form.stock) || 0)),
-            is_active: form.is_active,
-            category_id: form.category_id?.trim() || null,
-            item_type: form.item_type,
-            unit_weight_grams: form.unit_weight_grams ? Number(form.unit_weight_grams) : null,
-            serving_yield: form.serving_yield?.trim() || null,
-            weight_variants:
-              form.item_type === "weight" && form.weight_variants.length > 0
-                ? form.weight_variants
-                : null,
-          },
-        });
-        // Auto-clear form to "new bake" state after saving
-        setEditingProductId(null);
-        setForm(EMPTY_FORM);
-        if (productImageInputRef.current) productImageInputRef.current.value = "";
-        navigate({
-          search: (prev: any) => ({
-            ...prev,
-            tab: "inventory",
-            action: undefined,
-            id: undefined,
-          }),
-        });
-      }, form.id ? "✅ Product updated!" : "🧁 New bake added to catalog!");
+          // Auto-clear form to "new bake" state after saving
+          setEditingProductId(null);
+          setForm(EMPTY_FORM);
+          if (productImageInputRef.current) productImageInputRef.current.value = "";
+          navigate({
+            search: (prev: any) => ({
+              ...prev,
+              tab: "inventory",
+              action: undefined,
+              id: undefined,
+            }),
+          });
+        },
+        form.id ? "✅ Product updated!" : "🧁 New bake added to catalog!",
+      );
     } finally {
       setSavingProduct(false);
     }
@@ -1380,14 +1450,14 @@ function AdminDashboard() {
           label: "Gallery Atelier",
           icon: Camera,
           badge: "12 Shots",
-          badgeColor: "bg-berry/15 text-berry font-bold",
+          badgeColor: "bg-berry/15 text-berry-deep font-bold",
         },
         {
           id: "content_editor",
           label: "Page Text & Copy",
           icon: FileText,
           badge: "Editor",
-          badgeColor: "bg-berry/15 text-berry font-bold",
+          badgeColor: "bg-berry/15 text-berry-deep font-bold",
         },
       ],
     },
@@ -1414,7 +1484,15 @@ function AdminDashboard() {
           description: "Customer orders, kitchen slots, and approvals",
           icon: <ShoppingBag className="size-4" />,
           shortcut: "G S",
-          keywords: ["orders", "slots", "pending", "approvals", "deliveries", "schedule", "kitchen review"],
+          keywords: [
+            "orders",
+            "slots",
+            "pending",
+            "approvals",
+            "deliveries",
+            "schedule",
+            "kitchen review",
+          ],
           onSelect: () => setActiveTab("orders"),
         },
         {
@@ -1423,7 +1501,17 @@ function AdminDashboard() {
           description: "Edit bakes, set prices, manage discounts, upload images",
           icon: <Package className="size-4" />,
           shortcut: "G P",
-          keywords: ["inventory", "products", "items", "bakes", "dishes", "menu", "edit products", "pricing", "catalog"],
+          keywords: [
+            "inventory",
+            "products",
+            "items",
+            "bakes",
+            "dishes",
+            "menu",
+            "edit products",
+            "pricing",
+            "catalog",
+          ],
           onSelect: () => setActiveTab("inventory"),
         },
         {
@@ -1450,7 +1538,14 @@ function AdminDashboard() {
           description: "Set blackout dates and closure periods",
           icon: <Calendar className="size-4" />,
           shortcut: "G C",
-          keywords: ["calendar", "closed dates", "holidays", "blackout", "off days", "kitchen closed"],
+          keywords: [
+            "calendar",
+            "closed dates",
+            "holidays",
+            "blackout",
+            "off days",
+            "kitchen closed",
+          ],
           onSelect: () => setActiveTab("calendar"),
         },
         {
@@ -1504,7 +1599,19 @@ function AdminDashboard() {
           description: "Drag-and-swap 360° photo sequence, edit pill labels and photos",
           icon: <Camera className="size-4" />,
           shortcut: "G G",
-          keywords: ["gallery", "photos", "shots", "images", "about gallery", "pictures", "atelier photos", "inertia gallery", "portraits", "reorder", "swap"],
+          keywords: [
+            "gallery",
+            "photos",
+            "shots",
+            "images",
+            "about gallery",
+            "pictures",
+            "atelier photos",
+            "inertia gallery",
+            "portraits",
+            "reorder",
+            "swap",
+          ],
           onSelect: () => setActiveTab("gallery"),
         },
       ],
@@ -1519,14 +1626,25 @@ function AdminDashboard() {
           description: "Open the creation form to add a new delicious item",
           icon: <Plus className="size-4 text-emerald-600" />,
           shortcut: "⌘N",
-          keywords: ["new", "create", "add product", "new bake", "add item", "new cake", "new brownie"],
+          keywords: [
+            "new",
+            "create",
+            "add product",
+            "new bake",
+            "add item",
+            "new cake",
+            "new brownie",
+          ],
           onSelect: () => {
             setForm(EMPTY_FORM);
             setEditingProductId(null);
             setActiveTab("inventory");
             setTimeout(() => {
               const el = document.getElementById("side-name");
-              if (el) { el.focus(); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+              if (el) {
+                el.focus();
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
             }, 120);
           },
         },
@@ -1534,7 +1652,7 @@ function AdminDashboard() {
           id: "action-bakesheet",
           label: "Open Kitchen Bake Sheet",
           description: "View and print today's production list for the kitchen",
-          icon: <Printer className="size-4 text-berry" />,
+          icon: <Printer className="size-4 text-berry-deep" />,
           shortcut: "⌘P",
           keywords: ["bake sheet", "kitchen sheet", "print", "production sheet", "daily bakes"],
           onSelect: () => setBakeSheetOpen(true),
@@ -1581,14 +1699,22 @@ function AdminDashboard() {
         id: `prod-${p.id}`,
         label: p.name,
         description: `₹${p.price} • ${p.category_name ?? "Bakery"} • /${p.slug}`,
-        icon: <Package className="size-4 text-berry" />,
+        icon: <Package className="size-4 text-berry-deep" />,
         keywords: [p.name, p.slug, p.category_name ?? "", "edit", "product", "bake", "price"],
         onSelect: () => handleEditProduct(p),
       })),
     };
 
     return [navigationGroup, actionsGroup, productsGroup];
-  }, [data.products, setActiveTab, setForm, setEditingProductId, setBakeSheetOpen, refresh, handleEditProduct]);
+  }, [
+    data.products,
+    setActiveTab,
+    setForm,
+    setEditingProductId,
+    setBakeSheetOpen,
+    refresh,
+    handleEditProduct,
+  ]);
 
   return (
     <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">
@@ -1610,7 +1736,7 @@ function AdminDashboard() {
           {/* Brand Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="size-9 rounded-2xl bg-berry/15 text-berry flex items-center justify-center font-blogh font-bold text-lg shadow-2xs">
+              <div className="size-9 rounded-2xl bg-berry/15 text-berry-deep flex items-center justify-center font-blogh font-bold text-lg shadow-2xs">
                 🎂
               </div>
               <div>
@@ -1659,7 +1785,9 @@ function AdminDashboard() {
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <IconComp className={`size-4 shrink-0 ${isActive ? "text-berry-foreground" : "text-cocoa/70"}`} />
+                          <IconComp
+                            className={`size-4 shrink-0 ${isActive ? "text-berry-foreground" : "text-cocoa/70"}`}
+                          />
                           <span className="truncate">{item.label}</span>
                         </div>
                         {item.badge && (
@@ -1739,7 +1867,8 @@ function AdminDashboard() {
                 </span>
               </div>
               <p className="text-[11px] text-muted-foreground hidden sm:block truncate">
-                {pending} pending approval &bull; {activeProducts.length} active bakes &bull; {todayOrders.length} orders scheduled today
+                {pending} pending approval &bull; {activeProducts.length} active bakes &bull;{" "}
+                {todayOrders.length} orders scheduled today
               </p>
             </div>
           </div>
@@ -1753,7 +1882,7 @@ function AdminDashboard() {
               title="Open Command Palette (⌘K / Ctrl+K)"
             >
               <div className="flex items-center gap-2 min-w-0">
-                <Search className="size-3.5 text-berry shrink-0" />
+                <Search className="size-3.5 text-berry-deep shrink-0" />
                 <span className="truncate font-medium text-cocoa/80 text-left text-[11px] sm:text-xs">
                   Search bakes, tabs…
                 </span>
@@ -1783,7 +1912,10 @@ function AdminDashboard() {
                 setActiveTab("inventory");
                 setTimeout(() => {
                   const el = document.getElementById("side-name");
-                  if (el) { el.focus(); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+                  if (el) {
+                    el.focus();
+                    el.scrollIntoView({ behavior: "smooth", block: "center" });
+                  }
                 }, 120);
               }}
               className="rounded-2xl h-9 px-3 sm:px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
@@ -1802,14 +1934,22 @@ function AdminDashboard() {
               {/* Executive Welcome & Live Summary Banner */}
               <div className="rounded-3xl border border-border/80 bg-linear-to-br from-card via-card to-secondary/30 p-6 sm:p-8 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="space-y-2 max-w-xl">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/15 text-berry px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/15 text-berry-deep px-3 py-1 text-xs font-bold uppercase tracking-wider">
                     ✨ Daily Bakehouse Briefing
                   </span>
                   <h2 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
                     Welcome to the Kitchen Command Hub
                   </h2>
                   <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    You have <strong>{pending} order{pending === 1 ? "" : "s"}</strong> awaiting kitchen confirmation and <strong>{todayOrders.length} order{todayOrders.length === 1 ? "" : "s"}</strong> scheduled for today&apos;s deliveries and counter pickups.
+                    You have{" "}
+                    <strong>
+                      {pending} order{pending === 1 ? "" : "s"}
+                    </strong>{" "}
+                    awaiting kitchen confirmation and{" "}
+                    <strong>
+                      {todayOrders.length} order{todayOrders.length === 1 ? "" : "s"}
+                    </strong>{" "}
+                    scheduled for today&apos;s deliveries and counter pickups.
                   </p>
                 </div>
 
@@ -1857,9 +1997,7 @@ function AdminDashboard() {
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       Pending Approvals
                     </p>
-                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
-                      {pending}
-                    </h3>
+                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">{pending}</h3>
                     <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
                       {pending > 0 ? "Requires baker action" : "All orders up to date"}
                     </p>
@@ -1924,7 +2062,7 @@ function AdminDashboard() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setActiveTab("orders")}
-                      className="text-xs font-bold text-berry hover:underline p-0 h-auto cursor-pointer"
+                      className="text-xs font-bold text-berry-deep hover:underline p-0 h-auto cursor-pointer"
                     >
                       View All Orders →
                     </Button>
@@ -1933,7 +2071,9 @@ function AdminDashboard() {
                   {todayOrders.length === 0 ? (
                     <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-8 text-center">
                       <p className="text-3xl mb-2">🧁</p>
-                      <h4 className="font-display text-sm font-bold text-cocoa">No Bakes Scheduled for Today</h4>
+                      <h4 className="font-display text-sm font-bold text-cocoa">
+                        No Bakes Scheduled for Today
+                      </h4>
                       <p className="text-xs text-muted-foreground mt-1">
                         Upcoming orders will appear here automatically on their delivery slot date.
                       </p>
@@ -1958,7 +2098,9 @@ function AdminDashboard() {
                               </span>
                             </div>
                             <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                              {order.order_items.map((i: any) => `${i.quantity}× ${i.product_name}`).join(", ")}
+                              {order.order_items
+                                .map((i: any) => `${i.quantity}× ${i.product_name}`)
+                                .join(", ")}
                             </p>
                           </div>
                           <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
@@ -1996,7 +2138,7 @@ function AdminDashboard() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setActiveTab("inventory")}
-                      className="text-xs font-bold text-berry hover:underline p-0 h-auto cursor-pointer"
+                      className="text-xs font-bold text-berry-deep hover:underline p-0 h-auto cursor-pointer"
                     >
                       Manage Menu →
                     </Button>
@@ -2026,7 +2168,9 @@ function AdminDashboard() {
                               <span>{formatCurrency(prod.price)}</span>
                               <span>&bull;</span>
                               {prod.is_active ? (
-                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">🌿 Fresh to order</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                                  🌿 Fresh to order
+                                </span>
                               ) : (
                                 <span className="text-muted-foreground">Paused</span>
                               )}
@@ -2055,7 +2199,9 @@ function AdminDashboard() {
                       onClick={() => setActiveTab("shop_layout")}
                       className="p-3.5 rounded-2xl border border-border/70 bg-card hover:border-berry/40 transition-all cursor-pointer shadow-2xs group"
                     >
-                      <div className="text-lg mb-1 group-hover:scale-110 transition-transform">🗂️</div>
+                      <div className="text-lg mb-1 group-hover:scale-110 transition-transform">
+                        🗂️
+                      </div>
                       <p className="text-xs font-bold text-cocoa">Shop Layout</p>
                       <p className="text-[10px] text-muted-foreground mt-0.5">Reorder categories</p>
                     </div>
@@ -2064,9 +2210,13 @@ function AdminDashboard() {
                       onClick={() => setActiveTab("offers")}
                       className="p-3.5 rounded-2xl border border-border/70 bg-card hover:border-berry/40 transition-all cursor-pointer shadow-2xs group"
                     >
-                      <div className="text-lg mb-1 group-hover:scale-110 transition-transform">🏷️</div>
+                      <div className="text-lg mb-1 group-hover:scale-110 transition-transform">
+                        🏷️
+                      </div>
                       <p className="text-xs font-bold text-cocoa">Promo Codes</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{offerCodes?.length ?? 0} active codes</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {offerCodes?.length ?? 0} active codes
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -2134,1742 +2284,1990 @@ function AdminDashboard() {
                   })}
                 </div>
 
-            {/* Search Bar & Sort Dropdown */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/50">
-              <div className="relative min-w-[240px] flex-1 max-w-sm">
-                <Input
-                  placeholder="Search customer, phone, address…"
-                  value={orderSearchQuery}
-                  onChange={(e) => setOrderSearchQuery(e.target.value)}
-                  className="h-9 text-xs pl-8 rounded-xl bg-background"
-                />
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
-                  🔍
-                </span>
-                {orderSearchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setOrderSearchQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
+                {/* Search Bar & Sort Dropdown */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border/50">
+                  <div className="relative min-w-[240px] flex-1 max-w-sm">
+                    <Input
+                      placeholder="Search customer, phone, address…"
+                      value={orderSearchQuery}
+                      onChange={(e) => setOrderSearchQuery(e.target.value)}
+                      className="h-9 text-xs pl-8 rounded-xl bg-background"
+                    />
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
+                      🔍
+                    </span>
+                    {orderSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setOrderSearchQuery("")}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setBakeSheetOpen(true)}
-                  className="h-9 rounded-xl border-berry/40 bg-berry/10 text-berry hover:bg-berry/20 font-bold text-xs gap-1.5 shadow-2xs cursor-pointer"
-                >
-                  <ChefHat className="size-3.5" />
-                  <span>Kitchen Bake Sheet</span>
-                </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBakeSheetOpen(true)}
+                      className="h-9 rounded-xl border-berry/40 bg-berry/10 text-berry-deep hover:bg-berry/20 font-bold text-xs gap-1.5 shadow-2xs cursor-pointer"
+                    >
+                      <ChefHat className="size-3.5" />
+                      <span>Kitchen Bake Sheet</span>
+                    </Button>
 
-                <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                  Sort:
-                </span>
-                <select
-                  value={orderSortBy}
-                  onChange={(e) => setOrderSortBy(e.target.value)}
-                  className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
-                >
-                  <option value="priority">Priority (Pending ➔ Confirmed ➔ Done)</option>
-                  <option value="date_asc">Delivery Date (Earliest First)</option>
-                  <option value="date_desc">Delivery Date (Latest First)</option>
-                  <option value="amount_desc">Order Amount (High to Low)</option>
-                  <option value="amount_asc">Order Amount (Low to High)</option>
-                  <option value="newest">Newest Orders First</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Orders Summary Stats Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              {
-                label: "Pending Review",
-                value: data.orders.filter(o => o.status === "pending_approval").length,
-                color: "bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-400",
-                icon: "🛎️",
-                filter: "pending_approval",
-              },
-              {
-                label: "Confirmed",
-                value: data.orders.filter(o => o.status === "confirmed").length,
-                color: "bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400",
-                icon: "✅",
-                filter: "confirmed",
-              },
-              {
-                label: "Today's Orders",
-                value: todayOrders.length,
-                color: "bg-purple-500/15 border-purple-500/30 text-purple-700 dark:text-purple-400",
-                icon: "📅",
-                filter: "all",
-              },
-              {
-                label: "Revenue (Confirmed)",
-                value: formatCurrency(data.orders.filter(o => o.status === "confirmed" || o.status === "completed").reduce((s, o) => s + Number(o.total || 0), 0)),
-                color: "bg-blue-500/15 border-blue-500/30 text-blue-700 dark:text-blue-400",
-                icon: "💰",
-                filter: "all",
-              },
-            ].map((stat) => (
-              <button
-                key={stat.label}
-                type="button"
-                onClick={() => setOrderStatusFilter(stat.filter)}
-                className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-all hover:shadow-lift cursor-pointer ${stat.color} ${orderStatusFilter === stat.filter && stat.filter !== "all" ? "shadow-soft ring-2 ring-current ring-offset-1" : ""}`}
-              >
-                <span className="text-xl">{stat.icon}</span>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider opacity-80">{stat.label}</p>
-                  <p className="font-display text-lg font-extrabold">{stat.value}</p>
+                    <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                      Sort:
+                    </span>
+                    <select
+                      value={orderSortBy}
+                      onChange={(e) => setOrderSortBy(e.target.value)}
+                      className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                    >
+                      <option value="priority">Priority (Pending ➔ Confirmed ➔ Done)</option>
+                      <option value="date_asc">Delivery Date (Earliest First)</option>
+                      <option value="date_desc">Delivery Date (Latest First)</option>
+                      <option value="amount_desc">Order Amount (High to Low)</option>
+                      <option value="amount_asc">Order Amount (Low to High)</option>
+                      <option value="newest">Newest Orders First</option>
+                    </select>
+                  </div>
                 </div>
-              </button>
-            ))}
-          </div>
+              </div>
 
-          {/* Orders Cards Grid */}
-          {sortedOrders.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-border p-12 text-center">
-              <p className="text-sm font-medium text-muted-foreground">
-                {orderSearchQuery || orderStatusFilter !== "all"
-                  ? "No orders match your filter criteria."
-                  : "No orders yet."}
-              </p>
-              {(orderSearchQuery || orderStatusFilter !== "all") && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setOrderStatusFilter("all");
-                    setOrderSearchQuery("");
-                  }}
-                  className="mt-3 text-xs rounded-xl"
-                >
-                  Reset filters
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {sortedOrders.map((order) => {
-                const badgeStyle =
-                  STATUS_BADGE_STYLES[order.status] ?? "bg-matcha text-cocoa";
-                const isFutureDelivery = order.slot_date > todayISO;
-                const isAlreadyCompleted = order.status === "completed";
-
-                return (
-                  <article
-                    key={order.id}
-                    className="flex flex-col justify-between rounded-3xl border border-border/70 bg-card p-5 shadow-soft hover:shadow-lift transition-all"
+              {/* Orders Summary Stats Bar */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  {
+                    label: "Pending Review",
+                    value: data.orders.filter((o) => o.status === "pending_approval").length,
+                    color: "bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-400",
+                    icon: "🛎️",
+                    filter: "pending_approval",
+                  },
+                  {
+                    label: "Confirmed",
+                    value: data.orders.filter((o) => o.status === "confirmed").length,
+                    color:
+                      "bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400",
+                    icon: "✅",
+                    filter: "confirmed",
+                  },
+                  {
+                    label: "Today's Orders",
+                    value: todayOrders.length,
+                    color:
+                      "bg-purple-500/15 border-purple-500/30 text-purple-700 dark:text-purple-400",
+                    icon: "📅",
+                    filter: "all",
+                  },
+                  {
+                    label: "Revenue (Confirmed)",
+                    value: formatCurrency(
+                      data.orders
+                        .filter((o) => o.status === "confirmed" || o.status === "completed")
+                        .reduce((s, o) => s + Number(o.total || 0), 0),
+                    ),
+                    color: "bg-blue-500/15 border-blue-500/30 text-blue-700 dark:text-blue-400",
+                    icon: "💰",
+                    filter: "all",
+                  },
+                ].map((stat) => (
+                  <button
+                    key={stat.label}
+                    type="button"
+                    onClick={() => setOrderStatusFilter(stat.filter)}
+                    className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-all hover:shadow-lift cursor-pointer ${stat.color} ${orderStatusFilter === stat.filter && stat.filter !== "all" ? "shadow-soft ring-2 ring-current ring-offset-1" : ""}`}
                   >
+                    <span className="text-xl">{stat.icon}</span>
                     <div>
-                      {/* Card Header: Customer, Total, and Status */}
-                      <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-3">
+                      <p className="text-xs font-bold uppercase tracking-wider opacity-80">
+                        {stat.label}
+                      </p>
+                      <p className="font-display text-lg font-extrabold">{stat.value}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Orders Cards Grid */}
+              {sortedOrders.length === 0 ? (
+                <div className="rounded-3xl border border-dashed border-border p-12 text-center">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {orderSearchQuery || orderStatusFilter !== "all"
+                      ? "No orders match your filter criteria."
+                      : "No orders yet."}
+                  </p>
+                  {(orderSearchQuery || orderStatusFilter !== "all") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setOrderStatusFilter("all");
+                        setOrderSearchQuery("");
+                      }}
+                      className="mt-3 text-xs rounded-xl"
+                    >
+                      Reset filters
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {sortedOrders.map((order) => {
+                    const badgeStyle = STATUS_BADGE_STYLES[order.status] ?? "bg-matcha text-cocoa";
+                    const isFutureDelivery = order.slot_date > todayISO;
+                    const isAlreadyCompleted = order.status === "completed";
+
+                    return (
+                      <article
+                        key={order.id}
+                        className="flex flex-col justify-between rounded-3xl border border-border/70 bg-card p-5 shadow-soft hover:shadow-lift transition-all"
+                      >
                         <div>
-                          <p className="font-display text-base font-bold text-cocoa truncate">
-                            {order.contact_name ?? "Customer"}
-                          </p>
-                          <p className="font-sans text-lg font-extrabold text-foreground tracking-tight mt-0.5">
-                            {formatCurrency(Number(order.total))}
-                          </p>
-                        </div>
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold shrink-0 ${badgeStyle}`}
-                        >
-                          {STATUS_LABELS[order.status] ?? order.status}
-                        </span>
-                      </div>
-
-                      {/* Fulfilment & Timing Details */}
-                      <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
-                        <div className="flex items-center justify-between font-medium text-foreground">
-                          <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] capitalize">
-                            {order.fulfilment_type}
-                          </span>
-                          <span className="font-mono text-[11px]">
-                            {order.slot_date} ({order.slot_start.slice(0, 5)}–{order.slot_end.slice(0, 5)})
-                          </span>
-                        </div>
-
-                        <p className="pt-0.5">📞 {order.contact_phone}</p>
-
-                        {order.delivery_address && (
-                          <p className="line-clamp-2 leading-tight">
-                            📍 {order.delivery_address}
-                          </p>
-                        )}
-
-                        {order.delivery_lat != null && order.delivery_lng != null && (
-                          <a
-                            className="inline-flex items-center gap-1 text-xs text-berry font-semibold underline hover:text-berry/80 pt-0.5"
-                            target="_blank"
-                            rel="noreferrer"
-                            href={`https://www.openstreetmap.org/?mlat=${order.delivery_lat}&mlon=${order.delivery_lng}#map=17/${order.delivery_lat}/${order.delivery_lng}`}
-                          >
-                            🗺️ View map pin
-                          </a>
-                        )}
-                      </div>
-
-                      {/* Ordered Items Pill Container */}
-                      <div className="mt-3.5 rounded-2xl bg-secondary/30 p-3 border border-border/40">
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
-                          Items ({order.order_items.reduce((s, i) => s + i.quantity, 0)})
-                        </p>
-                        <ul className="space-y-1 text-xs text-foreground/90 max-h-32 overflow-y-auto pr-1">
-                          {order.order_items.map((item, index) => (
-                            <li key={index} className="flex justify-between items-center text-[11px]">
-                              <span className="truncate pr-2">
-                                <span className="font-bold text-berry">{item.quantity}×</span> {item.product_name}
-                              </span>
-                              <span className="font-semibold shrink-0">
-                                {formatCurrency(Number(item.line_total))}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {order.notes && (
-                        <p className="mt-2 text-xs italic text-muted-foreground bg-muted/40 p-2 rounded-xl border border-border/40">
-                          “{order.notes}”
-                        </p>
-                      )}
-
-                      {order.contact_phone && (
-                        <div className="mt-2.5 flex flex-wrap items-center gap-2">
-                          <a
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25 transition-all"
-                            href={(() => {
-                              const cleanDigits = (order.contact_phone || "").replace(/\D/g, "");
-                              const phoneWithCountry = cleanDigits.length === 10 ? `91${cleanDigits}` : cleanDigits;
-                              const shortId = order.id.slice(0, 8);
-                              const itemsText = order.order_items.map((i) => `• ${i.quantity}× ${i.product_name} (${formatCurrency(Number(i.line_total))})`).join("\n");
-                              
-                              const origin = typeof window !== "undefined" ? window.location.origin : "https://anibakes.app";
-                              const myOrdersUrl = `${origin}/orders`;
-                              
-                              let message = `🎂 *Ani Bakes Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;
-                              if (order.status === "pending_approval") {
-                                message += `We have received your payment of *${formatCurrency(Number(order.total))}*! Our head baker is reviewing the schedule for your requested slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Requested Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order:* ${myOrdersUrl}\n\nThank you!`;
-                              } else if (order.status === "confirmed") {
-                                message += `Your bakery order is *confirmed*! Our bakers will prepare it fresh for your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order here:* ${myOrdersUrl}\n\nThank you for choosing Ani Bakes!`;
-                              } else if (order.status === "rescheduled") {
-                                message += `Update on your order: The head baker has adjusted your scheduled baking slot to *${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})*.\n\n📦 *Items:*\n${itemsText}\n\n👉 *View details on our site:* ${myOrdersUrl}\n\nAni Bakes Bakery`;
-                              } else {
-                                message += `Here is your order summary for *${formatCurrency(Number(order.total))}*.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *View order:* ${myOrdersUrl}`;
-                              }
-
-                              return `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(message)}`;
-                            })()}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            💬 Send on WhatsApp
-                          </a>
-
-                          {order.payment_link_url && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="rounded-xl h-7 px-2 text-[11px] font-semibold"
-                              onClick={() => {
-                                navigator.clipboard.writeText(order.payment_link_url!);
-                                toast.success("Payment link copied to clipboard!");
-                              }}
+                          {/* Card Header: Customer, Total, and Status */}
+                          <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-3">
+                            <div>
+                              <p className="font-display text-base font-bold text-cocoa truncate">
+                                {order.contact_name ?? "Customer"}
+                              </p>
+                              <p className="font-sans text-lg font-extrabold text-foreground tracking-tight mt-0.5">
+                                {formatCurrency(Number(order.total))}
+                              </p>
+                            </div>
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold shrink-0 ${badgeStyle}`}
                             >
-                              📋 Copy Link
-                            </Button>
+                              {STATUS_LABELS[order.status] ?? order.status}
+                            </span>
+                          </div>
+
+                          {/* Fulfilment & Timing Details */}
+                          <div className="mt-3 space-y-1.5 text-xs text-muted-foreground">
+                            <div className="flex items-center justify-between font-medium text-foreground">
+                              <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] capitalize">
+                                {order.fulfilment_type}
+                              </span>
+                              <span className="font-mono text-[11px]">
+                                {order.slot_date} ({order.slot_start.slice(0, 5)}–
+                                {order.slot_end.slice(0, 5)})
+                              </span>
+                            </div>
+
+                            <p className="pt-0.5">📞 {order.contact_phone}</p>
+
+                            {order.delivery_address && (
+                              <p className="line-clamp-2 leading-tight">
+                                📍 {order.delivery_address}
+                              </p>
+                            )}
+
+                            {order.delivery_lat != null && order.delivery_lng != null && (
+                              <a
+                                className="inline-flex items-center gap-1 text-xs text-berry-deep font-semibold underline hover:text-berry-deep/80 pt-0.5"
+                                target="_blank"
+                                rel="noreferrer"
+                                href={`https://www.openstreetmap.org/?mlat=${order.delivery_lat}&mlon=${order.delivery_lng}#map=17/${order.delivery_lat}/${order.delivery_lng}`}
+                              >
+                                🗺️ View map pin
+                              </a>
+                            )}
+                          </div>
+
+                          {/* Ordered Items Pill Container */}
+                          <div className="mt-3.5 rounded-2xl bg-secondary/30 p-3 border border-border/40">
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">
+                              Items ({order.order_items.reduce((s, i) => s + i.quantity, 0)})
+                            </p>
+                            <ul className="space-y-1 text-xs text-foreground/90 max-h-32 overflow-y-auto pr-1">
+                              {order.order_items.map((item, index) => (
+                                <li
+                                  key={index}
+                                  className="flex justify-between items-center text-[11px]"
+                                >
+                                  <span className="truncate pr-2">
+                                    <span className="font-bold text-berry-deep">
+                                      {item.quantity}×
+                                    </span>{" "}
+                                    {item.product_name}
+                                  </span>
+                                  <span className="font-semibold shrink-0">
+                                    {formatCurrency(Number(item.line_total))}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          {order.notes && (
+                            <p className="mt-2 text-xs italic text-muted-foreground bg-muted/40 p-2 rounded-xl border border-border/40">
+                              “{order.notes}”
+                            </p>
+                          )}
+
+                          {order.contact_phone && (
+                            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                              <a
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25 transition-all"
+                                href={(() => {
+                                  const cleanDigits = (order.contact_phone || "").replace(
+                                    /\D/g,
+                                    "",
+                                  );
+                                  const phoneWithCountry =
+                                    cleanDigits.length === 10 ? `91${cleanDigits}` : cleanDigits;
+                                  const shortId = order.id.slice(0, 8);
+                                  const itemsText = order.order_items
+                                    .map(
+                                      (i) =>
+                                        `• ${i.quantity}× ${i.product_name} (${formatCurrency(Number(i.line_total))})`,
+                                    )
+                                    .join("\n");
+
+                                  const origin =
+                                    typeof window !== "undefined"
+                                      ? window.location.origin
+                                      : "https://anibakes.app";
+                                  const myOrdersUrl = `${origin}/orders`;
+
+                                  let message = `🎂 *Ani Bakes Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;
+                                  if (order.status === "pending_approval") {
+                                    message += `We have received your payment of *${formatCurrency(Number(order.total))}*! Our head baker is reviewing the schedule for your requested slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Requested Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order:* ${myOrdersUrl}\n\nThank you!`;
+                                  } else if (order.status === "confirmed") {
+                                    message += `Your bakery order is *confirmed*! Our bakers will prepare it fresh for your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order here:* ${myOrdersUrl}\n\nThank you for choosing Ani Bakes!`;
+                                  } else if (order.status === "rescheduled") {
+                                    message += `Update on your order: The head baker has adjusted your scheduled baking slot to *${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})*.\n\n📦 *Items:*\n${itemsText}\n\n👉 *View details on our site:* ${myOrdersUrl}\n\nAni Bakes Bakery`;
+                                  } else {
+                                    message += `Here is your order summary for *${formatCurrency(Number(order.total))}*.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *View order:* ${myOrdersUrl}`;
+                                  }
+
+                                  return `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(message)}`;
+                                })()}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                💬 Send on WhatsApp
+                              </a>
+
+                              {order.payment_link_url && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  className="rounded-xl h-7 px-2 text-[11px] font-semibold"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(order.payment_link_url!);
+                                    toast.success("Payment link copied to clipboard!");
+                                  }}
+                                >
+                                  📋 Copy Link
+                                </Button>
+                              )}
+                            </div>
                           )}
                         </div>
-                      )}
-                    </div>
 
-                    {/* Status Action Buttons */}
-                    {order.status === "rejected" ? (
-                      <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-center p-2.5 rounded-2xl bg-destructive/10 border border-destructive/20 text-xs font-semibold text-destructive">
-                        <XCircle className="mr-1.5 size-4" />
-                        <span>Order Cancelled &amp; Refunded</span>
-                      </div>
-                    ) : order.status === "completed" ? (
-                      <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-center p-2.5 rounded-2xl bg-secondary/80 border border-border/60 text-xs font-semibold text-muted-foreground">
-                        <CheckCircle2 className="mr-1.5 size-4 text-emerald-600" />
-                        <span>Order Fulfilled &amp; Completed</span>
-                      </div>
-                    ) : (
-                      <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-2 gap-2">
-                        {/* Confirm button */}
-                        <Button
-                          size="sm"
-                          disabled={order.status === "confirmed"}
-                          className={`h-8 text-xs font-semibold rounded-xl ${
-                            order.status === "confirmed"
-                              ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
-                              : "bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer"
-                          }`}
-                          onClick={() =>
-                            run(
-                              () => updateStatus({ data: { orderId: order.id, status: "confirmed" } }),
-                              "Order confirmed & customer emailed!",
-                            )
-                          }
-                        >
-                          {order.status === "confirmed" ? "✓ Confirmed" : "✅ Confirm"}
-                        </Button>
+                        {/* Status Action Buttons */}
+                        {order.status === "rejected" ? (
+                          <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-center p-2.5 rounded-2xl bg-destructive/10 border border-destructive/20 text-xs font-semibold text-destructive">
+                            <XCircle className="mr-1.5 size-4" />
+                            <span>Order Cancelled &amp; Refunded</span>
+                          </div>
+                        ) : order.status === "completed" ? (
+                          <div className="mt-4 border-t border-border/60 pt-3 flex items-center justify-center p-2.5 rounded-2xl bg-secondary/80 border border-border/60 text-xs font-semibold text-muted-foreground">
+                            <CheckCircle2 className="mr-1.5 size-4 text-emerald-600" />
+                            <span>Order Fulfilled &amp; Completed</span>
+                          </div>
+                        ) : (
+                          <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-2 gap-2">
+                            {/* Confirm button */}
+                            <Button
+                              size="sm"
+                              disabled={order.status === "confirmed"}
+                              className={`h-8 text-xs font-semibold rounded-xl ${
+                                order.status === "confirmed"
+                                  ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
+                                  : "bg-emerald-600 text-white hover:bg-emerald-700 cursor-pointer"
+                              }`}
+                              onClick={() =>
+                                run(
+                                  () =>
+                                    updateStatus({
+                                      data: { orderId: order.id, status: "confirmed" },
+                                    }),
+                                  "Order confirmed & customer emailed!",
+                                )
+                              }
+                            >
+                              {order.status === "confirmed" ? "✓ Confirmed" : "✅ Confirm"}
+                            </Button>
 
-                        {/* Postpone / Reschedule button */}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 text-xs font-semibold rounded-xl border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10 cursor-pointer"
-                          onClick={() => {
-                            setReschedulingOrder(order);
-                            setNewSlotDate(order.slot_date);
-                            const matchingSlot = TIME_SLOTS.find((s) => s.start === order.slot_start);
-                            setNewSlotId(matchingSlot ? matchingSlot.id : TIME_SLOTS[0]!.id);
-                            setRescheduleReason("");
-                          }}
-                        >
-                          🕒 Reschedule
-                        </Button>
+                            {/* Postpone / Reschedule button */}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 text-xs font-semibold rounded-xl border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10 cursor-pointer"
+                              onClick={() => {
+                                setReschedulingOrder(order);
+                                setNewSlotDate(order.slot_date);
+                                const matchingSlot = TIME_SLOTS.find(
+                                  (s) => s.start === order.slot_start,
+                                );
+                                setNewSlotId(matchingSlot ? matchingSlot.id : TIME_SLOTS[0]!.id);
+                                setRescheduleReason("");
+                              }}
+                            >
+                              🕒 Reschedule
+                            </Button>
 
-                        {/* Complete button */}
-                        <Button
-                          size="sm"
-                          disabled={isFutureDelivery}
-                          title={
-                            isFutureDelivery
-                              ? `Can only complete on or after delivery day (${order.slot_date})`
-                              : undefined
-                          }
-                          className={`h-8 text-xs font-semibold rounded-xl ${
-                            isFutureDelivery
-                              ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
-                              : "bg-berry text-berry-foreground hover:bg-berry/90 cursor-pointer"
-                          }`}
-                          onClick={() =>
-                            run(
-                              () => updateStatus({ data: { orderId: order.id, status: "completed" } }),
-                              "Order completed!",
-                            )
-                          }
-                        >
-                          {isFutureDelivery ? `🔒 Due ${order.slot_date.slice(5)}` : "Completed"}
-                        </Button>
+                            {/* Complete button */}
+                            <Button
+                              size="sm"
+                              disabled={isFutureDelivery}
+                              title={
+                                isFutureDelivery
+                                  ? `Can only complete on or after delivery day (${order.slot_date})`
+                                  : undefined
+                              }
+                              className={`h-8 text-xs font-semibold rounded-xl ${
+                                isFutureDelivery
+                                  ? "bg-muted text-muted-foreground opacity-60 cursor-not-allowed"
+                                  : "bg-berry text-berry-foreground hover:bg-berry/90 cursor-pointer"
+                              }`}
+                              onClick={() =>
+                                run(
+                                  () =>
+                                    updateStatus({
+                                      data: { orderId: order.id, status: "completed" },
+                                    }),
+                                  "Order completed!",
+                                )
+                              }
+                            >
+                              {isFutureDelivery
+                                ? `🔒 Due ${order.slot_date.slice(5)}`
+                                : "Completed"}
+                            </Button>
 
-                        {/* Reject / Refund button */}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 text-xs font-semibold rounded-xl text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer"
-                          onClick={() => setCancellingOrder(order)}
-                        >
-                          Cancel / Refund
-                        </Button>
-                      </div>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="inventory" className="mt-6 grid gap-6 lg:grid-cols-[400px_1fr] xl:grid-cols-[440px_1fr] items-start">
-          {/* LEFT SIDE: PRODUCT CREATION & EDIT FORM */}
-          <div className="w-full">
-            <AdminProductForm
-              form={form}
-              setForm={setForm}
-              categories={data.categories}
-              onSave={handleSaveProduct}
-              onCancel={() => {
-                setEditingProductId(null);
-                setForm(EMPTY_FORM);
-                navigate({
-                  search: (prev: any) => ({
-                    ...prev,
-                    tab: "inventory",
-                    action: undefined,
-                    id: undefined,
-                  }),
-                });
-              }}
-              saving={savingProduct}
-              uploadingImage={uploadingImage}
-              setUploadingImage={setUploadingImage}
-              productImageInputRef={productImageInputRef}
-              manualUrlMode={manualUrlMode}
-              setManualUrlMode={setManualUrlMode}
-              manualUrlInput={manualUrlInput}
-              setManualUrlInput={setManualUrlInput}
-            />
-          </div>
-
-          {/* RIGHT SIDE: PRODUCT CATALOG (CARDS GRID OR ROWS LIST WITH TOOLBAR) */}
-          <div className="min-w-0 space-y-5">
-            {/* Header & Controls Bar */}
-            <div className="flex flex-col gap-4 rounded-3xl border border-border/70 bg-card p-4 sm:p-5 shadow-soft">
-              {/* Top Row: Title, Stats & View Switcher */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-display text-xl sm:text-2xl font-bold text-cocoa">
-                      Bakery Catalog
-                    </h2>
-                    <span className="rounded-full bg-berry/15 text-berry border border-berry/30 px-2.5 py-0.5 text-xs font-bold">
-                      {data.products.length} Bakes
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {activeProducts.length} active in storefront &bull; Click any bake to edit on the left.
-                  </p>
+                            {/* Reject / Refund button */}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 text-xs font-semibold rounded-xl text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer"
+                              onClick={() => setCancellingOrder(order)}
+                            >
+                              Cancel / Refund
+                            </Button>
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })}
                 </div>
+              )}
+            </TabsContent>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  {/* View Mode Switcher */}
-                  <div className="flex items-center rounded-2xl border border-border/70 bg-secondary/40 p-1">
-                    <button
-                      type="button"
-                      onClick={() => setInventoryViewMode("grid")}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        inventoryViewMode === "grid"
-                          ? "bg-card text-cocoa shadow-xs"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                      title="Card Grid View"
-                    >
-                      <LayoutGrid className="size-3.5" />
-                      <span>Cards</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setInventoryViewMode("list")}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        inventoryViewMode === "list"
-                          ? "bg-card text-cocoa shadow-xs"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                      title="Compact Row List View"
-                    >
-                      <Sliders className="size-3.5" />
-                      <span>Rows</span>
-                    </button>
-                  </div>
-
-                  <Button
-                    size="sm"
-                    onClick={handleNewProduct}
-                    className="rounded-2xl h-9 px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Plus className="size-3.5" />
-                    <span>New Bake</span>
-                  </Button>
-                </div>
+            <TabsContent
+              value="inventory"
+              className="mt-6 grid gap-6 lg:grid-cols-[400px_1fr] xl:grid-cols-[440px_1fr] items-start"
+            >
+              {/* LEFT SIDE: PRODUCT CREATION & EDIT FORM */}
+              <div className="w-full">
+                <AdminProductForm
+                  form={form}
+                  setForm={setForm}
+                  categories={data.categories}
+                  onSave={handleSaveProduct}
+                  onCancel={() => {
+                    setEditingProductId(null);
+                    setForm(EMPTY_FORM);
+                    navigate({
+                      search: (prev: any) => ({
+                        ...prev,
+                        tab: "inventory",
+                        action: undefined,
+                        id: undefined,
+                      }),
+                    });
+                  }}
+                  saving={savingProduct}
+                  uploadingImage={uploadingImage}
+                  setUploadingImage={setUploadingImage}
+                  productImageInputRef={productImageInputRef}
+                  manualUrlMode={manualUrlMode}
+                  setManualUrlMode={setManualUrlMode}
+                  manualUrlInput={manualUrlInput}
+                  setManualUrlInput={setManualUrlInput}
+                />
               </div>
 
-              {/* Category Filter Pills */}
-              <div className="pt-2 border-t border-border/50">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setInventoryCategoryFilter("all")}
-                    className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
-                      inventoryCategoryFilter === "all"
-                        ? "bg-cocoa text-background shadow-xs"
-                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}
-                  >
-                    <span>All</span>
-                    <span
-                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                        inventoryCategoryFilter === "all"
-                          ? "bg-background/20 text-background"
-                          : "bg-background/80 text-foreground"
-                      }`}
-                    >
-                      {data.products.length}
-                    </span>
-                  </button>
+              {/* RIGHT SIDE: PRODUCT CATALOG (CARDS GRID OR ROWS LIST WITH TOOLBAR) */}
+              <div className="min-w-0 space-y-5">
+                {/* Header & Controls Bar */}
+                <div className="flex flex-col gap-4 rounded-3xl border border-border/70 bg-card p-4 sm:p-5 shadow-soft">
+                  {/* Top Row: Title, Stats & View Switcher */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-display text-xl sm:text-2xl font-bold text-cocoa">
+                          Bakery Catalog
+                        </h2>
+                        <span className="rounded-full bg-berry/15 text-berry-deep border border-berry/30 px-2.5 py-0.5 text-xs font-bold">
+                          {data.products.length} Bakes
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {activeProducts.length} active in storefront &bull; Click any bake to edit
+                        on the left.
+                      </p>
+                    </div>
 
-                  {data.categories.map((cat) => {
-                    const count = data.products.filter((p) => p.category_id === cat.id).length;
-                    const isActive = inventoryCategoryFilter === cat.id;
-                    return (
+                    <div className="flex items-center gap-2 shrink-0">
+                      {/* View Mode Switcher */}
+                      <div className="flex items-center rounded-2xl border border-border/70 bg-secondary/40 p-1">
+                        <button
+                          type="button"
+                          onClick={() => setInventoryViewMode("grid")}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                            inventoryViewMode === "grid"
+                              ? "bg-card text-cocoa shadow-xs"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                          title="Card Grid View"
+                        >
+                          <LayoutGrid className="size-3.5" />
+                          <span>Cards</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setInventoryViewMode("list")}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                            inventoryViewMode === "list"
+                              ? "bg-card text-cocoa shadow-xs"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                          title="Compact Row List View"
+                        >
+                          <Sliders className="size-3.5" />
+                          <span>Rows</span>
+                        </button>
+                      </div>
+
+                      <Button
+                        size="sm"
+                        onClick={handleNewProduct}
+                        className="rounded-2xl h-9 px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Plus className="size-3.5" />
+                        <span>New Bake</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Category Filter Pills */}
+                  <div className="pt-2 border-t border-border/50">
+                    <div className="flex flex-wrap items-center gap-1.5">
                       <button
-                        key={cat.id}
                         type="button"
-                        onClick={() => setInventoryCategoryFilter(cat.id)}
+                        onClick={() => setInventoryCategoryFilter("all")}
                         className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
-                          isActive
+                          inventoryCategoryFilter === "all"
                             ? "bg-cocoa text-background shadow-xs"
                             : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
                         }`}
                       >
-                        <span>{cat.name}</span>
+                        <span>All</span>
                         <span
                           className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                            isActive
+                            inventoryCategoryFilter === "all"
                               ? "bg-background/20 text-background"
                               : "bg-background/80 text-foreground"
                           }`}
                         >
-                          {count}
+                          {data.products.length}
                         </span>
                       </button>
-                    );
-                  })}
 
-                  {data.products.some((p) => !p.category_id) && (
-                    <button
-                      type="button"
-                      onClick={() => setInventoryCategoryFilter("uncategorized")}
-                      className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
-                        inventoryCategoryFilter === "uncategorized"
-                          ? "bg-cocoa text-background shadow-xs"
-                          : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                      }`}
-                    >
-                      <span>Uncategorised</span>
-                      <span
-                        className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                          inventoryCategoryFilter === "uncategorized"
-                            ? "bg-background/20 text-background"
-                            : "bg-background/80 text-foreground"
+                      {data.categories.map((cat) => {
+                        const count = data.products.filter((p) => p.category_id === cat.id).length;
+                        const isActive = inventoryCategoryFilter === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => setInventoryCategoryFilter(cat.id)}
+                            className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                              isActive
+                                ? "bg-cocoa text-background shadow-xs"
+                                : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                            }`}
+                          >
+                            <span>{cat.name}</span>
+                            <span
+                              className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                                isActive
+                                  ? "bg-background/20 text-background"
+                                  : "bg-background/80 text-foreground"
+                              }`}
+                            >
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+
+                      {data.products.some((p) => !p.category_id) && (
+                        <button
+                          type="button"
+                          onClick={() => setInventoryCategoryFilter("uncategorized")}
+                          className={`inline-flex items-center gap-1.5 rounded-xl px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                            inventoryCategoryFilter === "uncategorized"
+                              ? "bg-cocoa text-background shadow-xs"
+                              : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                          }`}
+                        >
+                          <span>Uncategorised</span>
+                          <span
+                            className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                              inventoryCategoryFilter === "uncategorized"
+                                ? "bg-background/20 text-background"
+                                : "bg-background/80 text-foreground"
+                            }`}
+                          >
+                            {data.products.filter((p) => !p.category_id).length}
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Search, Status & Sorting Controls */}
+                  <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2.5 border-t border-border/50">
+                    <div className="relative min-w-[180px] flex-1 max-w-xs">
+                      <Input
+                        placeholder="Search bakes by name, slug…"
+                        value={inventorySearchQuery}
+                        onChange={(e) => setInventorySearchQuery(e.target.value)}
+                        className="h-8 text-xs pl-7 rounded-xl bg-background"
+                      />
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[11px] pointer-events-none">
+                        🔍
+                      </span>
+                      {inventorySearchQuery && (
+                        <button
+                          type="button"
+                          onClick={() => setInventorySearchQuery("")}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <select
+                        value={inventoryStatusFilter}
+                        onChange={(e) => setInventoryStatusFilter(e.target.value)}
+                        className="h-8 rounded-xl border border-input bg-background px-2.5 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                      >
+                        <option value="all">All Statuses ({data.products.length})</option>
+                        <option value="active">🌿 Visible ({activeProducts.length})</option>
+                        <option value="hidden">
+                          ⏸️ Paused ({data.products.length - activeProducts.length})
+                        </option>
+                      </select>
+
+                      <select
+                        value={inventorySortBy}
+                        onChange={(e) => setInventorySortBy(e.target.value)}
+                        className="h-8 rounded-xl border border-input bg-background px-2.5 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                      >
+                        <option value="name_asc">Name: A to Z</option>
+                        <option value="name_desc">Name: Z to A</option>
+                        <option value="price_asc">Price: Low to High</option>
+                        <option value="price_desc">Price: High to Low</option>
+                        <option value="active_first">Visible Items First</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product Catalog Display (Cards Grid or Rows List) */}
+                {sortedProducts.length === 0 ? (
+                  <div className="rounded-3xl border border-dashed border-border p-12 text-center bg-card/50">
+                    <p className="text-3xl mb-2">🧁</p>
+                    <p className="text-sm font-semibold text-cocoa">
+                      {inventorySearchQuery ||
+                      inventoryStatusFilter !== "all" ||
+                      inventoryCategoryFilter !== "all"
+                        ? "No bakery items match your current filter criteria."
+                        : "No products in catalog yet."}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Try clearing your search query or reset your filters.
+                    </p>
+                    {(inventorySearchQuery ||
+                      inventoryStatusFilter !== "all" ||
+                      inventoryCategoryFilter !== "all") && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3.5 rounded-xl text-xs font-semibold cursor-pointer"
+                        onClick={() => {
+                          setInventorySearchQuery("");
+                          setInventoryStatusFilter("all");
+                          setInventoryCategoryFilter("all");
+                        }}
+                      >
+                        Reset All Filters
+                      </Button>
+                    )}
+                  </div>
+                ) : inventoryViewMode === "grid" ? (
+                  /* BENTO CARDS GRID VIEW */
+                  inventoryCategoryFilter !== "all" ? (
+                    /* Single Category Cards Grid */
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between px-1">
+                        <h3 className="font-display text-lg font-bold text-cocoa">
+                          {inventoryCategoryFilter === "uncategorized"
+                            ? "Uncategorised Items"
+                            : categoryMap.get(inventoryCategoryFilter) || "Category"}
+                        </h3>
+                        <span className="text-xs font-semibold text-muted-foreground">
+                          {sortedProducts.length} {sortedProducts.length === 1 ? "bake" : "bakes"}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                        {sortedProducts.map((product) => (
+                          <ProductAdminCard
+                            key={product.id}
+                            product={product}
+                            categoryName={
+                              product.category_id ? categoryMap.get(product.category_id) : undefined
+                            }
+                            isBeingEdited={editingProductId === product.id}
+                            onEdit={() => handleEditProduct(product)}
+                            onDuplicate={() => handleDuplicateProduct(product)}
+                            onToggleActive={() => handleToggleActiveProduct(product)}
+                            onDelete={() =>
+                              run(() => removeProductFn({ data: product.id }), "Product deleted")
+                            }
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    /* Grouped by Category Cards Grid */
+                    <div className="space-y-7">
+                      {data.categories.map((cat) => {
+                        const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
+                        if (catProducts.length === 0) return null;
+                        const activeCount = catProducts.filter((p) => p.is_active).length;
+
+                        return (
+                          <div key={cat.id} className="space-y-3">
+                            <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">
+                                  {cat.name}
+                                </h3>
+                                <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                                  {catProducts.length} {catProducts.length === 1 ? "bake" : "bakes"}
+                                </span>
+                              </div>
+                              <span className="text-xs text-muted-foreground font-medium">
+                                {activeCount} active
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                              {catProducts.map((product) => (
+                                <ProductAdminCard
+                                  key={product.id}
+                                  product={product}
+                                  categoryName={cat.name}
+                                  isBeingEdited={editingProductId === product.id}
+                                  onEdit={() => handleEditProduct(product)}
+                                  onDuplicate={() => handleDuplicateProduct(product)}
+                                  onToggleActive={() => handleToggleActiveProduct(product)}
+                                  onDelete={() =>
+                                    run(
+                                      () => removeProductFn({ data: product.id }),
+                                      "Product deleted",
+                                    )
+                                  }
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Uncategorized products */}
+                      {sortedProducts.some((p) => !p.category_id) && (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">
+                                Uncategorised
+                              </h3>
+                              <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                                {sortedProducts.filter((p) => !p.category_id).length} bakes
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                            {sortedProducts
+                              .filter((p) => !p.category_id)
+                              .map((product) => (
+                                <ProductAdminCard
+                                  key={product.id}
+                                  product={product}
+                                  isBeingEdited={editingProductId === product.id}
+                                  onEdit={() => handleEditProduct(product)}
+                                  onDuplicate={() => handleDuplicateProduct(product)}
+                                  onToggleActive={() => handleToggleActiveProduct(product)}
+                                  onDelete={() =>
+                                    run(
+                                      () => removeProductFn({ data: product.id }),
+                                      "Product deleted",
+                                    )
+                                  }
+                                />
+                              ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )
+                ) : /* COMPACT ROWS LIST VIEW */
+                inventoryCategoryFilter !== "all" ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between px-1">
+                      <h3 className="font-display text-lg font-bold text-cocoa">
+                        {inventoryCategoryFilter === "uncategorized"
+                          ? "Uncategorised Items"
+                          : categoryMap.get(inventoryCategoryFilter) || "Category"}
+                      </h3>
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        {sortedProducts.length}{" "}
+                        {sortedProducts.length === 1 ? "product" : "products"}
+                      </span>
+                    </div>
+
+                    <div className="space-y-3">
+                      {sortedProducts.map((product) => (
+                        <ProductAdminRow
+                          key={product.id}
+                          product={product}
+                          categoryName={
+                            product.category_id ? categoryMap.get(product.category_id) : undefined
+                          }
+                          onEdit={() => handleEditProduct(product)}
+                          onDuplicate={() => handleDuplicateProduct(product)}
+                          onToggleActive={() => handleToggleActiveProduct(product)}
+                          onDelete={() =>
+                            run(() => removeProductFn({ data: product.id }), "Product deleted")
+                          }
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-7">
+                    {data.categories.map((cat) => {
+                      const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
+                      if (catProducts.length === 0) return null;
+                      const activeCount = catProducts.filter((p) => p.is_active).length;
+
+                      return (
+                        <div key={cat.id} className="space-y-3">
+                          <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">
+                                {cat.name}
+                              </h3>
+                              <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                                {catProducts.length} {catProducts.length === 1 ? "item" : "items"}
+                              </span>
+                            </div>
+                            <span className="text-xs text-muted-foreground font-medium">
+                              {activeCount} active
+                            </span>
+                          </div>
+
+                          <div className="space-y-3">
+                            {catProducts.map((product) => (
+                              <ProductAdminRow
+                                key={product.id}
+                                product={product}
+                                categoryName={cat.name}
+                                onEdit={() => handleEditProduct(product)}
+                                onDuplicate={() => handleDuplicateProduct(product)}
+                                onToggleActive={() => handleToggleActiveProduct(product)}
+                                onDelete={() =>
+                                  run(
+                                    () => removeProductFn({ data: product.id }),
+                                    "Product deleted",
+                                  )
+                                }
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {sortedProducts.some((p) => !p.category_id) && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">
+                              Uncategorised
+                            </h3>
+                            <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                              {sortedProducts.filter((p) => !p.category_id).length} items
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          {sortedProducts
+                            .filter((p) => !p.category_id)
+                            .map((product) => (
+                              <ProductAdminRow
+                                key={product.id}
+                                product={product}
+                                onEdit={() => handleEditProduct(product)}
+                                onDuplicate={() => handleDuplicateProduct(product)}
+                                onToggleActive={() => handleToggleActiveProduct(product)}
+                                onDelete={() =>
+                                  run(
+                                    () => removeProductFn({ data: product.id }),
+                                    "Product deleted",
+                                  )
+                                }
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="shop_layout" className="mt-6 space-y-6">
+              <AdminShopLayoutManager
+                categories={data.categories}
+                products={data.products}
+                onRefresh={refresh}
+              />
+            </TabsContent>
+
+            <TabsContent value="calendar" className="mt-6 space-y-5">
+              {/* Add Closed Date Card */}
+              <div className="rounded-3xl border border-border/70 bg-card p-5 sm:p-6 shadow-soft">
+                <div className="flex items-center gap-2.5 mb-4">
+                  <span className="flex size-9 items-center justify-center rounded-2xl bg-berry/10 text-berry-deep text-lg">
+                    📅
+                  </span>
+                  <div>
+                    <h2 className="font-display text-xl font-bold text-cocoa">
+                      Close a Baking Date
+                    </h2>
+                    <p className="text-xs text-muted-foreground">
+                      Mark a date as fully closed — no new orders will be accepted for that slot.
+                    </p>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-[180px_1fr_auto] sm:items-end">
+                  <div>
+                    <Label htmlFor="b-date" className="text-xs font-semibold">
+                      Date to Close
+                    </Label>
+                    <Input
+                      id="b-date"
+                      type="date"
+                      value={blackoutDate}
+                      min={new Date().toISOString().slice(0, 10)}
+                      onChange={(e) => setBlackoutDate(e.target.value)}
+                      className="rounded-xl h-10 text-sm mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="b-reason" className="text-xs font-semibold">
+                      Reason (optional)
+                    </Label>
+                    <Input
+                      id="b-reason"
+                      placeholder="e.g. Public holiday, family event…"
+                      value={blackoutReason}
+                      onChange={(e) => setBlackoutReason(e.target.value)}
+                      className="rounded-xl h-10 text-sm mt-1"
+                    />
+                  </div>
+                  <Button
+                    disabled={!blackoutDate}
+                    className="bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-10 font-bold text-sm cursor-pointer shadow-soft"
+                    onClick={() =>
+                      run(async () => {
+                        await addBlackoutFn({
+                          data: {
+                            blackout_date: blackoutDate,
+                            reason: blackoutReason || undefined,
+                          },
+                        });
+                        setBlackoutDate("");
+                        setBlackoutReason("");
+                      }, "📅 Date closed successfully")
+                    }
+                  >
+                    Close Date
+                  </Button>
+                </div>
+              </div>
+
+              {/* Blocked Dates List */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="font-display text-base font-bold text-cocoa">Blocked Dates</h3>
+                  <span className="rounded-full bg-destructive/10 border border-destructive/20 px-2.5 py-0.5 text-xs font-bold text-destructive">
+                    {data.blackouts.length} closed
+                  </span>
+                </div>
+
+                {data.blackouts.length === 0 && (
+                  <div className="rounded-3xl border border-dashed border-border/80 bg-card/50 p-8 text-center">
+                    <p className="text-3xl mb-2">🟢</p>
+                    <p className="text-sm font-semibold text-cocoa">All Dates Open</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      No baking dates are currently blocked. Add a date above to close it.
+                    </p>
+                  </div>
+                )}
+
+                {[...data.blackouts]
+                  .sort((a, b) => a.blackout_date.localeCompare(b.blackout_date))
+                  .map((blackout) => {
+                    const dateObj = new Date(blackout.blackout_date + "T00:00:00");
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const diffDays = Math.round(
+                      (dateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+                    );
+                    const isPast = diffDays < 0;
+                    const relLabel = isPast
+                      ? `${Math.abs(diffDays)} days ago`
+                      : diffDays === 0
+                        ? "Today"
+                        : diffDays === 1
+                          ? "Tomorrow"
+                          : `In ${diffDays} days`;
+                    const formattedDate = dateObj.toLocaleDateString("en-IN", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    });
+
+                    return (
+                      <div
+                        key={blackout.id}
+                        className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border p-4 shadow-2xs transition-all ${
+                          isPast
+                            ? "border-border/40 bg-muted/20 opacity-70"
+                            : "border-destructive/25 bg-destructive/5 hover:border-destructive/40"
                         }`}
                       >
-                        {data.products.filter((p) => !p.category_id).length}
-                      </span>
-                    </button>
+                        <div className="flex items-center gap-3.5">
+                          <div
+                            className={`flex size-9 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${
+                              isPast
+                                ? "bg-muted text-muted-foreground"
+                                : "bg-destructive/15 text-destructive"
+                            }`}
+                          >
+                            🔒
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-foreground">{formattedDate}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                  isPast
+                                    ? "bg-muted text-muted-foreground"
+                                    : diffDays === 0
+                                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                                      : "bg-destructive/15 text-destructive"
+                                }`}
+                              >
+                                {relLabel}
+                              </span>
+                              {blackout.reason && (
+                                <span className="text-xs text-muted-foreground italic">
+                                  — {blackout.reason}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="rounded-xl h-8 text-xs font-semibold text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10 cursor-pointer shrink-0"
+                          onClick={() =>
+                            run(() => removeBlackoutFn({ data: blackout.id }), "📅 Date reopened")
+                          }
+                        >
+                          🔓 Reopen Date
+                        </Button>
+                      </div>
+                    );
+                  })}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="newsletter" className="mt-6">
+              <AdminNewsletter
+                subscribers={data.subscribers}
+                campaigns={data.campaigns}
+                products={data.products}
+                onSend={async (campaignData) => {
+                  await run(
+                    () => sendNewsletterFn({ data: campaignData }),
+                    "Newsletter campaign dispatched successfully!",
+                  );
+                }}
+              />
+            </TabsContent>
+
+            <TabsContent value="analytics" className="mt-6 space-y-6">
+              {/* KPI Cards */}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  {
+                    label: "Total Orders",
+                    value: String(data.stats.totalOrders),
+                    icon: "📦",
+                    color: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/25",
+                  },
+                  {
+                    label: "Last 30 Days",
+                    value: String(data.stats.ordersLast30Days),
+                    icon: "📈",
+                    color:
+                      "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/25",
+                  },
+                  {
+                    label: "Paid Revenue",
+                    value: formatCurrency(data.stats.revenue),
+                    icon: "💰",
+                    color:
+                      "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/25",
+                  },
+                  {
+                    label: "Avg Order Value",
+                    value: formatCurrency(data.stats.averageOrder),
+                    icon: "🎯",
+                    color: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/25",
+                  },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    className={`rounded-3xl border p-5 shadow-soft flex items-center gap-3.5 ${stat.color}`}
+                  >
+                    <span className="text-2xl">{stat.icon}</span>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">
+                        {stat.label}
+                      </p>
+                      <p className="font-display text-2xl font-bold mt-0.5">{stat.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Orders by Status */}
+                <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
+                  <h2 className="font-display text-lg font-bold text-cocoa mb-4">
+                    Orders by Status
+                  </h2>
+                  <div className="space-y-2.5">
+                    {Object.entries(data.stats.byStatus).map(([status, count]) => {
+                      const total = data.stats.totalOrders || 1;
+                      const pct = Math.round((Number(count) / total) * 100);
+                      const barColors: Record<string, string> = {
+                        pending_approval: "bg-amber-500",
+                        confirmed: "bg-emerald-500",
+                        completed: "bg-blue-500",
+                        rejected: "bg-destructive",
+                        rescheduled: "bg-purple-500",
+                        awaiting_payment: "bg-orange-500",
+                      };
+                      return (
+                        <div key={status} className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-semibold text-foreground">
+                              {STATUS_LABELS[status] ?? status}
+                            </span>
+                            <span className="font-bold text-muted-foreground">
+                              {count} ({pct}%)
+                            </span>
+                          </div>
+                          <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${barColors[status] ?? "bg-cocoa"}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Best Sellers */}
+                <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
+                  <h2 className="font-display text-lg font-bold text-cocoa mb-4">
+                    🏆 Top Selling Bakes
+                  </h2>
+                  {data.stats.topProducts.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <p className="text-2xl mb-1">🧁</p>
+                      <p className="text-sm text-muted-foreground">No sales data yet.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {data.stats.topProducts.slice(0, 6).map((product, idx) => {
+                        const maxQty = data.stats.topProducts[0]?.quantity || 1;
+                        const pct = Math.round((product.quantity / maxQty) * 100);
+                        const medals = ["🥇", "🥈", "🥉"];
+                        return (
+                          <div key={product.name} className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-semibold text-foreground flex items-center gap-1.5">
+                                {medals[idx] ?? (
+                                  <span className="w-4 text-center font-mono text-muted-foreground">
+                                    {idx + 1}
+                                  </span>
+                                )}
+                                <span className="truncate max-w-[160px]">{product.name}</span>
+                              </span>
+                              <span className="font-bold text-cocoa shrink-0">
+                                {product.quantity} pcs · {formatCurrency(product.revenue)}
+                              </span>
+                            </div>
+                            <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-berry transition-all"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
               </div>
 
-              {/* Search, Status & Sorting Controls */}
-              <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2.5 border-t border-border/50">
-                <div className="relative min-w-[180px] flex-1 max-w-xs">
+              <div className="rounded-3xl border border-border/70 bg-card/50 p-4 text-xs text-muted-foreground flex items-start gap-2.5">
+                <span className="text-base">📊</span>
+                <p>
+                  Heatmaps and session recordings run through Microsoft Clarity. Add your Clarity
+                  project ID as{" "}
+                  <code className="font-mono bg-secondary px-1 rounded">
+                    VITE_CLARITY_PROJECT_ID
+                  </code>{" "}
+                  and the tracking tag loads on every page automatically.
+                </p>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="offers" className="mt-6 grid gap-8 lg:grid-cols-[380px_1fr]">
+              <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft h-fit">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-display text-xl font-bold text-cocoa">
+                    {offerForm.id ? "Edit offer code" : "New offer code"}
+                  </h2>
+                  {offerForm.id && (
+                    <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[10px] font-bold text-berry-deep">
+                      Editing #{offerForm.code}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <Label htmlFor="o-code" className="text-xs font-semibold">
+                      Code (e.g. FESTIVE20)
+                    </Label>
+                    <Input
+                      id="o-code"
+                      placeholder="SWEET20"
+                      value={offerForm.code}
+                      className="rounded-xl h-9 text-xs font-mono font-bold uppercase mt-1"
+                      onChange={(e) =>
+                        setOfferForm((f) => ({ ...f, code: e.target.value.toUpperCase().trim() }))
+                      }
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="o-type" className="text-xs font-semibold">
+                        Discount type
+                      </Label>
+                      <select
+                        id="o-type"
+                        className="h-9 w-full rounded-xl border border-input bg-background px-3 text-xs mt-1 cursor-pointer"
+                        value={offerForm.discount_type}
+                        onChange={(e) =>
+                          setOfferForm((f) => ({
+                            ...f,
+                            discount_type: e.target.value as "percent" | "flat",
+                          }))
+                        }
+                      >
+                        <option value="percent">Percent (%)</option>
+                        <option value="flat">Flat (₹)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="o-val" className="text-xs font-semibold">
+                        Discount value
+                      </Label>
+                      <Input
+                        id="o-val"
+                        type="number"
+                        value={offerForm.discount_value}
+                        className="rounded-xl h-9 text-xs mt-1"
+                        onChange={(e) =>
+                          setOfferForm((f) => ({ ...f, discount_value: e.target.value }))
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="o-min" className="text-xs font-semibold">
+                      Min order amount (₹)
+                    </Label>
+                    <Input
+                      id="o-min"
+                      type="number"
+                      placeholder="0"
+                      value={offerForm.min_order_amount}
+                      className="rounded-xl h-9 text-xs mt-1"
+                      onChange={(e) =>
+                        setOfferForm((f) => ({ ...f, min_order_amount: e.target.value }))
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="o-expiry" className="text-xs font-semibold">
+                      Valid until (Expiry Date &amp; Time)
+                    </Label>
+                    <Input
+                      id="o-expiry"
+                      type="datetime-local"
+                      value={offerForm.expires_at}
+                      className="rounded-xl h-9 text-xs mt-1"
+                      onChange={(e) => setOfferForm((f) => ({ ...f, expires_at: e.target.value }))}
+                    />
+                    <p className="mt-1 text-[10px] text-muted-foreground">
+                      The code automatically expires past this timestamp.
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="o-desc" className="text-xs font-semibold">
+                      Description (optional)
+                    </Label>
+                    <Input
+                      id="o-desc"
+                      placeholder="e.g. 20% off for festival season"
+                      value={offerForm.description}
+                      className="rounded-xl h-9 text-xs mt-1"
+                      onChange={(e) => setOfferForm((f) => ({ ...f, description: e.target.value }))}
+                    />
+                  </div>
+
+                  {/* Visibility & Activation Toggles */}
+                  <div className="space-y-2 pt-2 border-t border-border/50">
+                    <label className="flex items-start gap-2.5 text-xs font-medium cursor-pointer p-2.5 rounded-xl border border-border/60 bg-secondary/20 hover:bg-secondary/40 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={offerForm.is_visible}
+                        onChange={(e) =>
+                          setOfferForm((f) => ({ ...f, is_visible: e.target.checked }))
+                        }
+                        className="mt-0.5 rounded border-input text-berry-deep cursor-pointer"
+                      />
+                      <div>
+                        <span className="font-semibold text-foreground flex items-center gap-1.5">
+                          {offerForm.is_visible ? (
+                            <>
+                              <Eye className="size-3.5 text-emerald-600" />
+                              <span>Visible on /offers page (Public)</span>
+                            </>
+                          ) : (
+                            <>
+                              <EyeOff className="size-3.5 text-purple-600" />
+                              <span>Secret / Hidden from /offers</span>
+                            </>
+                          )}
+                        </span>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                          {offerForm.is_visible
+                            ? "Public: All visitors can see and copy this code on the offers page."
+                            : "Secret: Hidden from /offers. Share privately via newsletter or VIP messages."}
+                        </p>
+                      </div>
+                    </label>
+
+                    <label className="flex items-start gap-2.5 text-xs font-medium cursor-pointer p-2.5 rounded-xl border border-border/60 bg-secondary/20 hover:bg-secondary/40 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={offerForm.is_active}
+                        onChange={(e) =>
+                          setOfferForm((f) => ({ ...f, is_active: e.target.checked }))
+                        }
+                        className="mt-0.5 rounded border-input text-berry-deep cursor-pointer"
+                      />
+                      <div>
+                        <span className="font-semibold text-foreground flex items-center gap-1.5">
+                          {offerForm.is_active
+                            ? "🟢 Active & Redeemable"
+                            : "⚪ Deactivated / Paused"}
+                        </span>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                          {offerForm.is_active
+                            ? "Active: Customers can apply this code during checkout."
+                            : "Deactivated: Code cannot be applied until reactivated."}
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      className="flex-1 bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl h-9 text-xs font-semibold cursor-pointer"
+                      onClick={() =>
+                        run(async () => {
+                          if (
+                            !offerForm.code ||
+                            !offerForm.discount_value ||
+                            !offerForm.expires_at
+                          ) {
+                            toast.error("Please fill in code, discount value, and expiry date.");
+                            return;
+                          }
+                          await saveOfferCodeFn({
+                            data: {
+                              ...(offerForm.id ? { id: offerForm.id } : {}),
+                              code: offerForm.code,
+                              discount_type: offerForm.discount_type,
+                              discount_value: Number(offerForm.discount_value),
+                              min_order_amount: Number(offerForm.min_order_amount || 0),
+                              expires_at: new Date(offerForm.expires_at).toISOString(),
+                              description: offerForm.description || undefined,
+                              is_active: offerForm.is_active,
+                              is_visible: offerForm.is_visible,
+                            },
+                          });
+                          setOfferForm(EMPTY_OFFER_FORM);
+                          queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
+                        }, "Offer code saved")
+                      }
+                    >
+                      {offerForm.id ? "Update offer code" : "Create offer code"}
+                    </Button>
+                    {offerForm.id && (
+                      <Button
+                        variant="outline"
+                        className="rounded-xl h-9 text-xs cursor-pointer"
+                        onClick={() => setOfferForm(EMPTY_OFFER_FORM)}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Offer Codes List */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="font-display text-lg font-bold text-cocoa">All Promo Codes</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-secondary border border-border/60 px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
+                      {offerCodes?.length || 0} total
+                    </span>
+                    <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                      {offerCodes?.filter(
+                        (o) => o.is_active && new Date(o.expires_at).getTime() > Date.now(),
+                      ).length || 0}{" "}
+                      active
+                    </span>
+                  </div>
+                </div>
+
+                {(!offerCodes || offerCodes.length === 0) && (
+                  <div className="rounded-3xl border border-dashed border-border/80 p-8 text-center bg-card/40">
+                    <p className="text-xs text-muted-foreground">No offer codes created yet.</p>
+                  </div>
+                )}
+
+                {offerCodes?.map((offer) => {
+                  const isExpired = new Date(offer.expires_at).getTime() <= Date.now();
+                  const isSecret = offer.is_visible === false;
+                  const isActive = offer.is_active && !isExpired;
+
+                  return (
+                    <div
+                      key={offer.id ?? offer.code}
+                      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border p-4 shadow-soft transition-all ${
+                        !offer.is_active
+                          ? "border-border/40 bg-card/40 opacity-70"
+                          : isSecret
+                            ? "border-purple-500/30 bg-purple-500/5 hover:border-purple-500/50"
+                            : "border-border/70 bg-card hover:border-berry/30"
+                      }`}
+                    >
+                      <div className="space-y-1.5 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-mono font-bold text-sm sm:text-base text-berry-deep bg-berry/10 px-2.5 py-0.5 rounded-xl border border-berry/20">
+                            {offer.code}
+                          </span>
+
+                          {/* Active / Inactive / Expired Badge */}
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold border ${
+                              isExpired
+                                ? "bg-destructive/15 text-destructive border-destructive/30"
+                                : offer.is_active
+                                  ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
+                                  : "bg-muted text-muted-foreground border-border"
+                            }`}
+                          >
+                            {isExpired
+                              ? "🔴 Expired"
+                              : offer.is_active
+                                ? "🟢 Active"
+                                : "⚪ Deactivated"}
+                          </span>
+
+                          {/* Visibility Badge */}
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold border flex items-center gap-1 ${
+                              isSecret
+                                ? "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30"
+                                : "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30"
+                            }`}
+                          >
+                            {isSecret ? (
+                              <>
+                                <Lock className="size-2.5" />
+                                <span>Secret (Hidden from /offers)</span>
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="size-2.5" />
+                                <span>Public (/offers)</span>
+                              </>
+                            )}
+                          </span>
+                        </div>
+
+                        <p className="text-xs sm:text-sm font-semibold text-foreground">
+                          {offer.discount_type === "percent"
+                            ? `${offer.discount_value}% off`
+                            : `₹${offer.discount_value} flat off`}
+                          {offer.min_order_amount > 0
+                            ? ` · Min order ₹${offer.min_order_amount}`
+                            : ""}
+                        </p>
+
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          {/* Expiry countdown badge */}
+                          {(() => {
+                            const expiresMs = new Date(offer.expires_at).getTime();
+                            const nowMs = Date.now();
+                            const diffMs = expiresMs - nowMs;
+                            const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+                            if (diffMs <= 0)
+                              return (
+                                <span className="text-[10px] font-bold bg-destructive/15 text-destructive px-2 py-0.5 rounded-full border border-destructive/30">
+                                  Expired
+                                </span>
+                              );
+                            if (diffDays <= 3)
+                              return (
+                                <span className="text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
+                                  ⚠️ Expires in {diffDays}d
+                                </span>
+                              );
+                            if (diffDays <= 7)
+                              return (
+                                <span className="text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20">
+                                  Expires in {diffDays}d
+                                </span>
+                              );
+                            return (
+                              <span className="text-[10px] text-muted-foreground">
+                                Expires{" "}
+                                {new Date(offer.expires_at).toLocaleDateString("en-IN", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            );
+                          })()}
+                          {offer.description && (
+                            <span className="text-[10px] text-muted-foreground italic">
+                              {offer.description}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions Bar */}
+                      <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2 sm:border-t-0 sm:pt-0 shrink-0">
+                        {/* Copy Code Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          title="Copy promo code to clipboard"
+                          className="h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer hover:border-berry/40 hover:bg-berry/5"
+                          onClick={() => {
+                            navigator.clipboard.writeText(offer.code);
+                            toast.success(`Copied "${offer.code}" to clipboard!`);
+                          }}
+                        >
+                          📋 Copy Code
+                        </Button>
+                        {/* Toggle Visibility Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          title={
+                            offer.is_visible !== false
+                              ? "Hide from /offers page"
+                              : "Show on /offers page"
+                          }
+                          className={`h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer ${
+                            offer.is_visible !== false
+                              ? "border-purple-500/30 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
+                              : "border-blue-500/30 text-blue-700 dark:text-blue-300 hover:bg-blue-500/10"
+                          }`}
+                          onClick={() =>
+                            run(
+                              async () => {
+                                if (offer.id) {
+                                  const newVisibility = offer.is_visible === false ? true : false;
+                                  await saveOfferCodeFn({
+                                    data: {
+                                      id: offer.id,
+                                      code: offer.code,
+                                      discount_type: offer.discount_type,
+                                      discount_value: offer.discount_value,
+                                      min_order_amount: offer.min_order_amount,
+                                      expires_at: offer.expires_at,
+                                      description: offer.description || undefined,
+                                      is_active: offer.is_active,
+                                      is_visible: newVisibility,
+                                    },
+                                  });
+                                  queryClient.invalidateQueries({
+                                    queryKey: ["admin-offer-codes"],
+                                  });
+                                }
+                              },
+                              offer.is_visible !== false
+                                ? `Promo code #${offer.code} hidden (now secret)`
+                                : `Promo code #${offer.code} made public`,
+                            )
+                          }
+                        >
+                          {offer.is_visible !== false ? "🔒 Hide (Secret)" : "👁️ Show (Public)"}
+                        </Button>
+
+                        {/* Toggle Active Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          title={offer.is_active ? "Deactivate promo code" : "Activate promo code"}
+                          className={`h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer ${
+                            offer.is_active
+                              ? "border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
+                              : "border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10"
+                          }`}
+                          onClick={() =>
+                            run(
+                              async () => {
+                                if (offer.id) {
+                                  await saveOfferCodeFn({
+                                    data: {
+                                      id: offer.id,
+                                      code: offer.code,
+                                      discount_type: offer.discount_type,
+                                      discount_value: offer.discount_value,
+                                      min_order_amount: offer.min_order_amount,
+                                      expires_at: offer.expires_at,
+                                      description: offer.description || undefined,
+                                      is_active: !offer.is_active,
+                                      is_visible: offer.is_visible !== false,
+                                    },
+                                  });
+                                  queryClient.invalidateQueries({
+                                    queryKey: ["admin-offer-codes"],
+                                  });
+                                }
+                              },
+                              offer.is_active
+                                ? `Deactivated #${offer.code}`
+                                : `Activated #${offer.code}`,
+                            )
+                          }
+                        >
+                          {offer.is_active ? "⚪ Deactivate" : "🟢 Activate"}
+                        </Button>
+
+                        {/* Edit Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 px-2 text-[10px] rounded-lg cursor-pointer hover:border-berry/40 font-semibold"
+                          onClick={() =>
+                            setOfferForm({
+                              id: offer.id,
+                              code: offer.code,
+                              discount_type: offer.discount_type,
+                              discount_value: String(offer.discount_value),
+                              min_order_amount: String(offer.min_order_amount),
+                              expires_at: new Date(offer.expires_at).toISOString().slice(0, 16),
+                              description: offer.description ?? "",
+                              is_active: offer.is_active,
+                              is_visible: offer.is_visible !== false,
+                            })
+                          }
+                        >
+                          Edit
+                        </Button>
+
+                        {/* Delete Button */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 px-2 text-[10px] rounded-lg text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer font-semibold"
+                          onClick={() =>
+                            run(async () => {
+                              if (offer.id) {
+                                await removeOfferCodeFn({ data: offer.id });
+                                queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
+                              }
+                            }, "Offer code deleted")
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </TabsContent>
+
+            {/* USERS / CUSTOMER ACCOUNTS TAB */}
+            <TabsContent value="users" className="mt-6 space-y-6">
+              {/* Summary Stat Cards */}
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Total Registered Accounts
+                  </span>
+                  <p className="mt-2 font-display text-3xl font-bold text-cocoa">
+                    {usersList.length}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Accounts created on Ani Bakes
+                  </p>
+                </div>
+
+                <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Verified Emails
+                  </span>
+                  <p className="mt-2 font-display text-3xl font-bold text-cocoa">
+                    {usersList.filter((u) => u.emailVerification).length}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Email addresses confirmed</p>
+                </div>
+
+                <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
+                  <span className="text-xs font-bold uppercase tracking-wider text-berry-deep">
+                    Active Buyers
+                  </span>
+                  <p className="mt-2 font-display text-3xl font-bold text-cocoa">
+                    {usersList.filter((u) => u.totalOrders > 0).length}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Customers who placed orders</p>
+                </div>
+              </div>
+
+              {/* Search & Filter Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-3xl border border-border/70 bg-card p-4 shadow-soft">
+                <div className="relative flex-1 max-w-md">
                   <Input
-                    placeholder="Search bakes by name, slug…"
-                    value={inventorySearchQuery}
-                    onChange={(e) => setInventorySearchQuery(e.target.value)}
-                    className="h-8 text-xs pl-7 rounded-xl bg-background"
+                    placeholder="Search by customer name, email, phone…"
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    className="h-10 text-xs pl-8 rounded-xl bg-background"
                   />
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-[11px] pointer-events-none">
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
                     🔍
                   </span>
-                  {inventorySearchQuery && (
+                  {userSearchQuery && (
                     <button
                       type="button"
-                      onClick={() => setInventorySearchQuery("")}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                      onClick={() => setUserSearchQuery("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
                     >
                       ✕
                     </button>
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <select
-                    value={inventoryStatusFilter}
-                    onChange={(e) => setInventoryStatusFilter(e.target.value)}
-                    className="h-8 rounded-xl border border-input bg-background px-2.5 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
-                  >
-                    <option value="all">All Statuses ({data.products.length})</option>
-                    <option value="active">🌿 Visible ({activeProducts.length})</option>
-                    <option value="hidden">⏸️ Paused ({data.products.length - activeProducts.length})</option>
-                  </select>
-
-                  <select
-                    value={inventorySortBy}
-                    onChange={(e) => setInventorySortBy(e.target.value)}
-                    className="h-8 rounded-xl border border-input bg-background px-2.5 text-xs font-semibold shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
-                  >
-                    <option value="name_asc">Name: A to Z</option>
-                    <option value="name_desc">Name: Z to A</option>
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
-                    <option value="active_first">Visible Items First</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Product Catalog Display (Cards Grid or Rows List) */}
-            {sortedProducts.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-border p-12 text-center bg-card/50">
-                <p className="text-3xl mb-2">🧁</p>
-                <p className="text-sm font-semibold text-cocoa">
-                  {inventorySearchQuery || inventoryStatusFilter !== "all" || inventoryCategoryFilter !== "all"
-                    ? "No bakery items match your current filter criteria."
-                    : "No products in catalog yet."}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Try clearing your search query or reset your filters.
-                </p>
-                {(inventorySearchQuery || inventoryStatusFilter !== "all" || inventoryCategoryFilter !== "all") && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-3.5 rounded-xl text-xs font-semibold cursor-pointer"
-                    onClick={() => {
-                      setInventorySearchQuery("");
-                      setInventoryStatusFilter("all");
-                      setInventoryCategoryFilter("all");
-                    }}
-                  >
-                    Reset All Filters
-                  </Button>
-                )}
-              </div>
-            ) : inventoryViewMode === "grid" ? (
-              /* BENTO CARDS GRID VIEW */
-              inventoryCategoryFilter !== "all" ? (
-                /* Single Category Cards Grid */
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between px-1">
-                    <h3 className="font-display text-lg font-bold text-cocoa">
-                      {inventoryCategoryFilter === "uncategorized"
-                        ? "Uncategorised Items"
-                        : categoryMap.get(inventoryCategoryFilter) || "Category"}
-                    </h3>
-                    <span className="text-xs font-semibold text-muted-foreground">
-                      {sortedProducts.length} {sortedProducts.length === 1 ? "bake" : "bakes"}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                    {sortedProducts.map((product) => (
-                      <ProductAdminCard
-                        key={product.id}
-                        product={product}
-                        categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
-                        isBeingEdited={editingProductId === product.id}
-                        onEdit={() => handleEditProduct(product)}
-                        onDuplicate={() => handleDuplicateProduct(product)}
-                        onToggleActive={() => handleToggleActiveProduct(product)}
-                        onDelete={() =>
-                          run(() => removeProductFn({ data: product.id }), "Product deleted")
-                        }
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                /* Grouped by Category Cards Grid */
-                <div className="space-y-7">
-                  {data.categories.map((cat) => {
-                    const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
-                    if (catProducts.length === 0) return null;
-                    const activeCount = catProducts.filter((p) => p.is_active).length;
-
+                <div className="flex items-center gap-1.5">
+                  {[
+                    { id: "all", label: "All Users", count: usersList.length },
+                    {
+                      id: "verified",
+                      label: "Verified",
+                      count: usersList.filter((u) => u.emailVerification).length,
+                    },
+                    {
+                      id: "unverified",
+                      label: "Pending",
+                      count: usersList.filter((u) => !u.emailVerification).length,
+                    },
+                  ].map((pill) => {
+                    const isActive = userVerifiedFilter === pill.id;
                     return (
-                      <div key={cat.id} className="space-y-3">
-                        <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">{cat.name}</h3>
-                            <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                              {catProducts.length} {catProducts.length === 1 ? "bake" : "bakes"}
-                            </span>
-                          </div>
-                          <span className="text-xs text-muted-foreground font-medium">
-                            {activeCount} active
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                          {catProducts.map((product) => (
-                            <ProductAdminCard
-                              key={product.id}
-                              product={product}
-                              categoryName={cat.name}
-                              isBeingEdited={editingProductId === product.id}
-                              onEdit={() => handleEditProduct(product)}
-                              onDuplicate={() => handleDuplicateProduct(product)}
-                              onToggleActive={() => handleToggleActiveProduct(product)}
-                              onDelete={() =>
-                                run(() => removeProductFn({ data: product.id }), "Product deleted")
-                              }
-                            />
-                          ))}
-                        </div>
-                      </div>
+                      <button
+                        key={pill.id}
+                        type="button"
+                        onClick={() =>
+                          setUserVerifiedFilter(pill.id as "all" | "verified" | "unverified")
+                        }
+                        className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                          isActive
+                            ? "bg-cocoa text-background shadow-xs"
+                            : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        }`}
+                      >
+                        <span>{pill.label}</span>
+                        <span
+                          className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                            isActive
+                              ? "bg-background/20 text-background"
+                              : "bg-background/80 text-foreground"
+                          }`}
+                        >
+                          {pill.count}
+                        </span>
+                      </button>
                     );
                   })}
-
-                  {/* Uncategorized products */}
-                  {sortedProducts.some((p) => !p.category_id) && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">Uncategorised</h3>
-                          <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                            {sortedProducts.filter((p) => !p.category_id).length} bakes
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                        {sortedProducts
-                          .filter((p) => !p.category_id)
-                          .map((product) => (
-                            <ProductAdminCard
-                              key={product.id}
-                              product={product}
-                              isBeingEdited={editingProductId === product.id}
-                              onEdit={() => handleEditProduct(product)}
-                              onDuplicate={() => handleDuplicateProduct(product)}
-                              onToggleActive={() => handleToggleActiveProduct(product)}
-                              onDelete={() =>
-                                run(() => removeProductFn({ data: product.id }), "Product deleted")
-                              }
-                            />
-                          ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            ) : (
-              /* COMPACT ROWS LIST VIEW */
-              inventoryCategoryFilter !== "all" ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between px-1">
-                    <h3 className="font-display text-lg font-bold text-cocoa">
-                      {inventoryCategoryFilter === "uncategorized"
-                        ? "Uncategorised Items"
-                        : categoryMap.get(inventoryCategoryFilter) || "Category"}
-                    </h3>
-                    <span className="text-xs font-semibold text-muted-foreground">
-                      {sortedProducts.length} {sortedProducts.length === 1 ? "product" : "products"}
-                    </span>
-                  </div>
-
-                  <div className="space-y-3">
-                    {sortedProducts.map((product) => (
-                      <ProductAdminRow
-                        key={product.id}
-                        product={product}
-                        categoryName={product.category_id ? categoryMap.get(product.category_id) : undefined}
-                        onEdit={() => handleEditProduct(product)}
-                        onDuplicate={() => handleDuplicateProduct(product)}
-                        onToggleActive={() => handleToggleActiveProduct(product)}
-                        onDelete={() =>
-                          run(() => removeProductFn({ data: product.id }), "Product deleted")
-                        }
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-7">
-                  {data.categories.map((cat) => {
-                    const catProducts = sortedProducts.filter((p) => p.category_id === cat.id);
-                    if (catProducts.length === 0) return null;
-                    const activeCount = catProducts.filter((p) => p.is_active).length;
-
-                    return (
-                      <div key={cat.id} className="space-y-3">
-                        <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">{cat.name}</h3>
-                            <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                              {catProducts.length} {catProducts.length === 1 ? "item" : "items"}
-                            </span>
-                          </div>
-                          <span className="text-xs text-muted-foreground font-medium">
-                            {activeCount} active
-                          </span>
-                        </div>
-
-                        <div className="space-y-3">
-                          {catProducts.map((product) => (
-                            <ProductAdminRow
-                              key={product.id}
-                              product={product}
-                              categoryName={cat.name}
-                              onEdit={() => handleEditProduct(product)}
-                              onDuplicate={() => handleDuplicateProduct(product)}
-                              onToggleActive={() => handleToggleActiveProduct(product)}
-                              onDelete={() =>
-                                run(() => removeProductFn({ data: product.id }), "Product deleted")
-                              }
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {sortedProducts.some((p) => !p.category_id) && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b border-border/60 pb-2 px-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">Uncategorised</h3>
-                          <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                            {sortedProducts.filter((p) => !p.category_id).length} items
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3">
-                        {sortedProducts
-                          .filter((p) => !p.category_id)
-                          .map((product) => (
-                            <ProductAdminRow
-                              key={product.id}
-                              product={product}
-                              onEdit={() => handleEditProduct(product)}
-                              onDuplicate={() => handleDuplicateProduct(product)}
-                              onToggleActive={() => handleToggleActiveProduct(product)}
-                              onDelete={() =>
-                                run(() => removeProductFn({ data: product.id }), "Product deleted")
-                              }
-                            />
-                          ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="shop_layout" className="mt-6 space-y-6">
-          <AdminShopLayoutManager
-            categories={data.categories}
-            products={data.products}
-            onRefresh={refresh}
-          />
-        </TabsContent>
-
-        <TabsContent value="calendar" className="mt-6 space-y-5">
-          {/* Add Closed Date Card */}
-          <div className="rounded-3xl border border-border/70 bg-card p-5 sm:p-6 shadow-soft">
-            <div className="flex items-center gap-2.5 mb-4">
-              <span className="flex size-9 items-center justify-center rounded-2xl bg-berry/10 text-berry text-lg">📅</span>
-              <div>
-                <h2 className="font-display text-xl font-bold text-cocoa">Close a Baking Date</h2>
-                <p className="text-xs text-muted-foreground">Mark a date as fully closed — no new orders will be accepted for that slot.</p>
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-[180px_1fr_auto] sm:items-end">
-              <div>
-                <Label htmlFor="b-date" className="text-xs font-semibold">Date to Close</Label>
-                <Input
-                  id="b-date"
-                  type="date"
-                  value={blackoutDate}
-                  min={new Date().toISOString().slice(0, 10)}
-                  onChange={(e) => setBlackoutDate(e.target.value)}
-                  className="rounded-xl h-10 text-sm mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="b-reason" className="text-xs font-semibold">Reason (optional)</Label>
-                <Input
-                  id="b-reason"
-                  placeholder="e.g. Public holiday, family event…"
-                  value={blackoutReason}
-                  onChange={(e) => setBlackoutReason(e.target.value)}
-                  className="rounded-xl h-10 text-sm mt-1"
-                />
-              </div>
-              <Button
-                disabled={!blackoutDate}
-                className="bg-berry text-berry-foreground hover:bg-berry/90 rounded-2xl h-10 font-bold text-sm cursor-pointer shadow-soft"
-                onClick={() =>
-                  run(async () => {
-                    await addBlackoutFn({
-                      data: { blackout_date: blackoutDate, reason: blackoutReason || undefined },
-                    });
-                    setBlackoutDate("");
-                    setBlackoutReason("");
-                  }, "📅 Date closed successfully")
-                }
-              >
-                Close Date
-              </Button>
-            </div>
-          </div>
-
-          {/* Blocked Dates List */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <h3 className="font-display text-base font-bold text-cocoa">Blocked Dates</h3>
-              <span className="rounded-full bg-destructive/10 border border-destructive/20 px-2.5 py-0.5 text-xs font-bold text-destructive">
-                {data.blackouts.length} closed
-              </span>
-            </div>
-
-            {data.blackouts.length === 0 && (
-              <div className="rounded-3xl border border-dashed border-border/80 bg-card/50 p-8 text-center">
-                <p className="text-3xl mb-2">🟢</p>
-                <p className="text-sm font-semibold text-cocoa">All Dates Open</p>
-                <p className="text-xs text-muted-foreground mt-1">No baking dates are currently blocked. Add a date above to close it.</p>
-              </div>
-            )}
-
-            {[...data.blackouts].sort((a, b) => a.blackout_date.localeCompare(b.blackout_date)).map((blackout) => {
-              const dateObj = new Date(blackout.blackout_date + "T00:00:00");
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              const diffDays = Math.round((dateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-              const isPast = diffDays < 0;
-              const relLabel = isPast
-                ? `${Math.abs(diffDays)} days ago`
-                : diffDays === 0
-                ? "Today"
-                : diffDays === 1
-                ? "Tomorrow"
-                : `In ${diffDays} days`;
-              const formattedDate = dateObj.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-
-              return (
-                <div
-                  key={blackout.id}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border p-4 shadow-2xs transition-all ${
-                    isPast
-                      ? "border-border/40 bg-muted/20 opacity-70"
-                      : "border-destructive/25 bg-destructive/5 hover:border-destructive/40"
-                  }`}
-                >
-                  <div className="flex items-center gap-3.5">
-                    <div className={`flex size-9 shrink-0 items-center justify-center rounded-2xl text-sm font-bold ${
-                      isPast ? "bg-muted text-muted-foreground" : "bg-destructive/15 text-destructive"
-                    }`}>
-                      🔒
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-foreground">{formattedDate}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          isPast
-                            ? "bg-muted text-muted-foreground"
-                            : diffDays === 0
-                            ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
-                            : "bg-destructive/15 text-destructive"
-                        }`}>{relLabel}</span>
-                        {blackout.reason && (
-                          <span className="text-xs text-muted-foreground italic">— {blackout.reason}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="rounded-xl h-8 text-xs font-semibold text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10 cursor-pointer shrink-0"
-                    onClick={() => run(() => removeBlackoutFn({ data: blackout.id }), "📅 Date reopened")}
-                  >
-                    🔓 Reopen Date
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="newsletter" className="mt-6">
-          <AdminNewsletter
-            subscribers={data.subscribers}
-            campaigns={data.campaigns}
-            products={data.products}
-            onSend={async (campaignData) => {
-              await run(
-                () => sendNewsletterFn({ data: campaignData }),
-                "Newsletter campaign dispatched successfully!"
-              );
-            }}
-          />
-        </TabsContent>
-
-        <TabsContent value="analytics" className="mt-6 space-y-6">
-          {/* KPI Cards */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { label: "Total Orders", value: String(data.stats.totalOrders), icon: "📦", color: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/25" },
-              { label: "Last 30 Days", value: String(data.stats.ordersLast30Days), icon: "📈", color: "bg-purple-500/15 text-purple-700 dark:text-purple-400 border-purple-500/25" },
-              { label: "Paid Revenue", value: formatCurrency(data.stats.revenue), icon: "💰", color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/25" },
-              { label: "Avg Order Value", value: formatCurrency(data.stats.averageOrder), icon: "🎯", color: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/25" },
-            ].map((stat) => (
-              <div key={stat.label} className={`rounded-3xl border p-5 shadow-soft flex items-center gap-3.5 ${stat.color}`}>
-                <span className="text-2xl">{stat.icon}</span>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">{stat.label}</p>
-                  <p className="font-display text-2xl font-bold mt-0.5">{stat.value}</p>
                 </div>
               </div>
-            ))}
-          </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Orders by Status */}
-            <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-              <h2 className="font-display text-lg font-bold text-cocoa mb-4">Orders by Status</h2>
-              <div className="space-y-2.5">
-                {Object.entries(data.stats.byStatus).map(([status, count]) => {
-                  const total = data.stats.totalOrders || 1;
-                  const pct = Math.round((Number(count) / total) * 100);
-                  const barColors: Record<string, string> = {
-                    pending_approval: "bg-amber-500",
-                    confirmed: "bg-emerald-500",
-                    completed: "bg-blue-500",
-                    rejected: "bg-destructive",
-                    rescheduled: "bg-purple-500",
-                    awaiting_payment: "bg-orange-500",
-                  };
-                  return (
-                    <div key={status} className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-foreground">{STATUS_LABELS[status] ?? status}</span>
-                        <span className="font-bold text-muted-foreground">{count} ({pct}%)</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all ${barColors[status] ?? "bg-cocoa"}`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Best Sellers */}
-            <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-              <h2 className="font-display text-lg font-bold text-cocoa mb-4">🏆 Top Selling Bakes</h2>
-              {data.stats.topProducts.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-2xl mb-1">🧁</p>
-                  <p className="text-sm text-muted-foreground">No sales data yet.</p>
+              {/* Users List Grid / Table */}
+              {filteredUsers.length === 0 ? (
+                <div className="rounded-3xl border border-dashed border-border p-12 text-center">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {userSearchQuery || userVerifiedFilter !== "all"
+                      ? "No user accounts match your filter criteria."
+                      : "No registered users found yet."}
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {data.stats.topProducts.slice(0, 6).map((product, idx) => {
-                    const maxQty = data.stats.topProducts[0]?.quantity || 1;
-                    const pct = Math.round((product.quantity / maxQty) * 100);
-                    const medals = ["🥇", "🥈", "🥉"];
-                    return (
-                      <div key={product.name} className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-foreground flex items-center gap-1.5">
-                            {medals[idx] ?? <span className="w-4 text-center font-mono text-muted-foreground">{idx + 1}</span>}
-                            <span className="truncate max-w-[160px]">{product.name}</span>
-                          </span>
-                          <span className="font-bold text-cocoa shrink-0">{product.quantity} pcs · {formatCurrency(product.revenue)}</span>
-                        </div>
-                        <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                          <div className="h-full rounded-full bg-berry transition-all" style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
+                  {filteredUsers.map((user) => {
+                    const initials = (user.name || "CU")
+                      .split(" ")
+                      .map((n) => n[0])
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .join("")
+                      .toUpperCase();
 
-          <div className="rounded-3xl border border-border/70 bg-card/50 p-4 text-xs text-muted-foreground flex items-start gap-2.5">
-            <span className="text-base">📊</span>
-            <p>Heatmaps and session recordings run through Microsoft Clarity. Add your Clarity project ID as <code className="font-mono bg-secondary px-1 rounded">VITE_CLARITY_PROJECT_ID</code> and the tracking tag loads on every page automatically.</p>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="offers" className="mt-6 grid gap-8 lg:grid-cols-[380px_1fr]">
-          <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft h-fit">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl font-bold text-cocoa">
-                {offerForm.id ? "Edit offer code" : "New offer code"}
-              </h2>
-              {offerForm.id && (
-                <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[10px] font-bold text-berry">
-                  Editing #{offerForm.code}
-                </span>
-              )}
-            </div>
-
-            <div className="mt-4 space-y-3">
-              <div>
-                <Label htmlFor="o-code" className="text-xs font-semibold">Code (e.g. FESTIVE20)</Label>
-                <Input
-                  id="o-code"
-                  placeholder="SWEET20"
-                  value={offerForm.code}
-                  className="rounded-xl h-9 text-xs font-mono font-bold uppercase mt-1"
-                  onChange={(e) =>
-                    setOfferForm((f) => ({ ...f, code: e.target.value.toUpperCase().trim() }))
-                  }
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="o-type" className="text-xs font-semibold">Discount type</Label>
-                  <select
-                    id="o-type"
-                    className="h-9 w-full rounded-xl border border-input bg-background px-3 text-xs mt-1 cursor-pointer"
-                    value={offerForm.discount_type}
-                    onChange={(e) =>
-                      setOfferForm((f) => ({
-                        ...f,
-                        discount_type: e.target.value as "percent" | "flat",
-                      }))
-                    }
-                  >
-                    <option value="percent">Percent (%)</option>
-                    <option value="flat">Flat (₹)</option>
-                  </select>
-                </div>
-                <div>
-                  <Label htmlFor="o-val" className="text-xs font-semibold">Discount value</Label>
-                  <Input
-                    id="o-val"
-                    type="number"
-                    value={offerForm.discount_value}
-                    className="rounded-xl h-9 text-xs mt-1"
-                    onChange={(e) =>
-                      setOfferForm((f) => ({ ...f, discount_value: e.target.value }))
-                    }
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="o-min" className="text-xs font-semibold">Min order amount (₹)</Label>
-                <Input
-                  id="o-min"
-                  type="number"
-                  placeholder="0"
-                  value={offerForm.min_order_amount}
-                  className="rounded-xl h-9 text-xs mt-1"
-                  onChange={(e) =>
-                    setOfferForm((f) => ({ ...f, min_order_amount: e.target.value }))
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="o-expiry" className="text-xs font-semibold">Valid until (Expiry Date &amp; Time)</Label>
-                <Input
-                  id="o-expiry"
-                  type="datetime-local"
-                  value={offerForm.expires_at}
-                  className="rounded-xl h-9 text-xs mt-1"
-                  onChange={(e) =>
-                    setOfferForm((f) => ({ ...f, expires_at: e.target.value }))
-                  }
-                />
-                <p className="mt-1 text-[10px] text-muted-foreground">
-                  The code automatically expires past this timestamp.
-                </p>
-              </div>
-
-              <div>
-                <Label htmlFor="o-desc" className="text-xs font-semibold">Description (optional)</Label>
-                <Input
-                  id="o-desc"
-                  placeholder="e.g. 20% off for festival season"
-                  value={offerForm.description}
-                  className="rounded-xl h-9 text-xs mt-1"
-                  onChange={(e) =>
-                    setOfferForm((f) => ({ ...f, description: e.target.value }))
-                  }
-                />
-              </div>
-
-              {/* Visibility & Activation Toggles */}
-              <div className="space-y-2 pt-2 border-t border-border/50">
-                <label className="flex items-start gap-2.5 text-xs font-medium cursor-pointer p-2.5 rounded-xl border border-border/60 bg-secondary/20 hover:bg-secondary/40 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={offerForm.is_visible}
-                    onChange={(e) => setOfferForm((f) => ({ ...f, is_visible: e.target.checked }))}
-                    className="mt-0.5 rounded border-input text-berry cursor-pointer"
-                  />
-                  <div>
-                    <span className="font-semibold text-foreground flex items-center gap-1.5">
-                      {offerForm.is_visible ? (
-                        <>
-                          <Eye className="size-3.5 text-emerald-600" />
-                          <span>Visible on /offers page (Public)</span>
-                        </>
-                      ) : (
-                        <>
-                          <EyeOff className="size-3.5 text-purple-600" />
-                          <span>Secret / Hidden from /offers</span>
-                        </>
-                      )}
-                    </span>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
-                      {offerForm.is_visible
-                        ? "Public: All visitors can see and copy this code on the offers page."
-                        : "Secret: Hidden from /offers. Share privately via newsletter or VIP messages."}
-                    </p>
-                  </div>
-                </label>
-
-                <label className="flex items-start gap-2.5 text-xs font-medium cursor-pointer p-2.5 rounded-xl border border-border/60 bg-secondary/20 hover:bg-secondary/40 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={offerForm.is_active}
-                    onChange={(e) => setOfferForm((f) => ({ ...f, is_active: e.target.checked }))}
-                    className="mt-0.5 rounded border-input text-berry cursor-pointer"
-                  />
-                  <div>
-                    <span className="font-semibold text-foreground flex items-center gap-1.5">
-                      {offerForm.is_active ? "🟢 Active & Redeemable" : "⚪ Deactivated / Paused"}
-                    </span>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
-                      {offerForm.is_active
-                        ? "Active: Customers can apply this code during checkout."
-                        : "Deactivated: Code cannot be applied until reactivated."}
-                    </p>
-                  </div>
-                </label>
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <Button
-                  className="flex-1 bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl h-9 text-xs font-semibold cursor-pointer"
-                  onClick={() =>
-                    run(async () => {
-                      if (!offerForm.code || !offerForm.discount_value || !offerForm.expires_at) {
-                        toast.error("Please fill in code, discount value, and expiry date.");
-                        return;
-                      }
-                      await saveOfferCodeFn({
-                        data: {
-                          ...(offerForm.id ? { id: offerForm.id } : {}),
-                          code: offerForm.code,
-                          discount_type: offerForm.discount_type,
-                          discount_value: Number(offerForm.discount_value),
-                          min_order_amount: Number(offerForm.min_order_amount || 0),
-                          expires_at: new Date(offerForm.expires_at).toISOString(),
-                          description: offerForm.description || undefined,
-                          is_active: offerForm.is_active,
-                          is_visible: offerForm.is_visible,
-                        },
-                      });
-                      setOfferForm(EMPTY_OFFER_FORM);
-                      queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
-                    }, "Offer code saved")
-                  }
-                >
-                  {offerForm.id ? "Update offer code" : "Create offer code"}
-                </Button>
-                {offerForm.id && (
-                  <Button
-                    variant="outline"
-                    className="rounded-xl h-9 text-xs cursor-pointer"
-                    onClick={() => setOfferForm(EMPTY_OFFER_FORM)}
-                  >
-                    Cancel
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Offer Codes List */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <h3 className="font-display text-lg font-bold text-cocoa">All Promo Codes</h3>
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-secondary border border-border/60 px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
-                  {offerCodes?.length || 0} total
-                </span>
-                <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                  {offerCodes?.filter(o => o.is_active && new Date(o.expires_at).getTime() > Date.now()).length || 0} active
-                </span>
-              </div>
-            </div>
-
-            {(!offerCodes || offerCodes.length === 0) && (
-              <div className="rounded-3xl border border-dashed border-border/80 p-8 text-center bg-card/40">
-                <p className="text-xs text-muted-foreground">No offer codes created yet.</p>
-              </div>
-            )}
-
-            {offerCodes?.map((offer) => {
-              const isExpired = new Date(offer.expires_at).getTime() <= Date.now();
-              const isSecret = offer.is_visible === false;
-              const isActive = offer.is_active && !isExpired;
-
-              return (
-                <div
-                  key={offer.id ?? offer.code}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border p-4 shadow-soft transition-all ${
-                    !offer.is_active
-                      ? "border-border/40 bg-card/40 opacity-70"
-                      : isSecret
-                      ? "border-purple-500/30 bg-purple-500/5 hover:border-purple-500/50"
-                      : "border-border/70 bg-card hover:border-berry/30"
-                  }`}
-                >
-                  <div className="space-y-1.5 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono font-bold text-sm sm:text-base text-berry bg-berry/10 px-2.5 py-0.5 rounded-xl border border-berry/20">
-                        {offer.code}
-                      </span>
-
-                      {/* Active / Inactive / Expired Badge */}
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold border ${
-                          isExpired
-                            ? "bg-destructive/15 text-destructive border-destructive/30"
-                            : offer.is_active
-                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
-                            : "bg-muted text-muted-foreground border-border"
-                        }`}
-                      >
-                        {isExpired ? "🔴 Expired" : offer.is_active ? "🟢 Active" : "⚪ Deactivated"}
-                      </span>
-
-                      {/* Visibility Badge */}
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold border flex items-center gap-1 ${
-                          isSecret
-                            ? "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30"
-                            : "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30"
-                        }`}
-                      >
-                        {isSecret ? (
-                          <>
-                            <Lock className="size-2.5" />
-                            <span>Secret (Hidden from /offers)</span>
-                          </>
-                        ) : (
-                          <>
-                            <Eye className="size-2.5" />
-                            <span>Public (/offers)</span>
-                          </>
-                        )}
-                      </span>
-                    </div>
-
-                    <p className="text-xs sm:text-sm font-semibold text-foreground">
-                      {offer.discount_type === "percent"
-                        ? `${offer.discount_value}% off`
-                        : `₹${offer.discount_value} flat off`}
-                      {offer.min_order_amount > 0 ? ` · Min order ₹${offer.min_order_amount}` : ""}
-                    </p>
-
-                    <div className="flex flex-wrap items-center gap-2 mt-1">
-                      {/* Expiry countdown badge */}
-                      {(() => {
-                        const expiresMs = new Date(offer.expires_at).getTime();
-                        const nowMs = Date.now();
-                        const diffMs = expiresMs - nowMs;
-                        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-                        if (diffMs <= 0) return <span className="text-[10px] font-bold bg-destructive/15 text-destructive px-2 py-0.5 rounded-full border border-destructive/30">Expired</span>;
-                        if (diffDays <= 3) return <span className="text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 animate-pulse">⚠️ Expires in {diffDays}d</span>;
-                        if (diffDays <= 7) return <span className="text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20">Expires in {diffDays}d</span>;
-                        return <span className="text-[10px] text-muted-foreground">Expires {new Date(offer.expires_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>;
-                      })()}
-                      {offer.description && (
-                        <span className="text-[10px] text-muted-foreground italic">{offer.description}</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions Bar */}
-                  <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2 sm:border-t-0 sm:pt-0 shrink-0">
-                    {/* Copy Code Button */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      title="Copy promo code to clipboard"
-                      className="h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer hover:border-berry/40 hover:bg-berry/5"
-                      onClick={() => {
-                        navigator.clipboard.writeText(offer.code);
-                        toast.success(`Copied "${offer.code}" to clipboard!`);
-                      }}
-                    >
-                      📋 Copy Code
-                    </Button>
-                    {/* Toggle Visibility Button */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      title={offer.is_visible !== false ? "Hide from /offers page" : "Show on /offers page"}
-                      className={`h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer ${
-                        offer.is_visible !== false
-                          ? "border-purple-500/30 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
-                          : "border-blue-500/30 text-blue-700 dark:text-blue-300 hover:bg-blue-500/10"
-                      }`}
-                      onClick={() =>
-                        run(async () => {
-                          if (offer.id) {
-                            const newVisibility = offer.is_visible === false ? true : false;
-                            await saveOfferCodeFn({
-                              data: {
-                                id: offer.id,
-                                code: offer.code,
-                                discount_type: offer.discount_type,
-                                discount_value: offer.discount_value,
-                                min_order_amount: offer.min_order_amount,
-                                expires_at: offer.expires_at,
-                                description: offer.description || undefined,
-                                is_active: offer.is_active,
-                                is_visible: newVisibility,
-                              },
-                            });
-                            queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
-                          }
-                        }, offer.is_visible !== false ? `Promo code #${offer.code} hidden (now secret)` : `Promo code #${offer.code} made public`)
-                      }
-                    >
-                      {offer.is_visible !== false ? "🔒 Hide (Secret)" : "👁️ Show (Public)"}
-                    </Button>
-
-                    {/* Toggle Active Button */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      title={offer.is_active ? "Deactivate promo code" : "Activate promo code"}
-                      className={`h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer ${
-                        offer.is_active
-                          ? "border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
-                          : "border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10"
-                      }`}
-                      onClick={() =>
-                        run(async () => {
-                          if (offer.id) {
-                            await saveOfferCodeFn({
-                              data: {
-                                id: offer.id,
-                                code: offer.code,
-                                discount_type: offer.discount_type,
-                                discount_value: offer.discount_value,
-                                min_order_amount: offer.min_order_amount,
-                                expires_at: offer.expires_at,
-                                description: offer.description || undefined,
-                                is_active: !offer.is_active,
-                                is_visible: offer.is_visible !== false,
-                              },
-                            });
-                            queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
-                          }
-                        }, offer.is_active ? `Deactivated #${offer.code}` : `Activated #${offer.code}`)
-                      }
-                    >
-                      {offer.is_active ? "⚪ Deactivate" : "🟢 Activate"}
-                    </Button>
-
-                    {/* Edit Button */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 px-2 text-[10px] rounded-lg cursor-pointer hover:border-berry/40 font-semibold"
-                      onClick={() =>
-                        setOfferForm({
-                          id: offer.id,
-                          code: offer.code,
-                          discount_type: offer.discount_type,
-                          discount_value: String(offer.discount_value),
-                          min_order_amount: String(offer.min_order_amount),
-                          expires_at: new Date(offer.expires_at).toISOString().slice(0, 16),
-                          description: offer.description ?? "",
-                          is_active: offer.is_active,
-                          is_visible: offer.is_visible !== false,
+                    const formattedCreated = user.createdAt
+                      ? new Date(user.createdAt).toLocaleString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })
-                      }
-                    >
-                      Edit
-                    </Button>
+                      : "Unknown";
 
-                    {/* Delete Button */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 px-2 text-[10px] rounded-lg text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer font-semibold"
-                      onClick={() =>
-                        run(async () => {
-                          if (offer.id) {
-                            await removeOfferCodeFn({ data: offer.id });
-                            queryClient.invalidateQueries({ queryKey: ["admin-offer-codes"] });
-                          }
-                        }, "Offer code deleted")
-                      }
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </TabsContent>
+                    const formattedAccessed = user.accessedAt
+                      ? new Date(user.accessedAt).toLocaleString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : formattedCreated;
 
-        {/* USERS / CUSTOMER ACCOUNTS TAB */}
-        <TabsContent value="users" className="mt-6 space-y-6">
-          {/* Summary Stat Cards */}
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Total Registered Accounts
-              </span>
-              <p className="mt-2 font-display text-3xl font-bold text-cocoa">{usersList.length}</p>
-              <p className="mt-1 text-xs text-muted-foreground">Accounts created on Ani Bakes</p>
-            </div>
+                    // Cross-reference lifetime spend from orders
+                    const userOrders = data.orders.filter(
+                      (o) =>
+                        (o as any).user_id === user.id ||
+                        (o.contact_phone && user.phone && o.contact_phone === user.phone),
+                    );
+                    const lifetimeSpend = userOrders
+                      .filter((o) => o.status === "confirmed" || o.status === "completed")
+                      .reduce((s, o) => s + Number(o.total || 0), 0);
+                    const lastOrderDate =
+                      userOrders.length > 0
+                        ? userOrders.sort(
+                            (a, b) =>
+                              new Date(b.created_at || b.slot_date).getTime() -
+                              new Date(a.created_at || a.slot_date).getTime(),
+                          )[0]?.slot_date
+                        : null;
 
-            <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                Verified Emails
-              </span>
-              <p className="mt-2 font-display text-3xl font-bold text-cocoa">
-                {usersList.filter((u) => u.emailVerification).length}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">Email addresses confirmed</p>
-            </div>
-
-            <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft">
-              <span className="text-xs font-bold uppercase tracking-wider text-berry">
-                Active Buyers
-              </span>
-              <p className="mt-2 font-display text-3xl font-bold text-cocoa">
-                {usersList.filter((u) => u.totalOrders > 0).length}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">Customers who placed orders</p>
-            </div>
-          </div>
-
-          {/* Search & Filter Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-3xl border border-border/70 bg-card p-4 shadow-soft">
-            <div className="relative flex-1 max-w-md">
-              <Input
-                placeholder="Search by customer name, email, phone…"
-                value={userSearchQuery}
-                onChange={(e) => setUserSearchQuery(e.target.value)}
-                className="h-10 text-xs pl-8 rounded-xl bg-background"
-              />
-              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
-                🔍
-              </span>
-              {userSearchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setUserSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              {[
-                { id: "all", label: "All Users", count: usersList.length },
-                {
-                  id: "verified",
-                  label: "Verified",
-                  count: usersList.filter((u) => u.emailVerification).length,
-                },
-                {
-                  id: "unverified",
-                  label: "Pending",
-                  count: usersList.filter((u) => !u.emailVerification).length,
-                },
-              ].map((pill) => {
-                const isActive = userVerifiedFilter === pill.id;
-                return (
-                  <button
-                    key={pill.id}
-                    type="button"
-                    onClick={() => setUserVerifiedFilter(pill.id as "all" | "verified" | "unverified")}
-                    className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
-                      isActive
-                        ? "bg-cocoa text-background shadow-xs"
-                        : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}
-                  >
-                    <span>{pill.label}</span>
-                    <span
-                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                        isActive ? "bg-background/20 text-background" : "bg-background/80 text-foreground"
-                      }`}
-                    >
-                      {pill.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Users List Grid / Table */}
-          {filteredUsers.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-border p-12 text-center">
-              <p className="text-sm font-medium text-muted-foreground">
-                {userSearchQuery || userVerifiedFilter !== "all"
-                  ? "No user accounts match your filter criteria."
-                  : "No registered users found yet."}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredUsers.map((user) => {
-                const initials = (user.name || "CU")
-                  .split(" ")
-                  .map((n) => n[0])
-                  .filter(Boolean)
-                  .slice(0, 2)
-                  .join("")
-                  .toUpperCase();
-
-                const formattedCreated = user.createdAt
-                  ? new Date(user.createdAt).toLocaleString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : "Unknown";
-
-                const formattedAccessed = user.accessedAt
-                  ? new Date(user.accessedAt).toLocaleString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
-                  : formattedCreated;
-
-                // Cross-reference lifetime spend from orders
-                const userOrders = data.orders.filter(
-                  (o) =>
-                    (o as any).user_id === user.id ||
-                    (o.contact_phone && user.phone && o.contact_phone === user.phone)
-                );
-                const lifetimeSpend = userOrders
-                  .filter(o => o.status === "confirmed" || o.status === "completed")
-                  .reduce((s, o) => s + Number(o.total || 0), 0);
-                const lastOrderDate = userOrders.length > 0
-                  ? userOrders.sort((a, b) => new Date(b.created_at || b.slot_date).getTime() - new Date(a.created_at || a.slot_date).getTime())[0]?.slot_date
-                  : null;
-
-                return (
-                  <div
-                    key={user.id}
-                    className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 rounded-3xl border border-border/70 bg-card p-5 shadow-soft transition-all hover:border-berry/30 hover:shadow-lift"
-                  >
-                    {/* User Info & Avatar */}
-                    <div className="flex items-start sm:items-center gap-3.5">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-berry/15 font-display text-sm font-bold text-berry shadow-2xs">
-                        {initials}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="font-display text-base font-bold text-cocoa truncate">
-                            {user.name}
-                          </h3>
-                          {user.emailVerification ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                              ✓ Verified
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
-                              Pending Verification
-                            </span>
-                          )}
-                          {user.totalOrders > 0 && (
-                            <span className="rounded-full bg-berry/10 border border-berry/20 px-2 py-0.5 text-[10px] font-bold text-berry">
-                              {user.totalOrders} order{user.totalOrders === 1 ? "" : "s"}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                          <span className="font-mono">{user.email}</span>
-                          {user.phone ? (
-                            <span className="font-semibold text-cocoa/90">📞 {user.phone}</span>
-                          ) : (
-                            <span className="italic text-muted-foreground/60">No phone</span>
-                          )}
-                        </div>
-
-                        {user.address && (
-                          <p className="mt-1.5 text-[11px] text-muted-foreground line-clamp-1">
-                            📍 {user.address}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Registration, Login & Spend Info */}
-                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 border-t border-border/40 pt-3 lg:border-t-0 lg:pt-0 shrink-0 text-xs">
-                      {lifetimeSpend > 0 && (
-                        <div className="space-y-0.5">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-berry">Lifetime Spend</p>
-                          <p className="font-display text-base font-bold text-cocoa">{formatCurrency(lifetimeSpend)}</p>
-                        </div>
-                      )}
-
-                      {lastOrderDate && (
-                        <div className="space-y-0.5">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Last Order</p>
-                          <p className="font-medium text-foreground">{lastOrderDate}</p>
-                        </div>
-                      )}
-
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Registered</p>
-                        <p className="font-medium text-cocoa/90">{formattedCreated}</p>
-                      </div>
-
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="rounded-xl text-xs h-8 cursor-pointer"
-                        onClick={() => {
-                          navigator.clipboard.writeText(user.email);
-                          toast.success(`Copied ${user.email}!`);
-                        }}
+                    return (
+                      <div
+                        key={user.id}
+                        className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 rounded-3xl border border-border/70 bg-card p-5 shadow-soft transition-all hover:border-berry/30 hover:shadow-lift"
                       >
-                        📋 Copy Email
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </TabsContent>
+                        {/* User Info & Avatar */}
+                        <div className="flex items-start sm:items-center gap-3.5">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-berry/15 font-display text-sm font-bold text-berry-deep shadow-2xs">
+                            {initials}
+                          </div>
 
-        <TabsContent value="reviews" className="mt-0">
-          <AdminCustomerMoments />
-        </TabsContent>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="font-display text-base font-bold text-cocoa truncate">
+                                {user.name}
+                              </h3>
+                              {user.emailVerification ? (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                                  ✓ Verified
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                                  Pending Verification
+                                </span>
+                              )}
+                              {user.totalOrders > 0 && (
+                                <span className="rounded-full bg-berry/10 border border-berry/20 px-2 py-0.5 text-[10px] font-bold text-berry-deep">
+                                  {user.totalOrders} order{user.totalOrders === 1 ? "" : "s"}
+                                </span>
+                              )}
+                            </div>
 
-        <TabsContent value="gallery" className="mt-0">
-          <AdminGalleryEditor />
-        </TabsContent>
+                            <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                              <span className="font-mono">{user.email}</span>
+                              {user.phone ? (
+                                <span className="font-semibold text-cocoa/90">📞 {user.phone}</span>
+                              ) : (
+                                <span className="italic text-muted-foreground/60">No phone</span>
+                              )}
+                            </div>
 
-        <TabsContent value="content_editor" className="mt-0">
-          <AdminSiteContentEditor />
-        </TabsContent>
-      </Tabs>
-      </main>
+                            {user.address && (
+                              <p className="mt-1.5 text-[11px] text-muted-foreground line-clamp-1">
+                                📍 {user.address}
+                              </p>
+                            )}
+                          </div>
+                        </div>
 
-      {/* Dev Tools Panel inside main column footer */}
-      <div className="mt-auto px-4 sm:px-6 lg:px-8 pb-6">
-        <DevPanel />
-      </div>
+                        {/* Registration, Login & Spend Info */}
+                        <div className="flex flex-wrap sm:flex-nowrap items-center gap-4 sm:gap-6 border-t border-border/40 pt-3 lg:border-t-0 lg:pt-0 shrink-0 text-xs">
+                          {lifetimeSpend > 0 && (
+                            <div className="space-y-0.5">
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-berry-deep">
+                                Lifetime Spend
+                              </p>
+                              <p className="font-display text-base font-bold text-cocoa">
+                                {formatCurrency(lifetimeSpend)}
+                              </p>
+                            </div>
+                          )}
+
+                          {lastOrderDate && (
+                            <div className="space-y-0.5">
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                Last Order
+                              </p>
+                              <p className="font-medium text-foreground">{lastOrderDate}</p>
+                            </div>
+                          )}
+
+                          <div className="space-y-0.5">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                              Registered
+                            </p>
+                            <p className="font-medium text-cocoa/90">{formattedCreated}</p>
+                          </div>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="rounded-xl text-xs h-8 cursor-pointer"
+                            onClick={() => {
+                              navigator.clipboard.writeText(user.email);
+                              toast.success(`Copied ${user.email}!`);
+                            }}
+                          >
+                            📋 Copy Email
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="reviews" className="mt-0">
+              <AdminCustomerMoments />
+            </TabsContent>
+
+            <TabsContent value="gallery" className="mt-0">
+              <AdminGalleryEditor />
+            </TabsContent>
+
+            <TabsContent value="content_editor" className="mt-0">
+              <AdminSiteContentEditor />
+            </TabsContent>
+          </Tabs>
+        </main>
+
+        {/* Dev Tools Panel inside main column footer */}
+        <div className="mt-auto px-4 sm:px-6 lg:px-8 pb-6">
+          <DevPanel />
+        </div>
       </div>
 
       {/* Postpone / Reschedule Slot Dialog */}
@@ -3888,7 +4286,8 @@ function AdminDashboard() {
               Postpone / Reschedule Baking Slot
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Adjust the delivery/pickup slot for Order #{reschedulingOrder?.id?.slice(0, 8)}. An automated email will be sent to {reschedulingOrder?.contact_name || "the customer"}.
+              Adjust the delivery/pickup slot for Order #{reschedulingOrder?.id?.slice(0, 8)}. An
+              automated email will be sent to {reschedulingOrder?.contact_name || "the customer"}.
             </DialogDescription>
           </DialogHeader>
 
@@ -3910,7 +4309,9 @@ function AdminDashboard() {
                       reason: rescheduleReason.trim() || undefined,
                     },
                   });
-                  toast.success(`Order rescheduled to ${newSlotDate}! Customer notified via email.`);
+                  toast.success(
+                    `Order rescheduled to ${newSlotDate}! Customer notified via email.`,
+                  );
                   setReschedulingOrder(null);
                   setRescheduleReason("");
                   await refresh();
@@ -3956,7 +4357,10 @@ function AdminDashboard() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="reschedule-reason" className="text-xs font-semibold text-foreground">
+                <Label
+                  htmlFor="reschedule-reason"
+                  className="text-xs font-semibold text-foreground"
+                >
                   Reason / Note to Customer from Baker (optional)
                 </Label>
                 <Textarea
@@ -4012,7 +4416,8 @@ function AdminDashboard() {
               Cancel &amp; Refund Order?
             </DialogTitle>
             <DialogDescription className="text-center text-xs sm:text-sm text-muted-foreground mt-1.5">
-              Are you sure you want to cancel this order? This will release the baking slot and initiate a full customer refund.
+              Are you sure you want to cancel this order? This will release the baking slot and
+              initiate a full customer refund.
             </DialogDescription>
           </DialogHeader>
 
@@ -4028,13 +4433,21 @@ function AdminDashboard() {
               </div>
               <div className="space-y-1 text-muted-foreground">
                 <p>
-                  👤 <strong className="text-foreground">{cancellingOrder.contact_name ?? "Customer"}</strong> ({cancellingOrder.contact_phone})
+                  👤{" "}
+                  <strong className="text-foreground">
+                    {cancellingOrder.contact_name ?? "Customer"}
+                  </strong>{" "}
+                  ({cancellingOrder.contact_phone})
                 </p>
                 <p>
-                  🕒 <strong>Slot:</strong> {cancellingOrder.slot_date} ({cancellingOrder.slot_start.slice(0, 5)} - {cancellingOrder.slot_end.slice(0, 5)})
+                  🕒 <strong>Slot:</strong> {cancellingOrder.slot_date} (
+                  {cancellingOrder.slot_start.slice(0, 5)} - {cancellingOrder.slot_end.slice(0, 5)})
                 </p>
                 <p className="line-clamp-2">
-                  📦 <strong>Items:</strong> {cancellingOrder.order_items.map((i: any) => `${i.quantity}× ${i.product_name}`).join(", ")}
+                  📦 <strong>Items:</strong>{" "}
+                  {cancellingOrder.order_items
+                    .map((i: any) => `${i.quantity}× ${i.product_name}`)
+                    .join(", ")}
                 </p>
               </div>
             </div>
@@ -4059,8 +4472,9 @@ function AdminDashboard() {
                 setCancelBusy(true);
                 try {
                   await run(
-                    () => updateStatus({ data: { orderId: cancellingOrder.id, status: "rejected" } }),
-                    "Order cancelled and refund email sent."
+                    () =>
+                      updateStatus({ data: { orderId: cancellingOrder.id, status: "rejected" } }),
+                    "Order cancelled and refund email sent.",
                   );
                   setCancellingOrder(null);
                 } finally {
@@ -4142,7 +4556,9 @@ function KitchenBakeSheetDialog({
 }) {
   const activeOrders = orders.filter((o) => o.status !== "rejected" && o.status !== "refunded");
   const availableDates = Array.from(new Set(activeOrders.map((o) => o.slot_date))).sort();
-  const [selectedDate, setSelectedDate] = useState<string>(availableDates[0] || toISODate(new Date()));
+  const [selectedDate, setSelectedDate] = useState<string>(
+    availableDates[0] || toISODate(new Date()),
+  );
 
   // Map product names / IDs to their photos
   const productPhotoMap = new Map<string, string | null>();
@@ -4175,10 +4591,7 @@ function KitchenBakeSheetDialog({
       totalItemsCount += item.quantity;
       const key = item.product_name.trim();
       if (!productAggregates[key]) {
-        const photo =
-          productPhotoMap.get(key.toLowerCase()) ||
-          productPhotoMap.get(key) ||
-          null;
+        const photo = productPhotoMap.get(key.toLowerCase()) || productPhotoMap.get(key) || null;
         productAggregates[key] = {
           name: item.product_name,
           totalQty: 0,
@@ -4303,9 +4716,7 @@ function KitchenBakeSheetDialog({
             <div className="flex flex-wrap items-center justify-between gap-3">
               {/* Date Selector */}
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-foreground shrink-0">
-                  📅 Select Date:
-                </span>
+                <span className="text-xs font-bold text-foreground shrink-0">📅 Select Date:</span>
                 <select
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
@@ -4316,7 +4727,8 @@ function KitchenBakeSheetDialog({
                   ) : (
                     availableDates.map((d) => (
                       <option key={d} value={d}>
-                        {formatBakeSheetDate(d)} ({activeOrders.filter((o) => o.slot_date === d).length} orders)
+                        {formatBakeSheetDate(d)} (
+                        {activeOrders.filter((o) => o.slot_date === d).length} orders)
                       </option>
                     ))
                   )}
@@ -4327,7 +4739,9 @@ function KitchenBakeSheetDialog({
               <div className="flex items-center gap-2 text-xs">
                 <div className="flex items-center gap-1.5 rounded-xl border border-border/80 bg-card px-3 py-1.5 font-bold text-foreground shadow-2xs">
                   <span>📦</span>
-                  <span>{dateOrders.length} {dateOrders.length === 1 ? "order" : "orders"}</span>
+                  <span>
+                    {dateOrders.length} {dateOrders.length === 1 ? "order" : "orders"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 font-extrabold text-amber-900 dark:text-amber-300 shadow-2xs">
                   <span>🥐</span>
@@ -4359,10 +4773,7 @@ function KitchenBakeSheetDialog({
                 </thead>
                 <tbody className="divide-y divide-border/60 font-sans">
                   {sortedItems.map((item, index) => (
-                    <tr
-                      key={item.name}
-                      className="hover:bg-secondary/20 transition-colors"
-                    >
+                    <tr key={item.name} className="hover:bg-secondary/20 transition-colors">
                       {/* Checkbox for kitchen bake checklist */}
                       <td className="py-3 px-4 text-center">
                         <input
@@ -4390,7 +4801,8 @@ function KitchenBakeSheetDialog({
                               {item.name}
                             </p>
                             <p className="text-[11px] text-muted-foreground">
-                              Ordered in {item.ordersCount} {item.ordersCount === 1 ? "order" : "orders"}
+                              Ordered in {item.ordersCount}{" "}
+                              {item.ordersCount === 1 ? "order" : "orders"}
                             </p>
                           </div>
                         </div>
@@ -4427,7 +4839,9 @@ function KitchenBakeSheetDialog({
           <div className="rounded-2xl bg-secondary/40 p-3.5 text-xs text-muted-foreground border border-border/60 flex items-start gap-2.5">
             <span className="text-base">👨‍🍳</span>
             <div className="leading-snug">
-              <span className="font-bold text-foreground">Kitchen Protocol:</span> Proof dough at 2:00 AM dawn. First bake batch into oven by 4:00 AM. Package in temperature-shielded bakery boxes 30 minutes prior to delivery slot.
+              <span className="font-bold text-foreground">Kitchen Protocol:</span> Proof dough at
+              2:00 AM dawn. First bake batch into oven by 4:00 AM. Package in temperature-shielded
+              bakery boxes 30 minutes prior to delivery slot.
             </div>
           </div>
         </div>

@@ -56,7 +56,10 @@ export async function fetchMyReviewState(userId: string, productId: string) {
   let canReview = false;
   if (completedOrders.length > 0) {
     const items = await listDocs<OrderItemDoc>(COLLECTIONS.orderItems, [
-      Q.equal("order_id", completedOrders.map((o) => o.$id)),
+      Q.equal(
+        "order_id",
+        completedOrders.map((o) => o.$id),
+      ),
       Q.equal("product_id", productId),
       Q.limit(1),
     ]);

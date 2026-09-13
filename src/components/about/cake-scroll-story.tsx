@@ -126,9 +126,14 @@ export function CakeScrollStory() {
       const scene = sceneRef.current;
       if (!scene || disposed) return;
       // On wide layouts the copy occupies the left column, so the cake moves
-      // right to sit in its own half. Below that it centres behind the copy.
-      const focusX = window.innerWidth >= 1024 ? 1.6 : 0;
-      scene.update(progressRef.current, (performance.now() - start) / 1000, focusX);
+      // right far enough to clear it. Below that it centres behind the copy,
+      // which the scrim keeps readable.
+      const width = window.innerWidth;
+      const focusX = width >= 1280 ? 1.75 : width >= 1024 ? 1.3 : 0;
+      // Narrow screens anchor the copy panel to the bottom of the stage, so the
+      // cake lifts to sit clear of it.
+      const focusY = width >= 1024 ? 0 : 1.15;
+      scene.update(progressRef.current, (performance.now() - start) / 1000, focusX, focusY);
       scene.render();
       if (visible) raf = requestAnimationFrame(loop);
     };
@@ -198,7 +203,7 @@ export function CakeScrollStory() {
               key={chapter.kicker}
               className="rounded-3xl border-2 border-[#2C1810]/15 bg-card/90 p-5 shadow-soft"
             >
-              <p className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-berry">
+              <p className="font-sans text-[10px] font-black uppercase tracking-[0.2em] text-berry-deep">
                 {chapter.kicker}
               </p>
               <h3 className="mt-1 font-nimbus text-2xl font-bold text-cocoa">{chapter.title}</h3>
@@ -225,7 +230,7 @@ export function CakeScrollStory() {
       className="relative h-[460vh] w-full sm:h-[520vh]"
     >
       {/* Pinned stage */}
-      <div className="sticky top-0 flex h-[100svh] w-full items-center overflow-hidden">
+      <div className="sticky top-0 flex h-[100svh] w-full items-end overflow-hidden lg:items-center">
         {/* Warm studio backdrop */}
         <div
           aria-hidden
@@ -250,20 +255,26 @@ export function CakeScrollStory() {
           )}
         />
 
-        {/* Keeps the chapter copy readable where it crosses the cake: a soft
-            wash from the left on wide layouts, from the bottom on narrow ones. */}
+        {/* Keeps the chapter copy readable where it crosses the cake: a wash
+            from the left on wide layouts, from the bottom on narrow ones.
+            Explicit stops keep it over the copy only — without them the
+            midpoint sat across the cake and drained the colour out of it. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#FFF3E2] via-[#FFF3E2]/70 to-transparent dark:from-[#150B05] dark:via-[#150B05]/70 lg:bg-gradient-to-r lg:from-[#FFF3E2] lg:via-[#FFF3E2]/55 lg:to-transparent lg:dark:from-[#150B05] lg:dark:via-[#150B05]/55"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#FFF3E2] from-0% via-[#FFF3E2]/80 via-25% to-transparent to-55% lg:bg-gradient-to-r lg:via-[#FFF3E2]/70 lg:via-22% lg:to-45% dark:from-[#150B05] dark:via-[#150B05]/80 lg:dark:via-[#150B05]/70"
         />
 
         {/* Copy rail */}
-        <div className="relative z-10 mx-auto grid w-full max-w-6xl gap-6 px-4 sm:px-6 lg:grid-cols-12 lg:items-center">
-          <div className="lg:col-span-5">
+        <div className="relative z-10 mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-12 lg:items-center lg:px-6">
+          {/* Below lg the cake fills the stage behind this, so the copy needs
+              its own surface rather than a gradient it can still lose against. */}
+          <div className="rounded-t-[2rem] border-t border-[#2C1810]/10 bg-[#FFF3E2]/94 px-5 pt-5 pb-7 backdrop-blur-md lg:col-span-5 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none dark:border-white/10 dark:bg-[#150B05]/94 lg:dark:bg-transparent">
             <StoryHeading />
 
             {/* Chapters cross-fade in place so the cake stays the focus. */}
-            <div className="relative mt-5 min-h-[15rem] sm:min-h-[13rem]">
+            {/* Tall enough for the longest chapter, so the body copy never runs
+                over the progress rail beneath it. */}
+            <div className="relative mt-4 min-h-[15.5rem] sm:min-h-[14rem] lg:mt-5 lg:min-h-[21rem]">
               {CHAPTERS.map((chapter, i) => (
                 <article
                   key={chapter.kicker}
@@ -275,7 +286,7 @@ export function CakeScrollStory() {
                       : "pointer-events-none translate-y-3 opacity-0",
                   )}
                 >
-                  <p className="font-sans text-[10px] font-black uppercase tracking-[0.24em] text-berry">
+                  <p className="font-sans text-[10px] font-black uppercase tracking-[0.24em] text-berry-deep">
                     {chapter.kicker}
                   </p>
                   <h3 className="mt-1.5 font-nimbus text-3xl font-bold leading-tight text-cocoa sm:text-5xl">
@@ -345,7 +356,7 @@ export function CakeScrollStory() {
 function StoryHeading() {
   return (
     <div>
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-berry/25 bg-berry/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-berry">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-berry/25 bg-berry/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-berry-deep">
         Built in five steps
       </span>
       <h2 className="mt-2.5 font-blogh text-2xl font-bold uppercase leading-tight tracking-wide text-cocoa sm:text-3xl">

@@ -26,7 +26,14 @@ export type FlagKey =
   | "ff_footer_instagram"
   | "ff_scroll_to_top";
 
-export type FlagCategory = "Typography" | "Animations" | "Home Page" | "Shop Page" | "Product Page" | "Offers Page" | "Footer";
+export type FlagCategory =
+  | "Typography"
+  | "Animations"
+  | "Home Page"
+  | "Shop Page"
+  | "Product Page"
+  | "Offers Page"
+  | "Footer";
 
 export type FlagDefinition = {
   label: string;

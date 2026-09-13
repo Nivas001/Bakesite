@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Trophy, RotateCcw, CheckCircle2, XCircle, Timer, HelpCircle, Loader2 } from "lucide-react";
+import {
+  Sparkles,
+  Trophy,
+  RotateCcw,
+  CheckCircle2,
+  XCircle,
+  Timer,
+  HelpCircle,
+  Loader2,
+} from "lucide-react";
 import type { VoucherReward } from "./voucher-reward-modal";
 
 interface QuizGameProps {
@@ -34,7 +43,8 @@ const QUIZ_QUESTIONS: Question[] = [
       "Artificial chocolate syrup",
     ],
     correctIndex: 0,
-    explanation: "We only use pure 70% Belgian dark couverture chocolate for deep cocoa intensity and silky ganache.",
+    explanation:
+      "We only use pure 70% Belgian dark couverture chocolate for deep cocoa intensity and silky ganache.",
   },
   {
     id: 2,
@@ -46,7 +56,8 @@ const QUIZ_QUESTIONS: Question[] = [
       "No advance booking needed",
     ],
     correctIndex: 1,
-    explanation: "Small-batch baking requires 24 hours notice so every sponge is baked fresh on the morning of delivery.",
+    explanation:
+      "Small-batch baking requires 24 hours notice so every sponge is baked fresh on the morning of delivery.",
   },
   {
     id: 3,
@@ -58,7 +69,8 @@ const QUIZ_QUESTIONS: Question[] = [
       "Only plain white frosting",
     ],
     correctIndex: 1,
-    explanation: "Our 4-inch mini Bento Cakes are personalized with custom colors and pastel lettering in cute lunchboxes!",
+    explanation:
+      "Our 4-inch mini Bento Cakes are personalized with custom colors and pastel lettering in cute lunchboxes!",
   },
   {
     id: 4,
@@ -70,7 +82,8 @@ const QUIZ_QUESTIONS: Question[] = [
       "Synthetic strawberry jelly powders",
     ],
     correctIndex: 2,
-    explanation: "We slow-simmer real farm berries and seasonal mangoes with zero artificial food dyes.",
+    explanation:
+      "We slow-simmer real farm berries and seasonal mangoes with zero artificial food dyes.",
   },
   {
     id: 5,
@@ -82,7 +95,8 @@ const QUIZ_QUESTIONS: Question[] = [
       "High temperature flash frying",
     ],
     correctIndex: 1,
-    explanation: "Our dough is chilled for 24 hours with pure brown butter and hand-chopped chocolate chunks.",
+    explanation:
+      "Our dough is chilled for 24 hours with pure brown butter and hand-chopped chocolate chunks.",
   },
 ];
 
@@ -167,27 +181,33 @@ export function QuizGame({ onWin, claimCouponFn }: QuizGameProps) {
       {/* Header Info Bar */}
       <div className="flex items-center justify-between border-b border-border/70 pb-4">
         <div className="flex items-center gap-2">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-berry/10 text-berry">
+          <div className="flex size-9 items-center justify-center rounded-xl bg-berry/10 text-berry-deep">
             <HelpCircle className="size-5" />
           </div>
           <div>
             <h3 className="font-blogh text-base sm:text-lg font-bold text-cocoa leading-tight">
               Bakery Confectionery Trivia
             </h3>
-            <p className="text-[11px] text-muted-foreground">Score 4/5 or more to win a 15% coupon</p>
+            <p className="text-[11px] text-muted-foreground">
+              Score 4/5 or more to win a 15% coupon
+            </p>
           </div>
         </div>
 
         {/* Timer & Score Pill */}
         <div className="flex items-center gap-2">
-          <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
-            timeLeft < 15 ? "bg-rose-500/15 text-rose-600 animate-pulse" : "bg-secondary text-cocoa"
-          }`}>
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
+              timeLeft < 15
+                ? "bg-rose-500/15 text-rose-600 animate-pulse"
+                : "bg-secondary text-cocoa"
+            }`}
+          >
             <Timer className="size-3.5" />
             <span>{timeLeft}s</span>
           </div>
 
-          <div className="rounded-full bg-berry/15 px-3 py-1 text-xs font-bold text-berry">
+          <div className="rounded-full bg-berry/15 px-3 py-1 text-xs font-bold text-berry-deep">
             Score: {score}/{QUIZ_QUESTIONS.length}
           </div>
         </div>
@@ -198,7 +218,9 @@ export function QuizGame({ onWin, claimCouponFn }: QuizGameProps) {
           {/* Progress Bar */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-semibold text-muted-foreground">
-              <span>Question {currentIdx + 1} of {QUIZ_QUESTIONS.length}</span>
+              <span>
+                Question {currentIdx + 1} of {QUIZ_QUESTIONS.length}
+              </span>
               <span>{Math.round(((currentIdx + 1) / QUIZ_QUESTIONS.length) * 100)}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
@@ -225,14 +247,16 @@ export function QuizGame({ onWin, claimCouponFn }: QuizGameProps) {
 
               if (isAnswerSubmitted) {
                 if (isCorrect) {
-                  styleClasses = "border-emerald-500 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-bold";
+                  styleClasses =
+                    "border-emerald-500 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-bold";
                 } else if (isSelected) {
-                  styleClasses = "border-rose-500 bg-rose-500/10 text-rose-800 dark:text-rose-300 font-medium";
+                  styleClasses =
+                    "border-rose-500 bg-rose-500/10 text-rose-800 dark:text-rose-300 font-medium";
                 } else {
                   styleClasses = "opacity-50 border-border bg-card text-muted-foreground";
                 }
               } else if (isSelected) {
-                styleClasses = "border-berry bg-berry/10 text-berry font-semibold";
+                styleClasses = "border-berry bg-berry/10 text-berry-deep font-semibold";
               }
 
               return (
@@ -262,7 +286,7 @@ export function QuizGame({ onWin, claimCouponFn }: QuizGameProps) {
           {isAnswerSubmitted && (
             <div className="space-y-3 rounded-2xl bg-secondary/80 p-4 border border-border/70 animate-fadeIn">
               <p className="text-xs text-cocoa leading-relaxed">
-                <span className="font-bold text-berry">Chef&apos;s Fact: </span>
+                <span className="font-bold text-berry-deep">Chef&apos;s Fact: </span>
                 {currentQ.explanation}
               </p>
               <div className="flex justify-end">
@@ -281,9 +305,11 @@ export function QuizGame({ onWin, claimCouponFn }: QuizGameProps) {
         /* Game Over Results */
         <div className="mt-6 text-center space-y-5">
           <div className="flex justify-center">
-            <div className={`flex size-16 items-center justify-center rounded-3xl ${
-              isPassed ? "bg-amber-500/20 text-amber-500" : "bg-rose-500/20 text-rose-500"
-            }`}>
+            <div
+              className={`flex size-16 items-center justify-center rounded-3xl ${
+                isPassed ? "bg-amber-500/20 text-amber-500" : "bg-rose-500/20 text-rose-500"
+              }`}
+            >
               <Trophy className="size-9 animate-bounce" />
             </div>
           </div>
@@ -293,7 +319,11 @@ export function QuizGame({ onWin, claimCouponFn }: QuizGameProps) {
               {isPassed ? "TRIVIA MASTER CONQUERED!" : "NICE EFFORT, BAKER!"}
             </h4>
             <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-              You scored <span className="font-bold text-cocoa">{score} out of {QUIZ_QUESTIONS.length}</span> correct answers.
+              You scored{" "}
+              <span className="font-bold text-cocoa">
+                {score} out of {QUIZ_QUESTIONS.length}
+              </span>{" "}
+              correct answers.
             </p>
           </div>
 
@@ -325,7 +355,8 @@ export function QuizGame({ onWin, claimCouponFn }: QuizGameProps) {
           ) : (
             <div className="rounded-2xl bg-secondary/80 border border-border/70 p-4 space-y-3">
               <p className="text-xs text-muted-foreground">
-                You need at least 4 correct answers to win the 15% coupon. Don&apos;t worry, you can retry anytime!
+                You need at least 4 correct answers to win the 15% coupon. Don&apos;t worry, you can
+                retry anytime!
               </p>
               <Button
                 type="button"

@@ -10,9 +10,7 @@ export const subscribeToNewsletter = createServerFn({ method: "POST" })
   });
 
 export const unsubscribeFromNewsletter = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
-    z.object({ email: z.string().trim().email() }).parse(input)
-  )
+  .inputValidator((input: unknown) => z.object({ email: z.string().trim().email() }).parse(input))
   .handler(async ({ data }) => {
     const { removeSubscriber } = await import("./newsletter.server");
     return removeSubscriber(data.email);

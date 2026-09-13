@@ -227,12 +227,7 @@ export const MagicInput = React.forwardRef<HTMLInputElement, MagicInputProps>(
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       onKeyDown?.(event);
-      if (
-        isIdle &&
-        onSubmit &&
-        event.key === "Enter" &&
-        !event.defaultPrevented
-      ) {
+      if (isIdle && onSubmit && event.key === "Enter" && !event.defaultPrevented) {
         onSubmit(event.currentTarget.value);
       }
     };
@@ -305,9 +300,7 @@ export const MagicInput = React.forwardRef<HTMLInputElement, MagicInputProps>(
       shadowClass = `absolute inset-0 rounded-2xl bg-[hsl(0deg_0%_0%_/_0.15)] blur-[4px] [will-change:translate] [transition:translate_600ms_cubic-bezier(0.3,0.7,0.4,1),opacity_250ms_ease] motion-reduce:[transition:none] motion-reduce:[animation:none] ${shadowDepth} ${shadowFocusOpacity} ${shadowRainbow}`;
 
       const edgeOpacity =
-        depth === "always"
-          ? "opacity-100"
-          : "opacity-0 group-focus-within:opacity-100";
+        depth === "always" ? "opacity-100" : "opacity-0 group-focus-within:opacity-100";
       const edgeRainbow = rainbow ? RAINBOW_FOCUS_FILL : "";
       edgeClass = `absolute inset-0 rounded-2xl [transition:opacity_250ms_ease] motion-reduce:[transition:none] motion-reduce:[animation:none] ${edgeOpacity} ${edgeVariant[variant]} ${edgeRainbow}`;
     }
@@ -382,7 +375,7 @@ export const MagicInput = React.forwardRef<HTMLInputElement, MagicInputProps>(
 
         {icon && (
           <span
-            className={`absolute inset-y-0 left-0 pl-3 flex items-center justify-center z-[2] pointer-events-none text-muted-foreground/70 group-focus-within:text-berry [transition:translate_600ms_cubic-bezier(0.3,0.7,0.4,1),color_200ms_ease] ${frontTransform}`}
+            className={`absolute inset-y-0 left-0 pl-3 flex items-center justify-center z-[2] pointer-events-none text-muted-foreground/70 group-focus-within:text-berry-deep [transition:translate_600ms_cubic-bezier(0.3,0.7,0.4,1),color_200ms_ease] ${frontTransform}`}
             aria-hidden="true"
           >
             {icon}
@@ -444,18 +437,10 @@ export const MagicInput = React.forwardRef<HTMLInputElement, MagicInputProps>(
                     <RingProgress value={isLoading ? (clamped as number) : 0} />
                   )}
                 </span>
-                <span
-                  className={iconClass(isSuccess)}
-                  data-icon="check"
-                  aria-hidden
-                >
+                <span className={iconClass(isSuccess)} data-icon="check" aria-hidden>
                   <CheckIcon />
                 </span>
-                <span
-                  className={iconClass(status === "error")}
-                  data-icon="x"
-                  aria-hidden
-                >
+                <span className={iconClass(status === "error")} data-icon="x" aria-hidden>
                   <XIcon />
                 </span>
               </>

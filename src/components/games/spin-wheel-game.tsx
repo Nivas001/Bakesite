@@ -25,14 +25,70 @@ interface WheelSegment {
 }
 
 const SEGMENTS: WheelSegment[] = [
-  { id: 0, label: "15% OFF", sublabel: "Mega Deal", icon: "🍰", bg: "#9e2a2b", textColor: "#ffffff" },
-  { id: 1, label: "15% OFF", sublabel: "Dark Truffle", icon: "🍫", bg: "#540b0e", textColor: "#ffffff" },
-  { id: 2, label: "15% OFF", sublabel: "Cookie Box", icon: "🍪", bg: "#d97706", textColor: "#ffffff" },
-  { id: 3, label: "15% OFF", sublabel: "Strawberry Bliss", icon: "🍓", bg: "#e11d48", textColor: "#ffffff" },
-  { id: 4, label: "15% OFF", sublabel: "Mango Treat", icon: "🥭", bg: "#f59e0b", textColor: "#1c1917" },
-  { id: 5, label: "15% OFF", sublabel: "Chef's Pass", icon: "✨", bg: "#6b21a8", textColor: "#ffffff" },
-  { id: 6, label: "15% OFF", sublabel: "Bento Cake", icon: "🧁", bg: "#db2777", textColor: "#ffffff" },
-  { id: 7, label: "15% OFF", sublabel: "Flower Blossom", icon: "🌸", bg: "#059669", textColor: "#ffffff" },
+  {
+    id: 0,
+    label: "15% OFF",
+    sublabel: "Mega Deal",
+    icon: "🍰",
+    bg: "#9e2a2b",
+    textColor: "#ffffff",
+  },
+  {
+    id: 1,
+    label: "15% OFF",
+    sublabel: "Dark Truffle",
+    icon: "🍫",
+    bg: "#540b0e",
+    textColor: "#ffffff",
+  },
+  {
+    id: 2,
+    label: "15% OFF",
+    sublabel: "Cookie Box",
+    icon: "🍪",
+    bg: "#d97706",
+    textColor: "#ffffff",
+  },
+  {
+    id: 3,
+    label: "15% OFF",
+    sublabel: "Strawberry Bliss",
+    icon: "🍓",
+    bg: "#e11d48",
+    textColor: "#ffffff",
+  },
+  {
+    id: 4,
+    label: "15% OFF",
+    sublabel: "Mango Treat",
+    icon: "🥭",
+    bg: "#f59e0b",
+    textColor: "#1c1917",
+  },
+  {
+    id: 5,
+    label: "15% OFF",
+    sublabel: "Chef's Pass",
+    icon: "✨",
+    bg: "#6b21a8",
+    textColor: "#ffffff",
+  },
+  {
+    id: 6,
+    label: "15% OFF",
+    sublabel: "Bento Cake",
+    icon: "🧁",
+    bg: "#db2777",
+    textColor: "#ffffff",
+  },
+  {
+    id: 7,
+    label: "15% OFF",
+    sublabel: "Flower Blossom",
+    icon: "🌸",
+    bg: "#059669",
+    textColor: "#ffffff",
+  },
 ];
 
 export function SpinWheelGame({ onWin, claimCouponFn }: SpinWheelGameProps) {
@@ -91,14 +147,16 @@ export function SpinWheelGame({ onWin, claimCouponFn }: SpinWheelGameProps) {
       {/* Header Info Bar */}
       <div className="flex items-center justify-between border-b border-border/70 pb-4">
         <div className="flex items-center gap-2">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-berry/10 text-berry">
+          <div className="flex size-9 items-center justify-center rounded-xl bg-berry/10 text-berry-deep">
             <Gift className="size-5" />
           </div>
           <div>
             <h3 className="font-blogh text-base sm:text-lg font-bold text-cocoa leading-tight">
               Lucky Baker&apos;s Wheel
             </h3>
-            <p className="text-[11px] text-muted-foreground">Spin the confectionery wheel to unlock a guaranteed 15% voucher</p>
+            <p className="text-[11px] text-muted-foreground">
+              Spin the confectionery wheel to unlock a guaranteed 15% voucher
+            </p>
           </div>
         </div>
 
@@ -190,7 +248,9 @@ export function SpinWheelGame({ onWin, claimCouponFn }: SpinWheelGameProps) {
                 disabled={isSpinning}
                 className="size-16 sm:size-20 rounded-full bg-gradient-to-br from-amber-100 via-amber-300 to-amber-500 border-4 border-white shadow-lift flex flex-col items-center justify-center text-cocoa font-extrabold cursor-pointer hover:scale-105 active:scale-95 transition-all disabled:opacity-75"
               >
-                <Play className={`size-5 text-cocoa ${isSpinning ? "animate-spin" : "fill-current"}`} />
+                <Play
+                  className={`size-5 text-cocoa ${isSpinning ? "animate-spin" : "fill-current"}`}
+                />
                 <span className="text-[10px] font-black uppercase tracking-wider">
                   {isSpinning ? "SPINNING" : "SPIN!"}
                 </span>
@@ -237,7 +297,8 @@ export function SpinWheelGame({ onWin, claimCouponFn }: SpinWheelGameProps) {
 
         {!winningSegment && !isSpinning && (
           <p className="mt-4 text-xs text-muted-foreground text-center">
-            Tap the golden <strong className="text-cocoa">SPIN!</strong> button in the center to test your sweet fortune!
+            Tap the golden <strong className="text-cocoa">SPIN!</strong> button in the center to
+            test your sweet fortune!
           </p>
         )}
       </div>

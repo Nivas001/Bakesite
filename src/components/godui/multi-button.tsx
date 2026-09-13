@@ -23,12 +23,7 @@ export type MultiButtonGroupProps = React.HTMLAttributes<HTMLDivElement> & {
 
 type MultiButtonRootProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
-  | "onAnimationStart"
-  | "onAnimationEnd"
-  | "onClick"
-  | "onDrag"
-  | "onDragStart"
-  | "onDragEnd"
+  "onAnimationStart" | "onAnimationEnd" | "onClick" | "onDrag" | "onDragStart" | "onDragEnd"
 >;
 
 type MultiButtonSharedProps = MultiButtonRootProps & {
@@ -56,9 +51,9 @@ type MultiButtonGroupContextValue = {
   sharedLabelWidth: number;
 };
 
-const MultiButtonGroupContext = React.createContext<
-  MultiButtonGroupContextValue | undefined
->(undefined);
+const MultiButtonGroupContext = React.createContext<MultiButtonGroupContextValue | undefined>(
+  undefined,
+);
 
 const SIZE_CONFIG: Record<
   MultiButtonSize,
@@ -75,19 +70,16 @@ const SIZE_CONFIG: Record<
 };
 
 const VARIANT_CLASSES: Record<MultiButtonVariant, string> = {
-  default:
-    "bg-berry text-white shadow-xs ring-1 ring-berry/20",
-  outline:
-    "bg-card/95 backdrop-blur-md text-cocoa shadow-2xs ring-1 ring-inset ring-border/80",
+  default: "bg-berry text-white shadow-xs ring-1 ring-berry/20",
+  outline: "bg-card/95 backdrop-blur-md text-cocoa shadow-2xs ring-1 ring-inset ring-border/80",
   secondary: "bg-secondary text-cocoa shadow-xs",
   ghost: "bg-muted/40 text-foreground ring-1 ring-border/60",
 };
 
 const ITEM_HOVER_CLASSES: Record<MultiButtonVariant, string> = {
   default: "hover:bg-white/15 active:bg-white/25",
-  outline: "hover:bg-berry/10 hover:text-berry active:bg-berry/20",
-  secondary:
-    "hover:bg-cocoa/10 active:bg-cocoa/20",
+  outline: "hover:bg-berry/10 hover:text-berry-deep active:bg-berry/20",
+  secondary: "hover:bg-cocoa/10 active:bg-cocoa/20",
   ghost: "hover:bg-accent hover:text-accent-foreground active:bg-accent/80",
 };
 
@@ -153,10 +145,8 @@ const GOOEY_ICON_TRANSITION_CLASSES = {
 } as const;
 
 const GOOEY_DIVIDER_TRANSITION_CLASSES = {
-  expanded:
-    "[transition:width_300ms_cubic-bezier(0.3,0.7,0.4,1.5),opacity_150ms_ease]",
-  collapsed:
-    "[transition:width_200ms_cubic-bezier(0.3,0.7,0.4,1),opacity_150ms_ease]",
+  expanded: "[transition:width_300ms_cubic-bezier(0.3,0.7,0.4,1.5),opacity_150ms_ease]",
+  collapsed: "[transition:width_200ms_cubic-bezier(0.3,0.7,0.4,1),opacity_150ms_ease]",
 } as const;
 
 function gooeyPhase(expanded: boolean) {
@@ -200,9 +190,7 @@ function useMultiButtonInteractions() {
   const reduceMotion = Boolean(useReducedMotion());
   const filterId = React.useId().replace(/:/g, "");
   const [hoveredId, setHoveredId] = React.useState<string | null>(null);
-  const [touchExpandedId, setTouchExpandedId] = React.useState<string | null>(
-    null,
-  );
+  const [touchExpandedId, setTouchExpandedId] = React.useState<string | null>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   return {
@@ -228,15 +216,12 @@ function useOutsidePointerDown(
       if (!containerRef.current?.contains(event.target as Node)) onOutside();
     };
     ownerDocument.addEventListener("pointerdown", handlePointerDown);
-    return () =>
-      ownerDocument.removeEventListener("pointerdown", handlePointerDown);
+    return () => ownerDocument.removeEventListener("pointerdown", handlePointerDown);
   }, [active, containerRef, onOutside]);
 }
 
 function labelText(label: React.ReactNode) {
-  return typeof label === "string" || typeof label === "number"
-    ? label.toString()
-    : "";
+  return typeof label === "string" || typeof label === "number" ? label.toString() : "";
 }
 
 function estimateLabelWidth(label: React.ReactNode, size: MultiButtonSize) {
@@ -245,41 +230,25 @@ function estimateLabelWidth(label: React.ReactNode, size: MultiButtonSize) {
 }
 
 function maxLabelWidth(items: MultiButtonItem[], size: MultiButtonSize) {
-  return items.reduce(
-    (max, item) => Math.max(max, estimateLabelWidth(item.label, size)),
-    0,
-  );
+  return items.reduce((max, item) => Math.max(max, estimateLabelWidth(item.label, size)), 0);
 }
 
 function estimatedLabelWidths(items: MultiButtonItem[], size: MultiButtonSize) {
-  return Object.fromEntries(
-    items.map((item) => [item.id, estimateLabelWidth(item.label, size)]),
-  );
+  return Object.fromEntries(items.map((item) => [item.id, estimateLabelWidth(item.label, size)]));
 }
 
-function equalLabelWidths(
-  current: Record<string, number>,
-  next: Record<string, number>,
-) {
+function equalLabelWidths(current: Record<string, number>, next: Record<string, number>) {
   const currentIds = Object.keys(current);
   const nextIds = Object.keys(next);
-  return (
-    currentIds.length === nextIds.length &&
-    nextIds.every((id) => current[id] === next[id])
-  );
+  return currentIds.length === nextIds.length && nextIds.every((id) => current[id] === next[id]);
 }
 
-function measuredLabelWidth(
-  element: HTMLElement | undefined,
-  fallback: number,
-) {
+function measuredLabelWidth(element: HTMLElement | undefined, fallback: number) {
   if (!element) return fallback;
   const style = getComputedStyle(element);
   const marginLeft = Number.parseFloat(style.marginLeft) || 0;
   const marginRight = Number.parseFloat(style.marginRight) || 0;
-  const measured = Math.ceil(
-    element.getBoundingClientRect().width + marginLeft + marginRight,
-  );
+  const measured = Math.ceil(element.getBoundingClientRect().width + marginLeft + marginRight);
   return measured > 0 ? Math.max(measured, fallback) : fallback;
 }
 
@@ -295,19 +264,13 @@ function useLabelWidths(
   const group = React.useContext(MultiButtonGroupContext);
   const instanceId = React.useId();
   const reserveItems = syncWidthTo ?? items;
-  const itemEstimates = React.useMemo(
-    () => estimatedLabelWidths(items, size),
-    [items, size],
-  );
+  const itemEstimates = React.useMemo(() => estimatedLabelWidths(items, size), [items, size]);
   const estimatedReserveWidth = React.useMemo(
     () => maxLabelWidth(reserveItems, size),
     [reserveItems, size],
   );
-  const [labelWidths, setLabelWidths] =
-    React.useState<Record<string, number>>(itemEstimates);
-  const [ownReservedWidth, setOwnReservedWidth] = React.useState(
-    estimatedReserveWidth,
-  );
+  const [labelWidths, setLabelWidths] = React.useState<Record<string, number>>(itemEstimates);
+  const [ownReservedWidth, setOwnReservedWidth] = React.useState(estimatedReserveWidth);
   const measurementRef = React.useRef<HTMLDivElement>(null);
   const register = group?.register;
   const unregister = group?.unregister;
@@ -333,10 +296,7 @@ function useLabelWidths(
       (largest, item, index) =>
         Math.max(
           largest,
-          measuredLabelWidth(
-            reserveLabels?.[index],
-            estimateLabelWidth(item.label, size),
-          ),
+          measuredLabelWidth(reserveLabels?.[index], estimateLabelWidth(item.label, size)),
         ),
       0,
     );
@@ -356,12 +316,8 @@ function useLabelWidths(
     measure();
 
     const observer =
-      typeof ResizeObserver === "undefined"
-        ? undefined
-        : new ResizeObserver(measure);
-    const labels = measurementNode.querySelectorAll<HTMLElement>(
-      '[data-slot$="-label-measure"]',
-    );
+      typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measure);
+    const labels = measurementNode.querySelectorAll<HTMLElement>('[data-slot$="-label-measure"]');
     labels.forEach((label) => {
       observer?.observe(label);
     });
@@ -469,24 +425,18 @@ function useMultiButtonLayout({
   syncWidthTo?: MultiButtonItem[] | undefined;
 }) {
   const cfg = SIZE_CONFIG[size];
-  const { labelWidths, reservedLabelWidth, measurementRef, reserveItems } =
-    useLabelWidths(items, syncWidthTo, size);
+  const { labelWidths, reservedLabelWidth, measurementRef, reserveItems } = useLabelWidths(
+    items,
+    syncWidthTo,
+    size,
+  );
   const effectiveLabelWidth = reserveLabelSpace ? reservedLabelWidth : 0;
   const activeLabelWidth = activeId ? (labelWidths[activeId] ?? effectiveLabelWidth) : 0;
   const dividerWidth = Math.max(0, items.length - 1);
   const expandedWidth =
-    items.length > 0
-      ? items.length * cfg.cell + activeLabelWidth + dividerWidth + 8
-      : cfg.cell + 8;
+    items.length > 0 ? items.length * cfg.cell + activeLabelWidth + dividerWidth + 8 : cfg.cell + 8;
   const itemWidths = items.map((item) =>
-    actionWidth(
-      item,
-      activeId,
-      items.length,
-      cfg.cell,
-      labelWidths,
-      effectiveLabelWidth,
-    ),
+    actionWidth(item, activeId, items.length, cfg.cell, labelWidths, effectiveLabelWidth),
   );
   let blobX = 0;
   const blobGeometries = items.map((item, index) => {
@@ -562,12 +512,11 @@ function MultiButtonBlobLayer({
         {geometries.map(({ item, width, x }) => {
           const selected = item.id === selectedId;
           const active = item.id === activeId;
-          const fill =
-            selected
-              ? "var(--berry)"
-              : active && highlightColor
-                ? `color-mix(in oklch, ${baseFill} 86%, ${highlightColor})`
-                : baseFill;
+          const fill = selected
+            ? "var(--berry)"
+            : active && highlightColor
+              ? `color-mix(in oklch, ${baseFill} 86%, ${highlightColor})`
+              : baseFill;
 
           return (
             <motion.rect
@@ -630,18 +579,17 @@ type MultiButtonLabelProps = {
   textClass: string;
 };
 
-const MultiButtonLabel = React.forwardRef<
-  HTMLSpanElement,
-  MultiButtonLabelProps
->(({ item, reduceMotion, textClass }, ref) => (
-  <motion.span
-    ref={ref}
-    {...labelMotion(reduceMotion)}
-    className={`relative z-raised -ml-0.5 shrink-0 whitespace-nowrap pr-3.5 pl-0.5 font-bold leading-none select-none ${textClass}`}
-  >
-    {item.label}
-  </motion.span>
-));
+const MultiButtonLabel = React.forwardRef<HTMLSpanElement, MultiButtonLabelProps>(
+  ({ item, reduceMotion, textClass }, ref) => (
+    <motion.span
+      ref={ref}
+      {...labelMotion(reduceMotion)}
+      className={`relative z-raised -ml-0.5 shrink-0 whitespace-nowrap pr-3.5 pl-0.5 font-bold leading-none select-none ${textClass}`}
+    >
+      {item.label}
+    </motion.span>
+  ),
+);
 MultiButtonLabel.displayName = "MultiButtonLabel";
 
 type MultiButtonItemButtonProps = {
@@ -663,10 +611,7 @@ type MultiButtonItemButtonProps = {
   restIcon?: MultiButtonItem["icon"] | undefined;
   showRestIcon?: boolean | undefined;
   visible?: boolean | undefined;
-  onTouchAction: (
-    event: React.PointerEvent<HTMLButtonElement>,
-    id: string,
-  ) => void;
+  onTouchAction: (event: React.PointerEvent<HTMLButtonElement>, id: string) => void;
   onHover: (id: string | null) => void;
   onAction?: ((event: React.MouseEvent<HTMLButtonElement>) => void) | undefined;
 };
@@ -695,9 +640,7 @@ function MultiButtonItemIcon({
   showRestIcon,
 }: MultiButtonItemIconProps) {
   const phase = gooeyPhase(gooeyExpanded);
-  const iconTransition = reduceMotion
-    ? ({ duration: 0 } as const)
-    : CONTEXTUAL_ICON_TRANSITION;
+  const iconTransition = reduceMotion ? ({ duration: 0 } as const) : CONTEXTUAL_ICON_TRANSITION;
   const visibleState = { opacity: 1, scale: 1, filter: "blur(0px)" };
   const hiddenState = { opacity: 0, scale: 0.25, filter: "blur(4px)" };
 
@@ -884,10 +827,7 @@ type MultiButtonItemsProps = {
   items: MultiButtonItem[];
   onAction?: ((event: React.MouseEvent<HTMLButtonElement>) => void) | undefined;
   onHover: (id: string | null) => void;
-  onTouchAction: (
-    event: React.PointerEvent<HTMLButtonElement>,
-    id: string,
-  ) => void;
+  onTouchAction: (event: React.PointerEvent<HTMLButtonElement>, id: string) => void;
   reduceMotion: boolean;
   restAriaLabel?: string | undefined;
   restIcon?: MultiButtonItem["icon"] | undefined;
@@ -924,17 +864,8 @@ function MultiButtonItems({
     const prevActive = prevItem ? activeId === prevItem.id || selectedId === prevItem.id : false;
     const nextActive = active || isSelected;
     const width =
-      compact && !expanded
-        ? isSelected
-          ? cfg.cell
-          : 0
-        : (itemWidths[index] ?? cfg.cell);
-    const iconOffset =
-      compact && !expanded
-        ? 0
-        : active
-          ? 0
-          : Math.max(0, (width - cfg.cell) / 2);
+      compact && !expanded ? (isSelected ? cfg.cell : 0) : (itemWidths[index] ?? cfg.cell);
+    const iconOffset = compact && !expanded ? 0 : active ? 0 : Math.max(0, (width - cfg.cell) / 2);
 
     return (
       <React.Fragment key={item.id}>
@@ -1096,11 +1027,13 @@ function MultiButtonRail({
       data-slot={slot}
       role="group"
       aria-expanded={compact ? expanded : undefined}
-      style={({
-        ...style,
-        width: `${containerWidth}px`,
-        "--multi-button-highlight": highlightColor,
-      }) as any}
+      style={
+        {
+          ...style,
+          width: `${containerWidth}px`,
+          "--multi-button-highlight": highlightColor,
+        } as any
+      }
       className={railClassName({
         className,
         compact,
@@ -1124,46 +1057,43 @@ function MultiButtonRail({
   );
 }
 
-export const MultiButtonGroup = React.forwardRef<
-  HTMLDivElement,
-  MultiButtonGroupProps
->(({ children, className, ...props }, ref) => {
-  const [registry, setRegistry] = React.useState<Record<string, number>>({});
+export const MultiButtonGroup = React.forwardRef<HTMLDivElement, MultiButtonGroupProps>(
+  ({ children, className, ...props }, ref) => {
+    const [registry, setRegistry] = React.useState<Record<string, number>>({});
 
-  const register = React.useCallback((id: string, width: number) => {
-    setRegistry((current) =>
-      current[id] === width ? current : { ...current, [id]: width },
+    const register = React.useCallback((id: string, width: number) => {
+      setRegistry((current) => (current[id] === width ? current : { ...current, [id]: width }));
+    }, []);
+
+    const unregister = React.useCallback((id: string) => {
+      setRegistry((current) => {
+        if (!(id in current)) return current;
+        const next = { ...current };
+        delete next[id];
+        return next;
+      });
+    }, []);
+
+    const sharedLabelWidth = Math.max(0, ...Object.values(registry));
+    const context = React.useMemo(
+      () => ({ register, unregister, sharedLabelWidth }),
+      [register, unregister, sharedLabelWidth],
     );
-  }, []);
 
-  const unregister = React.useCallback((id: string) => {
-    setRegistry((current) => {
-      if (!(id in current)) return current;
-      const next = { ...current };
-      delete next[id];
-      return next;
-    });
-  }, []);
-
-  const sharedLabelWidth = Math.max(0, ...Object.values(registry));
-  const context = React.useMemo(
-    () => ({ register, unregister, sharedLabelWidth }),
-    [register, unregister, sharedLabelWidth],
-  );
-
-  return (
-    <MultiButtonGroupContext.Provider value={context}>
-      <div
-        ref={ref}
-        data-slot="multi-button-group"
-        className={`contents ${className ?? ""}`}
-        {...props}
-      >
-        {children}
-      </div>
-    </MultiButtonGroupContext.Provider>
-  );
-});
+    return (
+      <MultiButtonGroupContext.Provider value={context}>
+        <div
+          ref={ref}
+          data-slot="multi-button-group"
+          className={`contents ${className ?? ""}`}
+          {...props}
+        >
+          {children}
+        </div>
+      </MultiButtonGroupContext.Provider>
+    );
+  },
+);
 MultiButtonGroup.displayName = "MultiButtonGroup";
 
 export const MultiButton = React.forwardRef<HTMLDivElement, MultiButtonProps>(
@@ -1192,29 +1122,16 @@ export const MultiButton = React.forwardRef<HTMLDivElement, MultiButtonProps>(
       touchExpandedId,
     } = useMultiButtonInteractions();
     const activeId = hoveredId ?? touchExpandedId ?? (selectedId || null);
-    const {
-      blobGeometries,
-      cfg,
-      expandedWidth,
-      itemWidths,
-      measurementRef,
-      reserveItems,
-    } = useMultiButtonLayout({ activeId, items, size, syncWidthTo });
+    const { blobGeometries, cfg, expandedWidth, itemWidths, measurementRef, reserveItems } =
+      useMultiButtonLayout({ activeId, items, size, syncWidthTo });
 
     const collapseTouchAction = React.useCallback(
       () => setTouchExpandedId(null),
       [setTouchExpandedId],
     );
-    useOutsidePointerDown(
-      Boolean(touchExpandedId),
-      containerRef,
-      collapseTouchAction,
-    );
+    useOutsidePointerDown(Boolean(touchExpandedId), containerRef, collapseTouchAction);
 
-    const onTouchAction = (
-      event: React.PointerEvent<HTMLButtonElement>,
-      id: string,
-    ) => {
+    const onTouchAction = (event: React.PointerEvent<HTMLButtonElement>, id: string) => {
       if (event.pointerType !== "touch") return;
       if (touchExpandedId !== id) {
         event.preventDefault();

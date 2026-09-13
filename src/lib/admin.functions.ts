@@ -11,8 +11,14 @@ import {
 export const getAdminData = createServerFn({ method: "GET" })
   .middleware([requireAppwriteAuth])
   .handler(async ({ context }) => {
-    const { assertAdmin, fetchAdminOrders, fetchAdminProducts, fetchBlackouts, fetchStats, fetchAdminUsers } =
-      await import("./admin.server");
+    const {
+      assertAdmin,
+      fetchAdminOrders,
+      fetchAdminProducts,
+      fetchBlackouts,
+      fetchStats,
+      fetchAdminUsers,
+    } = await import("./admin.server");
     const { fetchCampaigns, fetchSubscribers } = await import("./newsletter.server");
     await assertAdmin(context.userId);
     const [orders, catalog, blackouts, stats, subscribers, campaigns, users] = await Promise.all([

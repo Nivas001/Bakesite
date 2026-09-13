@@ -295,7 +295,7 @@ export function CakeBuilderWidget() {
                         <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
                           {option.cream}
                         </p>
-                        <p className="mt-1 text-[10px] font-black uppercase tracking-wider text-berry">
+                        <p className="mt-1 text-[10px] font-black uppercase tracking-wider text-berry-deep">
                           {option.badge}
                         </p>
                       </div>

@@ -34,9 +34,13 @@ function CartPage() {
           Your bake tray is empty
         </h1>
         <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-          Fresh morning pastries, crusty country sourdough, and celebration layer cakes are fresh from the oven.
+          Fresh morning pastries, crusty country sourdough, and celebration layer cakes are fresh
+          from the oven.
         </p>
-        <Button asChild className="mt-6 rounded-2xl bg-berry px-8 h-11 text-xs sm:text-sm font-bold text-berry-foreground hover:bg-berry/90 shadow-soft cursor-pointer">
+        <Button
+          asChild
+          className="mt-6 rounded-2xl bg-berry px-8 h-11 text-xs sm:text-sm font-bold text-berry-foreground hover:bg-berry/90 shadow-soft cursor-pointer"
+        >
           <Link to="/shop">Browse Bakery Counter</Link>
         </Button>
       </div>
@@ -45,12 +49,11 @@ function CartPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
-      
       {/* Page Header with Total Items Badge */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-6">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-berry/10 border border-berry/20 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-berry">
+            <span className="inline-flex items-center gap-1 rounded-full bg-berry/10 border border-berry/20 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-berry-deep">
               <Sparkles className="size-3" /> Fresh Bake Tray
             </span>
             <span className="text-xs text-muted-foreground font-medium">
@@ -63,7 +66,7 @@ function CartPage() {
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          <Link to="/shop" className="font-medium text-berry hover:underline">
+          <Link to="/shop" className="font-medium text-berry-deep hover:underline">
             + Add more bakes
           </Link>
           <span className="text-border">|</span>
@@ -79,7 +82,6 @@ function CartPage() {
 
       {/* Main 2-Column Split: Activated on Tablet (md: at 768px) and Desktop */}
       <div className="grid gap-6 md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_360px] items-start">
-        
         {/* Left Column: Cart Items List */}
         <div className="overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 bg-card shadow-soft divide-y divide-border/60">
           {lines.map((line) => {
@@ -106,22 +108,21 @@ function CartPage() {
 
                 {/* 2. Responsive Content Layout (2 Rows on Mobile, Fluid on Tablet/Desktop) */}
                 <div className="flex flex-1 flex-col justify-between min-w-0 self-stretch">
-                  
                   {/* Top Row: Name, Unit Price, and Delete Icon */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <Link
                         to="/shop/$slug"
                         params={{ slug: line.slug }}
-                        className="font-display font-semibold text-xs sm:text-base text-cocoa hover:text-berry transition-colors line-clamp-1"
+                        className="font-display font-semibold text-xs sm:text-base text-cocoa hover:text-berry-deep transition-colors line-clamp-1"
                       >
                         {line.name}
                       </Link>
-                      
+
                       {/* Variant & Portion Label Badge */}
                       {line.variantLabel && (
                         <div className="mt-0.5">
-                          <span className="inline-flex items-center gap-1 rounded-md bg-berry/10 border border-berry/25 px-1.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-berry">
+                          <span className="inline-flex items-center gap-1 rounded-md bg-berry/10 border border-berry/25 px-1.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-berry-deep">
                             ⚖️ {line.variantLabel}
                           </span>
                         </div>
@@ -152,14 +153,15 @@ function CartPage() {
 
                   {/* Bottom Row: Minimal Stepper on Left, Bold Line Total on Right */}
                   <div className="mt-2.5 sm:mt-3 flex items-center justify-between gap-2 pt-1">
-                    
                     {/* Stepper: [ - ]  qty  [ + ] */}
                     <div className="inline-flex h-7 sm:h-8 items-center gap-1 sm:gap-1.5 rounded-full bg-secondary/80 px-1 sm:px-1.5 py-0.5 border border-border/70 shadow-2xs">
                       <button
                         type="button"
                         aria-label={`Decrease ${line.name} quantity`}
                         className="flex size-5.5 sm:size-6 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer text-xs font-bold"
-                        onClick={() => setQuantity(line.productId, line.quantity - 1, line.variantLabel)}
+                        onClick={() =>
+                          setQuantity(line.productId, line.quantity - 1, line.variantLabel)
+                        }
                       >
                         −
                       </button>
@@ -172,7 +174,9 @@ function CartPage() {
                         type="button"
                         aria-label={`Increase ${line.name} quantity`}
                         className="flex size-5.5 sm:size-6 items-center justify-center rounded-full bg-card text-foreground transition-all hover:bg-background active:scale-90 shadow-2xs cursor-pointer text-xs font-bold"
-                        onClick={() => setQuantity(line.productId, line.quantity + 1, line.variantLabel)}
+                        onClick={() =>
+                          setQuantity(line.productId, line.quantity + 1, line.variantLabel)
+                        }
                       >
                         +
                       </button>
@@ -184,9 +188,7 @@ function CartPage() {
                         {formatCurrency(lineTotal)}
                       </span>
                     </div>
-
                   </div>
-
                 </div>
               </div>
             );
@@ -196,7 +198,9 @@ function CartPage() {
         {/* Right Column: Sticky Order Summary Card */}
         <aside className="md:sticky md:top-20 rounded-2xl sm:rounded-3xl border border-border/80 bg-card p-4 sm:p-6 shadow-soft flex flex-col gap-4">
           <div>
-            <h2 className="font-display text-base sm:text-xl font-bold text-cocoa">Order Summary</h2>
+            <h2 className="font-display text-base sm:text-xl font-bold text-cocoa">
+              Order Summary
+            </h2>
             <p className="text-[11px] text-muted-foreground mt-0.5">
               Includes all baked-to-order artisan items
             </p>
@@ -209,7 +213,7 @@ function CartPage() {
             </div>
 
             {discountTotal > 0 && (
-              <div className="flex justify-between items-center text-berry font-medium">
+              <div className="flex justify-between items-center text-berry-deep font-medium">
                 <dt className="flex items-center gap-1">
                   <span>Weekly Specials</span>
                 </dt>
@@ -219,7 +223,9 @@ function CartPage() {
 
             <div className="flex justify-between border-t border-border/60 pt-3 text-sm sm:text-base font-bold text-cocoa">
               <dt>Estimated Total</dt>
-              <dd className="text-base sm:text-lg font-black text-cocoa">{formatCurrency(total)}</dd>
+              <dd className="text-base sm:text-lg font-black text-cocoa">
+                {formatCurrency(total)}
+              </dd>
             </div>
           </dl>
 
@@ -239,7 +245,10 @@ function CartPage() {
           <div className="space-y-2.5 rounded-2xl bg-secondary/40 p-3 text-[11px] text-muted-foreground border border-border/50">
             <div className="flex items-center gap-2.5">
               <div className="size-8 shrink-0 rounded-xl overflow-hidden bg-background/80 border border-border/60 flex items-center justify-center">
-                <LazyVideo src="/illustration/3d-stickle-credit-card-terminal-pay" className="size-full object-contain pointer-events-none" />
+                <LazyVideo
+                  src="/illustration/3d-stickle-credit-card-terminal-pay"
+                  className="size-full object-contain pointer-events-none"
+                />
               </div>
               <div>
                 <p className="font-bold text-cocoa text-xs">Instant UPI & Card Payment</p>
@@ -247,14 +256,12 @@ function CartPage() {
               </div>
             </div>
             <div className="flex items-start gap-2 pt-1 border-t border-border/40">
-              <Clock className="size-3.5 text-berry shrink-0 mt-0.5" />
+              <Clock className="size-3.5 text-berry-deep shrink-0 mt-0.5" />
               <span>Baked fresh at 4:00 AM on your chosen delivery date</span>
             </div>
           </div>
         </aside>
-
       </div>
-
     </div>
   );
 }

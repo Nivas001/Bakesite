@@ -74,9 +74,15 @@ export const Route = createFileRoute("/orders")({
   head: () => ({
     meta: [
       { title: "Your orders — Ani Bakes Bakery" },
-      { name: "description", content: "Track live status and reorder fresh morning bakes from Ani Bakes." },
+      {
+        name: "description",
+        content: "Track live status and reorder fresh morning bakes from Ani Bakes.",
+      },
       { property: "og:title", content: "Your orders — Ani Bakes Bakery" },
-      { property: "og:description", content: "Track live status and reorder fresh morning bakes from Ani Bakes." },
+      {
+        property: "og:description",
+        content: "Track live status and reorder fresh morning bakes from Ani Bakes.",
+      },
     ],
   }),
   component: () => (
@@ -147,7 +153,8 @@ const STATUS_CONFIG: Record<string, StatusTheme> = {
   },
   confirmed: {
     label: "Confirmed by Baker",
-    badgeClass: "bg-emerald-500/20 text-emerald-950 dark:text-emerald-200 border border-emerald-500/35",
+    badgeClass:
+      "bg-emerald-500/20 text-emerald-950 dark:text-emerald-200 border border-emerald-500/35",
     cardBg: "bg-[#F5FAF7] dark:bg-[#0A2216]",
     cardBorder: "border-emerald-200/80 dark:border-emerald-900/50",
     headerText: "text-[#0E3E26] dark:text-emerald-100",
@@ -296,24 +303,28 @@ function OrderCardItem({
       <li
         className={`rounded-3xl border ${config.cardBorder} ${config.cardBg} p-4 sm:p-6 shadow-soft transition-all duration-300 hover:shadow-lift flex flex-col justify-between overflow-hidden relative group`}
       >
-        
         {/* 1. Header Row: Date & Status */}
         <div className="space-y-3.5">
           <div className="flex items-start justify-between gap-3 border-b border-black/5 dark:border-white/5 pb-3.5">
             <div className="flex items-center gap-3 min-w-0">
-              <div className={`flex size-11 shrink-0 items-center justify-center rounded-2xl ${config.iconBoxBg} ${config.iconColor} shadow-2xs border border-black/5`}>
+              <div
+                className={`flex size-11 shrink-0 items-center justify-center rounded-2xl ${config.iconBoxBg} ${config.iconColor} shadow-2xs border border-black/5`}
+              >
                 <StatusIcon className="size-5" />
               </div>
               <div className="min-w-0">
                 {/* Date Display in INTER font */}
                 <div className="flex items-center gap-1.5">
                   <Calendar className={`size-3.5 shrink-0 ${config.iconColor}`} />
-                  <p className={`font-sans font-bold text-sm sm:text-base tracking-tight truncate ${config.headerText}`}>
+                  <p
+                    className={`font-sans font-bold text-sm sm:text-base tracking-tight truncate ${config.headerText}`}
+                  >
                     {formatSlotDate(order.slot_date)}
                   </p>
                 </div>
                 <p className={`text-xs font-medium truncate mt-0.5 ${config.subText}`}>
-                  {slotLabelFor(order.slot_start)} · <span className="capitalize font-semibold">{order.fulfilment_type}</span>
+                  {slotLabelFor(order.slot_start)} ·{" "}
+                  <span className="capitalize font-semibold">{order.fulfilment_type}</span>
                 </p>
               </div>
             </div>
@@ -327,13 +338,15 @@ function OrderCardItem({
                     isFulfilled
                       ? "bg-rose-600 dark:bg-rose-400"
                       : isCancelled
-                      ? "bg-destructive"
-                      : "bg-emerald-500 animate-pulse"
+                        ? "bg-destructive"
+                        : "bg-emerald-500 animate-pulse"
                   }`}
                 />
                 {config.label}
               </span>
-              <span className={`text-[10px] font-mono font-bold tracking-wider opacity-75 ${config.subText}`}>
+              <span
+                className={`text-[10px] font-mono font-bold tracking-wider opacity-75 ${config.subText}`}
+              >
                 #{order.id.slice(-6).toUpperCase()}
               </span>
             </div>
@@ -347,7 +360,12 @@ function OrderCardItem({
                 <span className="font-bold text-xs">Baker Rescheduled Your Delivery Slot</span>
               </div>
               <p className="text-xs text-purple-900/80 dark:text-purple-300/90 leading-relaxed">
-                Your delivery was adjusted to <strong>{formatSlotDate(order.slot_date)} ({slotLabelFor(order.slot_start)})</strong>. If this time does not work for you, you can reject the slot for an immediate full refund.
+                Your delivery was adjusted to{" "}
+                <strong>
+                  {formatSlotDate(order.slot_date)} ({slotLabelFor(order.slot_start)})
+                </strong>
+                . If this time does not work for you, you can reject the slot for an immediate full
+                refund.
               </p>
               <div className="pt-1 flex items-center gap-2">
                 <Button
@@ -366,7 +384,9 @@ function OrderCardItem({
 
           {/* 3. Mini Baker Status Stepper (For Active Non-Rescheduled Orders) */}
           {!isFulfilled && !isCancelled && !isRescheduled && (
-            <div className={`rounded-2xl ${config.innerBoxBg} p-3 sm:p-3.5 border ${config.innerBoxBorder} space-y-2`}>
+            <div
+              className={`rounded-2xl ${config.innerBoxBg} p-3 sm:p-3.5 border ${config.innerBoxBorder} space-y-2`}
+            >
               <div className="flex items-center justify-between text-xs font-bold">
                 <span className={`inline-flex items-center gap-1.5 ${config.headerText}`}>
                   <Flame className="size-3.5 text-amber-500" /> Morning Bake Status
@@ -381,16 +401,26 @@ function OrderCardItem({
 
               {/* Visual 3-Stage Progress Bar */}
               <div className="grid grid-cols-3 gap-1.5 pt-1">
-                <div className={`h-1.5 rounded-full ${config.step >= 1 ? "bg-amber-600" : "bg-black/10 dark:bg-white/10"}`} />
-                <div className={`h-1.5 rounded-full ${config.step >= 2 ? "bg-amber-500" : "bg-black/10 dark:bg-white/10"}`} />
-                <div className={`h-1.5 rounded-full ${config.step >= 3 ? "bg-emerald-500" : "bg-black/10 dark:bg-white/10"}`} />
+                <div
+                  className={`h-1.5 rounded-full ${config.step >= 1 ? "bg-amber-600" : "bg-black/10 dark:bg-white/10"}`}
+                />
+                <div
+                  className={`h-1.5 rounded-full ${config.step >= 2 ? "bg-amber-500" : "bg-black/10 dark:bg-white/10"}`}
+                />
+                <div
+                  className={`h-1.5 rounded-full ${config.step >= 3 ? "bg-emerald-500" : "bg-black/10 dark:bg-white/10"}`}
+                />
               </div>
             </div>
           )}
 
           {/* 4. Bake Items List in INTER font with Matching Card Theme */}
-          <div className={`rounded-2xl ${config.innerBoxBg} p-3 border ${config.innerBoxBorder} space-y-2`}>
-            <div className={`flex items-center justify-between text-xs font-bold uppercase tracking-wider border-b border-black/5 dark:border-white/5 pb-1.5 ${config.subText}`}>
+          <div
+            className={`rounded-2xl ${config.innerBoxBg} p-3 border ${config.innerBoxBorder} space-y-2`}
+          >
+            <div
+              className={`flex items-center justify-between text-xs font-bold uppercase tracking-wider border-b border-black/5 dark:border-white/5 pb-1.5 ${config.subText}`}
+            >
               <span>Bake Items ({totalItemsCount})</span>
               {isMultiItem && (
                 <button
@@ -399,9 +429,13 @@ function OrderCardItem({
                   className={`flex items-center gap-1 font-bold text-xs lowercase transition-colors cursor-pointer ${config.iconColor}`}
                 >
                   {expanded ? (
-                    <>Show less <ChevronUp className="size-3.5" /></>
+                    <>
+                      Show less <ChevronUp className="size-3.5" />
+                    </>
                   ) : (
-                    <>+{items.length - 2} more <ChevronDown className="size-3.5" /></>
+                    <>
+                      +{items.length - 2} more <ChevronDown className="size-3.5" />
+                    </>
                   )}
                 </button>
               )}
@@ -409,9 +443,14 @@ function OrderCardItem({
 
             <ul className="space-y-1.5 text-xs">
               {displayedItems.map((item, index) => (
-                <li key={index} className="flex justify-between items-center py-1 border-b border-black/5 dark:border-white/5 last:border-0">
+                <li
+                  key={index}
+                  className="flex justify-between items-center py-1 border-b border-black/5 dark:border-white/5 last:border-0"
+                >
                   <div className="flex items-center gap-2 min-w-0 pr-2">
-                    <span className={`flex size-5 shrink-0 items-center justify-center rounded-md ${config.tagBg} ${config.tagText} font-sans font-bold text-[11px]`}>
+                    <span
+                      className={`flex size-5 shrink-0 items-center justify-center rounded-md ${config.tagBg} ${config.tagText} font-sans font-bold text-[11px]`}
+                    >
                       {item.quantity}×
                     </span>
                     {/* Bake Item Product Name in INTER font */}
@@ -419,7 +458,9 @@ function OrderCardItem({
                       {item.product_name}
                     </span>
                   </div>
-                  <span className={`font-sans font-bold shrink-0 text-xs tabular-nums ${config.subText}`}>
+                  <span
+                    className={`font-sans font-bold shrink-0 text-xs tabular-nums ${config.subText}`}
+                  >
                     {formatCurrency(Number(item.line_total))}
                   </span>
                 </li>
@@ -430,13 +471,18 @@ function OrderCardItem({
 
         {/* 5. Footer: Recipient Contact & Total Paid / Actions */}
         <div className="mt-4 pt-3.5 border-t border-black/5 dark:border-white/5 space-y-3">
-          
           {/* Recipient & Address Row */}
-          <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs ${config.subText}`}>
+          <div
+            className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs ${config.subText}`}
+          >
             <div className="space-y-1 min-w-0">
-              <p className={`flex items-center gap-1.5 truncate font-semibold ${config.headerText}`}>
+              <p
+                className={`flex items-center gap-1.5 truncate font-semibold ${config.headerText}`}
+              >
                 <Phone className={`size-3.5 shrink-0 ${config.iconColor}`} />
-                <span className="truncate">{order.contact_phone} ({order.contact_name})</span>
+                <span className="truncate">
+                  {order.contact_phone} ({order.contact_name})
+                </span>
               </p>
               {order.delivery_address && (
                 <p className={`flex items-center gap-1.5 truncate text-[11px] ${config.subText}`}>
@@ -450,7 +496,9 @@ function OrderCardItem({
               <p className={`text-[10px] uppercase font-bold tracking-wider ${config.subText}`}>
                 {order.status === "awaiting_payment" ? "Total Due" : "Total Paid"}
               </p>
-              <p className={`font-sans text-xl sm:text-2xl font-black tracking-tight tabular-nums ${config.priceText}`}>
+              <p
+                className={`font-sans text-xl sm:text-2xl font-black tracking-tight tabular-nums ${config.priceText}`}
+              >
                 {formatCurrency(Number(order.total))}
               </p>
             </div>
@@ -484,17 +532,23 @@ function OrderCardItem({
           {/* Action 2: Complete Payment Button (For Awaiting Payment) */}
           {order.status === "awaiting_payment" && order.payment_link_url && (
             <div className="pt-2 border-t border-black/5 dark:border-white/5">
-              <Button asChild className="w-full rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs h-10 shadow-lift cursor-pointer">
-                <a href={order.payment_link_url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-1.5">
+              <Button
+                asChild
+                className="w-full rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs h-10 shadow-lift cursor-pointer"
+              >
+                <a
+                  href={order.payment_link_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-1.5"
+                >
                   <CreditCard className="size-4 text-amber-300" />
                   <span>Complete Payment to Secure Slot →</span>
                 </a>
               </Button>
             </div>
           )}
-
         </div>
-
       </li>
 
       {/* Reject / Cancel Rescheduled Order Confirmation Modal */}
@@ -508,7 +562,8 @@ function OrderCardItem({
               </DialogTitle>
             </div>
             <DialogDescription className="text-xs text-muted-foreground pt-1 font-sans">
-              Cancelling order #{order.id.slice(-6).toUpperCase()} will release the baking slot and initiate a 100% full refund to your original payment method.
+              Cancelling order #{order.id.slice(-6).toUpperCase()} will release the baking slot and
+              initiate a 100% full refund to your original payment method.
             </DialogDescription>
           </DialogHeader>
 
@@ -593,7 +648,9 @@ function OrdersPage() {
 
   const filteredOrders = orders.filter((order) => {
     if (filter === "active") {
-      return order.status !== "completed" && order.status !== "delivered" && order.status !== "rejected";
+      return (
+        order.status !== "completed" && order.status !== "delivered" && order.status !== "rejected"
+      );
     }
     if (filter === "completed") {
       return order.status === "completed" || order.status === "delivered";
@@ -602,10 +659,10 @@ function OrdersPage() {
   });
 
   const activeCount = orders.filter(
-    (o) => o.status !== "completed" && o.status !== "delivered" && o.status !== "rejected"
+    (o) => o.status !== "completed" && o.status !== "delivered" && o.status !== "rejected",
   ).length;
   const completedCount = orders.filter(
-    (o) => o.status === "completed" || o.status === "delivered"
+    (o) => o.status === "completed" || o.status === "delivered",
   ).length;
 
   function handleOpenSupport(order?: OrderRecord) {
@@ -617,15 +674,22 @@ function OrdersPage() {
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:py-20 text-center">
         <div className="relative mx-auto flex size-44 sm:size-56 md:size-64 items-center justify-center mb-6">
-          <LazyVideo src="/illustration/3d-stickle-ai-analytics-report-on-clipboard" className="size-full object-contain pointer-events-none drop-shadow-xl" />
+          <LazyVideo
+            src="/illustration/3d-stickle-ai-analytics-report-on-clipboard"
+            className="size-full object-contain pointer-events-none drop-shadow-xl"
+          />
         </div>
         <h1 className="font-blogh uppercase tracking-wide text-3xl sm:text-5xl font-bold text-cocoa">
           No Orders Yet
         </h1>
         <p className="mt-3 text-xs sm:text-base text-muted-foreground max-w-md mx-auto leading-relaxed">
-          Your morning slot is waiting. Explore our stone-hearth wild sourdoughs, French butter croissants, and custom celebration cakes.
+          Your morning slot is waiting. Explore our stone-hearth wild sourdoughs, French butter
+          croissants, and custom celebration cakes.
         </p>
-        <Button asChild className="mt-6 rounded-full bg-cocoa text-background hover:bg-cocoa/90 px-8 py-5 font-bold text-sm shadow-lift cursor-pointer">
+        <Button
+          asChild
+          className="mt-6 rounded-full bg-cocoa text-background hover:bg-cocoa/90 px-8 py-5 font-bold text-sm shadow-lift cursor-pointer"
+        >
           <Link to="/shop" className="flex items-center gap-2">
             <span>Browse Daily Counter Bakes</span>
             <ArrowRight className="size-4" />
@@ -637,7 +701,6 @@ function OrdersPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
-      
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-6">
         <div>
@@ -661,7 +724,7 @@ function OrdersPage() {
             onClick={() => handleOpenSupport()}
             className="rounded-full border-cocoa/30 bg-card text-cocoa hover:bg-cocoa/10 font-bold text-xs h-9 px-4 shadow-2xs cursor-pointer flex items-center gap-1.5"
           >
-            <HelpCircle className="size-4 text-berry" />
+            <HelpCircle className="size-4 text-berry-deep" />
             <span>Help & Support</span>
           </Button>
         </div>
@@ -714,19 +777,22 @@ function OrdersPage() {
       {filteredOrders.length === 0 ? (
         <div className="rounded-3xl border border-border/70 bg-card p-10 text-center space-y-3 font-sans">
           <p className="font-bold text-base text-foreground">No orders found under this filter.</p>
-          <p className="text-xs text-muted-foreground">Select 'All Orders' to view your complete order history.</p>
-          <Button variant="outline" size="sm" onClick={() => setFilter("all")} className="rounded-full mt-2">
+          <p className="text-xs text-muted-foreground">
+            Select 'All Orders' to view your complete order history.
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilter("all")}
+            className="rounded-full mt-2"
+          >
             Show All Orders
           </Button>
         </div>
       ) : (
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredOrders.map((order) => (
-            <OrderCardItem
-              key={order.id}
-              order={order}
-              onReportIssue={handleOpenSupport}
-            />
+            <OrderCardItem key={order.id} order={order} onReportIssue={handleOpenSupport} />
           ))}
         </ul>
       )}
@@ -738,7 +804,6 @@ function OrdersPage() {
         selectedOrder={selectedSupportOrder}
         orders={orders}
       />
-
     </div>
   );
 }

@@ -123,7 +123,9 @@
 .drift-wall__tile:focus-visible .drift-wall__inner {
   opacity: 1;
   transform: translateZ(var(--dw-lift));
-  box-shadow: 0 24px 60px -18px rgba(44, 24, 16, 0.8), 0 0 0 2px rgba(235, 77, 105, 0.6);
+  box-shadow:
+    0 24px 60px -18px rgba(44, 24, 16, 0.8),
+    0 0 0 2px rgba(235, 77, 105, 0.6);
 }
 
 .drift-wall__tile.is-active img,

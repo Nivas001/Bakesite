@@ -157,7 +157,12 @@ const CAKE_SPECS: Record<
     hotspots: [
       { top: "30%", left: "40%", label: "Organic Wheat Germ", bg: "bg-yellow-400 text-yellow-950" },
       { top: "55%", left: "60%", label: "Cold Retard Crust", bg: "bg-amber-700 text-white" },
-      { top: "75%", left: "68%", label: "Air Pocket Sponge", bg: "bg-emerald-500 text-emerald-950" },
+      {
+        top: "75%",
+        left: "68%",
+        label: "Air Pocket Sponge",
+        bg: "bg-emerald-500 text-emerald-950",
+      },
     ],
   },
   top: {
@@ -419,7 +424,6 @@ export function AboutUsPage() {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground selection:bg-berry/20 pb-20 overflow-x-clip">
-      
       {/* 1. Header Banner & View Mode Switcher */}
       <section className="pt-8 sm:pt-12 pb-6 px-4 sm:px-6 max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border/60 pb-6">
@@ -432,7 +436,8 @@ export function AboutUsPage() {
               About Ani Bakes
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-2 max-w-xl leading-relaxed">
-              Where artisan bakery tradition meets modern wellness. Handcrafted with 100% French butter, wild sourdough fermentation, and guilt-free nutrient indulgence.
+              Where artisan bakery tradition meets modern wellness. Handcrafted with 100% French
+              butter, wild sourdough fermentation, and guilt-free nutrient indulgence.
             </p>
           </div>
 
@@ -523,23 +528,30 @@ export function AboutUsPage() {
 
           {/* Center Stage: 3D Cake Canvas & Floating Glowing Die-Cut Stickers */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mt-6 relative z-10">
-            
             {/* Cake Visual Stage (7 Columns) */}
             <div className="lg:col-span-7 flex flex-col items-center justify-center relative">
-              
               {/* Interactive Drag Pill / Tooltip Indicator */}
               <div
                 className={`absolute -top-3.5 z-30 flex items-center gap-1.5 bg-white/95 backdrop-blur-md text-zinc-900 border border-amber-300 px-3.5 py-1.5 rounded-full text-xs font-black shadow-xl transition-all duration-300 pointer-events-none ${
-                  isDragging ? "scale-105 bg-amber-300 text-black" : hasDragged ? "opacity-75" : "animate-bounce"
+                  isDragging
+                    ? "scale-105 bg-amber-300 text-black"
+                    : hasDragged
+                      ? "opacity-75"
+                      : "animate-bounce"
                 }`}
               >
-                <Compass className={`size-3.5 text-amber-600 ${isDragging ? "animate-spin" : ""}`} />
-                <span>{isDragging ? `Rotating Cake: ${normalizedDegree}°` : "⟷ Drag horizontally to rotate 360°"}</span>
+                <Compass
+                  className={`size-3.5 text-amber-600 ${isDragging ? "animate-spin" : ""}`}
+                />
+                <span>
+                  {isDragging
+                    ? `Rotating Cake: ${normalizedDegree}°`
+                    : "⟷ Drag horizontally to rotate 360°"}
+                </span>
               </div>
 
               {/* 3D Turntable Platter Outer Ring */}
               <div className="relative flex flex-col items-center justify-center pt-2">
-                
                 {/* Turntable Platter Base Stand with Metallic Edge & Degree Markers */}
                 <div
                   className="absolute bottom-3 size-72 sm:size-96 rounded-full border-4 border-amber-800/40 bg-gradient-to-b from-[#331C12] via-[#20110A] to-[#120905] shadow-[0_20px_50px_rgba(0,0,0,0.8)] pointer-events-none transition-transform duration-75"
@@ -548,10 +560,18 @@ export function AboutUsPage() {
                   }}
                 >
                   {/* Turntable Compass Markers */}
-                  <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-amber-300/80">0° FRONT</span>
-                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold text-amber-300/80">90°</span>
-                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-amber-300/80">180° CRUMB</span>
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold text-amber-300/80">270°</span>
+                  <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-amber-300/80">
+                    0° FRONT
+                  </span>
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold text-amber-300/80">
+                    90°
+                  </span>
+                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-amber-300/80">
+                    180° CRUMB
+                  </span>
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold text-amber-300/80">
+                    270°
+                  </span>
                   <div className="absolute inset-4 rounded-full border border-dashed border-amber-500/20" />
                 </div>
 
@@ -562,7 +582,9 @@ export function AboutUsPage() {
                   onPointerUp={handlePointerUp}
                   onPointerCancel={handlePointerUp}
                   className={`relative size-72 sm:size-96 rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl transition-all duration-100 flex items-center justify-center touch-none ${
-                    isDragging ? "cursor-grabbing ring-4 ring-amber-400/40 scale-[1.02]" : "cursor-grab hover:scale-[1.01]"
+                    isDragging
+                      ? "cursor-grabbing ring-4 ring-amber-400/40 scale-[1.02]"
+                      : "cursor-grab hover:scale-[1.01]"
                   }`}
                   style={{
                     transform: `perspective(1000px) rotateY(${((((rotationY % 90) + 90) % 90) - 45) * 0.25}deg) rotateX(${rotationX}deg)`,
@@ -579,9 +601,7 @@ export function AboutUsPage() {
                         src={spec.image}
                         alt={spec.title}
                         className={`absolute inset-0 size-full object-cover select-none pointer-events-none transition-all duration-500 ease-out ${
-                          isActive
-                            ? "opacity-100 scale-100 z-10"
-                            : "opacity-0 scale-[1.03] z-0"
+                          isActive ? "opacity-100 scale-100 z-10" : "opacity-0 scale-[1.03] z-0"
                         }`}
                         draggable={false}
                       />
@@ -623,7 +643,6 @@ export function AboutUsPage() {
                     </div>
                   ))}
                 </div>
-
               </div>
 
               {/* Interactive Spin & Angle Controls Bar */}
@@ -708,7 +727,6 @@ export function AboutUsPage() {
                 </button>
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -720,7 +738,6 @@ export function AboutUsPage() {
         /* MODE A: 🎨 DYNAMIC MULTI-LAYERED OVERLAPPING COLLAGE ARTBOARD */
         /* ===================================================================== */
         <section className="py-8 px-4 sm:px-6 max-w-6xl mx-auto animate-in fade-in duration-300">
-          
           <div className="flex items-center justify-between mb-6 pb-2 border-b border-border/40">
             <div className="flex items-center gap-2">
               <span className="flex size-2 rounded-full bg-berry" />
@@ -734,7 +751,6 @@ export function AboutUsPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
-            
             {/* 🌸 PINK CARD ("Our Story: Indulgence With a Healthy Twist") */}
             <div className="rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-br from-[#FFE8F0] via-[#FFD8E6] to-[#FFC2DA] text-[#2C1810] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#2C1810] hover:shadow-[12px_12px_0px_0px_#2C1810] transition-all duration-300 relative overflow-hidden flex flex-col justify-between lg:-rotate-1 lg:translate-y-1">
               <div className="space-y-4">
@@ -750,7 +766,9 @@ export function AboutUsPage() {
                 </h2>
 
                 <p className="text-xs sm:text-sm text-[#4A1D2B] font-medium leading-relaxed">
-                  We believe you shouldn't have to choose between rich artisanal pleasure and holistic wellness. Tap the numbered pins on our signature chocolate muffin to explore its clean pantry architecture.
+                  We believe you shouldn't have to choose between rich artisanal pleasure and
+                  holistic wellness. Tap the numbered pins on our signature chocolate muffin to
+                  explore its clean pantry architecture.
                 </p>
               </div>
 
@@ -855,7 +873,8 @@ export function AboutUsPage() {
                 </h2>
 
                 <p className="text-xs sm:text-sm text-[#4A154B] font-medium leading-relaxed">
-                  Browse our complete range of healthy bakery snacks — each product crafted to meet your lifestyle without sacrificing flavor, rich aroma, or texture.
+                  Browse our complete range of healthy bakery snacks — each product crafted to meet
+                  your lifestyle without sacrificing flavor, rich aroma, or texture.
                 </p>
               </div>
 
@@ -906,7 +925,9 @@ export function AboutUsPage() {
                       }`}
                     >
                       <span className="truncate text-[11px]">{diet.label}</span>
-                      <span className="text-[10px] opacity-80 shrink-0 font-mono ml-1">{diet.count}</span>
+                      <span className="text-[10px] opacity-80 shrink-0 font-mono ml-1">
+                        {diet.count}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -988,7 +1009,8 @@ export function AboutUsPage() {
                 </h2>
 
                 <p className="text-xs sm:text-sm text-[#5C3218] font-medium leading-relaxed">
-                  Experience muffins, celebration cakes, and sourdoughs that put health, purity, and honesty first.
+                  Experience muffins, celebration cakes, and sourdoughs that put health, purity, and
+                  honesty first.
                 </p>
               </div>
 
@@ -996,7 +1018,9 @@ export function AboutUsPage() {
               <div className="grid grid-cols-2 gap-3 my-6">
                 <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
                   <span className="text-xl">🔥</span>
-                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">4:00 AM Dawn Bake</h3>
+                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">
+                    4:00 AM Dawn Bake
+                  </h3>
                   <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
                     Baked fresh every single morning for your slot.
                   </p>
@@ -1004,7 +1028,9 @@ export function AboutUsPage() {
 
                 <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
                   <span className="text-xl">🌾</span>
-                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">36-Hour Wild Ferment</h3>
+                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">
+                    36-Hour Wild Ferment
+                  </h3>
                   <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
                     Slow cold proofing for gut health and open crumb.
                   </p>
@@ -1012,7 +1038,9 @@ export function AboutUsPage() {
 
                 <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
                   <span className="text-xl">🧈</span>
-                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">100% French Butter</h3>
+                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">
+                    100% French Butter
+                  </h3>
                   <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
                     84% butterfat dairy. Zero margarine or palm oil.
                   </p>
@@ -1020,7 +1048,9 @@ export function AboutUsPage() {
 
                 <div className="rounded-2xl border-2 border-[#2C1810] bg-white/85 p-3 shadow-[2px_2px_0px_#2C1810] space-y-1">
                   <span className="text-xl">🍫</span>
-                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">70% Belgian Couverture</h3>
+                  <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">
+                    70% Belgian Couverture
+                  </h3>
                   <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
                     Real cocoa butter and pure Bourbon vanilla beans.
                   </p>
@@ -1032,7 +1062,6 @@ export function AboutUsPage() {
                 <span className="text-emerald-700 font-extrabold">✓ Guaranteed Purity</span>
               </div>
             </div>
-
           </div>
         </section>
       ) : (
@@ -1040,7 +1069,6 @@ export function AboutUsPage() {
         /* MODE B: 📖 GUIDED STORY MODE (CHAPTER-BY-CHAPTER SPOTLIGHT IMMERSION) */
         /* ===================================================================== */
         <section className="py-8 px-4 sm:px-6 max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-3 duration-400">
-          
           {/* Chapter Timeline Navigation Stepper */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
@@ -1086,9 +1114,7 @@ export function AboutUsPage() {
                     <span>{ch.chapter}</span>
                     <span>{ch.tag}</span>
                   </div>
-                  <p className="text-xs font-bold line-clamp-1">
-                    {ch.title}
-                  </p>
+                  <p className="text-xs font-bold line-clamp-1">{ch.title}</p>
                 </button>
               ))}
             </div>
@@ -1099,7 +1125,6 @@ export function AboutUsPage() {
             className={`rounded-[2.5rem] border-[3.5px] ${currentChapter.borderColor} bg-gradient-to-br ${currentChapter.themeColor} text-[#2C1810] p-6 sm:p-10 shadow-[10px_10px_0px_0px_#2C1810] transition-all duration-500 relative overflow-hidden`}
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              
               {/* Narrative Story Column (7 Cols) */}
               <div className="lg:col-span-7 space-y-5">
                 <div className="flex items-center gap-2">
@@ -1111,7 +1136,9 @@ export function AboutUsPage() {
                   </span>
                 </div>
 
-                <h2 className={`font-blogh text-3xl sm:text-5xl ${currentChapter.textColor} uppercase leading-tight drop-shadow-xs`}>
+                <h2
+                  className={`font-blogh text-3xl sm:text-5xl ${currentChapter.textColor} uppercase leading-tight drop-shadow-xs`}
+                >
                   {currentChapter.title}
                 </h2>
 
@@ -1178,7 +1205,9 @@ export function AboutUsPage() {
                 {activeStoryChapter === 3 && (
                   <div className="rounded-2xl border-2 border-[#2C1810] bg-white/95 p-4 shadow-[3px_3px_0px_#2C1810] grid grid-cols-2 gap-3">
                     <div className="text-center p-2 rounded-xl bg-teal-50 border border-teal-200">
-                      <p className="text-[10px] font-bold text-teal-800 uppercase">Target Glycemic Index</p>
+                      <p className="text-[10px] font-bold text-teal-800 uppercase">
+                        Target Glycemic Index
+                      </p>
                       <p className="font-sans font-black text-lg text-teal-950">&lt; 35 GI (Low)</p>
                     </div>
                     <div className="text-center p-2 rounded-xl bg-teal-50 border border-teal-200">
@@ -1195,7 +1224,10 @@ export function AboutUsPage() {
                         Our Morning Hearth Schedule:
                       </span>
                       <div className="size-14 sm:size-16 shrink-0 flex items-center justify-center">
-                        <LazyVideo src="/illustration/people-walking-together-outdoors-urban-lifestyle-and-daily-routine" className="size-full object-contain pointer-events-none drop-shadow-sm" />
+                        <LazyVideo
+                          src="/illustration/people-walking-together-outdoors-urban-lifestyle-and-daily-routine"
+                          className="size-full object-contain pointer-events-none drop-shadow-sm"
+                        />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-bold">
@@ -1264,15 +1296,17 @@ export function AboutUsPage() {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
-
         </section>
       )}
 
       {/* 4. Real-Time WebGL 3D GLB Model Atelier (Accessible via center button) */}
-      <section ref={studio3dRef} id="3d-cake-studio" className="py-8 px-4 sm:px-6 max-w-6xl mx-auto space-y-6">
+      <section
+        ref={studio3dRef}
+        id="3d-cake-studio"
+        className="py-8 px-4 sm:px-6 max-w-6xl mx-auto space-y-6"
+      >
         {!is3dStudioOpen ? (
           <div className="relative overflow-hidden rounded-3xl sm:rounded-4xl border-2 border-border/80 bg-gradient-to-br from-[#2C1810] via-[#1D0F0A] to-[#120704] text-white p-8 sm:p-14 shadow-2xl text-center">
             {/* Ambient glows */}
@@ -1295,7 +1329,8 @@ export function AboutUsPage() {
               </TextAnimate>
 
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed max-w-lg mx-auto">
-                {siteContent?.about_3d?.description || "Rotate, orbit, zoom, and inspect every hand-piped caramel rosette, 24K gold foil crumb, and dietary macro telemetry in our real-time 3D studio."}
+                {siteContent?.about_3d?.description ||
+                  "Rotate, orbit, zoom, and inspect every hand-piped caramel rosette, 24K gold foil crumb, and dietary macro telemetry in our real-time 3D studio."}
               </p>
 
               {/* Center Launch Button */}
@@ -1341,8 +1376,8 @@ export function AboutUsPage() {
       {/* 6. Atelier & Hearth Inertia Gallery Showcase */}
       <section className="py-14 sm:py-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-8 overflow-hidden">
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-berry shadow-2xs">
-            <Sparkles className="size-3.5 text-berry" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-berry-deep shadow-2xs">
+            <Sparkles className="size-3.5 text-berry-deep" />
             <span>{siteContent?.about_gallery?.badge || "Atelier & Hearth Portraits"}</span>
           </span>
 
@@ -1363,19 +1398,9 @@ export function AboutUsPage() {
 
         {/* Inertia Gallery Motion Track with Momentum Drag & Rubberband Snap */}
         <div className="w-full">
-          <InertiaGallery
-            snap
-            itemWidth={270}
-            gap={24}
-            className="w-full"
-          >
+          <InertiaGallery snap itemWidth={270} gap={24} className="w-full">
             {(siteContent?.about_gallery?.photos || []).map((photo) => (
-              <GalleryShot
-                key={photo.id}
-                image={photo.image}
-                label={photo.label}
-                tag={photo.tag}
-              />
+              <GalleryShot key={photo.id} image={photo.image} label={photo.label} tag={photo.tag} />
             ))}
           </InertiaGallery>
         </div>
@@ -1384,17 +1409,18 @@ export function AboutUsPage() {
       {/* 7. Bottom Bakery Call-To-Action */}
       <section className="py-10 px-4 sm:px-6 max-w-4xl mx-auto text-center">
         <div className="rounded-3xl border-2 border-border/80 bg-card p-8 sm:p-12 shadow-soft space-y-4">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-berry">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-berry-deep">
             <Sparkles className="size-3.5" />
             <span>Ready for fresh indulgence?</span>
           </span>
-          
+
           <h2 className="font-nimbus text-3xl sm:text-4xl font-bold text-cocoa leading-tight">
             Order your fresh morning slot today
           </h2>
-          
+
           <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-            Reserve your sourdough loaves, lamination pastries, and custom celebration cakes before tomorrow's bake queue fills up.
+            Reserve your sourdough loaves, lamination pastries, and custom celebration cakes before
+            tomorrow's bake queue fills up.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
@@ -1422,7 +1448,6 @@ export function AboutUsPage() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }

@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/verify")({
   validateSearch: (search: Record<string, unknown>) => ({
-    userId: typeof search['userId'] === "string" ? (search['userId'] as string) : undefined,
-    secret: typeof search['secret'] === "string" ? (search['secret'] as string) : undefined,
+    userId: typeof search["userId"] === "string" ? (search["userId"] as string) : undefined,
+    secret: typeof search["secret"] === "string" ? (search["secret"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -26,7 +26,7 @@ function VerifyPage() {
   const { user } = useAuth();
 
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    userId && secret ? "loading" : user?.emailVerification ? "success" : "error"
+    userId && secret ? "loading" : user?.emailVerification ? "success" : "error",
   );
   const [errorMessage, setErrorMessage] = useState("");
   const [resending, setResending] = useState(false);
@@ -66,7 +66,7 @@ function VerifyPage() {
         setErrorMessage(
           err instanceof Error
             ? err.message
-            : "Invalid or expired verification link. The link may have already been used."
+            : "Invalid or expired verification link. The link may have already been used.",
         );
       }
     }
@@ -94,7 +94,9 @@ function VerifyPage() {
           <div className="space-y-4 py-8">
             <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-berry/30 border-t-berry" />
             <h2 className="font-display text-2xl font-bold text-cocoa">Verifying your email…</h2>
-            <p className="text-sm text-muted-foreground">Please wait while we activate your account.</p>
+            <p className="text-sm text-muted-foreground">
+              Please wait while we activate your account.
+            </p>
           </div>
         )}
 
@@ -106,11 +108,15 @@ function VerifyPage() {
             <div>
               <h2 className="font-display text-2xl font-bold text-cocoa">Email Verified!</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Your email address has been verified. You can now complete your bakery profile and place orders!
+                Your email address has been verified. You can now complete your bakery profile and
+                place orders!
               </p>
             </div>
             <div className="pt-2">
-              <Button asChild className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11">
+              <Button
+                asChild
+                className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11"
+              >
                 <Link to="/profile">Complete Profile & Add Phone</Link>
               </Button>
             </div>
@@ -127,7 +133,8 @@ function VerifyPage() {
               <p className="mt-2 text-sm text-muted-foreground">
                 {user ? (
                   <span>
-                    You are signed in as <strong className="text-cocoa">{user.email}</strong>. If this link was already opened, you can continue directly to your profile.
+                    You are signed in as <strong className="text-cocoa">{user.email}</strong>. If
+                    this link was already opened, you can continue directly to your profile.
                   </span>
                 ) : (
                   errorMessage || "The verification link may have expired or was already used."
@@ -137,7 +144,10 @@ function VerifyPage() {
             <div className="pt-2 space-y-3">
               {user ? (
                 <>
-                  <Button asChild className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11">
+                  <Button
+                    asChild
+                    className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11"
+                  >
                     <Link to="/profile">Go to Profile</Link>
                   </Button>
                   {!user.emailVerification && (
@@ -153,7 +163,10 @@ function VerifyPage() {
                   )}
                 </>
               ) : (
-                <Button asChild className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11">
+                <Button
+                  asChild
+                  className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-semibold h-11"
+                >
                   <Link to="/auth" search={{ redirect: undefined }}>
                     Go to Sign In
                   </Link>

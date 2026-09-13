@@ -76,18 +76,16 @@ function Connector({
   return (
     <div
       className={`relative overflow-hidden bg-border/80 ${
-        horizontal ? "mt-[15px] sm:mt-[17px] h-0.5 flex-1 mx-1.5 sm:mx-2 rounded-full" : "my-1 w-0.5 flex-1 self-center"
+        horizontal
+          ? "mt-[15px] sm:mt-[17px] h-0.5 flex-1 mx-1.5 sm:mx-2 rounded-full"
+          : "my-1 w-0.5 flex-1 self-center"
       }`}
       style={horizontal ? undefined : { minHeight: 24 }}
     >
       <motion.span
-        className={`absolute inset-0 bg-berry ${
-          horizontal ? "origin-left" : "origin-top"
-        }`}
+        className={`absolute inset-0 bg-berry ${horizontal ? "origin-left" : "origin-top"}`}
         initial={false}
-        animate={
-          horizontal ? { scaleX: filled ? 1 : 0 } : { scaleY: filled ? 1 : 0 }
-        }
+        animate={horizontal ? { scaleX: filled ? 1 : 0 } : { scaleY: filled ? 1 : 0 }}
         transition={
           reduceMotion
             ? { duration: 0 }
@@ -125,11 +123,7 @@ export const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
 
     if (horizontal) {
       return (
-        <div
-          ref={ref}
-          id={id}
-          className={`flex w-full items-start ${className ?? ""}`}
-        >
+        <div ref={ref} id={id} className={`flex w-full items-start ${className ?? ""}`}>
           {steps.map((step, i) => {
             const state = stateFor(i);
             const isLast = i === steps.length - 1;
@@ -139,11 +133,7 @@ export const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
                   className="flex flex-1 flex-col items-center text-center min-w-0"
                   aria-current={state === "active" ? "step" : undefined}
                 >
-                  <StepCircle
-                    state={state}
-                    index={i}
-                    reduceMotion={reduceMotion}
-                  />
+                  <StepCircle state={state} index={i} reduceMotion={reduceMotion} />
                   <div className="mt-2 w-full px-0.5">
                     <Label step={step} state={state} />
                   </div>
@@ -174,11 +164,7 @@ export const Stepper = React.forwardRef<HTMLDivElement, StepperProps>(
               aria-current={state === "active" ? "step" : undefined}
             >
               <div className="flex flex-col items-center">
-                <StepCircle
-                  state={state}
-                  index={i}
-                  reduceMotion={reduceMotion}
-                />
+                <StepCircle state={state} index={i} reduceMotion={reduceMotion} />
                 {!isLast && (
                   <Connector
                     filled={active > i}

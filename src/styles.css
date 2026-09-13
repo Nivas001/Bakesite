@@ -4,8 +4,9 @@
 
 @font-face {
   font-family: "TAN NIMBUS";
-  src: url("/fonts/TAN-NIMBUS.otf") format("opentype"),
-       url("/fonts/TAN-NIMBUS.ttf") format("truetype");
+  src:
+    url("/fonts/TAN-NIMBUS.otf") format("opentype"),
+    url("/fonts/TAN-NIMBUS.ttf") format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -111,6 +112,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-berry: var(--berry);
   --color-berry-foreground: var(--berry-foreground);
+  --color-berry-deep: var(--berry-deep);
   --color-matcha: var(--matcha);
   --color-matcha-foreground: var(--matcha-foreground);
   --color-cocoa: var(--cocoa);
@@ -173,6 +175,11 @@
   --ring: oklch(0.771 0.126 20);
   --berry: oklch(0.771 0.126 20);
   --berry-foreground: oklch(0.28 0.05 28);
+  /* Readable berry for text on light surfaces. Plain --berry measures only
+     1.99:1 against the cream background — below the 3:1 WCAG AA floor even
+     for large text — so labels and links use this instead (4.8:1 on cream,
+     5.1:1 on card). Fills and borders keep using --berry. */
+  --berry-deep: oklch(0.55 0.17 22);
   --matcha: oklch(0.925 0.031 20);
   --matcha-foreground: oklch(0.34 0.048 25);
   --cocoa: oklch(0.31 0.045 28);
@@ -221,6 +228,8 @@
   --accent-foreground: oklch(0.984 0.003 247.858);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.984 0.003 247.858);
+  /* Inverted for dark surfaces, where a darker berry would disappear. */
+  --berry-deep: oklch(0.8 0.13 20);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.551 0.027 264.364);
@@ -265,12 +274,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      115deg,
-      transparent 35%,
-      oklch(1 0 0 / 0.28) 50%,
-      transparent 65%
-    );
+    background: linear-gradient(115deg, transparent 35%, oklch(1 0 0 / 0.28) 50%, transparent 65%);
     transform: translateX(-120%) skewX(-12deg);
     transition: transform 0.7s ease;
     pointer-events: none;
@@ -281,7 +285,6 @@
 }
 
 @layer base {
-
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -333,7 +336,7 @@
 }
 
 /* Liquid Glass Toast Pill: auto-width, center aligned, Inter font */
-[data-sonner-toaster][data-x-position='center'] {
+[data-sonner-toaster][data-x-position="center"] {
   display: flex !important;
   justify-content: center !important;
   width: 100% !important;
@@ -353,7 +356,9 @@
   backdrop-filter: blur(24px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
   border: 1px solid color-mix(in oklab, var(--border) 90%, transparent) !important;
-  box-shadow: 0 16px 36px -10px oklch(0.3 0.05 28 / 22%), 0 0 0 1px oklch(1 0 0 / 20%) inset !important;
+  box-shadow:
+    0 16px 36px -10px oklch(0.3 0.05 28 / 22%),
+    0 0 0 1px oklch(1 0 0 / 20%) inset !important;
   padding: 0.55rem 1.15rem !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -389,52 +394,104 @@
 
 /* Scroll-Reveal: fade + slide up */
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(22px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Scale in (cards on category switch) */
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.94); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Floating bakery particles */
 @keyframes float-up {
-  0%   { opacity: 0; transform: translateY(0) scale(0.8); }
-  15%  { opacity: 0.7; }
-  80%  { opacity: 0.4; }
-  100% { opacity: 0; transform: translateY(-140px) scale(1.1) rotate(18deg); }
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  15% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-140px) scale(1.1) rotate(18deg);
+  }
 }
 
 /* Stats marquee ticker */
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* Typewriter cursor blink */
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Confetti dots burst on coupon copy */
 @keyframes confetti-fly {
-  0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
-  100% { opacity: 0; transform: var(--confetti-end) scale(0.5) rotate(var(--confetti-spin)); }
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: var(--confetti-end) scale(0.5) rotate(var(--confetti-spin));
+  }
 }
 
 /* Ripple pulse on Add to Cart */
 @keyframes ripple-out {
-  0%   { opacity: 0.6; transform: scale(1); }
-  100% { opacity: 0; transform: scale(2.4); }
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
 }
 
 @keyframes chocoDripDrop {
-  0%   { transform: scaleY(0.7) translateY(0px); opacity: 0.7; }
-  60%  { transform: scaleY(1.15) translateY(3px); opacity: 0.95; }
-  100% { transform: scaleY(1) translateY(1px); opacity: 0.88; }
+  0% {
+    transform: scaleY(0.7) translateY(0px);
+    opacity: 0.7;
+  }
+  60% {
+    transform: scaleY(1.15) translateY(3px);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scaleY(1) translateY(1px);
+    opacity: 0.88;
+  }
 }
 
 /* Utilities */

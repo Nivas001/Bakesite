@@ -26,7 +26,9 @@ function Stars({
           disabled={!onChange}
           aria-label={`${n} star${n > 1 ? "s" : ""}`}
           onClick={() => onChange?.(n)}
-          className={onChange ? "cursor-pointer transition-transform hover:scale-125" : "cursor-default"}
+          className={
+            onChange ? "cursor-pointer transition-transform hover:scale-125" : "cursor-default"
+          }
         >
           <Star
             className={`${size} ${
@@ -100,13 +102,12 @@ export function ProductReviews({ productId }: { productId: string }) {
 
   return (
     <section className="border-t border-border/60 pt-8 sm:pt-12 space-y-6">
-      
       {/* Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <MessageSquare className="size-4 text-berry" />
-            <span className="text-xs font-bold uppercase tracking-wider text-berry">
+            <MessageSquare className="size-4 text-berry-deep" />
+            <span className="text-xs font-bold uppercase tracking-wider text-berry-deep">
               Artisan Quality & Feedback
             </span>
           </div>
@@ -122,7 +123,8 @@ export function ProductReviews({ productId }: { productId: string }) {
           <div className="flex items-center gap-2 rounded-full bg-secondary/80 px-4 py-1.5 border border-border/60 shadow-2xs">
             <Stars value={Math.round(averageRating)} size="size-3.5" />
             <span className="text-xs font-bold text-cocoa">
-              {averageRating.toFixed(1)} / 5.0 ({reviewCount} {reviewCount === 1 ? "review" : "reviews"})
+              {averageRating.toFixed(1)} / 5.0 ({reviewCount}{" "}
+              {reviewCount === 1 ? "review" : "reviews"})
             </span>
           </div>
         )}
@@ -130,7 +132,6 @@ export function ProductReviews({ productId }: { productId: string }) {
 
       {/* 2-Column Bento Reviews Hub */}
       <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6 items-start">
-        
         {/* Left Bento Column: Rating Scorecard & Write Form */}
         <div className="space-y-5">
           {/* Rating Summary Card */}
@@ -176,7 +177,7 @@ export function ProductReviews({ productId }: { productId: string }) {
           {mineQuery.data?.canReview ? (
             <div className="rounded-3xl border border-berry/30 bg-card p-5 sm:p-6 shadow-soft space-y-3.5">
               <div className="flex items-center gap-1.5">
-                <Sparkles className="size-4 text-berry" />
+                <Sparkles className="size-4 text-berry-deep" />
                 <h3 className="font-blogh text-base font-bold text-cocoa">
                   {mineQuery.data.mine ? "Update Your Review" : "Leave a Tasting Review"}
                 </h3>
@@ -217,7 +218,8 @@ export function ProductReviews({ productId }: { productId: string }) {
           ) : (
             <div className="rounded-2xl border border-dashed border-border/80 bg-secondary/30 p-4 text-center">
               <p className="text-xs text-muted-foreground leading-snug">
-                💬 <strong className="text-cocoa">Verified Customer Reviews:</strong> Only customers who have placed an order for this bake can submit a verified review.
+                💬 <strong className="text-cocoa">Verified Customer Reviews:</strong> Only customers
+                who have placed an order for this bake can submit a verified review.
               </p>
             </div>
           )}
@@ -227,21 +229,20 @@ export function ProductReviews({ productId }: { productId: string }) {
         <div className="space-y-4">
           {reviewList.length === 0 ? (
             <div className="rounded-3xl border border-dashed border-border bg-card/60 p-8 text-center flex flex-col items-center justify-center space-y-3">
-              <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary text-berry shadow-inner">
-                <Heart className="size-7 text-berry/80 animate-pulse" />
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-secondary text-berry-deep shadow-inner">
+                <Heart className="size-7 text-berry-deep/80 animate-pulse" />
               </div>
-              <h3 className="font-blogh text-lg font-bold text-cocoa">
-                Fresh From the Kitchen
-              </h3>
+              <h3 className="font-blogh text-lg font-bold text-cocoa">Fresh From the Kitchen</h3>
               <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
-                This artisanal creation is baked fresh to order. Be the first to taste and share your review once your order arrives!
+                This artisanal creation is baked fresh to order. Be the first to taste and share
+                your review once your order arrives!
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
               {reviewList.map((review, i) => {
                 const colorClass = AVATAR_COLORS[i % AVATAR_COLORS.length]!;
-                const initial = String.fromCharCode(65 + (i * 3) % 26);
+                const initial = String.fromCharCode(65 + ((i * 3) % 26));
 
                 return (
                   <article
@@ -252,7 +253,9 @@ export function ProductReviews({ productId }: { productId: string }) {
                       {/* Top Row: User Avatar + Stars + Verified Badge */}
                       <div className="flex items-center justify-between gap-2 border-b border-border/50 pb-2.5">
                         <div className="flex items-center gap-2">
-                          <div className={`flex size-8 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold ${colorClass}`}>
+                          <div
+                            className={`flex size-8 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold ${colorClass}`}
+                          >
                             {initial}B
                           </div>
                           <div>
@@ -303,7 +306,6 @@ export function ProductReviews({ productId }: { productId: string }) {
             </div>
           )}
         </div>
-
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { getCatalog } from "@/lib/catalog.functions";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
@@ -64,10 +64,14 @@ export const Route = createFileRoute("/shop")({
       { title: "Shop all bakes — Ani Bakes Bakery" },
       {
         name: "description",
-        content: "Browse cakes, cookies, brownies, cheesecakes and pastries from Ani Bakes, baked fresh for your slot.",
+        content:
+          "Browse cakes, cookies, brownies, cheesecakes and pastries from Ani Bakes, baked fresh for your slot.",
       },
       { property: "og:title", content: "Shop all bakes — Ani Bakes Bakery" },
-      { property: "og:description", content: "Cakes, brownies, cheesecakes and tea-cakes baked fresh to order." },
+      {
+        property: "og:description",
+        content: "Cakes, brownies, cheesecakes and tea-cakes baked fresh to order.",
+      },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(catalogQuery),
@@ -93,6 +97,28 @@ function CategoryHorizontalLane({
   onViewAll: (slug: string) => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  // A category with only a couple of products does not overflow, so its arrows
+  // would do nothing. Track the real overflow and hide them when there is none.
+  const [overflow, setOverflow] = useState({ left: false, right: false });
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setOverflow({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+    };
+
+    measure();
+    el.addEventListener("scroll", measure, { passive: true });
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => {
+      el.removeEventListener("scroll", measure);
+      observer.disconnect();
+    };
+  }, [products.length]);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -126,7 +152,7 @@ function CategoryHorizontalLane({
               {categoryName}
             </h2>
             <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] sm:text-xs font-bold text-cocoa/80 border border-border/60">
-              {products.length} items
+              {products.length} {products.length === 1 ? "item" : "items"}
             </span>
           </div>
           {description && (
@@ -139,24 +165,28 @@ function CategoryHorizontalLane({
         {/* Action Controls: View All Button & Arrow Buttons */}
         <div className="flex items-center gap-2 shrink-0">
           {/* Desktop/Tablet Scroll Arrows */}
-          <div className="hidden sm:flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => scroll("left")}
-              aria-label={`Scroll ${categoryName} left`}
-              className="flex size-8 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs"
-            >
-              <ChevronLeft className="size-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => scroll("right")}
-              aria-label={`Scroll ${categoryName} right`}
-              className="flex size-8 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs"
-            >
-              <ChevronRight className="size-4" />
-            </button>
-          </div>
+          {(overflow.left || overflow.right) && (
+            <div className="hidden sm:flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => scroll("left")}
+                disabled={!overflow.left}
+                aria-label={`Scroll ${categoryName} left`}
+                className="flex size-8 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs disabled:cursor-default disabled:opacity-35 disabled:hover:bg-card"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scroll("right")}
+                disabled={!overflow.right}
+                aria-label={`Scroll ${categoryName} right`}
+                className="flex size-8 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs disabled:cursor-default disabled:opacity-35 disabled:hover:bg-card"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          )}
 
           {/* View All Products Button */}
           <Button
@@ -164,7 +194,7 @@ function CategoryHorizontalLane({
             variant="outline"
             size="sm"
             onClick={() => onViewAll(categorySlug)}
-            className="rounded-full border-berry/30 hover:border-berry text-berry hover:bg-berry/10 font-bold text-xs h-8 px-3.5 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+            className="rounded-full border-berry/30 hover:border-berry text-berry-deep hover:bg-berry/10 font-bold text-xs h-8 px-3.5 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span>View all {categoryName}</span>
             <ArrowRight className="size-3.5" />
@@ -173,9 +203,7 @@ function CategoryHorizontalLane({
       </div>
 
       {description && (
-        <p className="text-xs text-muted-foreground leading-relaxed sm:hidden">
-          {description}
-        </p>
+        <p className="text-xs text-muted-foreground leading-relaxed sm:hidden">{description}</p>
       )}
 
       {/* 📱 MOBILE VIEW: Clean 2-Column Grid (Shows 4 Featured Cards + View All Button) */}
@@ -193,9 +221,11 @@ function CategoryHorizontalLane({
             type="button"
             variant="outline"
             onClick={() => onViewAll(categorySlug)}
-            className="w-full rounded-2xl border-berry/30 text-berry hover:bg-berry/10 font-bold text-xs h-10 shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full rounded-2xl border-berry/30 text-berry-deep hover:bg-berry/10 font-bold text-xs h-10 shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <span>View all {products.length} {categoryName}</span>
+            <span>
+              View all {products.length} {categoryName}
+            </span>
             <ArrowRight className="size-3.5" />
           </Button>
         )}
@@ -227,7 +257,9 @@ function Shop() {
   const { data } = useSuspenseQuery(catalogQuery);
   const [active, setActive] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"featured" | "price_asc" | "price_desc" | "name_asc">("featured");
+  const [sortBy, setSortBy] = useState<"featured" | "price_asc" | "price_desc" | "name_asc">(
+    "featured",
+  );
   const [filterKey, setFilterKey] = useState(0);
 
   const showSearch = useFlag("ff_shop_search") ?? true;
@@ -245,7 +277,7 @@ function Shop() {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.description?.toLowerCase().includes(q) ||
-          p.category_name?.toLowerCase().includes(q)
+          p.category_name?.toLowerCase().includes(q),
       );
     }
 
@@ -300,10 +332,9 @@ function Shop() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12 space-y-6 sm:space-y-8">
-      
       {/* Header Banner */}
       <div className="flex flex-col gap-1 sm:gap-2">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-[10.5px] sm:text-xs font-bold uppercase tracking-wider text-berry w-fit">
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-[10.5px] sm:text-xs font-bold uppercase tracking-wider text-berry-deep w-fit">
           <Sparkles className="size-3.5" />
           <span>Fresh Small-Batch Counter</span>
         </div>
@@ -316,7 +347,8 @@ function Shop() {
           The bakery counter
         </TextAnimate>
         <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
-          Explore our signature brownies, velvety cheesecakes, celebration cakes, and morning tea cakes baked fresh on the day of your slot.
+          Explore our signature brownies, velvety cheesecakes, celebration cakes, and morning tea
+          cakes baked fresh on the day of your slot.
         </p>
       </div>
 
@@ -386,7 +418,6 @@ function Shop() {
       ) : (
         /* VIEW MODE 2: Full Responsive Product Grid (When specific category or search/sort is active) */
         <div className="space-y-6 animate-in fade-in duration-300">
-          
           {/* Active filter banner with Back button */}
           <div className="flex items-center justify-between bg-secondary/30 p-3.5 rounded-2xl border border-border/60">
             <div className="flex items-center gap-2">
@@ -399,8 +430,12 @@ function Shop() {
             </div>
             <button
               type="button"
-              onClick={() => { handleCategoryChange(null); setSearch(""); setSortBy("featured"); }}
-              className="text-xs font-bold text-berry hover:underline cursor-pointer"
+              onClick={() => {
+                handleCategoryChange(null);
+                setSearch("");
+                setSortBy("featured");
+              }}
+              className="text-xs font-bold text-berry-deep hover:underline cursor-pointer"
             >
               ← Back to category lanes
             </button>
@@ -411,13 +446,18 @@ function Shop() {
               <span className="text-5xl">🥐</span>
               <p className="font-display text-lg font-bold text-cocoa">No bakes found</p>
               <p className="text-xs text-muted-foreground max-w-xs">
-                {search ? `No results for "${search}". Try another keyword.` : "Nothing in this category right now."}
+                {search
+                  ? `No results for "${search}". Try another keyword.`
+                  : "Nothing in this category right now."}
               </p>
               <Button
                 size="sm"
                 variant="outline"
                 className="rounded-full text-xs mt-1 cursor-pointer"
-                onClick={() => { handleCategoryChange(null); setSearch(""); }}
+                onClick={() => {
+                  handleCategoryChange(null);
+                  setSearch("");
+                }}
               >
                 Show all bakes
               </Button>
@@ -440,7 +480,6 @@ function Shop() {
           )}
         </div>
       )}
-
     </div>
   );
 }

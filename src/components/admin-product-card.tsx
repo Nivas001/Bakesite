@@ -59,8 +59,8 @@ export function ProductAdminCard({
         isBeingEdited
           ? "border-berry shadow-lift ring-2 ring-berry/40 ring-offset-1"
           : product.is_active
-          ? "border-border/70 hover:border-berry/40"
-          : "border-dashed border-border/60 opacity-85 hover:opacity-100 bg-muted/20"
+            ? "border-border/70 hover:border-berry/40"
+            : "border-dashed border-border/60 opacity-85 hover:opacity-100 bg-muted/20"
       }`}
     >
       {/* Editing indicator banner */}
@@ -134,7 +134,7 @@ export function ProductAdminCard({
         <div>
           <div className="flex items-baseline justify-between gap-2">
             <h4
-              className="font-display text-sm font-bold text-cocoa line-clamp-1 group-hover:text-berry transition-colors"
+              className="font-display text-sm font-bold text-cocoa line-clamp-1 group-hover:text-berry-deep transition-colors"
               title={product.name}
             >
               {product.name}
@@ -156,7 +156,7 @@ export function ProductAdminCard({
           {/* Portion/Weight or Serving details */}
           <div className="mt-1.5 flex flex-wrap items-center gap-1">
             {itemType === "weight" ? (
-              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[10px] font-bold text-berry">
+              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[10px] font-bold text-berry-deep">
                 🎂 Tiered (250g–2kg)
               </span>
             ) : (product as any).unit_weight_grams || (product as any).serving_yield ? (
@@ -183,7 +183,7 @@ export function ProductAdminCard({
             <Button
               size="sm"
               variant="outline"
-              className="h-8 flex-1 rounded-xl text-xs font-bold hover:border-berry/40 hover:bg-berry/5 hover:text-berry transition-colors cursor-pointer"
+              className="h-8 flex-1 rounded-xl text-xs font-bold hover:border-berry/40 hover:bg-berry/5 hover:text-berry-deep transition-colors cursor-pointer"
               onClick={onEdit}
             >
               ✏️ Edit

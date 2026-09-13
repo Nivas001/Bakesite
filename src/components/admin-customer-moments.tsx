@@ -1,10 +1,6 @@
 import React, { useState, useRef } from "react";
 import { toast } from "sonner";
-import {
-  useCustomerMoments,
-  type CustomerMoment,
-  DEFAULT_MOMENTS,
-} from "@/lib/customer-moments";
+import { useCustomerMoments, type CustomerMoment, DEFAULT_MOMENTS } from "@/lib/customer-moments";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -94,9 +90,7 @@ export function AdminCustomerMoments() {
   };
 
   const handleToggleActive = (id: string) => {
-    const updated = moments.map((m) =>
-      m.id === id ? { ...m, isActive: !m.isActive } : m
-    );
+    const updated = moments.map((m) => (m.id === id ? { ...m, isActive: !m.isActive } : m));
     save(updated);
     toast.success("Visibility updated");
   };
@@ -138,7 +132,7 @@ export function AdminCustomerMoments() {
 
     if (editingMoment) {
       const updated = moments.map((m) =>
-        m.id === editingMoment.id ? ({ ...formState, id: editingMoment.id } as CustomerMoment) : m
+        m.id === editingMoment.id ? ({ ...formState, id: editingMoment.id } as CustomerMoment) : m,
       );
       save(updated);
       toast.success("Review updated successfully!");
@@ -159,7 +153,7 @@ export function AdminCustomerMoments() {
       {/* Top Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl border border-border/70 bg-card p-6 shadow-soft">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-berry mb-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-berry-deep mb-2">
             <Sparkles className="size-3.5" />
             <span>Homepage Reviews Accordion</span>
           </div>
@@ -167,7 +161,8 @@ export function AdminCustomerMoments() {
             Sweet Moments Reviews Manager
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Edit customer names, reviews, ratings, and uploaded photos displayed in the homepage Accordion Gallery.
+            Edit customer names, reviews, ratings, and uploaded photos displayed in the homepage
+            Accordion Gallery.
           </p>
         </div>
 
@@ -212,11 +207,7 @@ export function AdminCustomerMoments() {
             <div>
               {/* Photo & Active Badge */}
               <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-secondary border border-border/50 mb-3">
-                <img
-                  src={moment.image}
-                  alt={moment.customer}
-                  className="size-full object-cover"
-                />
+                <img src={moment.image} alt={moment.customer} className="size-full object-cover" />
                 <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/75 backdrop-blur-xs px-2.5 py-1 rounded-full text-amber-400 text-xs">
                   <Star className="size-3.5 fill-amber-400 text-amber-400" />
                   <span className="font-black text-[11px] text-amber-300">{moment.rating}/5</span>
@@ -250,7 +241,9 @@ export function AdminCustomerMoments() {
                 size="sm"
                 onClick={() => handleToggleActive(moment.id)}
                 className={`h-8 rounded-lg text-xs gap-1 cursor-pointer ${
-                  moment.isActive ? "text-emerald-600 hover:text-emerald-700" : "text-muted-foreground"
+                  moment.isActive
+                    ? "text-emerald-600 hover:text-emerald-700"
+                    : "text-muted-foreground"
                 }`}
               >
                 {moment.isActive ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
@@ -292,7 +285,8 @@ export function AdminCustomerMoments() {
               {editingMoment ? "Edit Customer Review" : "Add Customer Review"}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Customize the customer name (in Blogh font), review note (in Inter font), rating, and photo.
+              Customize the customer name (in Blogh font), review note (in Inter font), rating, and
+              photo.
             </DialogDescription>
           </DialogHeader>
 
@@ -358,15 +352,11 @@ export function AdminCustomerMoments() {
             {/* Image Selection & Upload */}
             <div className="space-y-2">
               <Label className="text-xs font-bold">Review Photo</Label>
-              
+
               {/* Current Preview */}
               {formState.image && (
                 <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-secondary border border-border/70">
-                  <img
-                    src={formState.image}
-                    alt="Preview"
-                    className="size-full object-cover"
-                  />
+                  <img src={formState.image} alt="Preview" className="size-full object-cover" />
                 </div>
               )}
 

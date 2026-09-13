@@ -80,10 +80,10 @@ function PlayCouponsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8 border-b border-border/60 pb-6 sm:pb-8">
         <div className="space-y-3 flex-1">
           <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-xl bg-berry/15 text-berry">
+            <span className="flex size-7 items-center justify-center rounded-xl bg-berry/15 text-berry-deep">
               <Gamepad2 className="size-4" />
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-berry">
+            <span className="text-xs font-bold uppercase tracking-wider text-berry-deep">
               Ani&apos;s Confectionery Arcade
             </span>
           </div>
@@ -123,7 +123,7 @@ function PlayCouponsPage() {
             }`}
           >
             <HelpCircle
-              className={`size-4 ${activeTab === "quiz" ? "text-berry" : "text-muted-foreground"}`}
+              className={`size-4 ${activeTab === "quiz" ? "text-berry-deep" : "text-muted-foreground"}`}
             />
             <span>Trivia Quiz</span>
           </button>
@@ -138,7 +138,7 @@ function PlayCouponsPage() {
             }`}
           >
             <Layers
-              className={`size-4 ${activeTab === "memory" ? "text-berry" : "text-muted-foreground"}`}
+              className={`size-4 ${activeTab === "memory" ? "text-berry-deep" : "text-muted-foreground"}`}
             />
             <span>Memory Match</span>
           </button>
@@ -194,7 +194,7 @@ function PlayCouponsPage() {
       <div className="rounded-3xl border border-border/70 bg-secondary/40 p-5 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="space-y-1 text-center sm:text-left">
           <div className="flex items-center justify-center sm:justify-start gap-1.5">
-            <Tag className="size-4 text-berry" />
+            <Tag className="size-4 text-berry-deep" />
             <h4 className="font-blogh text-base sm:text-lg font-bold text-cocoa uppercase tracking-wide">
               Already have a coupon code?
             </h4>

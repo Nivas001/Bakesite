@@ -76,7 +76,9 @@ export async function notifyCustomerOrderRescheduled(input: {
   const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
   const ordersPageUrl = `${appUrl}/orders`;
 
-  const reasonText = input.reason?.trim() ? `\n📝 Note from Head Baker: "${input.reason.trim()}"` : "";
+  const reasonText = input.reason?.trim()
+    ? `\n📝 Note from Head Baker: "${input.reason.trim()}"`
+    : "";
 
   const body = `Hi ${input.name ?? "there"},\n\nYour baking schedule for ${bakeryName} order #${shortId} has been updated by the head baker.\n\n🕒 New Scheduled Slot: ${input.newSlot}${reasonText}\n\nOur kitchen will prepare your bakes fresh for this updated time. You can view full details on your orders page:\n👉 ${ordersPageUrl}\n\nThank you for your understanding!\n${bakeryName}`;
 

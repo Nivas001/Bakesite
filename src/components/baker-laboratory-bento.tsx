@@ -1,5 +1,17 @@
 import { useState } from "react";
-import { Sparkles, Clock, ShieldCheck, Flame, Lock, Unlock, Copy, Check, Thermometer, Wind, Droplets } from "lucide-react";
+import {
+  Sparkles,
+  Clock,
+  ShieldCheck,
+  Flame,
+  Lock,
+  Unlock,
+  Copy,
+  Check,
+  Thermometer,
+  Wind,
+  Droplets,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useSiteContent } from "@/lib/site-content";
 import { TextAnimate } from "@/components/godui/text-animate";
@@ -101,11 +113,10 @@ export function BakerLaboratoryBento() {
   return (
     <section className="py-10 sm:py-16 bg-secondary/15">
       <div className="mx-auto w-full max-w-6xl px-4">
-        
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
           <div>
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry block mb-1">
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry-deep block mb-1">
               {siteContent.home_lab.badge || "Pure Craft & Cold Fermentation"}
             </span>
             <TextAnimate
@@ -118,13 +129,13 @@ export function BakerLaboratoryBento() {
             </TextAnimate>
           </div>
           <p className="max-w-md text-xs sm:text-sm text-muted-foreground">
-            {siteContent.home_lab.description || "No shortcuts, zero chemical improvers. Just wild fermentation, stone-ground flour, and real French butter."}
+            {siteContent.home_lab.description ||
+              "No shortcuts, zero chemical improvers. Just wild fermentation, stone-ground flour, and real French butter."}
           </p>
         </div>
 
         {/* 4-Card Asymmetric Bento Grid (2x2 on Tablet, Full Asymmetric on Desktop, Vault Only on Mobile) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 sm:gap-4 lg:gap-5">
-          
           {/* Card 1: Interactive Fermentation Stage Simulator (Amber Hearth Glow) */}
           <div className="hidden sm:flex lg:col-span-7 rounded-3xl border border-amber-300/60 bg-gradient-to-br from-[#FFFDF9] to-[#FFF4E8] dark:from-card dark:to-amber-950/20 p-5 sm:p-6 shadow-soft flex-col justify-between relative overflow-hidden group">
             <div className="space-y-2.5">
@@ -141,21 +152,23 @@ export function BakerLaboratoryBento() {
               <h3 className="font-blogh text-lg sm:text-xl font-bold text-cocoa uppercase tracking-wide">
                 The 4:00 AM Dawn Bake Ritual
               </h3>
-              
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {currentStage.desc}
-              </p>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">{currentStage.desc}</p>
             </div>
 
             {/* Interactive Fermentation Telemetry Stage Switcher */}
             <div className="mt-4 space-y-2.5 rounded-2xl bg-white/70 dark:bg-black/30 p-3 sm:p-3.5 border border-amber-200/70 dark:border-amber-900/30 backdrop-blur-xs">
               <div className="flex items-center justify-between text-xs font-bold text-foreground">
                 <span className="flex items-center gap-1.5">
-                  <Clock className="size-3.5 text-berry" /> Stage: {currentStage.name}
+                  <Clock className="size-3.5 text-berry-deep" /> Stage: {currentStage.name}
                 </span>
                 <div className="flex items-center gap-2.5 text-[11px] font-mono font-bold text-cocoa">
-                  <span className="flex items-center gap-1"><Thermometer className="size-3 text-amber-500" /> {currentStage.temp}</span>
-                  <span className="flex items-center gap-1"><Droplets className="size-3 text-blue-500" /> {currentStage.hydration}</span>
+                  <span className="flex items-center gap-1">
+                    <Thermometer className="size-3 text-amber-500" /> {currentStage.temp}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Droplets className="size-3 text-blue-500" /> {currentStage.hydration}
+                  </span>
                 </div>
               </div>
 
@@ -173,7 +186,9 @@ export function BakerLaboratoryBento() {
                     }`}
                   >
                     <p className="text-[9px] font-mono opacity-80">{s.duration}</p>
-                    <p className="text-[10.5px] font-bold truncate mt-0.5">{s.name.split(" ")[0]}</p>
+                    <p className="text-[10.5px] font-bold truncate mt-0.5">
+                      {s.name.split(" ")[0]}
+                    </p>
                   </button>
                 ))}
               </div>
@@ -214,11 +229,15 @@ export function BakerLaboratoryBento() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm">{ing.icon}</span>
-                      <span className="text-[8.5px] font-mono text-emerald-800 dark:text-emerald-300 uppercase">{ing.name.split(" ")[0]}</span>
+                      <span className="text-[8.5px] font-mono text-emerald-800 dark:text-emerald-300 uppercase">
+                        {ing.name.split(" ")[0]}
+                      </span>
                     </div>
                     <div className="mt-1">
                       <p className="font-bold text-[11px] leading-tight">{ing.name}</p>
-                      <p className="text-[9px] text-muted-foreground mt-0.5 truncate">{ing.origin}</p>
+                      <p className="text-[9px] text-muted-foreground mt-0.5 truncate">
+                        {ing.origin}
+                      </p>
                     </div>
                   </button>
                 );
@@ -237,7 +256,8 @@ export function BakerLaboratoryBento() {
                 Tropical Heat & Humidity Shield
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Pondicherry humidity is defeated by insulated thermal cake boxes. Delicate buttercreams and crisp laminated croissants arrive cellar-fresh.
+                Pondicherry humidity is defeated by insulated thermal cake boxes. Delicate
+                buttercreams and crisp laminated croissants arrive cellar-fresh.
               </p>
             </div>
 
@@ -246,7 +266,9 @@ export function BakerLaboratoryBento() {
                 <span className="flex size-2 rounded-full bg-emerald-500 animate-ping" />
                 <span className="text-muted-foreground font-medium">Cellar Box Temp:</span>
               </div>
-              <span className="font-mono font-black text-sky-700 dark:text-sky-400">18°C Controlled</span>
+              <span className="font-mono font-black text-sky-700 dark:text-sky-400">
+                18°C Controlled
+              </span>
             </div>
           </div>
 
@@ -254,7 +276,7 @@ export function BakerLaboratoryBento() {
           <div className="col-span-1 sm:col-span-1 lg:col-span-7 rounded-3xl border border-rose-300/70 bg-gradient-to-br from-[#FFF9F6] via-[#FFF3EE] to-[#FFEAE3] dark:from-card dark:to-berry/20 p-5 sm:p-6 shadow-soft flex flex-col justify-between relative overflow-hidden">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/15 text-berry border border-berry/30 px-3 py-0.5 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/15 text-berry-deep border border-berry/30 px-3 py-0.5 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider">
                   <Sparkles className="size-3.5" />
                   <span>Head Baker's Vault</span>
                 </span>
@@ -267,7 +289,8 @@ export function BakerLaboratoryBento() {
                 Secret Baker's Passcode
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Inspired by artisan tradition, we hide a secret privilege for bakery connoisseurs who explore our craft laboratory.
+                Inspired by artisan tradition, we hide a secret privilege for bakery connoisseurs
+                who explore our craft laboratory.
               </p>
             </div>
 
@@ -279,13 +302,13 @@ export function BakerLaboratoryBento() {
                   onClick={handleUnlock}
                   className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-white/90 dark:bg-card hover:bg-white text-cocoa text-xs font-bold border border-rose-300/70 shadow-soft transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
                 >
-                  <Lock className="size-4 text-berry animate-bounce" />
+                  <Lock className="size-4 text-berry-deep animate-bounce" />
                   <span>Tap to Unlock Head Baker's Secret 10% Passcode</span>
                 </button>
               ) : (
                 <div className="flex items-center justify-between p-3 rounded-2xl bg-berry/15 border border-berry/30 animate-in fade-in">
                   <div className="flex items-center gap-2">
-                    <Unlock className="size-4 text-berry" />
+                    <Unlock className="size-4 text-berry-deep" />
                     <div>
                       <span className="text-[10px] uppercase font-bold text-muted-foreground block">
                         Secret Promo Code
@@ -308,9 +331,7 @@ export function BakerLaboratoryBento() {
               )}
             </div>
           </div>
-
         </div>
-
       </div>
     </section>
   );

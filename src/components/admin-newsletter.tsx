@@ -74,7 +74,9 @@ type Props = {
 };
 
 export function AdminNewsletter({ subscribers, campaigns, products = [], onSend }: Props) {
-  const [campaignType, setCampaignType] = useState<"announcement" | "weekly_special" | "promotion">("announcement");
+  const [campaignType, setCampaignType] = useState<"announcement" | "weekly_special" | "promotion">(
+    "announcement",
+  );
   const [subject, setSubject] = useState<string>(CAMPAIGN_PRESETS.announcement.defaultSubject);
   const [bodyText, setBodyText] = useState<string>(CAMPAIGN_PRESETS.announcement.defaultBody);
   const [ctaLabel, setCtaLabel] = useState<string>(CAMPAIGN_PRESETS.announcement.defaultCtaLabel);
@@ -118,7 +120,10 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
     setShowcaseEnabled(true);
     setShowcaseTitle(p.name);
     setShowcaseTag(`${formatCurrency(Number(p.price))} · Fresh Bake`);
-    setShowcaseDesc(p.description || "Baked with pure butter and premium ingredients the morning of your chosen slot.");
+    setShowcaseDesc(
+      p.description ||
+        "Baked with pure butter and premium ingredients the morning of your chosen slot.",
+    );
     setShowcaseImage(p.image_url || "/products/croissant.jpg");
     setShowcaseLink(`https://anibakes.app/shop/${p.slug}`);
     toast.success(`Loaded "${p.name}" into showcase!`);
@@ -255,19 +260,18 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
     <div className="space-y-8">
       {/* 2-Column Responsive Layout: Compose on Left, Live Preview on Right */}
       <div className="grid gap-8 lg:grid-cols-12 items-start">
-        
         {/* Left Form: Compose Card (6 cols) */}
         <div className="lg:col-span-6 xl:col-span-6 rounded-3xl border border-border/70 bg-card p-5 sm:p-6 shadow-soft space-y-6">
-          
           <div>
             <div className="flex items-center justify-between">
               <h2 className="font-display text-xl font-bold text-cocoa">Compose Campaign</h2>
-              <span className="rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-xs font-semibold text-berry">
+              <span className="rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-xs font-semibold text-berry-deep">
                 {activeSubscribers.length} Recipient{activeSubscribers.length === 1 ? "" : "s"}
               </span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Branded email formatted in Playfair Display & Inter with custom Ani Bakes header, footer, product showcase, and attachment support.
+              Branded email formatted in Playfair Display & Inter with custom Ani Bakes header,
+              footer, product showcase, and attachment support.
             </p>
           </div>
 
@@ -290,7 +294,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                   onClick={() => handleSelectType(type)}
                   className={`flex flex-col items-center justify-center p-2.5 rounded-2xl border text-xs font-semibold transition-all cursor-pointer ${
                     campaignType === type
-                      ? "border-berry bg-berry/10 text-berry shadow-2xs scale-[1.02]"
+                      ? "border-berry bg-berry/10 text-berry-deep shadow-2xs scale-[1.02]"
                       : "border-border/60 bg-secondary/30 text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
                   }`}
                 >
@@ -326,7 +330,9 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                 <Label htmlFor="camp-body" className="text-xs font-semibold">
                   3. Email Message (Inter)
                 </Label>
-                <span className="text-[10px] text-muted-foreground">Line breaks format into paragraphs</span>
+                <span className="text-[10px] text-muted-foreground">
+                  Line breaks format into paragraphs
+                </span>
               </div>
               <Textarea
                 id="camp-body"
@@ -343,9 +349,12 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
             <div className="rounded-2xl border border-berry/30 bg-berry/5 p-3.5 sm:p-4 space-y-3.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Cake className="size-4 text-berry" />
+                  <Cake className="size-4 text-berry-deep" />
                   <div>
-                    <Label htmlFor="enable-showcase" className="text-xs font-bold text-cocoa cursor-pointer">
+                    <Label
+                      htmlFor="enable-showcase"
+                      className="text-xs font-bold text-cocoa cursor-pointer"
+                    >
                       Feature a Cake / Bake in this Email
                     </Label>
                     <p className="text-[10px] text-muted-foreground">
@@ -400,7 +409,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                         onClick={() => setShowcaseLayout("side_by_side")}
                         className={`flex items-center justify-center gap-1.5 p-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                           showcaseLayout === "side_by_side"
-                            ? "border-berry bg-card text-berry shadow-2xs"
+                            ? "border-berry bg-card text-berry-deep shadow-2xs"
                             : "border-border/60 bg-secondary/30 text-muted-foreground hover:bg-secondary/60"
                         }`}
                       >
@@ -412,7 +421,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                         onClick={() => setShowcaseLayout("stacked")}
                         className={`flex items-center justify-center gap-1.5 p-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
                           showcaseLayout === "stacked"
-                            ? "border-berry bg-card text-berry shadow-2xs"
+                            ? "border-berry bg-card text-berry-deep shadow-2xs"
                             : "border-border/60 bg-secondary/30 text-muted-foreground hover:bg-secondary/60"
                         }`}
                       >
@@ -425,7 +434,10 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                   {/* Title & Tag */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
-                      <Label htmlFor="sc-title" className="text-[11px] text-muted-foreground block mb-1">
+                      <Label
+                        htmlFor="sc-title"
+                        className="text-[11px] text-muted-foreground block mb-1"
+                      >
                         Cake / Bake Name
                       </Label>
                       <Input
@@ -437,7 +449,10 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                       />
                     </div>
                     <div>
-                      <Label htmlFor="sc-tag" className="text-[11px] text-muted-foreground block mb-1">
+                      <Label
+                        htmlFor="sc-tag"
+                        className="text-[11px] text-muted-foreground block mb-1"
+                      >
                         Price / Badge Tag
                       </Label>
                       <Input
@@ -452,7 +467,10 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
 
                   {/* Photo URL */}
                   <div>
-                    <Label htmlFor="sc-img" className="text-[11px] text-muted-foreground block mb-1">
+                    <Label
+                      htmlFor="sc-img"
+                      className="text-[11px] text-muted-foreground block mb-1"
+                    >
                       Cake Photo URL (or /products/filename.jpg)
                     </Label>
                     <Input
@@ -466,7 +484,10 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
 
                   {/* Description */}
                   <div>
-                    <Label htmlFor="sc-desc" className="text-[11px] text-muted-foreground block mb-1">
+                    <Label
+                      htmlFor="sc-desc"
+                      className="text-[11px] text-muted-foreground block mb-1"
+                    >
                       Cake Description & Flavor Notes
                     </Label>
                     <Textarea
@@ -481,7 +502,10 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
 
                   {/* Link URL */}
                   <div>
-                    <Label htmlFor="sc-link" className="text-[11px] text-muted-foreground block mb-1">
+                    <Label
+                      htmlFor="sc-link"
+                      className="text-[11px] text-muted-foreground block mb-1"
+                    >
                       Order Link URL
                     </Label>
                     <Input
@@ -500,7 +524,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
             <div className="rounded-2xl border border-border/60 bg-secondary/20 p-3.5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <LinkIcon className="size-3.5 text-berry" />
+                  <LinkIcon className="size-3.5 text-berry-deep" />
                   <Label htmlFor="enable-cta" className="text-xs font-semibold cursor-pointer">
                     Include Bottom Action Button (CTA)
                   </Label>
@@ -517,7 +541,10 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
               {enableCta && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                   <div>
-                    <Label htmlFor="cta-label" className="text-[11px] text-muted-foreground block mb-1">
+                    <Label
+                      htmlFor="cta-label"
+                      className="text-[11px] text-muted-foreground block mb-1"
+                    >
                       Button Text
                     </Label>
                     <Input
@@ -529,7 +556,10 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                     />
                   </div>
                   <div>
-                    <Label htmlFor="cta-url" className="text-[11px] text-muted-foreground block mb-1">
+                    <Label
+                      htmlFor="cta-url"
+                      className="text-[11px] text-muted-foreground block mb-1"
+                    >
                       Button Link URL
                     </Label>
                     <Input
@@ -581,7 +611,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                         className="size-8 rounded-lg object-cover border shrink-0"
                       />
                     ) : (
-                      <div className="size-8 rounded-lg bg-berry/10 text-berry flex items-center justify-center shrink-0">
+                      <div className="size-8 rounded-lg bg-berry/10 text-berry-deep flex items-center justify-center shrink-0">
                         <FileText className="size-4" />
                       </div>
                     )}
@@ -589,7 +619,9 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                       <p className="text-xs font-semibold truncate">{attachmentName}</p>
                       <p className="text-[10px] text-muted-foreground">
                         {(attachmentSize / 1024).toFixed(1)} KB ·{" "}
-                        {attachmentMime?.startsWith("image/") ? "Inline Email Banner" : "File Attachment"}
+                        {attachmentMime?.startsWith("image/")
+                          ? "Inline Email Banner"
+                          : "File Attachment"}
                       </p>
                     </div>
                   </div>
@@ -613,7 +645,9 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
               className="w-full h-11 rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs shadow-soft transition-all active:scale-98 cursor-pointer mt-2"
             >
               <Send className="mr-2 size-4" />
-              {busy ? "Dispatching Newsletter…" : `Send to ${activeSubscribers.length} Subscriber${activeSubscribers.length === 1 ? "" : "s"}`}
+              {busy
+                ? "Dispatching Newsletter…"
+                : `Send to ${activeSubscribers.length} Subscriber${activeSubscribers.length === 1 ? "" : "s"}`}
             </Button>
           </form>
         </div>
@@ -622,7 +656,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
         <div className="lg:col-span-6 xl:col-span-6 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Eye className="size-4 text-berry" />
+              <Eye className="size-4 text-berry-deep" />
               <h3 className="font-display text-sm sm:text-base font-bold text-cocoa">
                 Live Email Preview
               </h3>
@@ -673,14 +707,15 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Campaign History & Subscriber Count Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recently Sent Campaigns */}
         <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
-          <h3 className="font-display text-base font-bold text-cocoa mb-3">Recently Dispatched Campaigns</h3>
+          <h3 className="font-display text-base font-bold text-cocoa mb-3">
+            Recently Dispatched Campaigns
+          </h3>
           {campaigns.length === 0 ? (
             <p className="text-xs text-muted-foreground">No campaigns sent yet.</p>
           ) : (
@@ -724,7 +759,9 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                   key={s.id}
                   className="flex items-center justify-between rounded-lg px-2 py-1 hover:bg-secondary/30 transition-colors"
                 >
-                  <span className="font-mono text-[11px] truncate text-foreground/90">{s.email}</span>
+                  <span className="font-mono text-[11px] truncate text-foreground/90">
+                    {s.email}
+                  </span>
                   <span
                     className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                       s.is_subscribed

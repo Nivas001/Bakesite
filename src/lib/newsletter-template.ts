@@ -93,14 +93,9 @@ export function buildNewsletterHtml(input: NewsletterTemplateInput): string {
   const ctaUrl = input.cta_url || preset.defaultCtaUrl;
 
   const isImageAttachment =
-    input.attachment_b64 &&
-    input.attachment_mime &&
-    input.attachment_mime.startsWith("image/");
+    input.attachment_b64 && input.attachment_mime && input.attachment_mime.startsWith("image/");
 
-  const isNonImageAttachment =
-    input.attachment_b64 &&
-    input.attachment_name &&
-    !isImageAttachment;
+  const isNonImageAttachment = input.attachment_b64 && input.attachment_name && !isImageAttachment;
 
   // Showcase variables
   const showcaseEnabled = Boolean(input.showcase_enabled);

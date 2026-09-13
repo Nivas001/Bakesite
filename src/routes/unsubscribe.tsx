@@ -58,7 +58,6 @@ function UnsubscribePage() {
 
       <div className="relative w-full max-w-md sm:max-w-lg md:max-w-xl">
         <div className="glass-panel relative rounded-3xl sm:rounded-4xl border-2 border-border/80 p-6 sm:p-9 shadow-lift text-center space-y-5 sm:space-y-6 bg-card/95 backdrop-blur-md">
-          
           {!unsubscribed ? (
             <>
               {/* Mailbox Animated Illustration Resource */}
@@ -78,7 +77,8 @@ function UnsubscribePage() {
                   Taking a pastry break?
                 </h1>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
-                  Too full on morning croissants or tidying your inbox? Enter your email below to take a pause from our dawn newsletter.
+                  Too full on morning croissants or tidying your inbox? Enter your email below to
+                  take a pause from our dawn newsletter.
                 </p>
               </div>
 
@@ -130,21 +130,26 @@ function UnsubscribePage() {
                   You&apos;re all set! 🌾
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
-                  We have removed <span className="font-bold text-cocoa">{email}</span> from our newsletter dispatch list. We&apos;ll miss your inbox!
+                  We have removed <span className="font-bold text-cocoa">{email}</span> from our
+                  newsletter dispatch list. We&apos;ll miss your inbox!
                 </p>
                 <p className="text-xs italic text-muted-foreground/80 pt-1">
-                  Our morning ovens will still be baking at dawn whenever you crave warm sourdough or custom celebration cakes again.
+                  Our morning ovens will still be baking at dawn whenever you crave warm sourdough
+                  or custom celebration cakes again.
                 </p>
               </div>
 
               <div className="pt-2">
-                <Button asChild size="default" className="rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs sm:text-sm h-11 px-8 shadow-lift cursor-pointer">
+                <Button
+                  asChild
+                  size="default"
+                  className="rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 font-bold text-xs sm:text-sm h-11 px-8 shadow-lift cursor-pointer"
+                >
                   <Link to="/">Return to Bakery Counter</Link>
                 </Button>
               </div>
             </div>
           )}
-
         </div>
       </div>
     </div>

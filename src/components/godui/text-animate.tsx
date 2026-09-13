@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  type MotionProps,
-  motion,
-  useReducedMotion,
-  type Variants,
-} from "framer-motion";
+import { type MotionProps, motion, useReducedMotion, type Variants } from "framer-motion";
 import * as React from "react";
 
 export type TextAnimateBy = "text" | "word" | "character" | "line";
@@ -252,28 +247,13 @@ function splitTextAnimate(text: string, by: TextAnimateBy): TextAnimateSegment[]
 
 function getSegmentClassName(by: TextAnimateBy, segmentClassName?: string): string {
   const base =
-    by === "line"
-      ? "block"
-      : by === "character"
-        ? "inline-block"
-        : "inline-block whitespace-pre";
+    by === "line" ? "block" : by === "character" ? "inline-block" : "inline-block whitespace-pre";
 
   return segmentClassName ? `${base} ${segmentClassName}` : base;
 }
 
 export type TextAnimateElement =
-  | "article"
-  | "div"
-  | "h1"
-  | "h2"
-  | "h3"
-  | "h4"
-  | "h5"
-  | "h6"
-  | "li"
-  | "p"
-  | "section"
-  | "span";
+  "article" | "div" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "li" | "p" | "section" | "span";
 
 export type TextAnimateProps = {
   children: React.ReactNode;
@@ -316,24 +296,16 @@ export const TextAnimate = React.forwardRef<HTMLElement, TextAnimateProps>(
   ) => {
     const reducedMotion = useReducedMotion() ?? false;
     const textContent = getTextContent(children);
-    const segments = React.useMemo(
-      () => splitTextAnimate(textContent, by),
-      [textContent, by],
-    );
+    const segments = React.useMemo(() => splitTextAnimate(textContent, by), [textContent, by]);
 
     const staggerChildren =
-      stagger ??
-      (segments.length > 1 ? duration / segments.length : STAGGER_BY_SPLIT[by]);
+      stagger ?? (segments.length > 1 ? duration / segments.length : STAGGER_BY_SPLIT[by]);
 
     const itemVariants = variants || TEXT_ANIMATE_ITEM_PRESETS[animation];
     const rootClassName = `whitespace-pre-wrap ${className ?? ""}`.trim();
 
     if (reducedMotion) {
-      return React.createElement(
-        Component,
-        { ref, className: rootClassName, id },
-        textContent,
-      );
+      return React.createElement(Component, { ref, className: rootClassName, id }, textContent);
     }
 
     let nonSpaceIndex = 0;

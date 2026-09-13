@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export interface CartLine {
   productId: string;
@@ -57,22 +65,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const existing = prev.find((l) => getLineKey(l.productId, l.variantLabel) === key);
       if (existing) {
         return prev.map((l) =>
-          getLineKey(l.productId, l.variantLabel) === key ? { ...l, quantity: l.quantity + quantity } : l,
+          getLineKey(l.productId, l.variantLabel) === key
+            ? { ...l, quantity: l.quantity + quantity }
+            : l,
         );
       }
       return [...prev, { ...line, quantity }];
     });
   }, []);
 
-  const setQuantity = useCallback((productId: string, quantity: number, variantLabel?: string | null) => {
-    setLines((prev) => {
-      const key = getLineKey(productId, variantLabel);
-      if (quantity <= 0) {
-        return prev.filter((l) => getLineKey(l.productId, l.variantLabel) !== key);
-      }
-      return prev.map((l) => (getLineKey(l.productId, l.variantLabel) === key ? { ...l, quantity } : l));
-    });
-  }, []);
+  const setQuantity = useCallback(
+    (productId: string, quantity: number, variantLabel?: string | null) => {
+      setLines((prev) => {
+        const key = getLineKey(productId, variantLabel);
+        if (quantity <= 0) {
+          return prev.filter((l) => getLineKey(l.productId, l.variantLabel) !== key);
+        }
+        return prev.map((l) =>
+          getLineKey(l.productId, l.variantLabel) === key ? { ...l, quantity } : l,
+        );
+      });
+    },
+    [],
+  );
 
   const remove = useCallback((productId: string, variantLabel?: string | null) => {
     const key = getLineKey(productId, variantLabel);

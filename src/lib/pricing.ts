@@ -35,12 +35,15 @@ export interface CatalogProduct {
  * Generate smart tiered weight pricing for cakes with volume discounts
  * Example: Base 250g = ₹300 -> 500g = ₹580 (5% off) -> 1kg = ₹1080 (10% off) -> 2kg = ₹2040 (15% off)
  */
-export function generateSmartCakeWeightVariants(basePrice: number, baseGrams: number = 250): ProductWeightVariant[] {
+export function generateSmartCakeWeightVariants(
+  basePrice: number,
+  baseGrams: number = 250,
+): ProductWeightVariant[] {
   // Normalize base price to 250g
   const p250 = baseGrams === 500 ? Math.round(basePrice / (2 * 0.9667)) : Math.round(basePrice);
 
   const p500 = Math.round((p250 * 2 * 0.9667) / 10) * 10;
-  const p1kg = Math.round((p250 * 4 * 0.90) / 10) * 10;
+  const p1kg = Math.round((p250 * 4 * 0.9) / 10) * 10;
   const p1_5kg = Math.round((p250 * 6 * 0.875) / 10) * 10;
   const p2kg = Math.round((p250 * 8 * 0.85) / 10) * 10;
 
@@ -54,7 +57,7 @@ export function generateSmartCakeWeightVariants(basePrice: number, baseGrams: nu
     },
     {
       id: "500g",
-      label: "500g (6\" Regular)",
+      label: '500g (6" Regular)',
       weight_grams: 500,
       price: p500,
       serves: "5–7 Guests",
@@ -62,7 +65,7 @@ export function generateSmartCakeWeightVariants(basePrice: number, baseGrams: nu
     },
     {
       id: "1kg",
-      label: "1.0kg (8\" Family)",
+      label: '1.0kg (8" Family)',
       weight_grams: 1000,
       price: p1kg,
       serves: "10–14 Guests",
@@ -70,7 +73,7 @@ export function generateSmartCakeWeightVariants(basePrice: number, baseGrams: nu
     },
     {
       id: "1.5kg",
-      label: "1.5kg (9\" Grand)",
+      label: '1.5kg (9" Grand)',
       weight_grams: 1500,
       price: p1_5kg,
       serves: "16–20 Guests",
@@ -106,7 +109,8 @@ export function hasDiscount(discountType: DiscountType, discountValue: number): 
 }
 
 export function discountLabel(discountType: DiscountType, discountValue: number): string {
-  if (discountType === "percent") return `${discountValue % 1 === 0 ? discountValue : discountValue.toFixed(1)}% off`;
+  if (discountType === "percent")
+    return `${discountValue % 1 === 0 ? discountValue : discountValue.toFixed(1)}% off`;
   if (discountType === "flat") return `₹${discountValue} off`;
   return "";
 }

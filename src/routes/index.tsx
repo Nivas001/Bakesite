@@ -137,7 +137,7 @@ function Home() {
             <div className="relative z-10">
               <div className="flex items-end justify-between gap-3 mb-4 sm:mb-6">
                 <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry shadow-2xs mb-1.5">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry-deep shadow-2xs mb-1.5">
                     ✨ Daily Selection
                   </span>
                   <h2 className="mt-0.5 font-nimbus text-2xl sm:text-4xl font-bold leading-tight text-cocoa">
@@ -150,7 +150,7 @@ function Home() {
                 <div className="flex items-center gap-3 shrink-0">
                   <Link
                     to="/shop"
-                    className="rounded-xl bg-card/80 hover:bg-card border border-border/80 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-cocoa hover:text-berry transition-all flex items-center gap-1.5 shadow-2xs group"
+                    className="rounded-xl bg-card/80 hover:bg-card border border-border/80 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-cocoa hover:text-berry-deep transition-all flex items-center gap-1.5 shadow-2xs group"
                   >
                     <span>View all</span>
                     <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
@@ -188,7 +188,7 @@ function Home() {
             <div className="relative z-10">
               <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-card/90 border border-border/80 px-3.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.16em] text-cocoa shadow-2xs backdrop-blur">
-                  <HelpCircle className="size-3 text-berry" />{" "}
+                  <HelpCircle className="size-3 text-berry-deep" />{" "}
                   {siteContent.home_faq.badge || "Clear Answers"}
                 </span>
                 <h2 className="mt-2.5 font-display text-2xl sm:text-4xl font-bold text-cocoa">
@@ -250,8 +250,8 @@ function Home() {
               />
 
               <div className="relative mx-auto max-w-2xl">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] text-berry mb-3 shadow-2xs">
-                  <Sparkles className="size-3 text-berry" />{" "}
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] text-berry-deep mb-3 shadow-2xs">
+                  <Sparkles className="size-3 text-berry-deep" />{" "}
                   {siteContent.home_cta.badge || "Fresh Mornings"}
                 </span>
                 <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold leading-[1.15] text-cocoa uppercase tracking-wide">

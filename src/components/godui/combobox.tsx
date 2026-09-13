@@ -56,7 +56,7 @@ function highlight(label: string, query: string) {
   return (
     <>
       {label.slice(0, idx)}
-      <mark className="bg-transparent font-bold text-berry">
+      <mark className="bg-transparent font-bold text-berry-deep">
         {label.slice(idx, idx + query.length)}
       </mark>
       {label.slice(idx + query.length)}
@@ -97,7 +97,7 @@ const CheckIcon = () => (
   <svg
     aria-hidden="true"
     viewBox="0 0 24 24"
-    className="h-4 w-4 text-berry"
+    className="h-4 w-4 text-berry-deep"
     fill="none"
     stroke="currentColor"
     strokeWidth="2.5"
@@ -145,10 +145,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
 
     const selectedValues = React.useMemo(() => values ?? [], [values]);
 
-    const allOptions = React.useMemo(
-      () => staticOptions ?? [],
-      [staticOptions],
-    );
+    const allOptions = React.useMemo(() => staticOptions ?? [], [staticOptions]);
     const selectedOption = allOptions.find((o) => o.value === value);
 
     const isSearchable =
@@ -166,14 +163,14 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
     const [liveMessage, setLiveMessage] = React.useState("");
     const [createdFlash, setCreatedFlash] = React.useState(false);
     const flashTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
-    
+
     const flashCreated = () => {
       setCreatedFlash(true);
       clearTimeout(flashTimer.current);
       flashTimer.current = setTimeout(() => setCreatedFlash(false), 1300);
     };
     React.useEffect(() => () => clearTimeout(flashTimer.current), []);
-    
+
     const rootRef = React.useRef<HTMLDivElement>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
     const reqId = React.useRef(0);
@@ -213,24 +210,18 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
 
     const matches = onSearch
       ? asyncResults
-      : allOptions.filter((o) =>
-          o.label.toLowerCase().includes(query.toLowerCase()),
-        );
+      : allOptions.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()));
 
     const trimmedQuery = query.trim();
     const canCreate =
       creatable &&
       trimmedQuery.length > 0 &&
-      !matches.some(
-        (o) => o.label.toLowerCase() === trimmedQuery.toLowerCase(),
-      );
+      !matches.some((o) => o.label.toLowerCase() === trimmedQuery.toLowerCase());
     const createRow: ComboboxOption = {
       value: trimmedQuery,
       label: trimmedQuery,
     };
-    const results: ComboboxOption[] = canCreate
-      ? [...matches, createRow]
-      : matches;
+    const results: ComboboxOption[] = canCreate ? [...matches, createRow] : matches;
 
     React.useEffect(() => {
       setActive((a) => Math.min(a, Math.max(0, results.length - 1)));
@@ -240,15 +231,12 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
     React.useEffect(() => {
       for (const o of results) labelCacheRef.current.set(o.value, o.label);
     }, [results]);
-    
+
     const chipLabel = (v: string) =>
-      allOptions.find((o) => o.value === v)?.label ??
-      labelCacheRef.current.get(v) ??
-      v;
+      allOptions.find((o) => o.value === v)?.label ?? labelCacheRef.current.get(v) ?? v;
 
     const selectedLabel =
-      selectedOption?.label ??
-      (value ? labelCacheRef.current.get(value) : undefined);
+      selectedOption?.label ?? (value ? labelCacheRef.current.get(value) : undefined);
 
     const runCreate = async () => {
       if (isCreating) return;
@@ -342,9 +330,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
         const recent = Date.now() - typeahead.current.at < 600;
         const buf = recent ? typeahead.current.buf + e.key : e.key;
         typeahead.current = { buf, at: Date.now() };
-        const idx = results.findIndex((o) =>
-          o.label.toLowerCase().startsWith(buf.toLowerCase()),
-        );
+        const idx = results.findIndex((o) => o.label.toLowerCase().startsWith(buf.toLowerCase()));
         if (idx >= 0) setActive(idx);
       }
     };
@@ -354,11 +340,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
       : ({ type: "spring", stiffness: 520, damping: 32 } as const);
 
     return (
-      <div
-        ref={rootRef}
-        className={`relative inline-block ${className ?? ""}`}
-        {...props}
-      >
+      <div ref={rootRef} className={`relative inline-block ${className ?? ""}`} {...props}>
         <span aria-live="polite" role="status" className="sr-only">
           {liveMessage}
         </span>
@@ -379,8 +361,14 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
             } ${triggerClassName ?? ""}`}
           >
             <div className="flex items-center gap-1.5 truncate">
-              {icon && <span className="text-muted-foreground group-hover:text-cocoa transition-colors">{icon}</span>}
-              <span className={`truncate ${selectedLabel ? "text-cocoa" : "text-muted-foreground"}`}>
+              {icon && (
+                <span className="text-muted-foreground group-hover:text-cocoa transition-colors">
+                  {icon}
+                </span>
+              )}
+              <span
+                className={`truncate ${selectedLabel ? "text-cocoa" : "text-muted-foreground"}`}
+              >
                 {selectedLabel ? `Sort: ${selectedLabel}` : placeholder}
               </span>
             </div>
@@ -408,11 +396,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
               aria-controls={listboxId}
               aria-autocomplete="list"
               disabled={disabled}
-              value={
-                open
-                  ? query
-                  : (selectedLabel ?? (creatable ? (value ?? "") : query))
-              }
+              value={open ? query : (selectedLabel ?? (creatable ? (value ?? "") : query))}
               placeholder={placeholder}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -429,12 +413,8 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
                   key={loading ? "spin" : createdFlash ? "check" : "search"}
                   initial={reduceMotion ? false : { opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={
-                    reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.5 }
-                  }
-                  transition={
-                    reduceMotion ? { duration: 0 } : { duration: 0.14 }
-                  }
+                  exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.5 }}
+                  transition={reduceMotion ? { duration: 0 } : { duration: 0.14 }}
                   className="flex"
                 >
                   {loading ? <Spinner /> : createdFlash ? <CheckIcon /> : <SearchIcon />}
@@ -452,17 +432,9 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
               role="listbox"
               aria-multiselectable={multiple || undefined}
               aria-busy={loading || undefined}
-              initial={
-                reduceMotion
-                  ? { opacity: 0 }
-                  : { opacity: 0, scale: 0.95, y: -4 }
-              }
+              initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: -4 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={
-                reduceMotion
-                  ? { opacity: 0 }
-                  : { opacity: 0, scale: 0.95, y: -4 }
-              }
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: -4 }}
               transition={spring}
               className="absolute right-0 top-full z-50 mt-2 min-w-[13.5rem] max-h-72 origin-top-right overflow-y-auto rounded-2xl border border-border/80 bg-card/95 p-1.5 shadow-lift backdrop-blur-xl no-scrollbar"
             >
@@ -509,7 +481,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(
                       )}
                     </div>
                     {isSelected && (
-                      <span className="shrink-0 text-berry">
+                      <span className="shrink-0 text-berry-deep">
                         <CheckIcon />
                       </span>
                     )}

@@ -246,7 +246,7 @@ function AuthPage() {
     return (
       <div className="flex min-h-[calc(100svh-8rem)] items-center justify-center px-4 py-8">
         <div className="w-full max-w-sm rounded-2xl sm:rounded-3xl border border-border bg-card p-6 shadow-soft text-center space-y-3">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-berry/10 text-berry animate-pulse">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-berry/10 text-berry-deep animate-pulse">
             <span className="text-xl font-bold">🥐</span>
           </div>
           <h2 className="font-display text-xl font-bold text-cocoa">Completing Google Sign-In</h2>
@@ -336,12 +336,12 @@ function AuthPage() {
                 {/* Laptop */}
                 <path
                   d="M125 90 L140 70 L145 92 L120 96 Z"
-                  fill="#E86033"
+                  fill="#F0918C"
                   stroke="currentColor"
                   strokeWidth="2"
                   className="text-cocoa"
                 />
-                <rect x="110" y="94" width="28" height="5" fill="#C54820" rx="2" />
+                <rect x="110" y="94" width="28" height="5" fill="#C4123A" rx="2" />
                 {/* White Legs / Trousers */}
                 <path
                   d="M85 110 L105 110 L115 160 L100 160 Z"
@@ -366,24 +366,24 @@ function AuthPage() {
         </div>
 
         {/* Central Floating Card */}
-        <div className="relative z-20 w-full max-w-md bg-white dark:bg-card rounded-[2.25rem] border border-border/80 p-6 sm:p-9 shadow-xl shadow-orange-950/5 dark:shadow-none">
+        <div className="relative z-20 w-full max-w-md bg-white dark:bg-card rounded-[2.25rem] border border-border/80 p-6 sm:p-9 shadow-xl shadow-cocoa/10 dark:shadow-none">
           {/* Card Header: Stacked 2-Line Blogh Title */}
           <div className="space-y-1 mb-6">
             <h1 className="font-blogh text-3xl sm:text-4xl font-bold tracking-tight text-cocoa leading-tight uppercase">
               {verificationSentEmail ? (
                 <>
                   <div>Check</div>
-                  <div className="text-[#E86033]">Your Email</div>
+                  <div className="text-berry-deep">Your Email</div>
                 </>
               ) : authMode === "signin" ? (
                 <>
-                  <div>Lets</div>
-                  <div className="text-[#E86033]">Taste Fresh Bakes</div>
+                  <div>Welcome Back</div>
+                  <div className="text-berry-deep">Taste Fresh Bakes</div>
                 </>
               ) : (
                 <>
-                  <div>Lets</div>
-                  <div className="text-[#E86033]">Start Ordering</div>
+                  <div>Join Us</div>
+                  <div className="text-berry-deep">Start Ordering</div>
                 </>
               )}
             </h1>
@@ -397,12 +397,12 @@ function AuthPage() {
           {/* EMAIL VERIFICATION SENT SCREEN */}
           {verificationSentEmail ? (
             <div className="space-y-4 text-center py-2">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-2xl text-[#E86033]">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-berry/15 text-2xl text-berry-deep">
                 ✉
               </div>
               <div>
                 <p className="text-xs font-semibold text-cocoa">Verification link sent to</p>
-                <p className="font-mono text-xs font-bold text-[#E86033] mt-0.5">
+                <p className="font-mono text-xs font-bold text-berry-deep mt-0.5">
                   {verificationSentEmail}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
@@ -427,7 +427,7 @@ function AuthPage() {
                     setVerificationSentEmail(null);
                     setAuthMode("signin");
                   }}
-                  className="w-full rounded-2xl bg-[#E86033] hover:bg-[#D44E23] text-white h-11 font-bold text-xs shadow-md shadow-orange-500/20 cursor-pointer"
+                  className="w-full rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 h-11 font-bold text-xs shadow-md shadow-cocoa/20 cursor-pointer"
                 >
                   Continue to Sign In
                 </Button>
@@ -454,7 +454,7 @@ function AuthPage() {
                             placeholder="Your Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-4 text-sm font-medium focus-visible:ring-[#E86033]"
+                            className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-4 text-sm font-medium focus-visible:ring-berry"
                           />
                         </div>
                       </div>
@@ -470,7 +470,7 @@ function AuthPage() {
                             placeholder="Your Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-11 text-sm font-medium focus-visible:ring-[#E86033]"
+                            className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-11 text-sm font-medium focus-visible:ring-berry"
                           />
                           <button
                             type="button"
@@ -492,7 +492,7 @@ function AuthPage() {
                               setForgotPasswordMode(true);
                               setRecoveryEmail(email);
                             }}
-                            className="text-xs text-muted-foreground hover:text-[#E86033] font-medium transition-colors cursor-pointer"
+                            className="text-xs text-muted-foreground hover:text-berry-deep font-medium transition-colors cursor-pointer"
                           >
                             Forgot password?
                           </button>
@@ -503,7 +503,7 @@ function AuthPage() {
                       <Button
                         type="submit"
                         disabled={busy}
-                        className="w-full bg-[#E86033] hover:bg-[#D44E23] text-white rounded-2xl h-12 font-bold text-base shadow-md shadow-orange-500/20 active:scale-[0.99] transition-all cursor-pointer mt-2"
+                        className="w-full bg-cocoa text-background hover:bg-cocoa/90 rounded-2xl h-12 font-bold text-base shadow-md shadow-cocoa/20 active:scale-[0.99] transition-all cursor-pointer mt-2"
                       >
                         {busy ? "Signing In…" : "Sign In"}
                       </Button>
@@ -559,7 +559,7 @@ function AuthPage() {
                             placeholder="Your Registered Email"
                             value={recoveryEmail}
                             onChange={(e) => setRecoveryEmail(e.target.value)}
-                            className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-4 text-sm font-medium focus-visible:ring-[#E86033]"
+                            className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-4 text-sm font-medium focus-visible:ring-berry"
                           />
                         </div>
                       </div>
@@ -567,7 +567,7 @@ function AuthPage() {
                       <Button
                         type="submit"
                         disabled={busy}
-                        className="w-full bg-[#E86033] hover:bg-[#D44E23] text-white rounded-2xl h-12 font-bold text-base shadow-md shadow-orange-500/20 cursor-pointer"
+                        className="w-full bg-cocoa text-background hover:bg-cocoa/90 rounded-2xl h-12 font-bold text-base shadow-md shadow-cocoa/20 cursor-pointer"
                       >
                         {busy ? "Sending…" : "Send Reset Link"}
                       </Button>
@@ -590,7 +590,7 @@ function AuthPage() {
                     <button
                       type="button"
                       onClick={() => setAuthMode("signup")}
-                      className="font-bold text-[#E86033] hover:underline cursor-pointer ml-1"
+                      className="font-bold text-berry-deep hover:underline cursor-pointer ml-1"
                     >
                       Sign Up
                     </button>
@@ -610,7 +610,7 @@ function AuthPage() {
                           placeholder="Your Name"
                           value={signUpName}
                           onChange={(e) => setSignUpName(e.target.value)}
-                          className="h-11 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-10 pr-3 text-xs sm:text-sm font-medium focus-visible:ring-[#E86033]"
+                          className="h-11 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-10 pr-3 text-xs sm:text-sm font-medium focus-visible:ring-berry"
                         />
                       </div>
 
@@ -623,7 +623,7 @@ function AuthPage() {
                           placeholder="10-digit Phone"
                           value={signUpPhone}
                           onChange={(e) => setSignUpPhone(e.target.value)}
-                          className="h-11 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-10 pr-3 text-xs sm:text-sm font-medium focus-visible:ring-[#E86033]"
+                          className="h-11 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-10 pr-3 text-xs sm:text-sm font-medium focus-visible:ring-berry"
                         />
                       </div>
                     </div>
@@ -638,7 +638,7 @@ function AuthPage() {
                         placeholder="Your Email"
                         value={signUpEmail}
                         onChange={(e) => setSignUpEmail(e.target.value)}
-                        className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-4 text-sm font-medium focus-visible:ring-[#E86033]"
+                        className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-4 text-sm font-medium focus-visible:ring-berry"
                       />
                     </div>
 
@@ -653,7 +653,7 @@ function AuthPage() {
                         placeholder="Create Password (6+ chars)"
                         value={signUpPassword}
                         onChange={(e) => setSignUpPassword(e.target.value)}
-                        className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-11 text-sm font-medium focus-visible:ring-[#E86033]"
+                        className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-11 text-sm font-medium focus-visible:ring-berry"
                       />
                       <button
                         type="button"
@@ -673,7 +673,7 @@ function AuthPage() {
                     <Button
                       type="submit"
                       disabled={busy}
-                      className="w-full bg-[#E86033] hover:bg-[#D44E23] text-white rounded-2xl h-12 font-bold text-base shadow-md shadow-orange-500/20 active:scale-[0.99] transition-all cursor-pointer mt-1"
+                      className="w-full bg-cocoa text-background hover:bg-cocoa/90 rounded-2xl h-12 font-bold text-base shadow-md shadow-cocoa/20 active:scale-[0.99] transition-all cursor-pointer mt-1"
                     >
                       {busy ? "Creating Account…" : "Sign Up"}
                     </Button>
@@ -713,7 +713,7 @@ function AuthPage() {
                     <button
                       type="button"
                       onClick={() => setAuthMode("signin")}
-                      className="font-bold text-[#E86033] hover:underline cursor-pointer ml-1"
+                      className="font-bold text-berry-deep hover:underline cursor-pointer ml-1"
                     >
                       Login
                     </button>
@@ -737,7 +737,7 @@ function AuthPage() {
               stroke="currentColor"
               strokeWidth="2.5"
               strokeDasharray="4 4"
-              className="text-[#E86033]"
+              className="text-berry-deep"
             />
             <path
               d="M100 65 Q115 50 130 65"

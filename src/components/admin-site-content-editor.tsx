@@ -134,7 +134,8 @@ export function AdminSiteContentEditor() {
   };
 
   // Gallery Photos Handlers
-  const galleryPhotos = formState.about_gallery?.photos || DEFAULT_SITE_CONTENT.about_gallery.photos;
+  const galleryPhotos =
+    formState.about_gallery?.photos || DEFAULT_SITE_CONTENT.about_gallery.photos;
 
   const handleAddGalleryPhoto = () => {
     const newPhoto: GalleryPhoto = {
@@ -245,7 +246,7 @@ export function AdminSiteContentEditor() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[11px] font-extrabold uppercase tracking-widest text-berry">
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-berry-deep">
               Live Copywriting & Content Studio
             </span>
           </div>
@@ -253,7 +254,8 @@ export function AdminSiteContentEditor() {
             Homepage & About Page Copy Editor
           </h2>
           <p className="text-xs text-muted-foreground">
-            Edit headlines, dietary labels, descriptions, and gallery portraits across the live storefront.
+            Edit headlines, dietary labels, descriptions, and gallery portraits across the live
+            storefront.
           </p>
         </div>
 
@@ -302,9 +304,13 @@ export function AdminSiteContentEditor() {
                 <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   {sec.page}
                 </span>
-                <Icon className={`size-3.5 ${isActive ? "text-berry" : "text-muted-foreground"}`} />
+                <Icon
+                  className={`size-3.5 ${isActive ? "text-berry-deep" : "text-muted-foreground"}`}
+                />
               </div>
-              <p className={`text-xs font-bold line-clamp-1 ${isActive ? "text-cocoa font-extrabold" : "text-muted-foreground"}`}>
+              <p
+                className={`text-xs font-bold line-clamp-1 ${isActive ? "text-cocoa font-extrabold" : "text-muted-foreground"}`}
+              >
                 {sec.name}
               </p>
             </button>
@@ -314,17 +320,14 @@ export function AdminSiteContentEditor() {
 
       {/* Split-Screen Studio: Left Form & Right Live Preview */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
         {/* Left Side: Form Editor (5 Columns) */}
         <div className="lg:col-span-6 rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft space-y-5">
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-berry">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-berry-deep">
                 {activeConfig.page} Section
               </span>
-              <h3 className="font-display text-lg font-bold text-cocoa">
-                {activeConfig.name}
-              </h3>
+              <h3 className="font-display text-lg font-bold text-cocoa">{activeConfig.name}</h3>
             </div>
             <Button
               type="button"
@@ -362,7 +365,7 @@ export function AdminSiteContentEditor() {
             <div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="sec-title" className="text-xs font-bold text-cocoa">
-                  {activeConfig.titleLabel} <span className="text-berry">*</span>
+                  {activeConfig.titleLabel} <span className="text-berry-deep">*</span>
                 </Label>
                 <span className="text-[10px] text-muted-foreground font-mono">
                   {currentSection.title?.length || 0} chars
@@ -402,7 +405,7 @@ export function AdminSiteContentEditor() {
               <div className="pt-3 border-t border-border/60 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Camera className="size-4 text-berry" />
+                    <Camera className="size-4 text-berry-deep" />
                     <Label className="text-xs font-extrabold text-cocoa">
                       Gallery Portrait Photos ({galleryPhotos.length} Shots)
                     </Label>
@@ -432,21 +435,29 @@ export function AdminSiteContentEditor() {
                         />
                         <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <div>
-                            <span className="text-[10px] font-bold text-muted-foreground">Pill Badge Label</span>
+                            <span className="text-[10px] font-bold text-muted-foreground">
+                              Pill Badge Label
+                            </span>
                             <Input
                               value={photo.label}
                               placeholder="e.g. Belgian Brownie"
                               className="h-8 rounded-lg text-xs mt-0.5"
-                              onChange={(e) => handleUpdateGalleryPhoto(index, { label: e.target.value })}
+                              onChange={(e) =>
+                                handleUpdateGalleryPhoto(index, { label: e.target.value })
+                              }
                             />
                           </div>
                           <div>
-                            <span className="text-[10px] font-bold text-muted-foreground">Top Tag (Optional)</span>
+                            <span className="text-[10px] font-bold text-muted-foreground">
+                              Top Tag (Optional)
+                            </span>
                             <Input
                               value={photo.tag || ""}
                               placeholder="e.g. Signature"
                               className="h-8 rounded-lg text-xs mt-0.5"
-                              onChange={(e) => handleUpdateGalleryPhoto(index, { tag: e.target.value })}
+                              onChange={(e) =>
+                                handleUpdateGalleryPhoto(index, { tag: e.target.value })
+                              }
                             />
                           </div>
                         </div>
@@ -458,7 +469,9 @@ export function AdminSiteContentEditor() {
                             value={photo.image}
                             placeholder="Image URL or /products/photo.jpg"
                             className="h-7 text-[11px] font-mono rounded-lg"
-                            onChange={(e) => handleUpdateGalleryPhoto(index, { image: e.target.value })}
+                            onChange={(e) =>
+                              handleUpdateGalleryPhoto(index, { image: e.target.value })
+                            }
                           />
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
@@ -521,7 +534,7 @@ export function AdminSiteContentEditor() {
         <div className="lg:col-span-6 rounded-3xl border border-border/80 bg-secondary/30 p-5 sm:p-6 shadow-soft space-y-4">
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div className="flex items-center gap-2">
-              <Eye className="size-4 text-berry" />
+              <Eye className="size-4 text-berry-deep" />
               <span className="text-xs font-extrabold uppercase tracking-wide text-cocoa">
                 Live Storefront Preview
               </span>
@@ -577,30 +590,38 @@ export function AdminSiteContentEditor() {
 
             {/* Dynamic Section Mock View */}
             <div className="p-4 sm:p-6 overflow-hidden">
-              
               {/* Preview 1: The Artisan Bakery Laboratory */}
               {activeSectionKey === "home_lab" && (
                 <div className="rounded-2xl border border-amber-300/60 bg-gradient-to-br from-[#FFFDF9] to-[#FFF4E8] dark:from-card dark:to-amber-950/20 p-5 space-y-4 shadow-soft">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-berry block mb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-berry-deep block mb-1">
                       {currentSection.badge || "Pure Craft & Cold Fermentation"}
                     </span>
                     <h2 className="font-blogh text-xl sm:text-3xl font-bold text-cocoa leading-tight uppercase tracking-wide">
                       {currentSection.title || "The artisan bakery laboratory"}
                     </h2>
                     <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed max-w-md">
-                      {currentSection.description || "No shortcuts, zero chemical improvers. Just wild fermentation, stone-ground flour, and real French butter."}
+                      {currentSection.description ||
+                        "No shortcuts, zero chemical improvers. Just wild fermentation, stone-ground flour, and real French butter."}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 pt-2">
                     <div className="rounded-xl border border-amber-200/80 bg-card p-3 shadow-2xs">
-                      <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-300 uppercase">🔥 36h Wild Ferment</span>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">Slow cold retarder proofing</p>
+                      <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-300 uppercase">
+                        🔥 36h Wild Ferment
+                      </span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Slow cold retarder proofing
+                      </p>
                     </div>
                     <div className="rounded-xl border border-amber-200/80 bg-card p-3 shadow-2xs">
-                      <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-300 uppercase">🧈 French Butter</span>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">84% high fat laminating butter</p>
+                      <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-300 uppercase">
+                        🧈 French Butter
+                      </span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        84% high fat laminating butter
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -611,23 +632,29 @@ export function AdminSiteContentEditor() {
                 <div className="rounded-2xl border-2 border-[#2C1810]/15 bg-gradient-to-br from-[#FFF9F3] via-[#FFF5EC] to-[#FFEEE0] dark:from-[#1A1008] dark:to-[#1B0F09] p-5 space-y-4 shadow-soft">
                   <div className="text-center max-w-md mx-auto">
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-card/90 border border-border/80 px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-cocoa shadow-2xs">
-                      <HelpCircle className="size-3 text-berry" /> {currentSection.badge || "Clear Answers"}
+                      <HelpCircle className="size-3 text-berry-deep" />{" "}
+                      {currentSection.badge || "Clear Answers"}
                     </span>
                     <h2 className="mt-2 font-display text-xl sm:text-2xl font-bold text-cocoa">
                       {currentSection.title || "Frequently asked questions"}
                     </h2>
                     <p className="mt-1 text-xs text-cocoa/75 dark:text-muted-foreground leading-relaxed">
-                      {currentSection.description || "Everything you need to know about freshness, morning slots, and delivery."}
+                      {currentSection.description ||
+                        "Everything you need to know about freshness, morning slots, and delivery."}
                     </p>
                   </div>
 
                   <div className="space-y-2">
                     <div className="rounded-xl border border-border/80 bg-card p-3 flex items-center justify-between shadow-2xs">
-                      <span className="text-xs font-semibold text-cocoa">How fresh are the bakes when they reach my door?</span>
+                      <span className="text-xs font-semibold text-cocoa">
+                        How fresh are the bakes when they reach my door?
+                      </span>
                       <span className="text-xs text-muted-foreground font-bold">+</span>
                     </div>
                     <div className="rounded-xl border border-border/80 bg-card p-3 flex items-center justify-between shadow-2xs">
-                      <span className="text-xs font-semibold text-cocoa">How do next-day delivery and pickup slots work?</span>
+                      <span className="text-xs font-semibold text-cocoa">
+                        How do next-day delivery and pickup slots work?
+                      </span>
                       <span className="text-xs text-muted-foreground font-bold">+</span>
                     </div>
                   </div>
@@ -637,14 +664,16 @@ export function AdminSiteContentEditor() {
               {/* Preview 3: Tomorrow Morning CTA Banner */}
               {activeSectionKey === "home_cta" && (
                 <div className="rounded-2xl border border-border/80 bg-gradient-to-br from-card via-[#FFF9F4] to-secondary/40 p-6 text-center shadow-lift space-y-3">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-berry shadow-2xs">
-                    <Sparkles className="size-3 text-berry" /> {currentSection.badge || "Fresh Mornings"}
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-berry-deep shadow-2xs">
+                    <Sparkles className="size-3 text-berry-deep" />{" "}
+                    {currentSection.badge || "Fresh Mornings"}
                   </span>
                   <h2 className="font-blogh text-xl sm:text-2xl font-bold leading-tight text-cocoa uppercase tracking-wide">
                     {currentSection.title || "Tomorrow morning could smell a lot better."}
                   </h2>
                   <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
-                    {currentSection.description || "Reserve your next-day slot now. We mix and bake fresh at dawn for your chosen arrival window."}
+                    {currentSection.description ||
+                      "Reserve your next-day slot now. We mix and bake fresh at dawn for your chosen arrival window."}
                   </p>
                   <div className="pt-2 flex items-center justify-center gap-2">
                     <div className="rounded-xl bg-[#2C1810] text-white px-4 py-2 text-xs font-bold shadow-soft">
@@ -689,7 +718,8 @@ export function AdminSiteContentEditor() {
                     {currentSection.title || "How we deliver your bakes 100% safe & intact"}
                   </h2>
                   <p className="text-xs text-muted-foreground leading-relaxed max-w-md mx-auto">
-                    {currentSection.description || "Delicate croissants, moist multi-layer cakes, and artisanal brownie slabs require precision engineering to travel from our dawn hearth to your celebration table."}
+                    {currentSection.description ||
+                      "Delicate croissants, moist multi-layer cakes, and artisanal brownie slabs require precision engineering to travel from our dawn hearth to your celebration table."}
                   </p>
                   <div className="pt-2 flex items-center justify-center gap-2 text-[11px] font-bold text-emerald-600">
                     <CheckCircle2 className="size-3.5" />
@@ -701,20 +731,28 @@ export function AdminSiteContentEditor() {
               {/* Preview 6: Atelier & Bakes Inertia Gallery */}
               {activeSectionKey === "about_gallery" && (
                 <div className="rounded-2xl border border-border/80 bg-card p-5 space-y-3 shadow-soft text-center">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-berry">
-                    <Sparkles className="size-3 text-berry" />
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-berry-deep">
+                    <Sparkles className="size-3 text-berry-deep" />
                     <span>{currentSection.badge || "Atelier & Hearth Portraits"}</span>
                   </span>
                   <h2 className="font-blogh text-lg sm:text-xl font-bold text-cocoa leading-tight uppercase tracking-wide">
                     {currentSection.title || "Portraits of our daily oven craft"}
                   </h2>
                   <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
-                    {currentSection.description || "A peek behind the proofing racks. Slow lamination, 24K gold gilding, and pure bakes."}
+                    {currentSection.description ||
+                      "A peek behind the proofing racks. Slow lamination, 24K gold gilding, and pure bakes."}
                   </p>
                   <div className="flex gap-2 justify-center overflow-x-hidden pt-2">
                     {galleryPhotos.slice(0, 3).map((photo, i) => (
-                      <div key={i} className="relative w-24 aspect-[3/4] rounded-xl overflow-hidden border border-border/60 shadow-md shrink-0">
-                        <img src={photo.image} alt={photo.label} className="size-full object-cover" />
+                      <div
+                        key={i}
+                        className="relative w-24 aspect-[3/4] rounded-xl overflow-hidden border border-border/60 shadow-md shrink-0"
+                      >
+                        <img
+                          src={photo.image}
+                          alt={photo.label}
+                          className="size-full object-cover"
+                        />
                         <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-black/60 backdrop-blur-xs rounded-md px-1.5 py-0.5 text-[9px] font-bold text-white truncate">
                           {photo.label}
                         </div>
@@ -726,11 +764,9 @@ export function AdminSiteContentEditor() {
                   </p>
                 </div>
               )}
-
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

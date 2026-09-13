@@ -75,11 +75,26 @@ export function loadAppState(): AppStateStorage {
           product_weights: parsed.product_weights ?? {},
           site_content: parsed.site_content
             ? {
-                home_lab: { ...DEFAULT_SITE_CONTENT.home_lab, ...(parsed.site_content.home_lab || {}) },
-                home_faq: { ...DEFAULT_SITE_CONTENT.home_faq, ...(parsed.site_content.home_faq || {}) },
-                home_cta: { ...DEFAULT_SITE_CONTENT.home_cta, ...(parsed.site_content.home_cta || {}) },
-                about_3d: { ...DEFAULT_SITE_CONTENT.about_3d, ...(parsed.site_content.about_3d || {}) },
-                about_delivery: { ...DEFAULT_SITE_CONTENT.about_delivery, ...(parsed.site_content.about_delivery || {}) },
+                home_lab: {
+                  ...DEFAULT_SITE_CONTENT.home_lab,
+                  ...(parsed.site_content.home_lab || {}),
+                },
+                home_faq: {
+                  ...DEFAULT_SITE_CONTENT.home_faq,
+                  ...(parsed.site_content.home_faq || {}),
+                },
+                home_cta: {
+                  ...DEFAULT_SITE_CONTENT.home_cta,
+                  ...(parsed.site_content.home_cta || {}),
+                },
+                about_3d: {
+                  ...DEFAULT_SITE_CONTENT.about_3d,
+                  ...(parsed.site_content.about_3d || {}),
+                },
+                about_delivery: {
+                  ...DEFAULT_SITE_CONTENT.about_delivery,
+                  ...(parsed.site_content.about_delivery || {}),
+                },
                 about_gallery: {
                   ...DEFAULT_SITE_CONTENT.about_gallery,
                   ...(parsed.site_content.about_gallery || {}),
@@ -92,9 +107,10 @@ export function loadAppState(): AppStateStorage {
                 },
               }
             : DEFAULT_SITE_CONTENT,
-          customer_moments: Array.isArray(parsed.customer_moments) && parsed.customer_moments.length > 0
-            ? parsed.customer_moments
-            : DEFAULT_MOMENTS,
+          customer_moments:
+            Array.isArray(parsed.customer_moments) && parsed.customer_moments.length > 0
+              ? parsed.customer_moments
+              : DEFAULT_MOMENTS,
           ...(parsed.updated_at ? { updated_at: parsed.updated_at } : {}),
         };
         isInitialized = true;
@@ -141,7 +157,8 @@ export function saveCategoryLayoutOverrides(
   const current = { ...state.category_layout };
 
   for (const item of updates) {
-    const existing = current[item.id] ?? (item.slug ? current[item.slug] : undefined) ?? { sort_order: item.sort_order };
+    const existing = current[item.id] ??
+      (item.slug ? current[item.slug] : undefined) ?? { sort_order: item.sort_order };
     const config: CategoryLayoutConfig = {
       sort_order: item.sort_order,
       layout_rows: item.layout_rows ?? existing.layout_rows ?? 1,

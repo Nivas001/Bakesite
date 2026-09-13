@@ -1,10 +1,10 @@
-import { Account, Client, ID, OAuthProvider } from 'appwrite';
-import { APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID } from './config';
+import { Account, Client, ID, OAuthProvider } from "appwrite";
+import { APPWRITE_ENDPOINT, APPWRITE_PROJECT_ID } from "./config";
 
 function createAppwriteClient() {
   if (!APPWRITE_PROJECT_ID) {
     throw new Error(
-      'Missing VITE_APPWRITE_PROJECT_ID. Add your Appwrite endpoint and project id to the environment.',
+      "Missing VITE_APPWRITE_PROJECT_ID. Add your Appwrite endpoint and project id to the environment.",
     );
   }
   return new Client().setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT_ID);
@@ -94,7 +94,7 @@ export async function confirmPasswordRecovery(
 
 export async function signOut(): Promise<void> {
   try {
-    await appwriteAccount().deleteSession({ sessionId: 'current' });
+    await appwriteAccount().deleteSession({ sessionId: "current" });
   } catch {
     /* already signed out */
   }

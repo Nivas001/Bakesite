@@ -42,14 +42,21 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
             {discountLabel(product.discount_type, product.discount_value)}
           </span>
         )}
-        <div className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 flex flex-col items-end">
-          {discounted && (
-            <span className="text-[10px] sm:text-[11px] font-semibold text-foreground/90 line-through drop-shadow-xs mb-0.5">
-              {formatCurrency(displayBasePrice)}
+        {/* Both prices sit inside one backdrop. Previously the struck-through
+            price floated bare on the photograph just above the pill, where it
+            collided with it and was often unreadable against the image. */}
+        <div className="absolute right-2.5 bottom-2.5 sm:right-3 sm:bottom-3">
+          <span className="inline-flex items-baseline gap-1.5 rounded-full bg-card/92 px-2.5 py-1 shadow-soft backdrop-blur">
+            {discounted && (
+              <s className="text-[10px] font-semibold text-muted-foreground sm:text-[11px]">
+                <span className="sr-only">Was </span>
+                {formatCurrency(displayBasePrice)}
+              </s>
+            )}
+            <span className="text-[11px] font-bold text-cocoa sm:text-xs md:text-sm">
+              {hasVariants ? `From ` : ""}
+              {formatCurrency(price)}
             </span>
-          )}
-          <span className="rounded-full bg-card/90 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs md:text-sm font-bold text-cocoa shadow-soft backdrop-blur">
-            {hasVariants ? `From ` : ""}{formatCurrency(price)}
           </span>
         </div>
       </Link>
@@ -63,15 +70,21 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
               {product.category_name}
             </p>
             {(product.serving_yield || product.unit_weight_grams) && (
-              <span className="font-semibold text-berry shrink-0">
-                {product.unit_weight_grams ? `${product.unit_weight_grams}g` : product.serving_yield}
+              <span className="font-semibold text-berry-deep shrink-0">
+                {product.unit_weight_grams
+                  ? `${product.unit_weight_grams}g`
+                  : product.serving_yield}
               </span>
             )}
           </div>
 
           {/* Product Name (Strict 2-Line Fixed Height Box so 1-line and 2-line titles align identically) */}
           <h3 className="font-blogh uppercase tracking-wide text-xs sm:text-sm font-bold leading-snug line-clamp-2 mt-1 text-cocoa h-[2.25rem] sm:h-[2.6rem] flex items-start">
-            <Link to="/shop/$slug" params={{ slug: product.slug }} className="hover:text-berry transition-colors">
+            <Link
+              to="/shop/$slug"
+              params={{ slug: product.slug }}
+              className="hover:text-berry-deep transition-colors"
+            >
               {product.name}
             </Link>
           </h3>

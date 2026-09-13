@@ -40,14 +40,17 @@ export function OrderSupportDialog({
   selectedOrder,
   orders = [],
 }: OrderSupportDialogProps) {
-  const [activeTab, setActiveTab] = useState<"help" | "report">(
-    selectedOrder ? "report" : "help"
-  );
+  const [activeTab, setActiveTab] = useState<"help" | "report">(selectedOrder ? "report" : "help");
   const [targetOrderId, setTargetOrderId] = useState<string>(
-    selectedOrder?.id ?? (orders.length > 0 ? orders[0]!.id : "")
+    selectedOrder?.id ?? (orders.length > 0 ? orders[0]!.id : ""),
   );
   const [category, setCategory] = useState<
-    "damaged_packaging" | "missing_items" | "wrong_items" | "taste_freshness" | "delivery_delay" | "other"
+    | "damaged_packaging"
+    | "missing_items"
+    | "wrong_items"
+    | "taste_freshness"
+    | "delivery_delay"
+    | "other"
   >("damaged_packaging");
   const [description, setDescription] = useState("");
   const [preferredResolution, setPreferredResolution] = useState<
@@ -74,8 +77,7 @@ export function OrderSupportDialog({
     onOpenChange(isOpen);
   };
 
-  const currentOrder =
-    selectedOrder || orders.find((o) => o.id === targetOrderId) || null;
+  const currentOrder = selectedOrder || orders.find((o) => o.id === targetOrderId) || null;
 
   async function handleSubmitReport(e: React.FormEvent) {
     e.preventDefault();
@@ -112,7 +114,7 @@ export function OrderSupportDialog({
   }
 
   const directHelplineUrl = encodeURIComponent(
-    `Hi Ani Bakes Studio! 🥐 I need some help and support regarding my orders.`
+    `Hi Ani Bakes Studio! 🥐 I need some help and support regarding my orders.`,
   );
 
   return (
@@ -120,7 +122,7 @@ export function OrderSupportDialog({
       <DialogContent className="max-w-lg rounded-3xl p-6 border-border/80 bg-card shadow-lift overflow-hidden">
         <DialogHeader className="border-b border-border/60 pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-berry/15 text-berry border border-berry/30">
+            <div className="flex size-10 items-center justify-center rounded-2xl bg-berry/15 text-berry-deep border border-berry/30">
               <HelpCircle className="size-5" />
             </div>
             <div>
@@ -181,7 +183,8 @@ export function OrderSupportDialog({
                 </span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Have an urgent delivery inquiry, address change, or cake customization query? Message head baker directly on WhatsApp.
+                Have an urgent delivery inquiry, address change, or cake customization query?
+                Message head baker directly on WhatsApp.
               </p>
               <Button
                 asChild
@@ -208,7 +211,8 @@ export function OrderSupportDialog({
                   <span>Morning Slots</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Bakes come out of oven at 4:00 AM and arrive fresh within your chosen delivery window.
+                  Bakes come out of oven at 4:00 AM and arrive fresh within your chosen delivery
+                  window.
                 </p>
               </div>
 
@@ -218,7 +222,8 @@ export function OrderSupportDialog({
                   <span>Rescheduled Slot Policy</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  If we ever reschedule your slot, you can reject the slot for an instant 100% full refund.
+                  If we ever reschedule your slot, you can reject the slot for an instant 100% full
+                  refund.
                 </p>
               </div>
             </div>
@@ -231,14 +236,16 @@ export function OrderSupportDialog({
               <div className="rounded-2xl bg-card border border-border/70 p-3 text-xs space-y-1">
                 <p className="font-bold text-foreground">How should I store my pastries & cakes?</p>
                 <p className="text-muted-foreground text-[11px] leading-relaxed">
-                  Refrigerate cream cakes at 4°C–8°C. Sourdoughs and cookies stay best in an airtight container at cool room temperature.
+                  Refrigerate cream cakes at 4°C–8°C. Sourdoughs and cookies stay best in an
+                  airtight container at cool room temperature.
                 </p>
               </div>
 
               <div className="rounded-2xl bg-card border border-border/70 p-3 text-xs space-y-1">
                 <p className="font-bold text-foreground">What if my delivery arrives damaged?</p>
                 <p className="text-muted-foreground text-[11px] leading-relaxed">
-                  Click the <strong>'Report Order Issue'</strong> tab to report any damaged packaging or missing items for instant replacement or refund.
+                  Click the <strong>'Report Order Issue'</strong> tab to report any damaged
+                  packaging or missing items for instant replacement or refund.
                 </p>
               </div>
             </div>
@@ -306,7 +313,12 @@ export function OrderSupportDialog({
                     >
                       {orders.map((o) => (
                         <option key={o.id} value={o.id}>
-                          #{o.id.slice(-6).toUpperCase()} · {formatSlotDate(o.slot_date)} ({o.order_items.map((i) => i.product_name).join(", ").slice(0, 30)}...)
+                          #{o.id.slice(-6).toUpperCase()} · {formatSlotDate(o.slot_date)} (
+                          {o.order_items
+                            .map((i) => i.product_name)
+                            .join(", ")
+                            .slice(0, 30)}
+                          ...)
                         </option>
                       ))}
                     </select>
@@ -321,7 +333,8 @@ export function OrderSupportDialog({
                         Order #{currentOrder.id.slice(-6).toUpperCase()}
                       </span>
                       <span className="text-[11px] text-muted-foreground font-medium">
-                        {formatSlotDate(currentOrder.slot_date)} · {slotLabelFor(currentOrder.slot_start)}
+                        {formatSlotDate(currentOrder.slot_date)} ·{" "}
+                        {slotLabelFor(currentOrder.slot_start)}
                       </span>
                     </div>
                     <span className="rounded-full bg-card px-2.5 py-0.5 text-[10px] font-bold border border-border/60">
@@ -350,7 +363,7 @@ export function OrderSupportDialog({
                         onClick={() => setCategory(cat.id as any)}
                         className={`rounded-xl border p-2 text-left text-xs font-semibold transition-all cursor-pointer ${
                           category === cat.id
-                            ? "border-berry bg-berry/10 text-berry shadow-2xs font-bold"
+                            ? "border-berry bg-berry/10 text-berry-deep shadow-2xs font-bold"
                             : "border-border/60 bg-card hover:bg-secondary/50 text-muted-foreground"
                         }`}
                       >

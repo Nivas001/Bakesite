@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { getCurrentUser, signOut as appwriteSignOut, type AppwriteUser } from "@/integrations/appwrite/client";
+import {
+  getCurrentUser,
+  signOut as appwriteSignOut,
+  type AppwriteUser,
+} from "@/integrations/appwrite/client";
 
 let cachedUser: AppwriteUser | null = null;
 let loaded = false;

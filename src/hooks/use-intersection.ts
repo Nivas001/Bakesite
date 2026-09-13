@@ -20,7 +20,7 @@ export function useIntersection(options?: IntersectionObserverInit) {
           observer.disconnect(); // once visible, stop observing
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px", ...options }
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px", ...options },
     );
 
     observer.observe(el);

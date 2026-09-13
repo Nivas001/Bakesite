@@ -48,10 +48,9 @@ export function PolaroidMomentsWall() {
   return (
     <section className="py-10 sm:py-16 overflow-hidden bg-background">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-10">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry mb-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry-deep mb-2">
             <Heart className="size-3.5" />
             <span>Celebrated in Pondicherry</span>
           </div>
@@ -89,7 +88,7 @@ export function PolaroidMomentsWall() {
 
                 {/* Occasion Badge */}
                 <div className="absolute top-3 left-3 z-10">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold text-berry border border-border/60 shadow-2xs">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold text-berry-deep border border-border/60 shadow-2xs">
                     <Sparkles className="size-2.5" />
                     {currentMoment.occasion}
                   </span>
@@ -124,7 +123,7 @@ export function PolaroidMomentsWall() {
               {/* Review Note Body */}
               <div className="p-4 space-y-3 bg-card">
                 <div className="flex items-start gap-2 text-muted-foreground">
-                  <Quote className="size-4 text-berry shrink-0 rotate-180 opacity-60" />
+                  <Quote className="size-4 text-berry-deep shrink-0 rotate-180 opacity-60" />
                   <p className="text-xs italic text-foreground leading-relaxed">
                     "{currentMoment.note}"
                   </p>
@@ -151,7 +150,7 @@ export function PolaroidMomentsWall() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-berry hover:text-berry/80 cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-berry-deep hover:text-berry-deep/80 cursor-pointer"
                   >
                     <span>Next moment</span>
                     <ChevronRight className="size-3.5" />
@@ -184,7 +183,6 @@ export function PolaroidMomentsWall() {
             </div>
           )}
         </div>
-
       </div>
     </section>
   );

@@ -1,8 +1,22 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Copy, Check, Sparkles, ArrowRight, PartyPopper, ShoppingBag, ShieldCheck } from "lucide-react";
+import {
+  Copy,
+  Check,
+  Sparkles,
+  ArrowRight,
+  PartyPopper,
+  ShoppingBag,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export interface VoucherReward {
@@ -20,7 +34,13 @@ interface VoucherRewardModalProps {
 }
 
 const CONFETTI_ANGLES = [0, 36, 72, 108, 144, 180, 216, 252, 288, 324];
-const CONFETTI_COLORS = ["text-berry", "text-amber-500", "text-emerald-500", "text-rose-500", "text-purple-500"];
+const CONFETTI_COLORS = [
+  "text-berry-deep",
+  "text-amber-500",
+  "text-emerald-500",
+  "text-rose-500",
+  "text-purple-500",
+];
 
 export function VoucherRewardModal({ voucher, isOpen, onClose }: VoucherRewardModalProps) {
   const [copied, setCopied] = useState(false);
@@ -77,7 +97,8 @@ export function VoucherRewardModal({ voucher, isOpen, onClose }: VoucherRewardMo
               YOU WON A 15% VOUCHER!
             </DialogTitle>
             <DialogDescription className="text-xs sm:text-sm text-white/90 font-medium">
-              Congratulations! You mastered the {voucher.gameName}. Here is your exclusive 1-time discount code.
+              Congratulations! You mastered the {voucher.gameName}. Here is your exclusive 1-time
+              discount code.
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -87,11 +108,17 @@ export function VoucherRewardModal({ voucher, isOpen, onClose }: VoucherRewardMo
           {/* Realistic Dashed Bakery Coupon Ticket */}
           <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-berry/50 bg-secondary/50 p-4 sm:p-5 shadow-soft">
             {/* Left and right notch cutouts */}
-            <div aria-hidden className="absolute -left-3.5 top-1/2 -translate-y-1/2 size-6 rounded-full bg-card border-r-2 border-berry/50" />
-            <div aria-hidden className="absolute -right-3.5 top-1/2 -translate-y-1/2 size-6 rounded-full bg-card border-l-2 border-berry/50" />
+            <div
+              aria-hidden
+              className="absolute -left-3.5 top-1/2 -translate-y-1/2 size-6 rounded-full bg-card border-r-2 border-berry/50"
+            />
+            <div
+              aria-hidden
+              className="absolute -right-3.5 top-1/2 -translate-y-1/2 size-6 rounded-full bg-card border-l-2 border-berry/50"
+            />
 
             <div className="flex items-center justify-between gap-2 border-b border-dashed border-border/70 pb-3">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-berry">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-berry-deep">
                 <ShieldCheck className="size-3.5 text-emerald-500" />
                 <span>Verified 1-Time Single Use</span>
               </div>
@@ -102,7 +129,9 @@ export function VoucherRewardModal({ voucher, isOpen, onClose }: VoucherRewardMo
 
             {/* Big Prominent Voucher Code */}
             <div className="my-4 text-center">
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Your Exclusive Promo Code</p>
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                Your Exclusive Promo Code
+              </p>
               <div className="mt-1 flex items-center justify-center gap-2">
                 <span className="font-mono text-2xl sm:text-3xl font-black text-cocoa tracking-wider select-all bg-card px-4 py-1.5 rounded-xl border border-berry/30 shadow-inner">
                   {voucher.code}
@@ -154,7 +183,8 @@ export function VoucherRewardModal({ voucher, isOpen, onClose }: VoucherRewardMo
           </div>
 
           <p className="text-center text-[11px] text-muted-foreground/80 leading-snug">
-            💡 This code can only be used once at checkout. Keep it safe or apply it directly on your fresh order!
+            💡 This code can only be used once at checkout. Keep it safe or apply it directly on
+            your fresh order!
           </p>
         </div>
       </DialogContent>

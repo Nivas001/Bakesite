@@ -1,5 +1,5 @@
 // Server-only Appwrite REST client (API key). Never import from client code.
-import { COLLECTIONS } from './config';
+import { COLLECTIONS } from "./config";
 
 export { COLLECTIONS };
 
@@ -16,16 +16,16 @@ function env(name: string, fallback?: string): string {
 }
 
 function endpoint(): string {
-  return env('APPWRITE_ENDPOINT', 'https://cloud.appwrite.io/v1').replace(/\/$/, '');
+  return env("APPWRITE_ENDPOINT", "https://cloud.appwrite.io/v1").replace(/\/$/, "");
 }
 
 function databaseId(): string {
-  return env('APPWRITE_DATABASE_ID', 'bakery');
+  return env("APPWRITE_DATABASE_ID", "bakery");
 }
 
 /** True once the Appwrite server credentials are present. */
 export function isAppwriteConfigured(): boolean {
-  return Boolean(process.env['APPWRITE_PROJECT_ID'] && process.env['APPWRITE_API_KEY']);
+  return Boolean(process.env["APPWRITE_PROJECT_ID"] && process.env["APPWRITE_API_KEY"]);
 }
 
 async function request<T>(
@@ -33,12 +33,12 @@ async function request<T>(
   init: { method?: string; body?: unknown; headers?: Record<string, string> } = {},
 ): Promise<T> {
   const response = await fetch(`${endpoint()}${path}`, {
-    method: init.method ?? 'GET',
+    method: init.method ?? "GET",
     headers: {
-      'content-type': 'application/json',
-      'X-Appwrite-Project': env('APPWRITE_PROJECT_ID'),
-      'X-Appwrite-Key': env('APPWRITE_API_KEY'),
-      'X-Appwrite-Response-Format': '1.6.0',
+      "content-type": "application/json",
+      "X-Appwrite-Project": env("APPWRITE_PROJECT_ID"),
+      "X-Appwrite-Key": env("APPWRITE_API_KEY"),
+      "X-Appwrite-Response-Format": "1.6.0",
       ...init.headers,
     },
     ...(init.body === undefined ? {} : { body: JSON.stringify(init.body) }),
@@ -55,17 +55,17 @@ async function request<T>(
 /** Appwrite query builders (JSON string form used by Appwrite 1.5+). */
 export const Q = {
   equal: (attribute: string, values: unknown | unknown[]) =>
-    JSON.stringify({ method: 'equal', attribute, values: toArray(values) }),
+    JSON.stringify({ method: "equal", attribute, values: toArray(values) }),
   notEqual: (attribute: string, value: unknown) =>
-    JSON.stringify({ method: 'notEqual', attribute, values: [value] }),
+    JSON.stringify({ method: "notEqual", attribute, values: [value] }),
   greaterEqual: (attribute: string, value: unknown) =>
-    JSON.stringify({ method: 'greaterThanEqual', attribute, values: [value] }),
+    JSON.stringify({ method: "greaterThanEqual", attribute, values: [value] }),
   lessEqual: (attribute: string, value: unknown) =>
-    JSON.stringify({ method: 'lessThanEqual', attribute, values: [value] }),
-  orderAsc: (attribute: string) => JSON.stringify({ method: 'orderAsc', attribute }),
-  orderDesc: (attribute: string) => JSON.stringify({ method: 'orderDesc', attribute }),
-  limit: (value: number) => JSON.stringify({ method: 'limit', values: [value] }),
-  offset: (value: number) => JSON.stringify({ method: 'offset', values: [value] }),
+    JSON.stringify({ method: "lessThanEqual", attribute, values: [value] }),
+  orderAsc: (attribute: string) => JSON.stringify({ method: "orderAsc", attribute }),
+  orderDesc: (attribute: string) => JSON.stringify({ method: "orderDesc", attribute }),
+  limit: (value: number) => JSON.stringify({ method: "limit", values: [value] }),
+  offset: (value: number) => JSON.stringify({ method: "offset", values: [value] }),
 };
 
 function toArray(value: unknown | unknown[]): unknown[] {
@@ -78,9 +78,9 @@ function docPath(collection: string, id?: string): string {
 }
 
 export async function listDocs<T>(collection: string, queries: string[] = []): Promise<Doc<T>[]> {
-  const search = queries.map((q) => `queries[]=${encodeURIComponent(q)}`).join('&');
+  const search = queries.map((q) => `queries[]=${encodeURIComponent(q)}`).join("&");
   const result = await request<{ documents: Doc<T>[] }>(
-    `${docPath(collection)}${search ? `?${search}` : ''}`,
+    `${docPath(collection)}${search ? `?${search}` : ""}`,
   );
   return result.documents;
 }
@@ -94,7 +94,7 @@ export async function getDoc<T>(collection: string, id: string): Promise<Doc<T> 
   try {
     return await request<Doc<T>>(docPath(collection, id));
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith('Appwrite 404')) return null;
+    if (error instanceof Error && error.message.startsWith("Appwrite 404")) return null;
     throw error;
   }
 }
@@ -102,7 +102,7 @@ export async function getDoc<T>(collection: string, id: string): Promise<Doc<T> 
 export async function createDoc<T>(
   collection: string,
   data: Record<string, unknown>,
-  documentId = 'unique()',
+  documentId = "unique()",
 ): Promise<Doc<T>> {
   // Strip null and undefined values to prevent Appwrite non-nullable attribute rejection
   const cleanData: Record<string, unknown> = {};
@@ -112,7 +112,7 @@ export async function createDoc<T>(
     }
   }
   return request<Doc<T>>(docPath(collection), {
-    method: 'POST',
+    method: "POST",
     body: { documentId, data: cleanData },
   });
 }
@@ -129,7 +129,7 @@ export async function updateDoc<T>(
       cleanData[key] = value;
     }
   }
-  return request<Doc<T>>(docPath(collection, id), { method: 'PATCH', body: { data: cleanData } });
+  return request<Doc<T>>(docPath(collection, id), { method: "PATCH", body: { data: cleanData } });
 }
 
 export async function upsertDoc<T>(
@@ -142,7 +142,7 @@ export async function upsertDoc<T>(
 }
 
 export async function deleteDoc(collection: string, id: string): Promise<void> {
-  await request(docPath(collection, id), { method: 'DELETE' });
+  await request(docPath(collection, id), { method: "DELETE" });
 }
 
 export type AppwriteAccount = { $id: string; email: string; name: string };
@@ -151,12 +151,12 @@ export type AppwriteAccount = { $id: string; email: string; name: string };
 export async function getAccountFromJwt(jwt: string): Promise<AppwriteAccount> {
   const response = await fetch(`${endpoint()}/account`, {
     headers: {
-      'content-type': 'application/json',
-      'X-Appwrite-Project': env('APPWRITE_PROJECT_ID'),
-      'X-Appwrite-JWT': jwt,
+      "content-type": "application/json",
+      "X-Appwrite-Project": env("APPWRITE_PROJECT_ID"),
+      "X-Appwrite-JWT": jwt,
     },
   });
-  if (!response.ok) throw new Error('Unauthorized: invalid or expired session');
+  if (!response.ok) throw new Error("Unauthorized: invalid or expired session");
   return (await response.json()) as AppwriteAccount;
 }
 
@@ -197,7 +197,7 @@ export async function listAppwriteUsers(): Promise<AppwriteAuthUser[]> {
 export async function updateUserPhone(userId: string, phone: string): Promise<void> {
   try {
     await request(`/users/${userId}/phone`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: { phone },
     });
   } catch (err) {
@@ -209,7 +209,7 @@ export async function updateUserPhone(userId: string, phone: string): Promise<vo
 export async function updateUserName(userId: string, name: string): Promise<void> {
   try {
     await request(`/users/${userId}/name`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: { name },
     });
   } catch (err) {
@@ -217,7 +217,7 @@ export async function updateUserName(userId: string, name: string): Promise<void
   }
 }
 
-const STORAGE_BUCKET_ID = 'products';
+const STORAGE_BUCKET_ID = "products";
 
 /** Ensures the storage bucket exists with public read permissions */
 export async function ensureStorageBucket(): Promise<string> {
@@ -226,16 +226,16 @@ export async function ensureStorageBucket(): Promise<string> {
     return STORAGE_BUCKET_ID;
   } catch {
     try {
-      await request('/storage/buckets', {
-        method: 'POST',
+      await request("/storage/buckets", {
+        method: "POST",
         body: {
           bucketId: STORAGE_BUCKET_ID,
-          name: 'Bakery Products & Media',
+          name: "Bakery Products & Media",
           permissions: ['read("any")'],
           fileSecurity: false,
           enabled: true,
           maximumFileSize: 10 * 1024 * 1024,
-          allowedFileExtensions: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'],
+          allowedFileExtensions: ["jpg", "jpeg", "png", "webp", "gif", "svg", "avif"],
         },
       });
       return STORAGE_BUCKET_ID;
@@ -253,19 +253,19 @@ export async function uploadProductImage(input: {
 }): Promise<string> {
   const bucket = await ensureStorageBucket();
 
-  const buffer = Buffer.from(input.base64, 'base64');
-  const blob = new Blob([buffer], { type: input.mimeType || 'image/jpeg' });
+  const buffer = Buffer.from(input.base64, "base64");
+  const blob = new Blob([buffer], { type: input.mimeType || "image/jpeg" });
 
   const formData = new FormData();
-  formData.append('fileId', 'unique()');
-  formData.append('file', blob, input.filename || 'product.jpg');
-  formData.append('permissions[]', 'read("any")');
+  formData.append("fileId", "unique()");
+  formData.append("file", blob, input.filename || "product.jpg");
+  formData.append("permissions[]", 'read("any")');
 
   const response = await fetch(`${endpoint()}/storage/buckets/${bucket}/files`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'X-Appwrite-Project': env('APPWRITE_PROJECT_ID'),
-      'X-Appwrite-Key': env('APPWRITE_API_KEY'),
+      "X-Appwrite-Project": env("APPWRITE_PROJECT_ID"),
+      "X-Appwrite-Key": env("APPWRITE_API_KEY"),
     },
     body: formData,
   });
@@ -277,5 +277,5 @@ export async function uploadProductImage(input: {
   }
 
   const file = (await response.json()) as { $id: string };
-  return `${endpoint()}/storage/buckets/${bucket}/files/${file.$id}/view?project=${env('APPWRITE_PROJECT_ID')}`;
+  return `${endpoint()}/storage/buckets/${bucket}/files/${file.$id}/view?project=${env("APPWRITE_PROJECT_ID")}`;
 }

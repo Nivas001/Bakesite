@@ -32,7 +32,12 @@ export const productSchema = z.object({
     .min(2, "URL slug must be at least 2 characters")
     .max(120)
     .regex(/^[a-z0-9-]+$/, "Use lowercase letters, numbers and dashes only"),
-  description: z.string().trim().max(600, "Description must be under 600 characters").optional().nullable(),
+  description: z
+    .string()
+    .trim()
+    .max(600, "Description must be under 600 characters")
+    .optional()
+    .nullable(),
   price: z.number().min(0, "Price must be greater than or equal to 0").max(100000),
   discount_type: z.enum(["none", "percent", "flat"]),
   discount_value: z.number().min(0).max(100000),

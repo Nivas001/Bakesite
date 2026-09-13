@@ -97,13 +97,13 @@ export function AdminGalleryEditor() {
     };
     setPhotos((prev) => [newPhoto, ...prev]);
     setIsDirty(true);
-    toast.success("Added new photo slot to top of gallery. Upload photo or edit labels and click Save.");
+    toast.success(
+      "Added new photo slot to top of gallery. Upload photo or edit labels and click Save.",
+    );
   };
 
   const handleUpdatePhoto = (id: string, updated: Partial<GalleryPhoto>) => {
-    setPhotos((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...updated } : p)),
-    );
+    setPhotos((prev) => prev.map((p) => (p.id === id ? { ...p, ...updated } : p)));
     setIsDirty(true);
   };
 
@@ -155,7 +155,9 @@ export function AdminGalleryEditor() {
           if (res?.imageUrl) {
             handleUpdatePhoto(photoId, { image: res.imageUrl });
             setIsDirty(true);
-            toast.success("📸 Photo uploaded & stored! Click 'Save Gallery Changes' to apply live.");
+            toast.success(
+              "📸 Photo uploaded & stored! Click 'Save Gallery Changes' to apply live.",
+            );
           }
         } catch (err: any) {
           toast.error(err?.message || "Failed to upload photo file.");
@@ -246,7 +248,7 @@ export function AdminGalleryEditor() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[11px] font-extrabold uppercase tracking-widest text-berry">
+            <span className="text-[11px] font-extrabold uppercase tracking-widest text-berry-deep">
               About Page Gallery Atelier
             </span>
           </div>
@@ -254,7 +256,8 @@ export function AdminGalleryEditor() {
             Atelier Portraits & Inertia Gallery
           </h2>
           <p className="text-xs text-muted-foreground max-w-xl">
-            Upload your own bakery photos, drag and drop to swap their order, and edit bottom pill labels live.
+            Upload your own bakery photos, drag and drop to swap their order, and edit bottom pill
+            labels live.
           </p>
         </div>
 
@@ -285,14 +288,12 @@ export function AdminGalleryEditor() {
 
       {/* Main Split-Screen Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
         {/* Left Side: Drag-and-Drop Photo Sequence & Meta (6 Columns) */}
         <div className="lg:col-span-6 space-y-6">
-          
           {/* Section Copywriting Card */}
           <div className="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft space-y-4">
             <div className="border-b border-border/60 pb-3">
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-berry">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-berry-deep">
                 Section Headlines
               </span>
               <h3 className="font-display text-base font-bold text-cocoa">
@@ -347,7 +348,7 @@ export function AdminGalleryEditor() {
           <div className="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-soft space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3">
               <div className="flex items-center gap-2">
-                <Camera className="size-4 text-berry" />
+                <Camera className="size-4 text-berry-deep" />
                 <div>
                   <h3 className="font-display text-base font-bold text-cocoa">
                     Drag-to-Swap Sequence ({photos.length} Photos)
@@ -357,7 +358,7 @@ export function AdminGalleryEditor() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Button
                   type="button"
@@ -366,7 +367,7 @@ export function AdminGalleryEditor() {
                   onClick={() => globalFileInputRef.current?.click()}
                   className="h-8 rounded-xl text-xs font-bold gap-1 px-3 hover:border-berry/40 cursor-pointer"
                 >
-                  <Upload className="size-3.5 text-berry" />
+                  <Upload className="size-3.5 text-berry-deep" />
                   <span>Upload Photo</span>
                 </Button>
                 <Button
@@ -387,7 +388,11 @@ export function AdminGalleryEditor() {
                 {photos.map((photo, index) => {
                   const isUploadingThis = uploadingId === photo.id;
                   return (
-                    <ReorderItem key={photo.id} value={photo} className="cursor-grab active:cursor-grabbing p-3.5">
+                    <ReorderItem
+                      key={photo.id}
+                      value={photo}
+                      className="cursor-grab active:cursor-grabbing p-3.5"
+                    >
                       <div className="flex flex-col gap-2.5 w-full">
                         <div className="flex items-center gap-3 w-full">
                           {/* Drag Handle */}
@@ -445,7 +450,9 @@ export function AdminGalleryEditor() {
                               <Input
                                 value={photo.label}
                                 placeholder="e.g. Belgian Brownie"
-                                onChange={(e) => handleUpdatePhoto(photo.id, { label: e.target.value })}
+                                onChange={(e) =>
+                                  handleUpdatePhoto(photo.id, { label: e.target.value })
+                                }
                                 className="h-8 rounded-lg text-xs mt-0.5 font-semibold"
                               />
                             </div>
@@ -456,7 +463,9 @@ export function AdminGalleryEditor() {
                               <Input
                                 value={photo.tag || ""}
                                 placeholder="e.g. Signature"
-                                onChange={(e) => handleUpdatePhoto(photo.id, { tag: e.target.value })}
+                                onChange={(e) =>
+                                  handleUpdatePhoto(photo.id, { tag: e.target.value })
+                                }
                                 className="h-8 rounded-lg text-xs mt-0.5 font-semibold"
                               />
                             </div>
@@ -483,7 +492,9 @@ export function AdminGalleryEditor() {
                             <Input
                               value={photo.image}
                               placeholder="Image URL or upload custom photo"
-                              onChange={(e) => handleUpdatePhoto(photo.id, { image: e.target.value })}
+                              onChange={(e) =>
+                                handleUpdatePhoto(photo.id, { image: e.target.value })
+                              }
                               className="h-7 text-[11px] font-mono rounded-lg bg-secondary/30"
                             />
                           </div>
@@ -516,7 +527,9 @@ export function AdminGalleryEditor() {
             {/* Bottom Save Bar */}
             <div className="pt-3 border-t border-border/60 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
-                {isDirty ? "⚠️ Changes pending — Click Save to apply" : "✅ Sequence live in sync with /about"}
+                {isDirty
+                  ? "⚠️ Changes pending — Click Save to apply"
+                  : "✅ Sequence live in sync with /about"}
               </span>
               <Button
                 type="button"
@@ -537,7 +550,7 @@ export function AdminGalleryEditor() {
           <div className="rounded-3xl border border-border/80 bg-card p-6 shadow-soft space-y-4">
             <div className="flex items-center justify-between border-b border-border/60 pb-3">
               <div className="flex items-center gap-2">
-                <Eye className="size-4 text-berry" />
+                <Eye className="size-4 text-berry-deep" />
                 <h3 className="font-display text-base font-bold text-cocoa">
                   Live Inertia Gallery Preview
                 </h3>
@@ -546,7 +559,7 @@ export function AdminGalleryEditor() {
                 href="/about"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs font-bold text-berry hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1 text-xs font-bold text-berry-deep hover:underline cursor-pointer"
               >
                 <span>View Public About Page</span>
                 <ExternalLink className="size-3" />
@@ -554,7 +567,7 @@ export function AdminGalleryEditor() {
             </div>
 
             <div className="text-center space-y-1.5 pt-1">
-              <span className="inline-flex items-center gap-1 rounded-full bg-berry/10 border border-berry/30 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-berry">
+              <span className="inline-flex items-center gap-1 rounded-full bg-berry/10 border border-berry/30 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-berry-deep">
                 <Sparkles className="size-3" />
                 <span>{badge || "Atelier & Hearth Portraits"}</span>
               </span>
@@ -562,25 +575,16 @@ export function AdminGalleryEditor() {
                 {title || "Portraits of our daily oven craft"}
               </h4>
               <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-                {description || "A peek behind the proofing racks. Slow lamination, 24K gold gilding, and the purest single-origin bakes."}
+                {description ||
+                  "A peek behind the proofing racks. Slow lamination, 24K gold gilding, and the purest single-origin bakes."}
               </p>
             </div>
 
             {/* Embedded Live Interactive Inertia Gallery */}
             <div className="py-2 overflow-hidden">
-              <InertiaGallery
-                snap
-                itemWidth={210}
-                gap={16}
-                className="w-full"
-              >
+              <InertiaGallery snap itemWidth={210} gap={16} className="w-full">
                 {photos.map((p) => (
-                  <GalleryShot
-                    key={p.id}
-                    image={p.image}
-                    label={p.label}
-                    tag={p.tag}
-                  />
+                  <GalleryShot key={p.id} image={p.image} label={p.label} tag={p.tag} />
                 ))}
               </InertiaGallery>
             </div>
@@ -588,12 +592,12 @@ export function AdminGalleryEditor() {
             <div className="rounded-2xl bg-secondary/40 p-3 text-center border border-border/60 text-xs text-muted-foreground space-y-1">
               <p className="font-bold text-cocoa">📸 Dynamic Photo Storage</p>
               <p className="text-[11px]">
-                Uploaded photos are processed and permanently stored in Appwrite Storage, updating the database and About page gallery live on save.
+                Uploaded photos are processed and permanently stored in Appwrite Storage, updating
+                the database and About page gallery live on save.
               </p>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
