@@ -36,7 +36,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Ani Bakes Bakery" },
-      { name: "description", content: "Sign in with your email or Google account to place and track bakery orders." },
+      {
+        name: "description",
+        content: "Sign in with your email or Google account to place and track bakery orders.",
+      },
       { property: "og:title", content: "Sign in — Ani Bakes Bakery" },
       { property: "og:description", content: "Sign in to place and track your bakery orders." },
     ],
@@ -57,7 +60,9 @@ function AuthPage() {
   const saveProfileFn = useServerFn(saveMyProfile);
 
   const [authMode, setAuthMode] = useState<"signin" | "signup">(search.mode ?? "signin");
-  const [authenticatingOAuth, setAuthenticatingOAuth] = useState(Boolean(search.userId && search.secret));
+  const [authenticatingOAuth, setAuthenticatingOAuth] = useState(
+    Boolean(search.userId && search.secret),
+  );
 
   // Email Sign-in State
   const [email, setEmail] = useState("");
@@ -124,7 +129,9 @@ function AuthPage() {
       toast.success("Welcome back!");
       navigate({ to: target, replace: true });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Sign in failed. Check your email and password.");
+      toast.error(
+        error instanceof Error ? error.message : "Sign in failed. Check your email and password.",
+      );
     } finally {
       setBusy(false);
     }
@@ -253,10 +260,8 @@ function AuthPage() {
 
   return (
     <div className="relative min-h-[calc(100svh-7.5rem)] flex flex-col justify-center px-4 py-8 sm:py-12 bg-background overflow-hidden">
-      
       {/* Center Section: Floating Card & Flanking Geometric Elements */}
       <div className="relative my-auto flex items-center justify-center w-full max-w-4xl mx-auto">
-        
         {/* Bottom-Left Character & Geometric Pedestals (Desktop & Tablet) */}
         <div className="hidden md:flex absolute -left-2 sm:left-2 lg:left-6 bottom-0 z-10 flex-col items-start pointer-events-none select-none">
           <div className="relative">
@@ -268,18 +273,55 @@ function AuthPage() {
             <div className="relative w-36 sm:w-44 lg:w-52 h-44 sm:h-52 flex items-end">
               <svg viewBox="0 0 200 220" className="w-full h-full drop-shadow-md">
                 {/* Base Step 1: White Box with rising arrow */}
-                <rect x="10" y="140" width="60" height="70" fill="#FFFFFF" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" rx="4" />
-                <path d="M25 195 L55 155 M38 155 L55 155 L55 172" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" />
-                
+                <rect
+                  x="10"
+                  y="140"
+                  width="60"
+                  height="70"
+                  fill="#FFFFFF"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="text-cocoa"
+                  rx="4"
+                />
+                <path
+                  d="M25 195 L55 155 M38 155 L55 155 L55 172"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="text-cocoa"
+                />
+
                 {/* Base Step 2: Yellow Elevated Podium */}
-                <rect x="70" y="110" width="70" height="100" fill="#FCE38A" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" rx="4" />
-                
+                <rect
+                  x="70"
+                  y="110"
+                  width="70"
+                  height="100"
+                  fill="#FCE38A"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="text-cocoa"
+                  rx="4"
+                />
+
                 {/* Baseline */}
-                <line x1="0" y1="210" x2="200" y2="210" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" />
+                <line
+                  x1="0"
+                  y1="210"
+                  x2="200"
+                  y2="210"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="text-cocoa"
+                />
 
                 {/* Character Sitting On Yellow Podium */}
                 {/* Hair */}
-                <path d="M75 35 C70 20, 95 15, 105 30 C115 35, 120 50, 110 60 C98 62, 85 55, 75 35 Z" fill="#1C1816" />
+                <path
+                  d="M75 35 C70 20, 95 15, 105 30 C115 35, 120 50, 110 60 C98 62, 85 55, 75 35 Z"
+                  fill="#1C1816"
+                />
                 <circle cx="70" cy="48" r="8" fill="#1C1816" />
                 {/* Face & Head */}
                 <circle cx="95" cy="50" r="14" fill="#FFE5D9" />
@@ -292,11 +334,29 @@ function AuthPage() {
                 <line x1="90" y1="95" x2="95" y2="90" stroke="#FFF" strokeWidth="2" />
                 <line x1="110" y1="95" x2="115" y2="90" stroke="#FFF" strokeWidth="2" />
                 {/* Laptop */}
-                <path d="M125 90 L140 70 L145 92 L120 96 Z" fill="#E86033" stroke="currentColor" strokeWidth="2" className="text-cocoa" />
+                <path
+                  d="M125 90 L140 70 L145 92 L120 96 Z"
+                  fill="#E86033"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="text-cocoa"
+                />
                 <rect x="110" y="94" width="28" height="5" fill="#C54820" rx="2" />
                 {/* White Legs / Trousers */}
-                <path d="M85 110 L105 110 L115 160 L100 160 Z" fill="#FFFFFF" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" />
-                <path d="M105 110 L125 110 L145 160 L130 160 Z" fill="#FFFFFF" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" />
+                <path
+                  d="M85 110 L105 110 L115 160 L100 160 Z"
+                  fill="#FFFFFF"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="text-cocoa"
+                />
+                <path
+                  d="M105 110 L125 110 L145 160 L130 160 Z"
+                  fill="#FFFFFF"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  className="text-cocoa"
+                />
                 {/* Black Shoes */}
                 <path d="M95 160 L110 160 L115 170 L95 170 Z" fill="#1C1816" />
                 <path d="M130 160 L150 160 L155 172 L132 172 Z" fill="#1C1816" />
@@ -307,7 +367,6 @@ function AuthPage() {
 
         {/* Central Floating Card */}
         <div className="relative z-20 w-full max-w-md bg-white dark:bg-card rounded-[2.25rem] border border-border/80 p-6 sm:p-9 shadow-xl shadow-orange-950/5 dark:shadow-none">
-          
           {/* Card Header: Stacked 2-Line Blogh Title */}
           <div className="space-y-1 mb-6">
             <h1 className="font-blogh text-3xl sm:text-4xl font-bold tracking-tight text-cocoa leading-tight uppercase">
@@ -343,7 +402,9 @@ function AuthPage() {
               </div>
               <div>
                 <p className="text-xs font-semibold text-cocoa">Verification link sent to</p>
-                <p className="font-mono text-xs font-bold text-[#E86033] mt-0.5">{verificationSentEmail}</p>
+                <p className="font-mono text-xs font-bold text-[#E86033] mt-0.5">
+                  {verificationSentEmail}
+                </p>
                 <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
                   Click the link inside your email to activate your account and access member bakes!
                 </p>
@@ -417,7 +478,11 @@ function AuthPage() {
                             className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors cursor-pointer"
                             aria-label={showSignInPassword ? "Hide password" : "Show password"}
                           >
-                            {showSignInPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                            {showSignInPassword ? (
+                              <EyeOff className="size-4" />
+                            ) : (
+                              <Eye className="size-4" />
+                            )}
                           </button>
                         </div>
                         <div className="flex justify-end pt-0.5">
@@ -596,7 +661,11 @@ function AuthPage() {
                         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors cursor-pointer"
                         aria-label={showSignUpPassword ? "Hide password" : "Show password"}
                       >
-                        {showSignUpPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                        {showSignUpPassword ? (
+                          <EyeOff className="size-4" />
+                        ) : (
+                          <Eye className="size-4" />
+                        )}
                       </button>
                     </div>
 
@@ -657,7 +726,10 @@ function AuthPage() {
 
         {/* Bottom-Right Geometric Pedestals & Doodles (Desktop & Tablet) */}
         <div className="hidden md:flex absolute -right-2 sm:right-2 lg:right-6 bottom-0 z-10 flex-col items-end pointer-events-none select-none">
-          <svg viewBox="0 0 180 180" className="w-32 sm:w-40 lg:w-48 h-32 sm:h-40 lg:h-48 drop-shadow-md">
+          <svg
+            viewBox="0 0 180 180"
+            className="w-32 sm:w-40 lg:w-48 h-32 sm:h-40 lg:h-48 drop-shadow-md"
+          >
             {/* Rising Steam Puff / Doodles */}
             <path
               d="M120 40 C110 25, 135 15, 145 30 C155 40, 150 55, 135 60"
@@ -667,16 +739,50 @@ function AuthPage() {
               strokeDasharray="4 4"
               className="text-[#E86033]"
             />
-            <path d="M100 65 Q115 50 130 65" fill="none" stroke="currentColor" strokeWidth="2" className="text-cocoa" />
-            
+            <path
+              d="M100 65 Q115 50 130 65"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="text-cocoa"
+            />
+
             {/* White Step Box */}
-            <rect x="20" y="85" width="60" height="95" fill="#FFFFFF" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" rx="4" />
-            
+            <rect
+              x="20"
+              y="85"
+              width="60"
+              height="95"
+              fill="#FFFFFF"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="text-cocoa"
+              rx="4"
+            />
+
             {/* Yellow Tall Step Box */}
-            <rect x="80" y="45" width="70" height="135" fill="#FCE38A" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" rx="4" />
-            
+            <rect
+              x="80"
+              y="45"
+              width="70"
+              height="135"
+              fill="#FCE38A"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="text-cocoa"
+              rx="4"
+            />
+
             {/* Baseline Connection */}
-            <line x1="0" y1="180" x2="180" y2="180" stroke="currentColor" strokeWidth="2.5" className="text-cocoa" />
+            <line
+              x1="0"
+              y1="180"
+              x2="180"
+              y2="180"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              className="text-cocoa"
+            />
           </svg>
         </div>
       </div>

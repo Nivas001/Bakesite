@@ -7,7 +7,17 @@ import { MemoryGame } from "@/components/games/memory-game";
 import { SpinWheelGame } from "@/components/games/spin-wheel-game";
 import { VoucherRewardModal, type VoucherReward } from "@/components/games/voucher-reward-modal";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Gamepad2, HelpCircle, Layers, Gift, ArrowRight, Tag, ShieldCheck, LogIn } from "lucide-react";
+import {
+  Sparkles,
+  Gamepad2,
+  HelpCircle,
+  Layers,
+  Gift,
+  ArrowRight,
+  Tag,
+  ShieldCheck,
+  LogIn,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-appwrite-auth";
 
@@ -17,7 +27,8 @@ export const Route = createFileRoute("/play-coupons")({
       { title: "Play & Win Bakery Coupons — Ani Bakes Bakery" },
       {
         name: "description",
-        content: "Play our confectionery trivia, memory match, or spin the wheel to win a single-use 15% discount coupon at Ani Bakes.",
+        content:
+          "Play our confectionery trivia, memory match, or spin the wheel to win a single-use 15% discount coupon at Ani Bakes.",
       },
       { property: "og:title", content: "Play & Win Bakery Coupons — Ani Bakes Bakery" },
       {
@@ -65,7 +76,6 @@ function PlayCouponsPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10 space-y-8 sm:space-y-12">
-      
       {/* 1. Hero Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8 border-b border-border/60 pb-6 sm:pb-8">
         <div className="space-y-3 flex-1">
@@ -83,7 +93,10 @@ function PlayCouponsPage() {
           </h1>
 
           <p className="max-w-2xl text-xs sm:text-base text-muted-foreground leading-relaxed">
-            Test your craft knowledge, challenge your memory, or spin the sweets wheel. Conquer any game to unlock an exclusive <strong className="text-cocoa font-bold">15% single-use discount voucher</strong> for your next artisan order!
+            Test your craft knowledge, challenge your memory, or spin the sweets wheel. Conquer any
+            game to unlock an exclusive{" "}
+            <strong className="text-cocoa font-bold">15% single-use discount voucher</strong> for
+            your next artisan order!
           </p>
         </div>
 
@@ -109,7 +122,9 @@ function PlayCouponsPage() {
                 : "text-muted-foreground hover:text-cocoa hover:bg-card/40"
             }`}
           >
-            <HelpCircle className={`size-4 ${activeTab === "quiz" ? "text-berry" : "text-muted-foreground"}`} />
+            <HelpCircle
+              className={`size-4 ${activeTab === "quiz" ? "text-berry" : "text-muted-foreground"}`}
+            />
             <span>Trivia Quiz</span>
           </button>
 
@@ -122,7 +137,9 @@ function PlayCouponsPage() {
                 : "text-muted-foreground hover:text-cocoa hover:bg-card/40"
             }`}
           >
-            <Layers className={`size-4 ${activeTab === "memory" ? "text-berry" : "text-muted-foreground"}`} />
+            <Layers
+              className={`size-4 ${activeTab === "memory" ? "text-berry" : "text-muted-foreground"}`}
+            />
             <span>Memory Match</span>
           </button>
 
@@ -135,7 +152,9 @@ function PlayCouponsPage() {
                 : "text-muted-foreground hover:text-cocoa hover:bg-card/40"
             }`}
           >
-            <Gift className={`size-4 ${activeTab === "spin" ? "text-amber-500" : "text-muted-foreground"}`} />
+            <Gift
+              className={`size-4 ${activeTab === "spin" ? "text-amber-500" : "text-muted-foreground"}`}
+            />
             <span>Wheel of Sweets</span>
           </button>
         </div>
@@ -193,7 +212,11 @@ function PlayCouponsPage() {
             </Link>
           </Button>
 
-          <Button asChild size="sm" className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs h-9 shadow-soft">
+          <Button
+            asChild
+            size="sm"
+            className="rounded-xl bg-berry text-berry-foreground hover:bg-berry/90 font-bold text-xs h-9 shadow-soft"
+          >
             <Link to="/shop">
               <span>Shop Bakery Counter</span>
               <ArrowRight className="size-3.5 ml-1" />
@@ -208,7 +231,6 @@ function PlayCouponsPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
-
     </div>
   );
 }

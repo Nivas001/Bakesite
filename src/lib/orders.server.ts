@@ -17,7 +17,11 @@ import {
 import { finalPrice } from "./pricing";
 import type { ProductDoc } from "./catalog.server";
 import { TIME_SLOTS, toISODate, isSlotAvailable } from "./slots";
-import { notifyAdminNewOrder, notifyCustomerOrderPlaced, notifyCustomerOrderUpdate } from "./notifications.server";
+import {
+  notifyAdminNewOrder,
+  notifyCustomerOrderPlaced,
+  notifyCustomerOrderUpdate,
+} from "./notifications.server";
 import {
   placeOrderSchema,
   profileSchema,
@@ -40,7 +44,13 @@ export {
 
 export type OrderDoc = {
   user_id: string;
-  status: "pending_approval" | "awaiting_payment" | "confirmed" | "rescheduled" | "completed" | "rejected";
+  status:
+    | "pending_approval"
+    | "awaiting_payment"
+    | "confirmed"
+    | "rescheduled"
+    | "completed"
+    | "rejected";
   fulfilment_type: string;
   slot_date: string;
   slot_start: string;
@@ -223,11 +233,11 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
   }
 
   const finalOrderTotal = Math.max(0, total - promoDiscount);
-  const totalDiscount = (subtotal - total) + promoDiscount;
+  const totalDiscount = subtotal - total + promoDiscount;
 
   const orderNotes = input.promoCode
     ? `${input.notes ? `${input.notes} | ` : ""}Promo: ${input.promoCode} (-₹${promoDiscount})`
-    : input.notes ?? null;
+    : (input.notes ?? null);
 
   const order = await createDoc<OrderDoc>(COLLECTIONS.orders, {
     user_id: userId,
@@ -245,9 +255,13 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     delivery_lat: input.fulfilmentType === "delivery" ? input.latitude : null,
     delivery_lng: input.fulfilmentType === "delivery" ? input.longitude : null,
     notes: orderNotes,
+    // Payment fields stay empty until money actually moves. A new order is
+    // `pending_approval`; the admin moves it to `awaiting_payment`, which mints
+    // the Razorpay link, and the webhook is what records payment_ref/paid_at.
+    // Stamping them here wrote a paid timestamp onto every unpaid order.
     payment_link_url: null,
-    payment_ref: `PAY_${Date.now()}`,
-    paid_at: new Date().toISOString(),
+    payment_ref: null,
+    paid_at: null,
   });
 
   try {
@@ -291,7 +305,10 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
 }
 
 /** Customer cancels / rejects an order because it was rescheduled */
-export async function cancelRescheduledOrderForUser(userId: string, input: CancelRescheduledOrderInput) {
+export async function cancelRescheduledOrderForUser(
+  userId: string,
+  input: CancelRescheduledOrderInput,
+) {
   const order = await getDoc<OrderDoc>(COLLECTIONS.orders, input.orderId);
   if (!order) throw new Error("Order not found.");
   if (order.user_id !== userId) throw new Error("Unauthorized to modify this order.");
@@ -321,7 +338,8 @@ export async function cancelRescheduledOrderForUser(userId: string, input: Cance
 
   return {
     ok: true as const,
-    message: "Rescheduled slot rejected. Your order has been cancelled and full refund has been initiated.",
+    message:
+      "Rescheduled slot rejected. Your order has been cancelled and full refund has been initiated.",
   };
 }
 
@@ -349,10 +367,10 @@ export async function reportOrderIssueForUser(userId: string, input: ReportOrder
 
   const whatsappMessage = encodeURIComponent(
     `Hi Ani Bakes Studio! 🥐 I am reporting an issue with my completed order #${order.$id.slice(-6).toUpperCase()}.\n\n` +
-    `• Issue: ${catLabel}\n` +
-    `• Details: ${input.description.trim()}\n` +
-    `• Preferred Resolution: ${input.preferredResolution}\n\n` +
-    `Please help review and assist.`
+      `• Issue: ${catLabel}\n` +
+      `• Details: ${input.description.trim()}\n` +
+      `• Preferred Resolution: ${input.preferredResolution}\n\n` +
+      `Please help review and assist.`,
   );
 
   return {

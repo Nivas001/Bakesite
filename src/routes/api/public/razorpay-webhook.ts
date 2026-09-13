@@ -23,8 +23,12 @@ export const Route = createFileRoute("/api/public/razorpay-webhook")({
         const payload = JSON.parse(body) as {
           event?: string;
           payload?: {
-            payment_link?: { entity?: { reference_id?: string; id?: string } };
-            payment?: { entity?: { id?: string; notes?: { order_id?: string } } };
+            payment_link?: {
+              entity?: { reference_id?: string; id?: string; amount_paid?: number };
+            };
+            payment?: {
+              entity?: { id?: string; amount?: number; notes?: { order_id?: string } };
+            };
           };
         };
 
@@ -38,7 +42,41 @@ export const Route = createFileRoute("/api/public/razorpay-webhook")({
           return new Response("ok");
         }
 
-        const { COLLECTIONS, updateDoc } = await import("@/integrations/appwrite/admin.server");
+        const { COLLECTIONS, getDoc, updateDoc } =
+          await import("@/integrations/appwrite/admin.server");
+
+        const order = await getDoc<{ status: string; total: number; paid_at: string | null }>(
+          COLLECTIONS.orders,
+          orderId,
+        );
+        if (!order) {
+          console.warn("[razorpay webhook] no such order:", orderId);
+          return new Response("ok");
+        }
+
+        // Idempotency: Razorpay retries, and a replayed body carries a valid
+        // signature. An order that is already paid must not be re-confirmed —
+        // that would resurrect one the customer or admin has since cancelled.
+        if (order.paid_at) return new Response("ok");
+        if (order.status === "rejected" || order.status === "completed") {
+          console.warn(`[razorpay webhook] ignoring payment for ${order.status} order ${orderId}`);
+          return new Response("ok");
+        }
+
+        // Confirm only when the money actually covers the order. Razorpay
+        // reports paise, so compare in paise.
+        const paidPaise =
+          payload.payload?.payment?.entity?.amount ??
+          payload.payload?.payment_link?.entity?.amount_paid ??
+          null;
+        const expectedPaise = Math.round(Number(order.total) * 100);
+        if (paidPaise !== null && paidPaise < expectedPaise) {
+          console.error(
+            `[razorpay webhook] underpaid order ${orderId}: got ${paidPaise}, expected ${expectedPaise}`,
+          );
+          return new Response("ok");
+        }
+
         try {
           await updateDoc(COLLECTIONS.orders, orderId, {
             status: "confirmed",

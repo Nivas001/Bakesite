@@ -137,9 +137,7 @@ export async function removeOfferCode(id: string) {
 
 export async function validatePromoCode(input: ValidateOfferCodeInput) {
   const codes = await fetchOfferCodes();
-  const code = codes.find(
-    (c) => c.code.toUpperCase() === input.code.toUpperCase().trim(),
-  );
+  const code = codes.find((c) => c.code.toUpperCase() === input.code.toUpperCase().trim());
 
   if (!code) {
     throw new Error(`Promo code "${input.code}" not found.`);
@@ -165,14 +163,12 @@ export async function validatePromoCode(input: ValidateOfferCodeInput) {
   }
 
   if (code.min_order_amount > 0 && input.subtotal < code.min_order_amount) {
-    throw new Error(
-      `Minimum order of ₹${code.min_order_amount} required to use "${code.code}".`,
-    );
+    throw new Error(`Minimum order of ₹${code.min_order_amount} required to use "${code.code}".`);
   }
 
   let discountAmount = 0;
   if (code.discount_type === "percent") {
-    discountAmount = Math.round((input.subtotal * (code.discount_value / 100)) * 100) / 100;
+    discountAmount = Math.round(input.subtotal * (code.discount_value / 100) * 100) / 100;
   } else if (code.discount_type === "flat") {
     discountAmount = Math.min(input.subtotal, code.discount_value);
   }
@@ -209,7 +205,7 @@ export async function markOfferCodeUsed(codeString: string) {
     } catch {
       // Memory fallback
       memoryCodes = memoryCodes.map((c) =>
-        (c.id === docId || c.$id === docId) ? { ...c, ...updatePayload } : c,
+        c.id === docId || c.$id === docId ? { ...c, ...updatePayload } : c,
       );
     }
   }

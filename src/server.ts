@@ -44,18 +44,85 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+/**
+ * Origins the app genuinely talks to. Anything not listed here is refused by
+ * the content security policy.
+ */
+const APPWRITE_ORIGINS =
+  "https://auth.anibakes.app https://*.appwrite.io https://cloud.appwrite.io";
+const CLARITY_ORIGINS = "https://www.clarity.ms https://*.clarity.ms";
+const RAZORPAY_ORIGINS = "https://api.razorpay.com https://checkout.razorpay.com";
+
+/**
+ * `script-src` still needs `unsafe-inline`: TanStack Start streams inline
+ * hydration scripts and Clarity injects an inline bootstrap. Moving to nonces
+ * would let this drop, and is the natural next tightening step.
+ */
+const CSP = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline' ${CLARITY_ORIGINS} ${RAZORPAY_ORIGINS}`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  // Product imagery is admin-supplied and may be hosted anywhere.
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' blob:",
+  `connect-src 'self' ${APPWRITE_ORIGINS} ${CLARITY_ORIGINS} ${RAZORPAY_ORIGINS} https://tile.openstreetmap.org https://*.tile.openstreetmap.org`,
+  `frame-src ${RAZORPAY_ORIGINS}`,
+  "worker-src 'self' blob:",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+  "upgrade-insecure-requests",
+].join("; ");
+
+/**
+ * Applies the security headers to every response.
+ *
+ * The policy ships in report-only mode unless `CSP_ENFORCE` is set, so it can
+ * be validated against real traffic before it is able to break a live page.
+ * Every other header here is safe to enforce immediately.
+ */
+function withSecurityHeaders(response: Response): Response {
+  const headers = new Headers(response.headers);
+
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("X-Frame-Options", "DENY");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("Cross-Origin-Opener-Policy", "same-origin");
+  headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), payment=(self), geolocation=(self), interest-cohort=()",
+  );
+  headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
+  headers.set(
+    process.env["CSP_ENFORCE"] === "true"
+      ? "Content-Security-Policy"
+      : "Content-Security-Policy-Report-Only",
+    CSP,
+  );
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return withSecurityHeaders(await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
-      });
+      return withSecurityHeaders(
+        new Response(renderErrorPage(), {
+          status: 500,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+      );
     }
   },
 };

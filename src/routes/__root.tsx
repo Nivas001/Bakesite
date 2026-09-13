@@ -17,6 +17,7 @@ import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { Toaster } from "../components/ui/sonner";
 import { ScrollToTop } from "../components/scroll-to-top";
+import { ScrollProgressBar } from "../components/motion/scroll-progress-bar";
 
 /** Microsoft Clarity heatmaps/analytics — only injected once a project id is set. */
 function clarityScripts() {
@@ -183,6 +184,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
+        <ScrollProgressBar />
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
           <main className="flex-1">

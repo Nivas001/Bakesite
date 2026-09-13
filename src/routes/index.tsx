@@ -28,6 +28,7 @@ import { BakerLaboratoryBento } from "@/components/baker-laboratory-bento";
 import { PolaroidMomentsWall } from "@/components/polaroid-moments-wall";
 import { CategoryPeekCarousel } from "@/components/category-peek-carousel";
 import { HeroRevampSection } from "@/components/hero-revamp-section";
+import { Reveal } from "@/components/motion/reveal";
 
 const catalogQuery = queryOptions({
   queryKey: ["catalog"],
@@ -101,7 +102,13 @@ function Home() {
   const [selectedFaqCategory, setSelectedFaqCategory] = useState<string>("All");
   const { content: siteContent } = useSiteContent();
 
-  const faqCategories = ["All", "Freshness & Ingredients", "Slots & Ordering", "Delivery & Pickup", "Payment & Guarantee"];
+  const faqCategories = [
+    "All",
+    "Freshness & Ingredients",
+    "Slots & Ordering",
+    "Delivery & Pickup",
+    "Payment & Guarantee",
+  ];
 
   const filteredFaqs =
     selectedFaqCategory === "All"
@@ -110,14 +117,13 @@ function Home() {
 
   return (
     <div className="w-full overflow-x-clip">
-      
       {/* 1. Full-Width 3D Confectionery Hero Section (Includes Seamless Integrated TextLoop) */}
       <HeroRevampSection />
 
       {/* Main Content Sections with Standard Spacing */}
       <div className="w-full space-y-12 sm:space-y-20 pt-4 sm:pt-8">
         {/* 2. Daily Selection — Fresh from the counter (Enhanced Warm Contrast Background) */}
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
+        <Reveal variant="rise" className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
           <section className="relative overflow-hidden rounded-3xl sm:rounded-4xl border-2 border-[#2C1810]/15 dark:border-white/10 bg-gradient-to-b from-[#FFF9F2] via-[#FFF3E7] to-[#FFF8F0] dark:from-[#1E110A] dark:via-[#160D07] dark:to-[#1C1009] p-5 sm:p-8 lg:p-10 shadow-[0_12px_36px_rgba(44,24,16,0.08)]">
             <div
               aria-hidden
@@ -154,7 +160,7 @@ function Home() {
               <FeaturedProducts products={featured} />
             </div>
           </section>
-        </div>
+        </Reveal>
 
         {/* 3. The Celebration Cake Studio (25% Story / 70% Carousel Showcase) */}
         <CakeStudioCarousel />
@@ -172,7 +178,7 @@ function Home() {
         <CategoryPeekCarousel categories={data.categories} products={data.products} />
 
         {/* 8. Frequently Asked Questions (Enhanced Elevated Background) */}
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
+        <Reveal variant="rise" className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
           <section className="relative overflow-hidden rounded-3xl sm:rounded-4xl border-2 border-[#2C1810]/15 dark:border-border/80 bg-gradient-to-br from-[#FFF9F3] via-[#FFF5EC] to-[#FFEEE0] dark:from-[#1A1008] dark:via-[#130B06] dark:to-[#1B0F09] p-6 sm:p-10 lg:p-12 shadow-[0_12px_40px_rgba(44,24,16,0.07)]">
             <div
               aria-hidden
@@ -182,13 +188,15 @@ function Home() {
             <div className="relative z-10">
               <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-card/90 border border-border/80 px-3.5 py-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.16em] text-cocoa shadow-2xs backdrop-blur">
-                  <HelpCircle className="size-3 text-berry" /> {siteContent.home_faq.badge || "Clear Answers"}
+                  <HelpCircle className="size-3 text-berry" />{" "}
+                  {siteContent.home_faq.badge || "Clear Answers"}
                 </span>
                 <h2 className="mt-2.5 font-display text-2xl sm:text-4xl font-bold text-cocoa">
                   {siteContent.home_faq.title || "Frequently asked questions"}
                 </h2>
                 <p className="mt-1.5 text-xs sm:text-sm text-cocoa/75 dark:text-muted-foreground leading-relaxed">
-                  {siteContent.home_faq.description || "Everything you need to know about freshness, morning slots, and delivery."}
+                  {siteContent.home_faq.description ||
+                    "Everything you need to know about freshness, morning slots, and delivery."}
                 </p>
               </div>
 
@@ -226,10 +234,10 @@ function Home() {
               </div>
             </div>
           </section>
-        </div>
+        </Reveal>
 
         {/* 9. Closing Call-To-Action Banner */}
-        <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10 pb-6">
+        <Reveal variant="rise" className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10 pb-6">
           <section className="mb-2">
             <div className="glass-panel relative overflow-hidden rounded-3xl sm:rounded-4xl border border-border/80 bg-gradient-to-br from-card via-[#FFF9F4] to-secondary/40 px-5 py-9 text-center sm:px-12 sm:py-14 shadow-lift">
               <div
@@ -243,13 +251,15 @@ function Home() {
 
               <div className="relative mx-auto max-w-2xl">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] text-berry mb-3 shadow-2xs">
-                  <Sparkles className="size-3 text-berry" /> {siteContent.home_cta.badge || "Fresh Mornings"}
+                  <Sparkles className="size-3 text-berry" />{" "}
+                  {siteContent.home_cta.badge || "Fresh Mornings"}
                 </span>
                 <h2 className="font-blogh text-2xl sm:text-4xl lg:text-5xl font-bold leading-[1.15] text-cocoa uppercase tracking-wide">
                   {siteContent.home_cta.title || "Tomorrow morning could smell a lot better."}
                 </h2>
                 <p className="mt-2.5 text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-lg mx-auto">
-                  {siteContent.home_cta.description || "Reserve your next-day slot now. We mix and bake fresh at dawn for your chosen arrival window."}
+                  {siteContent.home_cta.description ||
+                    "Reserve your next-day slot now. We mix and bake fresh at dawn for your chosen arrival window."}
                 </p>
 
                 {/* Micro Perks Pills */}
@@ -289,8 +299,7 @@ function Home() {
               </div>
             </div>
           </section>
-        </div>
-
+        </Reveal>
       </div>
     </div>
   );
