@@ -11,7 +11,6 @@ import {
   sendEmailVerification,
 } from "@/integrations/appwrite/client";
 import { refreshAuth } from "@/hooks/use-appwrite-auth";
-import { requestPasswordRecovery as serverRecovery } from "@/lib/auth.functions";
 import { saveMyProfile } from "@/lib/orders.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +54,6 @@ function AuthPage() {
   const search = useSearch({ from: "/auth" });
   const target = safePath(search.redirect);
 
-  const serverRecoveryFn = useServerFn(serverRecovery);
   const saveProfileFn = useServerFn(saveMyProfile);
 
   const [authMode, setAuthMode] = useState<"signin" | "signup">(search.mode ?? "signin");
@@ -142,11 +140,6 @@ function AuthPage() {
     setBusy(true);
     try {
       await sendPasswordRecovery(recoveryEmail.trim());
-      try {
-        await serverRecoveryFn({ data: { email: recoveryEmail.trim() } });
-      } catch {
-        // Appwrite handled recovery
-      }
       toast.success(`Password reset instructions sent to ${recoveryEmail}`);
       setForgotPasswordMode(false);
     } catch (err) {

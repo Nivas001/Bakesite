@@ -43,9 +43,14 @@ export const checkOfferCode = createServerFn({ method: "POST" })
     return validatePromoCode(data);
   });
 
+/**
+ * Issues an arcade voucher. Requires a signed-in account: this endpoint mints
+ * live discount codes, so leaving it open let anyone script unlimited ones.
+ */
 export const claimGameRewardCoupon = createServerFn({ method: "POST" })
+  .middleware([requireAppwriteAuth])
   .validator((input: unknown) => claimGameCouponSchema.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { generateGameWinnerVoucher } = await import("./offers.server");
-    return generateGameWinnerVoucher(data);
+    return generateGameWinnerVoucher(context.userId, data);
   });

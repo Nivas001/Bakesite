@@ -7,7 +7,9 @@ import { MemoryGame } from "@/components/games/memory-game";
 import { SpinWheelGame } from "@/components/games/spin-wheel-game";
 import { VoucherRewardModal, type VoucherReward } from "@/components/games/voucher-reward-modal";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Gamepad2, HelpCircle, Layers, Gift, ArrowRight, Tag, ShieldCheck } from "lucide-react";
+import { Sparkles, Gamepad2, HelpCircle, Layers, Gift, ArrowRight, Tag, ShieldCheck, LogIn } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/use-appwrite-auth";
 
 export const Route = createFileRoute("/play-coupons")({
   head: () => ({
@@ -35,9 +37,25 @@ function PlayCouponsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const executeClaimCoupon = useServerFn(claimGameRewardCoupon);
+  const { user, ready: authReady } = useAuth();
 
   async function handleClaimCoupon(input: { gameId: string; gameName: string }) {
-    return executeClaimCoupon({ data: input });
+    // Claiming mints a live discount code, so it needs an account behind it.
+    // Playing stays open to everyone.
+    if (!user) {
+      toast.error("Sign in to claim your voucher — your win is saved to your account.");
+      throw new Error("Sign in required to claim this voucher.");
+    }
+    try {
+      return await executeClaimCoupon({ data: input });
+    } catch (error) {
+      toast.error(
+        error instanceof Error && error.message
+          ? error.message
+          : "We could not issue your voucher. Please try again.",
+      );
+      throw error;
+    }
   }
 
   function handleGameWin(voucher: VoucherReward) {
@@ -122,6 +140,23 @@ function PlayCouponsPage() {
           </button>
         </div>
       </div>
+
+      {/* Signed-out players can still play; the voucher needs an account. */}
+      {authReady && !user && (
+        <div className="flex flex-col items-center justify-between gap-3 rounded-2xl border border-berry/25 bg-berry/8 px-4 py-3.5 sm:flex-row sm:px-5">
+          <p className="text-center text-xs leading-relaxed text-cocoa sm:text-left sm:text-sm">
+            <strong className="font-bold">Play away — </strong>
+            you will need to be signed in to claim the voucher at the end, so we can keep it
+            attached to your account.
+          </p>
+          <Button asChild size="sm" className="shrink-0 rounded-xl font-bold">
+            <Link to="/auth" search={{ redirect: "/play-coupons" }}>
+              <LogIn className="mr-1.5 size-3.5" />
+              Sign in
+            </Link>
+          </Button>
+        </div>
+      )}
 
       {/* 3. Active Game Container */}
       <div className="transition-all duration-300">

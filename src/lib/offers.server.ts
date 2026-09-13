@@ -215,29 +215,60 @@ export async function markOfferCodeUsed(codeString: string) {
   }
 }
 
-/** Generates a unique, single-use 15% discount voucher for arcade game winners */
-export async function generateGameWinnerVoucher(input: ClaimGameCouponInput) {
-  // Generate a random 4-letter alphanumeric suffix
-  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let randomSuffix = "";
-  for (let i = 0; i < 4; i++) {
-    randomSuffix += characters.charAt(Math.floor(Math.random() * characters.length));
+const VOUCHER_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+/**
+ * Derives the voucher suffix from the player and the game rather than from
+ * `Math.random`.
+ *
+ * A random suffix meant every replay minted another live discount code, so a
+ * script could mint them without limit. Deriving it deterministically caps each
+ * account at one voucher per game: replaying returns the code they already hold
+ * instead of issuing a new one.
+ */
+async function voucherSuffix(userId: string, gameId: string): Promise<string> {
+  const bytes = new TextEncoder().encode(`${userId}:${gameId}:ani-bakes-arcade`);
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes));
+  let suffix = "";
+  for (let i = 0; i < 5; i += 1) {
+    suffix += VOUCHER_ALPHABET.charAt(digest[i]! % VOUCHER_ALPHABET.length);
+  }
+  return suffix;
+}
+
+/** Issues (or re-returns) the single-use 15% voucher this player won. */
+export async function generateGameWinnerVoucher(userId: string, input: ClaimGameCouponInput) {
+  const prefix =
+    input.gameId === "quiz" ? "QUIZ15" : input.gameId === "memory" ? "MATCH15" : "SPIN15";
+  const voucherCode = `${prefix}-${await voucherSuffix(userId, input.gameId)}`;
+  const description = `15% off winner voucher from ${input.gameName} (single use)`;
+
+  // Already won this game before: hand back the same code untouched, so a
+  // replay cannot reset a voucher that has already been redeemed.
+  const existing = (await fetchOfferCodes()).find((c) => c.code === voucherCode);
+  if (existing) {
+    return {
+      ok: true as const,
+      code: existing.code,
+      discountPercent: Number(existing.discount_value),
+      expiresAt: existing.expires_at,
+      description: existing.description,
+      gameName: input.gameName,
+      alreadyClaimed: true as const,
+    };
   }
 
-  const prefix = input.gameId === "quiz" ? "QUIZ15" : input.gameId === "memory" ? "MATCH15" : "SPIN15";
-  const voucherCode = `${prefix}-${randomSuffix}`;
-  const expiryDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7-day validity
-
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
   const voucherData: OfferCodeInput = {
     code: voucherCode,
     discount_type: "percent",
     discount_value: 15,
     min_order_amount: 200,
-    expires_at: expiryDate,
-    description: `15% off Winner Voucher from ${input.gameName} (1-time use only)`,
+    expires_at: expiresAt,
+    description,
     is_active: true,
-    is_visible: false, // Hidden from public coupon list
-    usage_limit: 1, // Strictly single-use!
+    is_visible: false, // never listed publicly
+    usage_limit: 1,
     used_count: 0,
   };
 
@@ -247,8 +278,9 @@ export async function generateGameWinnerVoucher(input: ClaimGameCouponInput) {
     ok: true as const,
     code: voucherCode,
     discountPercent: 15,
-    expiresAt: expiryDate,
-    description: voucherData.description,
+    expiresAt,
+    description,
     gameName: input.gameName,
+    alreadyClaimed: false as const,
   };
 }
