@@ -33,7 +33,7 @@ export const PACKAGING_SLIDES: PackagingSlide[] = [
     subtitle: "Custom Multi-Compartment Shock Absorption",
     tag: "Multi-Grid Protection",
     badge: "Food-Grade Gold Board",
-    image: "/packaging/insulated-brownie-box.jpg",
+    image: "/packaging/insulated-brownie-box.webp",
     desc: "Every artisan fudge brownie and delicate tea cake sits in its own dedicated snug compartment. Fitted with a thermal-reflective insulated interior and cold-pack pocket to ensure toppings and glazes stay immaculately pristine.",
     perks: [
       "Zero-movement partition walls",
@@ -48,7 +48,7 @@ export const PACKAGING_SLIDES: PackagingSlide[] = [
     subtitle: "Double-Walled Rigid Carton with Silk Satin Ribbon",
     tag: "Cellar-Cool Transit",
     badge: "Wax Quality Seal",
-    image: "/packaging/sealed-gift-delivery-box.jpg",
+    image: "/packaging/sealed-gift-delivery-box.webp",
     desc: "Delivered in bespoke white-and-blush rigid packaging embossed with gold foil Ani Bakes branding. Tied with our signature satin berry ribbon and sealed with a certified head baker wax badge, housed within an insulated courier thermal tote.",
     perks: [
       "Heavyweight crush-proof rigid carton",
@@ -63,7 +63,7 @@ export const PACKAGING_SLIDES: PackagingSlide[] = [
     subtitle: "Dry-Ice Chill Pouch & Rigid Corner Buffers",
     tag: "Doorstep Freshness",
     badge: "Zero-Damage Guarantee",
-    image: "/packaging/safe-cake-unboxing.jpg",
+    image: "/packaging/safe-cake-unboxing.webp",
     desc: "From single-tier bento cakes to grand 3-tier celebration masterpieces, our engineered cake bases lock securely into the base of our insulated container. Buttercream flowers, mirror glazes, and 24K gold leaves arrive exactly as piped.",
     perks: [
       "Anti-tip lock-in-place baseboard",

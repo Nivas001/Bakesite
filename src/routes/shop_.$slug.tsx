@@ -66,7 +66,7 @@ const EXPLORE_CATEGORIES = [
     desc: "Bespoke celebration layers & velvet tea slices.",
     tag: "Pure Buttercream",
     icon: Cake,
-    image: "/cakes/pink-bento-cake.jpg",
+    image: "/cakes/pink-bento-cake.webp",
     accentGlow: "from-pink-500/20 to-transparent",
   },
   {

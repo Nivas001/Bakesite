@@ -3,6 +3,7 @@ import { Trash2, ShoppingBag, ArrowRight, Sparkles, Clock, ShieldCheck } from "l
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { formatCurrency } from "@/lib/pricing";
+import { LazyVideo } from "@/components/motion/lazy-video";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -24,7 +25,7 @@ function CartPage() {
       <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:py-20 text-center">
         <div className="relative mx-auto flex size-40 sm:size-52 items-center justify-center mb-4">
           <img
-            src="/illustration/business-3d-red-shopping-cart.png"
+            src="/illustration/business-3d-red-shopping-cart.webp"
             alt="Empty bakery shopping cart"
             className="size-full object-contain drop-shadow-md select-none pointer-events-none"
           />
@@ -238,16 +239,7 @@ function CartPage() {
           <div className="space-y-2.5 rounded-2xl bg-secondary/40 p-3 text-[11px] text-muted-foreground border border-border/50">
             <div className="flex items-center gap-2.5">
               <div className="size-8 shrink-0 rounded-xl overflow-hidden bg-background/80 border border-border/60 flex items-center justify-center">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="size-full object-contain pointer-events-none"
-                >
-                  <source src="/illustration/3d-stickle-credit-card-terminal-pay.webm" type="video/webm" />
-                  <source src="/illustration/3d-stickle-credit-card-terminal-pay.mp4" type="video/mp4" />
-                </video>
+                <LazyVideo src="/illustration/3d-stickle-credit-card-terminal-pay" className="size-full object-contain pointer-events-none" />
               </div>
               <div>
                 <p className="font-bold text-cocoa text-xs">Instant UPI & Card Payment</p>

@@ -109,31 +109,31 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
       {
         id: "shot-7",
         label: "Salted Caramel Rosette",
-        image: "/about/salted-caramel-cupcake.jpg",
+        image: "/about/salted-caramel-cupcake.webp",
         tag: "Couverture Cream",
       },
       {
         id: "shot-8",
         label: "Royal Gilded Brownie",
-        image: "/cakes/royal-gold-brownie.jpg",
+        image: "/cakes/royal-gold-brownie.webp",
         tag: "24K Gold Leaf",
       },
       {
         id: "shot-9",
         label: "Dark Belgian Truffle Cake",
-        image: "/cakes/belgian-truffle-cake.jpg",
+        image: "/cakes/belgian-truffle-cake.webp",
         tag: "Celebration Tier",
       },
       {
         id: "shot-10",
         label: "Biscoff Herringbone Cake",
-        image: "/cakes/biscoff-herringbone-cake.jpg",
+        image: "/cakes/biscoff-herringbone-cake.webp",
         tag: "Speculoos Butter",
       },
       {
         id: "shot-11",
         label: "Pink Bento Cake",
-        image: "/cakes/pink-bento-cake.jpg",
+        image: "/cakes/pink-bento-cake.webp",
         tag: "Mini Bento",
       },
       {

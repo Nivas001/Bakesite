@@ -11,6 +11,7 @@ import { Tag, Copy, Check, ShoppingBag, ArrowRight, Sparkles, Layers, Gamepad2 }
 import { Button } from "@/components/ui/button";
 import { useFlag } from "@/lib/feature-flags";
 import { DriftWall } from "@/components/ui/drift-wall";
+import { LazyVideo } from "@/components/motion/lazy-video";
 
 const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCatalog() });
 
@@ -86,22 +87,7 @@ function Offers() {
 
         {/* 3D Animated Coupons Blueprint (Unboxed & Generously Sized) */}
         <div className="flex items-center justify-center shrink-0 self-center md:self-auto">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="size-36 sm:size-48 md:size-56 lg:size-60 object-contain pointer-events-none drop-shadow-xl"
-          >
-            <source
-              src="/illustration/3d-blueprint-blue-coupons-with-percent-symbol-retail-discount-marketing.webm"
-              type="video/webm"
-            />
-            <source
-              src="/illustration/3d-blueprint-blue-coupons-with-percent-symbol-retail-discount-marketing.mov"
-              type="video/quicktime"
-            />
-          </video>
+          <LazyVideo src="/illustration/3d-blueprint-blue-coupons-with-percent-symbol-retail-discount-marketing" formats={["webm", "mov"]} className="size-36 sm:size-48 md:size-56 lg:size-60 object-contain pointer-events-none drop-shadow-xl" />
         </div>
       </div>
 

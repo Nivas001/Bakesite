@@ -32,13 +32,13 @@ import {
 } from "lucide-react";
 
 const PRESET_IMAGES = [
-  { label: "Pink Bento Cake", path: "/cakes/pink-bento-cake.jpg" },
-  { label: "Lavender Pearl Cake", path: "/cakes/lavender-pearl-cake.jpg" },
-  { label: "Belgian Truffle Cake", path: "/cakes/belgian-truffle-cake.jpg" },
-  { label: "Royal Gold Brownie", path: "/cakes/royal-gold-brownie.jpg" },
-  { label: "Biscoff Nut Brownie", path: "/cakes/biscoff-nut-brownie.jpg" },
-  { label: "Coral Heart Cake", path: "/cakes/coral-heart-cake.jpg" },
-  { label: "Butterfly Lilac Cake", path: "/cakes/butterfly-lilac-cake.jpg" },
+  { label: "Pink Bento Cake", path: "/cakes/pink-bento-cake.webp" },
+  { label: "Lavender Pearl Cake", path: "/cakes/lavender-pearl-cake.webp" },
+  { label: "Belgian Truffle Cake", path: "/cakes/belgian-truffle-cake.webp" },
+  { label: "Royal Gold Brownie", path: "/cakes/royal-gold-brownie.webp" },
+  { label: "Biscoff Nut Brownie", path: "/cakes/biscoff-nut-brownie.webp" },
+  { label: "Coral Heart Cake", path: "/cakes/coral-heart-cake.webp" },
+  { label: "Butterfly Lilac Cake", path: "/cakes/butterfly-lilac-cake.webp" },
   { label: "Artisan Cookies", path: "/products/artisan-cookies.jpg" },
   { label: "Choc Chip Cookies", path: "/products/choc-chip-cookies.jpg" },
 ];
@@ -62,7 +62,7 @@ export function AdminCustomerMoments() {
     occasion: "",
     rating: 5,
     note: "",
-    image: "/cakes/pink-bento-cake.jpg",
+    image: "/cakes/pink-bento-cake.webp",
     isActive: true,
   });
 
@@ -73,7 +73,7 @@ export function AdminCustomerMoments() {
       occasion: "",
       rating: 5,
       note: "",
-      image: "/cakes/pink-bento-cake.jpg",
+      image: "/cakes/pink-bento-cake.webp",
       isActive: true,
     });
     setIsDialogOpen(true);

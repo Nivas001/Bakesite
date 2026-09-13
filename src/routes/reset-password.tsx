@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
+import { LazyVideo } from "@/components/motion/lazy-video";
 
 export const Route = createFileRoute("/reset-password")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -112,22 +113,7 @@ function ResetPasswordPage() {
       <div className="w-full rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8 space-y-6">
         <div className="text-center">
           <div className="relative mx-auto flex size-36 sm:size-44 md:size-48 items-center justify-center mb-4">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="size-full object-contain pointer-events-none drop-shadow-xl"
-            >
-              <source
-                src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.webm"
-                type="video/webm"
-              />
-              <source
-                src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware.mp4"
-                type="video/mp4"
-              />
-            </video>
+            <LazyVideo src="/illustration/3d-isometric-online-data-security-with-strong-password-blocking-malware" className="size-full object-contain pointer-events-none drop-shadow-xl" />
           </div>
           <h1 className="font-blogh text-2xl sm:text-4xl font-bold text-cocoa uppercase tracking-wide">
             Set New Password

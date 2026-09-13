@@ -119,7 +119,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "brownies",
     stock: 35,
     description: "Vanilla bean blondie studded with creamy caramelized white chocolate chunks.",
-    image_url: "/packaging/insulated-brownie-box.jpg",
+    image_url: "/packaging/insulated-brownie-box.webp",
     is_active: true,
   },
   {
@@ -133,7 +133,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "brownies",
     stock: 30,
     description: "Fudgy brownie base swirled with caramelized spiced Biscoff spread and crunchy biscuit crown.",
-    image_url: "/cakes/biscoff-nut-brownie.jpg",
+    image_url: "/cakes/biscoff-nut-brownie.webp",
     is_active: true,
   },
   {
@@ -147,7 +147,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "brownies",
     stock: 30,
     description: "Generously stuffed and marbled with roasted hazelnut Nutella spread and toasted nuts.",
-    image_url: "/cakes/royal-gold-brownie.jpg",
+    image_url: "/cakes/royal-gold-brownie.webp",
     is_active: true,
   },
   {
@@ -161,7 +161,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "brownies",
     stock: 25,
     description: "Topped with Iranian pistachio ganache, sea salt flakes, and roasted crushed emerald pistachios.",
-    image_url: "/packaging/insulated-brownie-box.jpg",
+    image_url: "/packaging/insulated-brownie-box.webp",
     is_active: true,
   },
   {
@@ -175,7 +175,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "brownies",
     stock: 20,
     description: "Gourmet tasting box containing 1 Classic, 1 Biscoff, 1 Nutella, and 1 Pistachio brownie bite (250g).",
-    image_url: "/packaging/insulated-brownie-box.jpg",
+    image_url: "/packaging/insulated-brownie-box.webp",
     is_active: true,
   },
 
@@ -205,7 +205,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cheesecakes",
     stock: 15,
     description: "Velvety cold-set Philadelphia cream cheese base topped with wild blueberry reduction.",
-    image_url: "/hero/hero-3d-mango-cheesecake.jpg",
+    image_url: "/hero/hero-3d-mango-cheesecake.webp",
     is_active: true,
   },
   {
@@ -219,7 +219,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cheesecakes",
     stock: 12,
     description: "70% Belgian chocolate folded into rich cream cheese on an Oreo cookie butter crust.",
-    image_url: "/about/cake-3d-front.jpg",
+    image_url: "/about/cake-3d-front.webp",
     is_active: true,
   },
   {
@@ -233,7 +233,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cheesecakes",
     stock: 10,
     description: "Silky hazelnut cheesecake swirled with Nutella and crowned with whole toasted hazelnuts.",
-    image_url: "/cakes/belgian-truffle-cake.jpg",
+    image_url: "/cakes/belgian-truffle-cake.webp",
     is_active: true,
   },
   {
@@ -247,7 +247,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cheesecakes",
     stock: 10,
     description: "Speculoos spiced biscuit crust, caramelized Biscoff ribbon layer, and molten cookie butter drizzle.",
-    image_url: "/cakes/biscoff-herringbone-cake.jpg",
+    image_url: "/cakes/biscoff-herringbone-cake.webp",
     is_active: true,
   },
 
@@ -291,7 +291,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 15,
     description: "Single-origin Belgian dark chocolate ganache draped over delicate chocolate sponge.",
-    image_url: "/cakes/belgian-truffle-cake.jpg",
+    image_url: "/cakes/belgian-truffle-cake.webp",
     is_active: true,
   },
   {
@@ -305,7 +305,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 15,
     description: "Vanilla sponge layered with fresh strawberry crush and pastel pink piped rosettes.",
-    image_url: "/cakes/pink-bento-cake.jpg",
+    image_url: "/cakes/pink-bento-cake.webp",
     is_active: true,
   },
   {
@@ -333,7 +333,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 12,
     description: "Tender vanilla cake infused with simmered wild blueberries and lilac cream frosting.",
-    image_url: "/cakes/butterfly-lilac-cake.jpg",
+    image_url: "/cakes/butterfly-lilac-cake.webp",
     is_active: true,
   },
   {
@@ -347,7 +347,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 12,
     description: "Classic chocolate sponge layered with sour cherry compote, fresh cream, and chocolate flakes.",
-    image_url: "/about/hero-3d-caramel-cake.jpg",
+    image_url: "/about/hero-3d-caramel-cake.webp",
     is_active: true,
   },
   {
@@ -361,7 +361,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 10,
     description: "White chocolate curls, vanilla sponge, tart cherry compote, and light whipped frosting.",
-    image_url: "/cakes/coral-heart-cake.jpg",
+    image_url: "/cakes/coral-heart-cake.webp",
     is_active: true,
   },
   {
@@ -375,7 +375,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 10,
     description: "Roasted hazelnut praline buttercream, chocolate sponge, and Ferrero-style cocoa glaze.",
-    image_url: "/cakes/lavender-pearl-cake.jpg",
+    image_url: "/cakes/lavender-pearl-cake.webp",
     is_active: true,
   },
   {
@@ -389,7 +389,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 10,
     description: "Layered with caramelized Lotus spread, biscuit crunch crumb, and gold shimmer accents.",
-    image_url: "/cakes/biscoff-herringbone-cake.jpg",
+    image_url: "/cakes/biscoff-herringbone-cake.webp",
     is_active: true,
   },
   {
@@ -403,7 +403,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 10,
     description: "Damask rose petal preserve (Gulkand) infused sponge with cardamom cream and pistachios.",
-    image_url: "/cakes/coral-heart-cake.jpg",
+    image_url: "/cakes/coral-heart-cake.webp",
     is_active: true,
   },
   {
@@ -417,7 +417,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 10,
     description: "Betel leaf infused fragrant sponge layered with sweet fennel and rose petal filling.",
-    image_url: "/cakes/butterfly-lilac-cake.jpg",
+    image_url: "/cakes/butterfly-lilac-cake.webp",
     is_active: true,
   },
   {
@@ -445,7 +445,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "cakes",
     stock: 10,
     description: "Alphonso mango pulp reduction, passionfruit glaze, and airy vanilla sponge.",
-    image_url: "/hero/hero-3d-mango-cheesecake.jpg",
+    image_url: "/hero/hero-3d-mango-cheesecake.webp",
     is_active: true,
   },
 
@@ -461,7 +461,7 @@ const SEED_PRODUCTS: Array<ProductDoc & { id: string; category_slug: string }> =
     category_slug: "tea-cakes",
     stock: 25,
     description: "Classic English buttery tea cake loaf (16-18 bite slices, 300g total in 2 boxes).",
-    image_url: "/cakes/trio-snack-loaves.jpg",
+    image_url: "/cakes/trio-snack-loaves.webp",
     is_active: true,
   },
   {

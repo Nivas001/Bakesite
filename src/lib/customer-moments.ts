@@ -24,7 +24,7 @@ export const DEFAULT_MOMENTS: CustomerMoment[] = [
     occasion: "2nd Anniversary Celebration",
     rating: 5,
     note: "The strawberry mascarpone was heavenly! Not overly sweet, just pure cloud perfection.",
-    image: "/cakes/pink-bento-cake.jpg",
+    image: "/cakes/pink-bento-cake.webp",
     isActive: true,
   },
   {
@@ -33,7 +33,7 @@ export const DEFAULT_MOMENTS: CustomerMoment[] = [
     occasion: "Mum's 50th High-Tea Party",
     rating: 5,
     note: "The showstopper of our evening. Everyone thought it was flown in from Paris!",
-    image: "/cakes/lavender-pearl-cake.jpg",
+    image: "/cakes/lavender-pearl-cake.webp",
     isActive: true,
   },
   {
@@ -42,7 +42,7 @@ export const DEFAULT_MOMENTS: CustomerMoment[] = [
     occasion: "Birthday Celebration",
     rating: 5,
     note: "The rich dark Belgian ganache melted like silk. Absolutely sensational for chocolate lovers!",
-    image: "/cakes/belgian-truffle-cake.jpg",
+    image: "/cakes/belgian-truffle-cake.webp",
     isActive: true,
   },
   {
@@ -51,7 +51,7 @@ export const DEFAULT_MOMENTS: CustomerMoment[] = [
     occasion: "Product Launch Party",
     rating: 5,
     note: "Fudge brownie of our dreams. The gold chocolate spheres made the photos look unreal.",
-    image: "/cakes/royal-gold-brownie.jpg",
+    image: "/cakes/royal-gold-brownie.webp",
     isActive: true,
   },
   {
@@ -60,7 +60,7 @@ export const DEFAULT_MOMENTS: CustomerMoment[] = [
     occasion: "Family Sunday Feast",
     note: "Every single square had a distinct crunch. Pistachio + Biscoff was the unanimous winner!",
     rating: 5,
-    image: "/cakes/biscoff-nut-brownie.jpg",
+    image: "/cakes/biscoff-nut-brownie.webp",
     isActive: true,
   },
 ];

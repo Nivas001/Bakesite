@@ -38,6 +38,7 @@ import {
   Check,
   Tag,
 } from "lucide-react";
+import { LazyVideo } from "@/components/motion/lazy-video";
 
 const LocationPicker = lazy(() => import("@/components/location-picker"));
 
@@ -257,16 +258,7 @@ function CheckoutPage() {
                   </p>
                 </div>
                 <div className="size-20 sm:size-24 shrink-0 flex items-center justify-center -mt-2 -mr-2">
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="size-full object-contain pointer-events-none drop-shadow-md"
-                  >
-                    <source src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1.webm" type="video/webm" />
-                    <source src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1.mp4" type="video/mp4" />
-                  </video>
+                  <LazyVideo src="/illustration/courier-on-scooter-with-delivery-backpack-urban-express-shipping-1" className="size-full object-contain pointer-events-none drop-shadow-md" />
                 </div>
               </div>
               <div className="mt-4 flex gap-2">
@@ -903,16 +895,7 @@ function CheckoutPage() {
             <div className="rounded-2xl bg-secondary/40 p-4 border border-border/50 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="size-12 shrink-0 flex items-center justify-center">
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="size-full object-contain pointer-events-none drop-shadow-sm"
-                  >
-                    <source src="/illustration/3d-stickle-credit-card-terminal-pay.webm" type="video/webm" />
-                    <source src="/illustration/3d-stickle-credit-card-terminal-pay.mp4" type="video/mp4" />
-                  </video>
+                  <LazyVideo src="/illustration/3d-stickle-credit-card-terminal-pay" className="size-full object-contain pointer-events-none drop-shadow-sm" />
                 </div>
                 <div>
                   <p className="font-bold text-cocoa text-xs sm:text-sm">Instant Encrypted Payment</p>

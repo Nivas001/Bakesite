@@ -72,7 +72,7 @@ function PlayCouponsPage() {
         {/* Prominent 3D Celebration Gift Box (Unboxed & Generously Sized) */}
         <div className="flex items-center justify-center shrink-0 self-center md:self-auto">
           <img
-            src="/illustration/open-gift-box-with-candy-cane-and-christmas-ornament-holiday-celebration-and-party.png"
+            src="/illustration/open-gift-box-with-candy-cane-and-christmas-ornament-holiday-celebration-and-party.webp"
             alt="Celebration reward gift box"
             className="size-36 sm:size-48 md:size-56 lg:size-60 object-contain drop-shadow-xl select-none pointer-events-none transition-transform hover:scale-105 duration-300"
           />

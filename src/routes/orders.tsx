@@ -41,6 +41,7 @@ import {
   Loader2,
   PackageX,
 } from "lucide-react";
+import { LazyVideo } from "@/components/motion/lazy-video";
 
 export type OrderRecord = {
   id: string;
@@ -616,16 +617,7 @@ function OrdersPage() {
     return (
       <div className="mx-auto w-full max-w-2xl px-4 py-12 sm:py-20 text-center">
         <div className="relative mx-auto flex size-44 sm:size-56 md:size-64 items-center justify-center mb-6">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="size-full object-contain pointer-events-none drop-shadow-xl"
-          >
-            <source src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.webm" type="video/webm" />
-            <source src="/illustration/3d-stickle-ai-analytics-report-on-clipboard.mp4" type="video/mp4" />
-          </video>
+          <LazyVideo src="/illustration/3d-stickle-ai-analytics-report-on-clipboard" className="size-full object-contain pointer-events-none drop-shadow-xl" />
         </div>
         <h1 className="font-blogh uppercase tracking-wide text-3xl sm:text-5xl font-bold text-cocoa">
           No Orders Yet

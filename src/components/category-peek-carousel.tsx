@@ -46,7 +46,7 @@ const CATEGORY_STYLE_MAP: Record<
   cakes: {
     icon: Sparkles,
     desc: "Korean bento boxes, ombré floral tiers & custom celebration bakes",
-    image: "/cakes/pink-bento-cake.jpg",
+    image: "/cakes/pink-bento-cake.webp",
     badge: "Pure Buttercream",
     tag: "Celebration",
     accentGlow: "from-rose-600/40 to-pink-950/80",

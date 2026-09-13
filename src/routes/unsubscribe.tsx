@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, CheckCircle2, Sparkles, MailOpen } from "lucide-react";
+import { LazyVideo } from "@/components/motion/lazy-video";
 
 export const Route = createFileRoute("/unsubscribe")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -63,24 +64,11 @@ function UnsubscribePage() {
               {/* Mailbox Animated Illustration Resource */}
               <div className="relative mx-auto flex items-center justify-center">
                 <div className="relative size-36 sm:size-44 md:size-52 rounded-3xl overflow-hidden flex items-center justify-center bg-secondary/30 border border-border/60 shadow-inner">
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
+                  <LazyVideo
+                    src="/illustration/open-mailbox-with-envelopes-message-notification-and-correspondence"
+                    alt="Open mailbox with letters illustration"
                     className="size-full object-contain select-none pointer-events-none"
-                    aria-label="Open mailbox with letters illustration"
-                  >
-                    <source
-                      src="/illustration/open-mailbox-with-envelopes-message-notification-and-correspondence.webm"
-                      type="video/webm"
-                    />
-                    <source
-                      src="/illustration/open-mailbox-with-envelopes-message-notification-and-correspondence.mp4"
-                      type="video/mp4"
-                    />
-                    <MailOpen className="size-16 text-berry/70" />
-                  </video>
+                  />
                 </div>
               </div>
 

@@ -31,6 +31,7 @@ import { DeliverySecurityShowcase } from "@/components/delivery-security-showcas
 import { InertiaGallery, GalleryShot } from "@/components/godui/inertia-gallery";
 import { TextAnimate } from "@/components/godui/text-animate";
 import { useSiteContent } from "@/lib/site-content";
+import { LazyVideo } from "@/components/motion/lazy-video";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -122,7 +123,7 @@ const CAKE_SPECS: Record<
     title: "3-Tier Dark Chocolate & Salted Caramel Masterpiece",
     description:
       "Exposed 70% dark Belgian cocoa sponge layers stacked with organic coconut milk caramel cream and dripping couverture ganache.",
-    image: "/about/cake-3d-front.jpg",
+    image: "/about/cake-3d-front.webp",
     angleDegree: 0,
     macros: { calories: "185 kcal", protein: "12g", sugar: "0g Refined", butterfat: "84% French" },
     hotspots: [
@@ -136,7 +137,7 @@ const CAKE_SPECS: Record<
     title: "360° Studio Rotation: Handcrafted Symmetry",
     description:
       "Every angle showcases hand-piped caramel droplets, gilded chocolate truffle spheres, and glossy slow-dripping Belgian ganache.",
-    image: "/about/cake-3d-orbit.jpg",
+    image: "/about/cake-3d-orbit.webp",
     angleDegree: 90,
     macros: { calories: "185 kcal", protein: "12g", sugar: "0g Refined", butterfat: "84% French" },
     hotspots: [
@@ -149,7 +150,7 @@ const CAKE_SPECS: Record<
     title: "Macro Crumb & Air Pocket Architecture",
     description:
       "Wild cold proofing creates airy alveoli and custard-like sponge that holds rich moisture without requiring artificial chemical emulsifiers.",
-    image: "/about/cake-3d-crumb.jpg",
+    image: "/about/cake-3d-crumb.webp",
     angleDegree: 180,
     macros: { calories: "185 kcal", protein: "14g", sugar: "0g Refined", butterfat: "84% French" },
     hotspots: [
@@ -162,7 +163,7 @@ const CAKE_SPECS: Record<
     title: "Gilded Crown & Truffle Centerpiece",
     description:
       "A coronation of 4 hand-rolled dark chocolate truffles dusted with edible 24K gold dust and sea salt flakes.",
-    image: "/about/cake-3d-top.jpg",
+    image: "/about/cake-3d-top.webp",
     angleDegree: 270,
     macros: { calories: "190 kcal", protein: "12g", sugar: "0g Refined", butterfat: "84% French" },
     hotspots: [
@@ -194,7 +195,7 @@ const STORY_CHAPTERS = [
     themeColor: "from-[#FFE8F0] via-[#FFD8E6] to-[#FFC2DA]",
     textColor: "text-[#E83181]",
     borderColor: "border-[#2C1810]",
-    image: "/about/wellness-chocolate-muffin.jpg",
+    image: "/about/wellness-chocolate-muffin.webp",
     imageAlt: "Healthy Indulgence Chocolate Muffin",
   },
   {
@@ -210,7 +211,7 @@ const STORY_CHAPTERS = [
     themeColor: "from-[#FEF9B5] via-[#FFF380] to-[#FFE655]",
     textColor: "text-[#4A154B]",
     borderColor: "border-[#2C1810]",
-    image: "/about/walnut-cupcake-trio.jpg",
+    image: "/about/walnut-cupcake-trio.webp",
     imageAlt: "Brownies and Cupcakes Variety",
   },
   {
@@ -226,7 +227,7 @@ const STORY_CHAPTERS = [
     themeColor: "from-[#C8F6EC] via-[#A6EFE0] to-[#88E4D2]",
     textColor: "text-[#2E1854]",
     borderColor: "border-[#2C1810]",
-    image: "/about/salted-caramel-cupcake.jpg",
+    image: "/about/salted-caramel-cupcake.webp",
     imageAlt: "Decadent Salted Caramel Cupcake",
   },
   {
@@ -242,7 +243,7 @@ const STORY_CHAPTERS = [
     themeColor: "from-[#FFF8EC] via-[#FDF0DE] to-[#F8E3C8]",
     textColor: "text-[#5C3218]",
     borderColor: "border-[#2C1810]",
-    image: "/about/hero-3d-caramel-cake.jpg",
+    image: "/about/hero-3d-caramel-cake.webp",
     imageAlt: "Artisan Dawn Bake Craft",
   },
 ];
@@ -753,7 +754,7 @@ export function AboutUsPage() {
               <div className="my-6 relative flex items-center justify-center">
                 <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/60 shadow-md">
                   <img
-                    src="/about/wellness-chocolate-muffin.jpg"
+                    src="/about/wellness-chocolate-muffin.webp"
                     alt="Healthy Indulgence Chocolate Muffin"
                     className="w-full h-full object-cover select-none"
                   />
@@ -858,7 +859,7 @@ export function AboutUsPage() {
               <div className="my-6 relative flex items-center justify-center">
                 <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/70 shadow-md">
                   <img
-                    src="/about/walnut-cupcake-trio.jpg"
+                    src="/about/walnut-cupcake-trio.webp"
                     alt="Gourmet Brownies and Cupcakes"
                     className="w-full h-full object-cover select-none"
                   />
@@ -936,7 +937,7 @@ export function AboutUsPage() {
               <div className="my-6 relative flex items-center justify-center">
                 <div className="relative size-60 sm:size-72 rounded-3xl overflow-hidden border-2 border-[#2C1810] bg-white/70 shadow-md group">
                   <img
-                    src="/about/salted-caramel-cupcake.jpg"
+                    src="/about/salted-caramel-cupcake.webp"
                     alt="Decadent Salted Caramel Cupcake"
                     className="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-105"
                   />
@@ -1190,22 +1191,7 @@ export function AboutUsPage() {
                         Our Morning Hearth Schedule:
                       </span>
                       <div className="size-14 sm:size-16 shrink-0 flex items-center justify-center">
-                        <video
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          className="size-full object-contain pointer-events-none drop-shadow-sm"
-                        >
-                          <source
-                            src="/illustration/people-walking-together-outdoors-urban-lifestyle-and-daily-routine.webm"
-                            type="video/webm"
-                          />
-                          <source
-                            src="/illustration/people-walking-together-outdoors-urban-lifestyle-and-daily-routine.mp4"
-                            type="video/mp4"
-                          />
-                        </video>
+                        <LazyVideo src="/illustration/people-walking-together-outdoors-urban-lifestyle-and-daily-routine" className="size-full object-contain pointer-events-none drop-shadow-sm" />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-bold">

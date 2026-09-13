@@ -25,12 +25,12 @@ interface MemoryCard {
 }
 
 const CARD_PAIRS = [
-  { pairId: 1, name: "Bento Cake", emoji: "🍰", image: "/hero/hero-cake-real.png", bgGradient: "from-pink-500/20 to-rose-500/30" },
-  { pairId: 2, name: "Dark Truffle", emoji: "🍫", image: "/hero/hero-3d-dark-truffle.jpg", bgGradient: "from-amber-700/20 to-amber-900/30" },
+  { pairId: 1, name: "Bento Cake", emoji: "🍰", image: "/cakes/pink-bento-cake.webp", bgGradient: "from-pink-500/20 to-rose-500/30" },
+  { pairId: 2, name: "Dark Truffle", emoji: "🍫", image: "/cakes/belgian-truffle-cake.webp", bgGradient: "from-amber-700/20 to-amber-900/30" },
   { pairId: 3, name: "Chunky Cookie", emoji: "🍪", image: "/hero/hero-3d-cookie.jpg", bgGradient: "from-amber-500/20 to-orange-500/30" },
-  { pairId: 4, name: "French Strawberry", emoji: "🍓", image: "/hero/hero-3d-cake.jpg", bgGradient: "from-rose-500/20 to-red-500/30" },
-  { pairId: 5, name: "Mango Gateau", emoji: "🥭", bgGradient: "from-amber-400/20 to-yellow-500/30" },
-  { pairId: 6, name: "Buttercream Blossom", emoji: "🌸", bgGradient: "from-purple-400/20 to-pink-500/30" },
+  { pairId: 4, name: "French Strawberry", emoji: "🍓", image: "/products/strawberry-cake.jpg", bgGradient: "from-rose-500/20 to-red-500/30" },
+  { pairId: 5, name: "Mango Gateau", emoji: "🥭", image: "/hero/hero-3d-mango-cheesecake.webp", bgGradient: "from-amber-400/20 to-yellow-500/30" },
+  { pairId: 6, name: "Buttercream Blossom", emoji: "🌸", image: "/cakes/butterfly-lilac-cake.webp", bgGradient: "from-purple-400/20 to-pink-500/30" },
 ];
 
 function shuffleCards(): MemoryCard[] {
