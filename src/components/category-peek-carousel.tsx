@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/motion/reveal";
 
 export interface CategoryItem {
   id: string;
@@ -121,7 +122,7 @@ export function CategoryPeekCarousel({
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
+    <Reveal variant="rise" className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
       <section className="rounded-3xl p-5 sm:p-8 lg:p-10 border border-border/80 bg-card/60 backdrop-blur-md shadow-soft overflow-hidden">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
@@ -303,6 +304,6 @@ export function CategoryPeekCarousel({
           ))}
         </div>
       </section>
-    </div>
+    </Reveal>
   );
 }

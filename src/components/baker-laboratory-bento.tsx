@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { useSiteContent } from "@/lib/site-content";
 import { TextAnimate } from "@/components/godui/text-animate";
+import { Reveal } from "@/components/motion/reveal";
 
 interface FermentStage {
   stage: string;
@@ -112,7 +113,7 @@ export function BakerLaboratoryBento() {
 
   return (
     <section className="py-10 sm:py-16 bg-secondary/15">
-      <div className="mx-auto w-full max-w-6xl px-4">
+      <Reveal variant="rise" className="mx-auto w-full max-w-6xl px-4">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
           <div>
@@ -332,7 +333,7 @@ export function BakerLaboratoryBento() {
             </div>
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }

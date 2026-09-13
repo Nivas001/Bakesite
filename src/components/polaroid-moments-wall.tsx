@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import { Heart, Star, ChevronLeft, ChevronRight, Sparkles, Quote } from "lucide-react";
 import { AccordionGallery, type AccordionGalleryItem } from "@/components/ui/accordion-gallery";
 import { useCustomerMoments } from "@/lib/customer-moments";
+import { Reveal } from "@/components/motion/reveal";
 
 export function PolaroidMomentsWall() {
   const { activeMoments } = useCustomerMoments();
@@ -47,7 +48,7 @@ export function PolaroidMomentsWall() {
 
   return (
     <section className="py-10 sm:py-16 overflow-hidden bg-background">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+      <Reveal variant="rise" className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-10">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/20 px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-berry-deep mb-2">
@@ -183,7 +184,7 @@ export function PolaroidMomentsWall() {
             </div>
           )}
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
