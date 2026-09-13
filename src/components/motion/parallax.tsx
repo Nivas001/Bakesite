@@ -20,13 +20,7 @@ interface ParallaxProps {
  * Drifts its children against the scroll direction for depth. Falls back to a
  * plain static wrapper when the user prefers reduced motion.
  */
-export function Parallax({
-  children,
-  distance = 60,
-  zoom = 0,
-  className,
-  style,
-}: ParallaxProps) {
+export function Parallax({ children, distance = 60, zoom = 0, className, style }: ParallaxProps) {
   const reduced = usePrefersReducedMotion();
   const { ref, progress } = useScrollProgress<HTMLDivElement>();
 

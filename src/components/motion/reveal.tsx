@@ -12,14 +12,7 @@ import { cn } from "@/lib/utils";
 import { EASE_OUT, usePrefersReducedMotion } from "@/lib/motion";
 
 export type RevealVariant =
-  | "fade"
-  | "fade-up"
-  | "fade-down"
-  | "fade-left"
-  | "fade-right"
-  | "scale"
-  | "blur-up"
-  | "rise";
+  "fade" | "fade-up" | "fade-down" | "fade-left" | "fade-right" | "scale" | "blur-up" | "rise";
 
 /** The hidden-state transform for each variant. The settled state is always identity. */
 const HIDDEN_TRANSFORM: Record<RevealVariant, string> = {
@@ -36,6 +29,9 @@ const HIDDEN_TRANSFORM: Record<RevealVariant, string> = {
 const HIDDEN_FILTER: Partial<Record<RevealVariant, string>> = {
   "blur-up": "blur(10px)",
 };
+
+/** How long to wait for the observer before revealing regardless. */
+const FAILSAFE_MS = 2500;
 
 interface RevealProps {
   children: ReactNode;
@@ -87,7 +83,6 @@ export function Reveal({
     const el = ref.current;
     if (!el) return;
 
-    // Elements already past the fold on first paint should not wait for a scroll.
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -103,7 +98,19 @@ export function Reveal({
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Safety net: content must never be left permanently invisible. Background
+    // tabs, throttled embeddings and headless renderers can all delay or
+    // suppress observer callbacks, so reveal anyway if nothing has fired.
+    const failsafe = window.setTimeout(() => {
+      setShown(true);
+      if (!repeat) observer.disconnect();
+    }, FAILSAFE_MS);
+
+    return () => {
+      window.clearTimeout(failsafe);
+      observer.disconnect();
+    };
   }, [reduced, repeat, threshold, rootMargin]);
 
   const settled = shown || reduced;

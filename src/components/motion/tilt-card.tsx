@@ -17,13 +17,7 @@ interface TiltCardProps {
  * touch devices and when reduced motion is requested, so it never interferes
  * with tapping or scrolling.
  */
-export function TiltCard({
-  children,
-  max = 8,
-  glare = true,
-  className,
-  style,
-}: TiltCardProps) {
+export function TiltCard({ children, max = 8, glare = true, className, style }: TiltCardProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const reduced = usePrefersReducedMotion();
   const [tilt, setTilt] = useState({ x: 0, y: 0, px: 50, py: 50, active: false });
@@ -54,7 +48,9 @@ export function TiltCard({
       className={cn("relative [transform-style:preserve-3d]", className)}
       style={{
         transform: `perspective(900px) rotateX(${tilt.x.toFixed(2)}deg) rotateY(${tilt.y.toFixed(2)}deg) scale(${tilt.active ? 1.015 : 1})`,
-        transition: tilt.active ? "transform 90ms linear" : "transform 520ms cubic-bezier(0.16, 1, 0.3, 1)",
+        transition: tilt.active
+          ? "transform 90ms linear"
+          : "transform 520ms cubic-bezier(0.16, 1, 0.3, 1)",
         ...style,
       }}
     >

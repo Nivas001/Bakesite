@@ -54,7 +54,15 @@ export function CountUp({
     );
 
     observer.observe(el);
+
+    // Never leave a stale zero on screen if the observer never reports in.
+    const failsafe = window.setTimeout(() => {
+      observer.disconnect();
+      setValue(to);
+    }, 3000);
+
     return () => {
+      window.clearTimeout(failsafe);
       observer.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };

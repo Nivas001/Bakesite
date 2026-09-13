@@ -62,7 +62,19 @@ export function LazyVideo({
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
+
+    // Some embeddings throttle observer callbacks badly enough that they never
+    // arrive. Re-check the geometry once by hand so an on-screen clip still
+    // loads, without giving up laziness for off-screen ones.
+    const recheck = window.setTimeout(() => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight + 200 && rect.bottom > -200) setLoad(true);
+    }, 1500);
+
+    return () => {
+      window.clearTimeout(recheck);
+      observer.disconnect();
+    };
   }, [reduced]);
 
   // Once the sources appear the element needs an explicit load() to pick them up.

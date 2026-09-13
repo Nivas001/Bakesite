@@ -32,6 +32,7 @@ import { InertiaGallery, GalleryShot } from "@/components/godui/inertia-gallery"
 import { TextAnimate } from "@/components/godui/text-animate";
 import { useSiteContent } from "@/lib/site-content";
 import { LazyVideo } from "@/components/motion/lazy-video";
+import { CakeScrollStory } from "@/components/about/cake-scroll-story";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -417,7 +418,7 @@ export function AboutUsPage() {
   const normalizedDegree = Math.round(((rotationY % 360) + 360) % 360);
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground selection:bg-berry/20 pb-20 overflow-x-hidden">
+    <div className="relative min-h-screen bg-background text-foreground selection:bg-berry/20 pb-20 overflow-x-clip">
       
       {/* 1. Header Banner & View Mode Switcher */}
       <section className="pt-8 sm:pt-12 pb-6 px-4 sm:px-6 max-w-6xl mx-auto">
@@ -475,7 +476,10 @@ export function AboutUsPage() {
         </div>
       </section>
 
-      {/* 2. Central 3D Hero Cake Explorer ("The Core Wellness Cake") */}
+      {/* 2. Scroll-choreographed WebGL build sequence */}
+      <CakeScrollStory />
+
+      {/* 3. Central 3D Hero Cake Explorer ("The Core Wellness Cake") */}
       <section className="py-6 px-4 sm:px-6 max-w-6xl mx-auto">
         <div
           ref={heroCardRef}

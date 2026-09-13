@@ -10,6 +10,25 @@ export interface HeroThemeState {
   btnText: string | null;
 }
 
+/**
+ * What the server renders, and what the client renders on its hydration pass.
+ *
+ * The store's live value is seeded from `window.location` so the homepage
+ * navbar does not flash from cream to pink, but handing that seeded value to
+ * hydration would not match the server's markup. Returning this constant as the
+ * server snapshot lets React hydrate cleanly and then immediately re-render
+ * with the real value.
+ */
+const NEUTRAL_STATE: HeroThemeState = {
+  inHero: false,
+  bgColor: null,
+  textColor: null,
+  accentColor: null,
+  dotColor: null,
+  btnBg: null,
+  btnText: null,
+};
+
 const getInitialState = (): HeroThemeState => {
   if (
     typeof window !== "undefined" &&
@@ -86,6 +105,6 @@ export function useHeroNavbarTheme(): HeroThemeState {
       return () => listeners.delete(onStoreChange);
     },
     () => currentState,
-    () => currentState
+    () => NEUTRAL_STATE,
   );
 }
