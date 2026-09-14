@@ -241,6 +241,27 @@ function CartPage() {
             </Link>
           </Button>
 
+          {/* What actually happens next. Without this the missing "pay now"
+              button reads as something being broken, when in fact the bakery
+              confirms oven capacity before taking any money. */}
+          <ol className="space-y-2.5 rounded-2xl border border-border/50 bg-secondary/40 p-3.5">
+            {[
+              ["1", "You request a slot", "No payment yet — nothing is charged at checkout."],
+              ["2", "We confirm the oven has room", "Usually within a few hours."],
+              ["3", "We send a secure payment link", "Pay then, and your slot is locked in."],
+            ].map(([step, title, detail]) => (
+              <li key={step} className="flex items-start gap-2.5">
+                <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-cocoa text-[10px] font-bold text-background">
+                  {step}
+                </span>
+                <div>
+                  <p className="text-xs font-bold text-cocoa">{title}</p>
+                  <p className="text-[11px] text-muted-foreground">{detail}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
           {/* Bakery Assurance Trust Chips */}
           <div className="space-y-2.5 rounded-2xl bg-secondary/40 p-3 text-[11px] text-muted-foreground border border-border/50">
             <div className="flex items-center gap-2.5">
@@ -251,8 +272,10 @@ function CartPage() {
                 />
               </div>
               <div>
-                <p className="font-bold text-cocoa text-xs">Instant UPI & Card Payment</p>
-                <p className="text-[11px] text-muted-foreground">Secures your morning bake slot</p>
+                <p className="font-bold text-cocoa text-xs">Secure UPI &amp; card payment</p>
+                <p className="text-[11px] text-muted-foreground">
+                  Sent once your slot is confirmed
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-2 pt-1 border-t border-border/40">

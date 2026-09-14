@@ -224,7 +224,7 @@ function CheckoutPage() {
         },
       });
       clear();
-      toast.success("Payment successful! Your order is now in the kitchen bake queue.");
+      toast.success("Order placed. We will confirm your slot and send a payment link.");
       navigate({ to: "/orders" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not place the order");
@@ -239,11 +239,43 @@ function CheckoutPage() {
     <div className="mx-auto w-full max-w-6xl px-4 py-12">
       <div className="mb-8">
         <h1 className="font-display text-3xl font-bold text-cocoa">Choose your slot & checkout</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Orders need at least one day of notice. Instant payment secures your slot in our fresh
-          bake queue.
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Orders need at least one day of notice. You are not charged now — we check the morning
+          oven has room, then send a secure payment link.
         </p>
       </div>
+
+      {/* A completion checklist rather than a wizard: the form is one page, and
+          this says what still has to be filled in before it can be submitted. */}
+      <ol className="mb-8 flex flex-wrap gap-2" aria-label="Checkout progress">
+        {[
+          { label: "Delivery or pickup", done: true },
+          { label: "Date & time slot", done: Boolean(slotDate) },
+          { label: "Contact details", done: isProfileReady },
+          {
+            label: "Review & confirm",
+            done: Boolean(slotDate) && isProfileReady,
+          },
+        ].map((step, index) => (
+          <li
+            key={step.label}
+            className={`flex min-h-9 flex-1 items-center gap-2 rounded-xl border px-3 text-xs font-bold transition-colors ${
+              step.done
+                ? "border-emerald-600/40 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300"
+                : "border-border/70 bg-card text-muted-foreground"
+            }`}
+          >
+            <span
+              className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] ${
+                step.done ? "bg-emerald-600 text-white" : "bg-secondary text-cocoa"
+              }`}
+            >
+              {step.done ? "✓" : index + 1}
+            </span>
+            <span className="truncate">{step.label}</span>
+          </li>
+        ))}
+      </ol>
 
       <form onSubmit={submit} className="grid gap-10 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
@@ -948,7 +980,7 @@ function CheckoutPage() {
               }
               className="w-full rounded-2xl bg-berry text-berry-foreground hover:bg-berry/90 py-6 text-base font-semibold shadow-soft cursor-pointer transition-all hover:scale-[1.01]"
             >
-              {busy ? "Processing payment…" : `Pay & Place Order · ${formatCurrency(finalTotal)}`}
+              {busy ? "Placing your order…" : `Request this slot · ${formatCurrency(finalTotal)}`}
             </Button>
           </div>
         </aside>

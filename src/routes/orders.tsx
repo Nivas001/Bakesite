@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getCatalog } from "@/lib/catalog.functions";
+import { finalPrice, type CatalogProduct } from "@/lib/pricing";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -114,7 +116,7 @@ export type StatusTheme = {
 
 const STATUS_CONFIG: Record<string, StatusTheme> = {
   pending_approval: {
-    label: "Paid · In Queue",
+    label: "Requested · Awaiting confirmation",
     badgeClass: "bg-amber-500/20 text-amber-950 dark:text-amber-200 border border-amber-500/35",
     cardBg: "bg-[#FFFDF7] dark:bg-[#231A0B]",
     cardBorder: "border-amber-200/80 dark:border-amber-900/50",
@@ -129,7 +131,7 @@ const STATUS_CONFIG: Record<string, StatusTheme> = {
     tagText: "text-amber-800 dark:text-amber-300",
     priceText: "text-[#4D3305] dark:text-amber-100",
     icon: ChefHat,
-    desc: "Payment confirmed! The head baker is scheduling your bakes for the morning slot.",
+    desc: "We have your request. The head baker is checking the morning oven has room — nothing has been charged yet.",
     step: 1,
   },
   awaiting_payment: {
@@ -225,17 +227,90 @@ const STATUS_CONFIG: Record<string, StatusTheme> = {
     tagText: "text-slate-700 dark:text-slate-300",
     priceText: "text-slate-800 dark:text-slate-200",
     icon: XCircle,
-    desc: "Slot cancelled or rejected. Full refund has been initiated.",
+    desc: "Slot cancelled. If a payment was taken, a full refund has been initiated.",
     step: 0,
   },
 };
 
+/** The stages a normal order passes through, in order. */
+const ORDER_STAGES = [
+  { key: "requested", label: "Requested" },
+  { key: "confirmed", label: "Slot confirmed" },
+  { key: "paid", label: "Paid" },
+  { key: "baked", label: "Baked & delivered" },
+] as const;
+
+/** How far along `status` is, as an index into ORDER_STAGES. -1 means cancelled. */
+function stageIndexFor(status: string): number {
+  switch (status) {
+    case "pending_approval":
+      return 0;
+    case "awaiting_payment":
+    case "rescheduled":
+      return 1;
+    case "confirmed":
+      return 2;
+    case "completed":
+    case "delivered":
+      return 3;
+    default:
+      return -1;
+  }
+}
+
+/**
+ * Horizontal progress through the order stages.
+ *
+ * The status badge says where an order is; this says what is still to come,
+ * which is the question customers actually have while they wait.
+ */
+function OrderTimeline({ status }: { status: string }) {
+  const current = stageIndexFor(status);
+
+  if (current < 0) {
+    return (
+      <p className="rounded-xl border border-destructive/30 bg-destructive/8 px-3 py-2 text-[11px] font-semibold text-destructive">
+        This order was cancelled and is no longer in the bake queue.
+      </p>
+    );
+  }
+
+  return (
+    <ol className="flex items-center gap-1" aria-label="Order progress">
+      {ORDER_STAGES.map((stage, index) => {
+        const done = index <= current;
+        return (
+          <li key={stage.key} className="flex-1">
+            <span
+              className={`block h-1 rounded-full ${done ? "bg-emerald-600" : "bg-black/10 dark:bg-white/15"}`}
+            />
+            <span
+              className={`mt-1 block truncate text-[10px] font-bold ${
+                index === current
+                  ? "text-emerald-800 dark:text-emerald-300"
+                  : done
+                    ? "text-muted-foreground"
+                    : "text-muted-foreground/60"
+              }`}
+            >
+              {stage.label}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 function OrderCardItem({
   order,
   onReportIssue,
+  catalogProducts,
 }: {
   order: OrderRecord;
   onReportIssue: (order: OrderRecord) => void;
+  /** Live catalogue, used to rebuild a basket at today's prices. */
+  catalogProducts: CatalogProduct[] | undefined;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -255,23 +330,51 @@ function OrderCardItem({
   const isMultiItem = items.length > 3;
   const displayedItems = isMultiItem && !expanded ? items.slice(0, 2) : items;
 
+  /**
+   * Rebuilds the basket from a past order.
+   *
+   * Matched against the live catalogue rather than copied from the order rows:
+   * the stored rows carry only a name and the price paid at the time, so a
+   * slug guessed from the name pointed at a product page that did not exist,
+   * the thumbnail was always missing, and the old price was reused. Quantities
+   * were dropped too, because `add` was called once per line without one.
+   */
   function handleReorder() {
-    let addedCount = 0;
+    const catalogue = catalogProducts ?? [];
+    let added = 0;
+    let unavailable = 0;
+
     for (const item of order.order_items) {
-      if (item.product_id) {
-        const unitPrice = Number(item.line_total) / Math.max(1, item.quantity);
-        add({
-          productId: item.product_id,
-          slug: item.product_name.toLowerCase().replace(/\s+/g, "-"),
-          name: item.product_name,
-          unitPrice,
-          basePrice: unitPrice,
-          imageUrl: null,
-        });
-        addedCount += item.quantity;
+      if (!item.product_id) continue;
+      const product = catalogue.find((p) => p.id === item.product_id);
+      if (!product) {
+        unavailable += 1;
+        continue;
       }
+      const unitPrice = finalPrice(product.price, product.discount_type, product.discount_value);
+      add(
+        {
+          productId: product.id,
+          slug: product.slug,
+          name: product.name,
+          unitPrice,
+          basePrice: product.price,
+          imageUrl: product.image_url,
+        },
+        item.quantity,
+      );
+      added += item.quantity;
     }
-    toast.success(`Added ${addedCount || "all"} items from order to your cart tray!`);
+
+    if (added === 0) {
+      toast.error("None of these bakes are on the counter right now.");
+      return;
+    }
+    toast.success(
+      unavailable > 0
+        ? `Added ${added} items. ${unavailable} are no longer on the counter.`
+        : `Added ${added} items to your cart at today's prices.`,
+    );
     navigate({ to: "/cart" });
   }
 
@@ -351,6 +454,7 @@ function OrderCardItem({
               </span>
             </div>
           </div>
+          <OrderTimeline status={order.status} />
 
           {/* 2. Rescheduled Order Action Alert Box */}
           {isRescheduled && (
@@ -631,6 +735,9 @@ function OrderCardItem({
 function OrdersPage() {
   const fetchOrders = useServerFn(getMyOrders);
   const { data, isLoading } = useQuery({ queryKey: ["my-orders"], queryFn: () => fetchOrders() });
+  // Re-ordering rebuilds the basket from live products, not from the stored
+  // order rows, so prices and availability are current.
+  const { data: catalog } = useQuery({ queryKey: ["catalog"], queryFn: () => getCatalog() });
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
   const [supportModalOpen, setSupportModalOpen] = useState(false);
   const [selectedSupportOrder, setSelectedSupportOrder] = useState<OrderRecord | null>(null);
@@ -792,7 +899,12 @@ function OrdersPage() {
       ) : (
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredOrders.map((order) => (
-            <OrderCardItem key={order.id} order={order} onReportIssue={handleOpenSupport} />
+            <OrderCardItem
+              key={order.id}
+              order={order}
+              onReportIssue={handleOpenSupport}
+              catalogProducts={catalog?.products}
+            />
           ))}
         </ul>
       )}
