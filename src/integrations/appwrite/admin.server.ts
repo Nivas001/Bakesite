@@ -46,7 +46,14 @@ async function request<T>(
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Appwrite ${response.status}: ${text}`);
+    // The full upstream body names collections, attributes and validation
+    // internals, and these errors surface to the browser through server
+    // function failures. Log it here and hand the caller a correlation id
+    // instead. The status is kept on the message because callers switch on it
+    // (getDoc treats 404 as "absent" rather than an error).
+    const reference = crypto.randomUUID().slice(0, 8);
+    console.error(`[appwrite ${reference}] ${response.status} ${path}: ${text}`);
+    throw new Error(`Appwrite ${response.status}: request failed (reference ${reference})`);
   }
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;

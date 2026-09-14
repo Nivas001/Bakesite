@@ -187,9 +187,7 @@ export function BakerLaboratoryBento() {
                     }`}
                   >
                     <p className="text-[11px] font-mono opacity-80">{s.duration}</p>
-                    <p className="text-[11px] font-bold truncate mt-0.5">
-                      {s.name.split(" ")[0]}
-                    </p>
+                    <p className="text-[11px] font-bold truncate mt-0.5">{s.name.split(" ")[0]}</p>
                   </button>
                 ))}
               </div>

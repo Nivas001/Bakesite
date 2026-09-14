@@ -83,7 +83,11 @@ function formatBodyHtml(text: string): string {
     .join("");
 }
 
-export function buildNewsletterHtml(input: NewsletterTemplateInput): string {
+export function buildNewsletterHtml(
+  input: NewsletterTemplateInput,
+  /** Per-recipient signed unsubscribe link. Falls back to the bare page. */
+  unsubscribeUrl = "https://anibakes.app/unsubscribe",
+): string {
   const type = input.campaign_type || "announcement";
   const preset = CAMPAIGN_PRESETS[type] || CAMPAIGN_PRESETS.announcement;
 
@@ -341,7 +345,7 @@ export function buildNewsletterHtml(input: NewsletterTemplateInput): string {
               <div style="background-color: #efe2d6; border-radius: 14px; padding: 12px 16px; margin-top: 4px; display: inline-block; max-width: 440px;">
                 <p style="margin: 0 0 4px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 11px; line-height: 1.5; color: #6e4e40; font-weight: 500;">
                   Too full on pastries or watching your sugar? 🧁<br />
-                  You can <a href="https://anibakes.app/unsubscribe" target="_blank" style="color: #c94a29; font-weight: 700; text-decoration: underline;">take a sweet break &amp; unsubscribe</a> anytime.
+                  You can <a href="${unsubscribeUrl}" target="_blank" style="color: #c94a29; font-weight: 700; text-decoration: underline;">take a sweet break &amp; unsubscribe</a> anytime.
                 </p>
                 <p style="margin: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 10px; color: #9c8072; font-style: italic;">
                   Our ovens will still be warm whenever you crave that fresh bake aroma again. 🥐

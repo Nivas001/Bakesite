@@ -56,6 +56,16 @@ const SEED_OFFER_CODES: OfferCodeDoc[] = [
 
 let memoryCodes: OfferCodeDoc[] = [...SEED_OFFER_CODES];
 
+/**
+ * Whether write failures may fall back to the in-process list.
+ *
+ * That fallback is useful locally, where the Appwrite collection may not exist
+ * yet. In production it is actively harmful: the array is per-isolate and lost
+ * on recycle, so a failed write reported success and the code later did not
+ * exist — and a genuine outage looked like everything was fine.
+ */
+const allowMemoryFallback = process.env["NODE_ENV"] !== "production";
+
 export async function fetchOfferCodes(): Promise<OfferCodeDoc[]> {
   try {
     const docs = await listDocs<OfferCodeDoc>(COLLECTIONS.offerCodes, [
@@ -112,8 +122,8 @@ export async function upsertOfferCode(input: OfferCodeInput) {
     } else {
       await createDoc(COLLECTIONS.offerCodes, payload);
     }
-  } catch {
-    // Memory fallback
+  } catch (error) {
+    if (!allowMemoryFallback) throw error;
     if (input.id) {
       memoryCodes = memoryCodes.map((c) =>
         c.id === input.id ? { ...c, ...payload, id: input.id } : c,
@@ -129,7 +139,8 @@ export async function upsertOfferCode(input: OfferCodeInput) {
 export async function removeOfferCode(id: string) {
   try {
     await deleteDoc(COLLECTIONS.offerCodes, id);
-  } catch {
+  } catch (error) {
+    if (!allowMemoryFallback) throw error;
     memoryCodes = memoryCodes.filter((c) => c.id !== id && c.$id !== id);
   }
   return { ok: true as const };
@@ -183,31 +194,72 @@ export async function validatePromoCode(input: ValidateOfferCodeInput) {
   };
 }
 
-/** Increments used_count and closes single-use voucher codes upon completed order placement */
+/**
+ * Reserves one use of a code.
+ *
+ * Re-reads the current count immediately before writing and refuses if the
+ * limit has been reached in the meantime, so the gap between validating a code
+ * at checkout and consuming it is as small as it can be without a transaction.
+ * Failures now propagate: swallowing them meant a single-use voucher could be
+ * spent repeatedly without the count ever moving.
+ */
 export async function markOfferCodeUsed(codeString: string) {
+  if (!codeString) return;
+  const codes = await fetchOfferCodes();
+  const code = codes.find((c) => c.code.toUpperCase() === codeString.toUpperCase().trim());
+  if (!code) throw new Error(`Promo code "${codeString}" is no longer available.`);
+
+  const usedCount = code.used_count ?? 0;
+  if (code.usage_limit && usedCount >= code.usage_limit) {
+    throw new Error(`Voucher code "${code.code}" has already been redeemed.`);
+  }
+
+  const newUsedCount = usedCount + 1;
+  const updatePayload = {
+    used_count: newUsedCount,
+    is_active: code.usage_limit ? newUsedCount < code.usage_limit : true,
+  };
+
+  const docId = code.id || code.$id;
+  if (!docId) return;
+
+  try {
+    await updateDoc(COLLECTIONS.offerCodes, docId, updatePayload);
+  } catch (error) {
+    if (!allowMemoryFallback) throw error;
+    memoryCodes = memoryCodes.map((c) =>
+      c.id === docId || c.$id === docId ? { ...c, ...updatePayload } : c,
+    );
+  }
+}
+
+/**
+ * Gives a reserved use back, for when the order it was reserved for failed.
+ * Never lets the count fall below zero, and re-opens a code the reservation
+ * had closed.
+ */
+export async function releaseOfferCodeUse(codeString: string) {
   if (!codeString) return;
   const codes = await fetchOfferCodes();
   const code = codes.find((c) => c.code.toUpperCase() === codeString.toUpperCase().trim());
   if (!code) return;
 
-  const newUsedCount = (code.used_count ?? 0) + 1;
-  const isNowInactive = code.usage_limit ? newUsedCount >= code.usage_limit : false;
-
+  const newUsedCount = Math.max(0, (code.used_count ?? 1) - 1);
   const updatePayload = {
     used_count: newUsedCount,
-    is_active: !isNowInactive,
+    is_active: code.usage_limit ? newUsedCount < code.usage_limit : true,
   };
 
   const docId = code.id || code.$id;
-  if (docId) {
-    try {
-      await updateDoc(COLLECTIONS.offerCodes, docId, updatePayload);
-    } catch {
-      // Memory fallback
-      memoryCodes = memoryCodes.map((c) =>
-        c.id === docId || c.$id === docId ? { ...c, ...updatePayload } : c,
-      );
-    }
+  if (!docId) return;
+
+  try {
+    await updateDoc(COLLECTIONS.offerCodes, docId, updatePayload);
+  } catch (error) {
+    if (!allowMemoryFallback) throw error;
+    memoryCodes = memoryCodes.map((c) =>
+      c.id === docId || c.$id === docId ? { ...c, ...updatePayload } : c,
+    );
   }
 }
 

@@ -204,6 +204,21 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     if (!product || !product.is_active) {
       throw new Error(`Product ${product ? product.name : item.productId} is unavailable.`);
     }
+
+    // Stock was previously never consulted, so any quantity of any active
+    // product could be ordered regardless of what the kitchen had. Every
+    // product carries a deliberate stock number (the admin editor defaults it
+    // to 100), so this is safe to enforce.
+    const available = Number(product.stock ?? 0);
+    if (available <= 0) {
+      throw new Error(`${product.name} has sold out for now. Please remove it to continue.`);
+    }
+    if (item.quantity > available) {
+      throw new Error(
+        `Only ${available} × ${product.name} left this morning. Please lower the quantity.`,
+      );
+    }
+
     const unit = finalPrice(product.price, product.discount_type, product.discount_value);
     const lineSubtotal = product.price * item.quantity;
     const lineTotal = unit * item.quantity;
@@ -218,19 +233,35 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     });
   }
 
+  // A promo code is reserved before the order is written, not after.
+  //
+  // Previously the code was validated here and only marked used once the order
+  // had been created, so two orders placed at the same moment both passed
+  // validation and a single-use voucher could be redeemed twice. Reserving
+  // first closes most of that window; if anything below fails, the reservation
+  // is released again. (A fully atomic version needs a uniquely-indexed
+  // redemption document per code, which is the next step.)
+  //
+  // Validation failures are also no longer swallowed: a customer who typed an
+  // expired code used to be charged full price with no explanation.
   let promoDiscount = 0;
+  let promoReserved = false;
   if (input.promoCode) {
-    try {
-      const { validatePromoCode } = await import("./offers.server");
-      const promoResult = await validatePromoCode({
-        code: input.promoCode,
-        subtotal: total,
-      });
-      promoDiscount = promoResult.discountAmount;
-    } catch {
-      // Continue if promo validation fails on edge cases
-    }
+    const { validatePromoCode, markOfferCodeUsed } = await import("./offers.server");
+    const promoResult = await validatePromoCode({ code: input.promoCode, subtotal: total });
+    promoDiscount = promoResult.discountAmount;
+    await markOfferCodeUsed(input.promoCode);
+    promoReserved = true;
   }
+
+  /** Gives a reserved promo use back when the order does not go through. */
+  const releasePromo = async () => {
+    if (!promoReserved || !input.promoCode) return;
+    const { releaseOfferCodeUse } = await import("./offers.server");
+    await releaseOfferCodeUse(input.promoCode).catch(() => {
+      console.error("[orders] could not release promo reservation for", input.promoCode);
+    });
+  };
 
   const finalOrderTotal = Math.max(0, total - promoDiscount);
   const totalDiscount = subtotal - total + promoDiscount;
@@ -239,42 +270,53 @@ export async function createOrderForUser(userId: string, input: PlaceOrderInput)
     ? `${input.notes ? `${input.notes} | ` : ""}Promo: ${input.promoCode} (-₹${promoDiscount})`
     : (input.notes ?? null);
 
-  const order = await createDoc<OrderDoc>(COLLECTIONS.orders, {
-    user_id: userId,
-    status: "pending_approval",
-    fulfilment_type: input.fulfilmentType,
-    slot_date: input.slotDate,
-    slot_start: slot.start,
-    slot_end: slot.end,
-    subtotal: Math.round(subtotal * 100) / 100,
-    discount_total: Math.round(totalDiscount * 100) / 100,
-    total: Math.round(finalOrderTotal * 100) / 100,
-    contact_name: input.contactName,
-    contact_phone: input.contactPhone,
-    delivery_address: input.fulfilmentType === "delivery" ? input.address : null,
-    delivery_lat: input.fulfilmentType === "delivery" ? input.latitude : null,
-    delivery_lng: input.fulfilmentType === "delivery" ? input.longitude : null,
-    notes: orderNotes,
-    // Payment fields stay empty until money actually moves. A new order is
-    // `pending_approval`; the admin moves it to `awaiting_payment`, which mints
-    // the Razorpay link, and the webhook is what records payment_ref/paid_at.
-    // Stamping them here wrote a paid timestamp onto every unpaid order.
-    payment_link_url: null,
-    payment_ref: null,
-    paid_at: null,
-  });
+  let order: Doc<OrderDoc>;
+  try {
+    order = await createDoc<OrderDoc>(COLLECTIONS.orders, {
+      user_id: userId,
+      status: "pending_approval",
+      fulfilment_type: input.fulfilmentType,
+      slot_date: input.slotDate,
+      slot_start: slot.start,
+      slot_end: slot.end,
+      subtotal: Math.round(subtotal * 100) / 100,
+      discount_total: Math.round(totalDiscount * 100) / 100,
+      total: Math.round(finalOrderTotal * 100) / 100,
+      contact_name: input.contactName,
+      contact_phone: input.contactPhone,
+      delivery_address: input.fulfilmentType === "delivery" ? input.address : null,
+      delivery_lat: input.fulfilmentType === "delivery" ? input.latitude : null,
+      delivery_lng: input.fulfilmentType === "delivery" ? input.longitude : null,
+      notes: orderNotes,
+      // Payment fields stay empty until money actually moves. A new order is
+      // `pending_approval`; the admin moves it to `awaiting_payment`, which
+      // mints the Razorpay link, and the webhook records payment_ref/paid_at.
+      payment_link_url: null,
+      payment_ref: null,
+      paid_at: null,
+    });
+  } catch (error) {
+    await releasePromo();
+    throw error;
+  }
 
   try {
     for (const row of rows) {
       await createDoc(COLLECTIONS.orderItems, { ...row, order_id: order.$id });
     }
-    // Increment used count for single-use / usage-limited promo codes
-    if (input.promoCode) {
-      const { markOfferCodeUsed } = await import("./offers.server");
-      await markOfferCodeUsed(input.promoCode).catch(() => {});
+
+    // Take the ordered quantities out of stock. Appwrite has no atomic
+    // increment, so this reads and writes; the check above plus small batch
+    // sizes make a lost update unlikely, and the admin sees the real count.
+    for (const item of input.items) {
+      const product = productMap.get(item.productId);
+      if (!product) continue;
+      const remaining = Math.max(0, Number(product.stock ?? 0) - item.quantity);
+      await updateDoc(COLLECTIONS.products, product.$id, { stock: remaining });
     }
   } catch (error) {
     await deleteDoc(COLLECTIONS.orders, order.$id);
+    await releasePromo();
     throw error;
   }
 

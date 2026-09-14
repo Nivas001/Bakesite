@@ -21,7 +21,7 @@ import { ScrollProgressBar } from "../components/motion/scroll-progress-bar";
 
 /** Microsoft Clarity heatmaps/analytics — only injected once a project id is set. */
 function clarityScripts() {
-  const clarityId = import.meta.env["VITE_CLARITY_PROJECT_ID"] as string | undefined;
+  const clarityId = import.meta.env.VITE_CLARITY_PROJECT_ID;
   if (!clarityId) return [];
   return [
     {

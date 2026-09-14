@@ -12,6 +12,7 @@ import { LazyVideo } from "@/components/motion/lazy-video";
 export const Route = createFileRoute("/unsubscribe")({
   validateSearch: (search: Record<string, unknown>) => ({
     email: typeof search["email"] === "string" ? (search["email"] as string) : undefined,
+    token: typeof search["token"] === "string" ? (search["token"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -28,6 +29,9 @@ function UnsubscribePage() {
   const [email, setEmail] = useState(search.email || "");
   const [busy, setBusy] = useState(false);
   const [unsubscribed, setUnsubscribed] = useState(false);
+  // Set when the address could not be verified and a confirmation link was
+  // emailed instead of unsubscribing outright.
+  const [confirmationSent, setConfirmationSent] = useState(false);
 
   const unsubscribeFn = useServerFn(unsubscribeFromNewsletter);
 
@@ -40,9 +44,16 @@ function UnsubscribePage() {
 
     setBusy(true);
     try {
-      await unsubscribeFn({ data: { email: email.trim() } });
-      setUnsubscribed(true);
-      toast.success("You have been unsubscribed from our newsletter.");
+      const result = await unsubscribeFn({
+        data: { email: email.trim(), ...(search.token ? { token: search.token } : {}) },
+      });
+      if (result.confirmationSent) {
+        setConfirmationSent(true);
+        toast.success("Check your inbox — we sent a link to confirm.");
+      } else {
+        setUnsubscribed(true);
+        toast.success("You have been unsubscribed from our newsletter.");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not unsubscribe");
     } finally {
@@ -58,7 +69,26 @@ function UnsubscribePage() {
 
       <div className="relative w-full max-w-md sm:max-w-lg md:max-w-xl">
         <div className="glass-panel relative rounded-3xl sm:rounded-4xl border-2 border-border/80 p-6 sm:p-9 shadow-lift text-center space-y-5 sm:space-y-6 bg-card/95 backdrop-blur-md">
-          {!unsubscribed ? (
+          {confirmationSent ? (
+            <div className="space-y-3 py-6">
+              <span className="text-5xl" aria-hidden>
+                📬
+              </span>
+              <h1 className="font-blogh text-2xl font-bold tracking-wide text-cocoa uppercase sm:text-3xl">
+                Check your inbox
+              </h1>
+              <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground">
+                We sent a confirmation link to <strong className="text-cocoa">{email}</strong>. Open
+                it to finish unsubscribing. We ask for this so nobody else can unsubscribe you.
+              </p>
+              <Button asChild variant="outline" className="mt-2 rounded-xl">
+                <Link to="/">
+                  <ArrowLeft className="mr-1.5 size-4" />
+                  Back to the bakery
+                </Link>
+              </Button>
+            </div>
+          ) : !unsubscribed ? (
             <>
               {/* Mailbox Animated Illustration Resource */}
               <div className="relative mx-auto flex items-center justify-center">

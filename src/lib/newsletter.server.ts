@@ -10,6 +10,7 @@ import {
 import { sendEmail, type EmailAttachment } from "./notifications-impl.server";
 import { campaignSchema, subscribeSchema } from "./admin.schema";
 import { buildNewsletterHtml } from "./newsletter-template";
+import { createUnsubscribeToken, verifyUnsubscribeToken } from "./unsubscribe-token.server";
 
 export { campaignSchema, subscribeSchema };
 
@@ -32,8 +33,34 @@ export async function addSubscriber(input: z.infer<typeof subscribeSchema>) {
   return { ok: true as const };
 }
 
-export async function removeSubscriber(email: string) {
+/**
+ * Unsubscribes an address, but only on proof the caller controls it.
+ *
+ * Without the token check this endpoint removed whatever address it was given,
+ * so anyone could unsubscribe anyone. Requests with no token are answered by
+ * emailing a signed confirmation link to the address itself, which is the only
+ * way to prove ownership without an account.
+ */
+export async function removeSubscriber(email: string, token?: string) {
   const cleanEmail = email.toLowerCase().trim();
+
+  if (!token) {
+    const link = `https://anibakes.app/unsubscribe?email=${encodeURIComponent(cleanEmail)}&token=${await createUnsubscribeToken(cleanEmail)}`;
+    await sendEmail({
+      to: cleanEmail,
+      subject: "Confirm your Ani Bakes unsubscribe",
+      text: `Open this link to stop receiving our newsletter: ${link}`,
+      html: `<p>Tap below to stop receiving the Ani Bakes newsletter.</p><p><a href="${link}">Confirm unsubscribe</a></p><p>If you did not ask for this, you can ignore this email — nothing has changed.</p>`,
+    });
+    // Reported identically whether or not the address is on the list, so this
+    // cannot be used to test which addresses are subscribed.
+    return { ok: true as const, confirmationSent: true as const };
+  }
+
+  if (!(await verifyUnsubscribeToken(cleanEmail, token))) {
+    throw new Error("This unsubscribe link is invalid or has expired. Please request a new one.");
+  }
+
   const existing = await findDoc<SubscriberDoc>(COLLECTIONS.newsletterSubscribers, [
     Q.equal("email", cleanEmail),
   ]);
@@ -43,7 +70,7 @@ export async function removeSubscriber(email: string) {
       is_subscribed: false,
     });
   }
-  return { ok: true as const };
+  return { ok: true as const, confirmationSent: false as const };
 }
 
 export async function fetchSubscribers() {
@@ -80,8 +107,6 @@ export async function sendCampaign(userId: string, input: z.infer<typeof campaig
     Q.limit(500),
   ]);
 
-  const html = buildNewsletterHtml(input);
-
   const attachments: EmailAttachment[] = [];
   if (input.attachment_b64 && input.attachment_name) {
     attachments.push({
@@ -92,11 +117,14 @@ export async function sendCampaign(userId: string, input: z.infer<typeof campaig
   }
 
   for (const subscriber of recipients) {
+    // Signed per recipient, so the footer link works in one tap and cannot be
+    // reused to unsubscribe somebody else.
+    const unsubscribeUrl = `https://anibakes.app/unsubscribe?email=${encodeURIComponent(subscriber.email)}&token=${await createUnsubscribeToken(subscriber.email)}`;
     await sendEmail({
       to: subscriber.email,
       subject: input.subject,
       text: input.body,
-      html,
+      html: buildNewsletterHtml(input, unsubscribeUrl),
       attachments: attachments.length > 0 ? attachments : undefined,
     });
   }
