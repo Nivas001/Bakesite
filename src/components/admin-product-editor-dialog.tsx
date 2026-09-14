@@ -432,11 +432,11 @@ export function ProductEditorDialog({
                           </td>
                           <td className="py-1.5 text-right">
                             {v.savings_label ? (
-                              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                              <span className="text-[11px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded">
                                 {v.savings_label}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-muted-foreground">Base</span>
+                              <span className="text-[11px] text-muted-foreground">Base</span>
                             )}
                           </td>
                         </tr>
@@ -518,12 +518,12 @@ export function ProductEditorDialog({
                           }}
                         />
                         {isPinned && (
-                          <span className="absolute top-1.5 left-1.5 rounded-full bg-berry text-berry-foreground px-2 py-0.5 text-[9px] font-bold shadow-xs flex items-center gap-1">
+                          <span className="absolute top-1.5 left-1.5 rounded-full bg-berry text-berry-foreground px-2 py-0.5 text-[11px] font-bold shadow-xs flex items-center gap-1">
                             <Pin className="size-2.5" />
                             <span>Cover</span>
                           </span>
                         )}
-                        <span className="absolute bottom-1.5 right-1.5 rounded-md bg-black/60 text-white backdrop-blur-xs px-1.5 py-0.5 text-[9px] font-mono font-bold">
+                        <span className="absolute bottom-1.5 right-1.5 rounded-md bg-black/60 text-white backdrop-blur-xs px-1.5 py-0.5 text-[11px] font-mono font-bold">
                           #{idx + 1}
                         </span>
                       </div>
@@ -536,13 +536,13 @@ export function ProductEditorDialog({
                               setForm((f) => ({ ...f, image_url: img }));
                               toast.success(`Photo #${idx + 1} pinned as primary cover!`);
                             }}
-                            className="inline-flex items-center gap-1 text-[10px] font-bold text-berry-deep hover:underline py-1 px-1 rounded-lg hover:bg-berry/10 cursor-pointer"
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-berry-deep hover:underline py-1 px-1 rounded-lg hover:bg-berry/10 cursor-pointer"
                           >
                             <Pin className="size-3" />
                             <span>Pin Cover</span>
                           </button>
                         ) : (
-                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 py-1 px-1 flex items-center gap-1">
+                          <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 py-1 px-1 flex items-center gap-1">
                             <CheckCircle2 className="size-3" />
                             <span>Active</span>
                           </span>
@@ -766,7 +766,7 @@ export function ProductEditorDialog({
             />
             <div>
               <p className="text-cocoa font-bold">Visible in the Public Storefront</p>
-              <p className="text-[10px] text-muted-foreground font-normal">
+              <p className="text-[11px] text-muted-foreground font-normal">
                 When enabled, customers can view and add this item to their delivery slot basket.
               </p>
             </div>

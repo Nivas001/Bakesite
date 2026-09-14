@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { clamp, usePrefersReducedMotion } from "@/lib/motion";
-import { createCakeScene, type CakeScene } from "./cake-scroll-scene";
+import type { CakeScene } from "./cake-scroll-scene";
 
 interface Chapter {
   kicker: string;
@@ -138,20 +138,31 @@ export function CakeScrollStory() {
       if (visible) raf = requestAnimationFrame(loop);
     };
 
-    const boot = () => {
-      if (sceneRef.current || disposed) return;
+    let booting = false;
+
+    // Three.js is imported here rather than at module scope so it lands in its
+    // own chunk and is only fetched as this section comes into range, instead
+    // of being paid for by every page that shares the entry bundle.
+    const boot = async () => {
+      if (sceneRef.current || disposed || booting) return;
+      booting = true;
       try {
+        const { createCakeScene } = await import("./cake-scroll-scene");
+        if (disposed) return;
         // Smaller viewports get a cheaper scene: no antialiasing, no shadow
         // map, fewer segments and fewer decorations.
         const quality = window.innerWidth < 820 ? "low" : "high";
         sceneRef.current = createCakeScene(canvas, quality);
         sizeToBox();
         setReady(true);
+        if (visible && !raf) raf = requestAnimationFrame(loop);
       } catch (error) {
         // A machine without a usable WebGL context still gets the chapter text,
         // but the reason should not disappear silently.
         console.warn("[cake-scroll-story] 3D scene unavailable:", error);
         setReady(false);
+      } finally {
+        booting = false;
       }
     };
 
@@ -161,8 +172,8 @@ export function CakeScrollStory() {
         if (!entry) return;
         visible = entry.isIntersecting;
         if (visible) {
-          boot();
-          if (!raf) raf = requestAnimationFrame(loop);
+          void boot();
+          if (sceneRef.current && !raf) raf = requestAnimationFrame(loop);
         }
       },
       { rootMargin: "400px" },
@@ -175,8 +186,8 @@ export function CakeScrollStory() {
       const rect = section.getBoundingClientRect();
       if (rect.top < window.innerHeight + 400 && rect.bottom > -400) {
         visible = true;
-        boot();
-        if (!raf) raf = requestAnimationFrame(loop);
+        void boot();
+        if (sceneRef.current && !raf) raf = requestAnimationFrame(loop);
       }
     }, 1500);
 

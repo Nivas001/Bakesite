@@ -311,7 +311,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                 <Label htmlFor="camp-subject" className="text-xs font-semibold">
                   2. Subject Line (Playfair Display)
                 </Label>
-                <span className="text-[10px] text-muted-foreground">{subject.length}/160</span>
+                <span className="text-[11px] text-muted-foreground">{subject.length}/160</span>
               </div>
               <Input
                 id="camp-subject"
@@ -330,7 +330,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                 <Label htmlFor="camp-body" className="text-xs font-semibold">
                   3. Email Message (Inter)
                 </Label>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground">
                   Line breaks format into paragraphs
                 </span>
               </div>
@@ -357,7 +357,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                     >
                       Feature a Cake / Bake in this Email
                     </Label>
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-[11px] text-muted-foreground">
                       Showcase a photo with title, price/badge, and details on the right or below
                     </p>
                   </div>
@@ -581,7 +581,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                   <Paperclip className="size-3.5 text-cocoa" />
                   <span className="text-xs font-semibold">Attach Image or PDF Document</span>
                 </div>
-                <span className="text-[10px] text-muted-foreground">Max 5 MB</span>
+                <span className="text-[11px] text-muted-foreground">Max 5 MB</span>
               </div>
 
               <input
@@ -617,7 +617,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                     )}
                     <div className="min-w-0">
                       <p className="text-xs font-semibold truncate">{attachmentName}</p>
-                      <p className="text-[10px] text-muted-foreground">
+                      <p className="text-[11px] text-muted-foreground">
                         {(attachmentSize / 1024).toFixed(1)} KB ·{" "}
                         {attachmentMime?.startsWith("image/")
                           ? "Inline Email Banner"
@@ -727,7 +727,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                 >
                   <div className="min-w-0 pr-2">
                     <p className="font-semibold text-foreground truncate">{c.subject}</p>
-                    <p className="text-[10px] text-muted-foreground">
+                    <p className="text-[11px] text-muted-foreground">
                       {new Date(c.sent_at).toLocaleDateString("en-IN", {
                         day: "numeric",
                         month: "short",
@@ -735,7 +735,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                       })}
                     </p>
                   </div>
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground shrink-0">
+                  <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-bold text-muted-foreground shrink-0">
                     {c.recipients} sent
                   </span>
                 </li>
@@ -763,7 +763,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
                     {s.email}
                   </span>
                   <span
-                    className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                    className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                       s.is_subscribed
                         ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
                         : "bg-muted text-muted-foreground"

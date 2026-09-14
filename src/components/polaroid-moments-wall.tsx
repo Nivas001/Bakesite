@@ -89,7 +89,7 @@ export function PolaroidMomentsWall() {
 
                 {/* Occasion Badge */}
                 <div className="absolute top-3 left-3 z-10">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold text-berry-deep border border-border/60 shadow-2xs">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[11px] font-bold text-berry-deep border border-border/60 shadow-2xs">
                     <Sparkles className="size-2.5" />
                     {currentMoment.occasion}
                   </span>

@@ -178,7 +178,7 @@ export function OrderSupportDialog({
                   <MessageCircle className="size-4 text-emerald-500" />
                   Direct Baker Hotline
                 </span>
-                <span className="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full">
+                <span className="text-[11px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full">
                   Instant Reply
                 </span>
               </div>
@@ -337,7 +337,7 @@ export function OrderSupportDialog({
                         {slotLabelFor(currentOrder.slot_start)}
                       </span>
                     </div>
-                    <span className="rounded-full bg-card px-2.5 py-0.5 text-[10px] font-bold border border-border/60">
+                    <span className="rounded-full bg-card px-2.5 py-0.5 text-[11px] font-bold border border-border/60">
                       {currentOrder.order_items.length} item(s)
                     </span>
                   </div>
@@ -403,7 +403,7 @@ export function OrderSupportDialog({
                         key={res.id}
                         type="button"
                         onClick={() => setPreferredResolution(res.id as any)}
-                        className={`rounded-xl border p-1.5 text-center text-[10.5px] font-semibold transition-all cursor-pointer ${
+                        className={`rounded-xl border p-1.5 text-center text-[11px] font-semibold transition-all cursor-pointer ${
                           preferredResolution === res.id
                             ? "border-cocoa bg-cocoa text-background font-bold shadow-2xs"
                             : "border-border/60 bg-card text-muted-foreground hover:bg-secondary/40"

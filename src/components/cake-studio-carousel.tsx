@@ -277,7 +277,7 @@ export function CakeStudioCarousel() {
 
             {/* Top Badge Floating */}
             <div className="absolute top-2.5 right-2.5 z-10 pointer-events-none">
-              <span className="inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white px-2.5 py-0.5 text-[10px] font-bold shadow-xs">
+              <span className="inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white px-2.5 py-0.5 text-[11px] font-bold shadow-xs">
                 <Sparkles className="size-3 text-amber-300" />
                 <span>{activeSlide.badge}</span>
               </span>
@@ -422,7 +422,7 @@ export function CakeStudioCarousel() {
                     <Users className="size-4 text-berry-deep" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground block">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground block">
                       Portion
                     </span>
                     <span className="text-[13px] font-bold text-cocoa truncate block">
@@ -437,7 +437,7 @@ export function CakeStudioCarousel() {
                     <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div className="min-w-0">
-                    <span className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground block">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground block">
                       Best For
                     </span>
                     <span className="text-[13px] font-bold text-cocoa truncate block">

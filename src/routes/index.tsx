@@ -264,13 +264,13 @@ function Home() {
 
                 {/* Micro Perks Pills */}
                 <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[11px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
                     🥐 4:00 AM Dawn Oven
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[11px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
                     🛵 Pondicherry Doorstep
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-card/80 backdrop-blur-xs px-2.5 py-0.5 text-[11px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
                     🧈 100% French Butter
                   </span>
                 </div>

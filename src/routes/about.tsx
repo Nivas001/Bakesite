@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useState, useRef, lazy, Suspense } from "react";
 import {
   Sparkles,
   Heart,
@@ -26,7 +26,12 @@ import {
   Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Cake3dModelViewer } from "@/components/cake-3d-model-viewer";
+// Loaded on demand. This viewer pulls in Three.js plus the GLTF, FBX and
+// OrbitControls addons — around 1MB of JavaScript — and it only renders once
+// the visitor actually opens the studio, so it must not sit in the page chunk.
+const Cake3dModelViewer = lazy(() =>
+  import("@/components/cake-3d-model-viewer").then((m) => ({ default: m.Cake3dModelViewer })),
+);
 import { DeliverySecurityShowcase } from "@/components/delivery-security-showcase";
 import { InertiaGallery, GalleryShot } from "@/components/godui/inertia-gallery";
 import { TextAnimate } from "@/components/godui/text-animate";
@@ -560,16 +565,16 @@ export function AboutUsPage() {
                   }}
                 >
                   {/* Turntable Compass Markers */}
-                  <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-amber-300/80">
+                  <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[11px] font-mono font-bold text-amber-300/80">
                     0° FRONT
                   </span>
-                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold text-amber-300/80">
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-amber-300/80">
                     90°
                   </span>
-                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-mono font-bold text-amber-300/80">
+                  <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[11px] font-mono font-bold text-amber-300/80">
                     180° CRUMB
                   </span>
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-mono font-bold text-amber-300/80">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[11px] font-mono font-bold text-amber-300/80">
                     270°
                   </span>
                   <div className="absolute inset-4 rounded-full border border-dashed border-amber-500/20" />
@@ -925,7 +930,7 @@ export function AboutUsPage() {
                       }`}
                     >
                       <span className="truncate text-[11px]">{diet.label}</span>
-                      <span className="text-[10px] opacity-80 shrink-0 font-mono ml-1">
+                      <span className="text-[11px] opacity-80 shrink-0 font-mono ml-1">
                         {diet.count}
                       </span>
                     </button>
@@ -1021,7 +1026,7 @@ export function AboutUsPage() {
                   <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">
                     4:00 AM Dawn Bake
                   </h3>
-                  <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
+                  <p className="text-[11px] text-[#5C3218]/80 leading-snug font-medium">
                     Baked fresh every single morning for your slot.
                   </p>
                 </div>
@@ -1031,7 +1036,7 @@ export function AboutUsPage() {
                   <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">
                     36-Hour Wild Ferment
                   </h3>
-                  <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
+                  <p className="text-[11px] text-[#5C3218]/80 leading-snug font-medium">
                     Slow cold proofing for gut health and open crumb.
                   </p>
                 </div>
@@ -1041,7 +1046,7 @@ export function AboutUsPage() {
                   <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">
                     100% French Butter
                   </h3>
-                  <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
+                  <p className="text-[11px] text-[#5C3218]/80 leading-snug font-medium">
                     84% butterfat dairy. Zero margarine or palm oil.
                   </p>
                 </div>
@@ -1051,7 +1056,7 @@ export function AboutUsPage() {
                   <h3 className="font-sans font-black text-xs sm:text-sm text-[#5C3218] uppercase">
                     70% Belgian Couverture
                   </h3>
-                  <p className="text-[10.5px] text-[#5C3218]/80 leading-snug font-medium">
+                  <p className="text-[11px] text-[#5C3218]/80 leading-snug font-medium">
                     Real cocoa butter and pure Bourbon vanilla beans.
                   </p>
                 </div>
@@ -1170,7 +1175,7 @@ export function AboutUsPage() {
                               : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50"
                           }`}
                         >
-                          <span className="block text-[10px] opacity-70">Pin #{hs.id}</span>
+                          <span className="block text-[11px] opacity-70">Pin #{hs.id}</span>
                           <span className="truncate block">{hs.badge}</span>
                         </button>
                       ))}
@@ -1365,7 +1370,17 @@ export function AboutUsPage() {
                 Collapse 3D Studio ↑
               </Button>
             </div>
-            <Cake3dModelViewer />
+            <Suspense
+              fallback={
+                <div className="flex min-h-[24rem] items-center justify-center rounded-3xl border border-border/60 bg-card/60">
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    Loading the 3D studio&hellip;
+                  </p>
+                </div>
+              }
+            >
+              <Cake3dModelViewer />
+            </Suspense>
           </div>
         )}
       </section>

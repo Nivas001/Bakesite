@@ -206,7 +206,7 @@ export function CakeBuilderWidget() {
                       {flavour.name}
                     </p>
                   </div>
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[10px] font-bold text-emerald-800 dark:text-emerald-300">
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
                     <Sparkles className="size-2.5" /> {size.serves}
                   </span>
                 </div>

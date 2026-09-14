@@ -186,8 +186,8 @@ export function BakerLaboratoryBento() {
                         : "bg-white/80 dark:bg-card/80 text-muted-foreground border-border/70 hover:bg-secondary hover:text-foreground"
                     }`}
                   >
-                    <p className="text-[9px] font-mono opacity-80">{s.duration}</p>
-                    <p className="text-[10.5px] font-bold truncate mt-0.5">
+                    <p className="text-[11px] font-mono opacity-80">{s.duration}</p>
+                    <p className="text-[11px] font-bold truncate mt-0.5">
                       {s.name.split(" ")[0]}
                     </p>
                   </button>
@@ -230,13 +230,13 @@ export function BakerLaboratoryBento() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm">{ing.icon}</span>
-                      <span className="text-[8.5px] font-mono text-emerald-800 dark:text-emerald-300 uppercase">
+                      <span className="text-[10px] font-mono text-emerald-800 dark:text-emerald-300 uppercase">
                         {ing.name.split(" ")[0]}
                       </span>
                     </div>
                     <div className="mt-1">
                       <p className="font-bold text-[11px] leading-tight">{ing.name}</p>
-                      <p className="text-[9px] text-muted-foreground mt-0.5 truncate">
+                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
                         {ing.origin}
                       </p>
                     </div>
@@ -281,7 +281,7 @@ export function BakerLaboratoryBento() {
                   <Sparkles className="size-3.5" />
                   <span>Head Baker's Vault</span>
                 </span>
-                <span className="text-[10px] sm:text-[11px] text-muted-foreground font-mono">
+                <span className="text-[11px] sm:text-[11px] text-muted-foreground font-mono">
                   EASTER EGG #01
                 </span>
               </div>

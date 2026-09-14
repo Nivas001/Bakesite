@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/pricing";
+import { isPlaceholderDescription, formatCurrency } from "@/lib/pricing";
 import { Copy, Trash2, Eye, EyeOff, Pin, CheckCircle2 } from "lucide-react";
 
 export function ProductAdminCard({
@@ -66,7 +66,7 @@ export function ProductAdminCard({
       {/* Editing indicator banner */}
       {isBeingEdited && (
         <div className="absolute -top-2.5 left-3 right-3 flex items-center justify-center z-10">
-          <span className="rounded-full bg-berry text-berry-foreground px-3 py-0.5 text-[10px] font-bold shadow-sm flex items-center gap-1">
+          <span className="rounded-full bg-berry text-berry-foreground px-3 py-0.5 text-[11px] font-bold shadow-sm flex items-center gap-1">
             ✏️ Currently Editing
           </span>
         </div>
@@ -92,17 +92,17 @@ export function ProductAdminCard({
         {/* Top Badges */}
         <div className="absolute top-2 left-2 right-2 flex items-center justify-between gap-1 pointer-events-none">
           {categoryName ? (
-            <span className="rounded-full bg-black/65 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold text-white shadow-2xs truncate max-w-[120px]">
+            <span className="rounded-full bg-black/65 backdrop-blur-md px-2 py-0.5 text-[11px] font-bold text-white shadow-2xs truncate max-w-[120px]">
               {categoryName}
             </span>
           ) : (
-            <span className="rounded-full bg-black/50 backdrop-blur-md px-2 py-0.5 text-[10px] font-bold text-white/80">
+            <span className="rounded-full bg-black/50 backdrop-blur-md px-2 py-0.5 text-[11px] font-bold text-white/80">
               Uncategorised
             </span>
           )}
 
           {discountType !== "none" && discountVal > 0 && (
-            <span className="rounded-full bg-berry text-berry-foreground font-bold px-2 py-0.5 text-[10px] shadow-2xs">
+            <span className="rounded-full bg-berry text-berry-foreground font-bold px-2 py-0.5 text-[11px] shadow-2xs">
               {discountType === "percent" ? `${discountVal}% OFF` : `₹${discountVal} OFF`}
             </span>
           )}
@@ -111,18 +111,18 @@ export function ProductAdminCard({
         {/* Bottom Badges on Image */}
         <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
           {product.is_active ? (
-            <span className="rounded-full bg-emerald-500/90 text-white backdrop-blur-xs px-2 py-0.5 text-[9px] font-bold shadow-2xs flex items-center gap-1">
+            <span className="rounded-full bg-emerald-500/90 text-white backdrop-blur-xs px-2 py-0.5 text-[11px] font-bold shadow-2xs flex items-center gap-1">
               <span className="size-1.5 rounded-full bg-white animate-pulse" />
               <span>Fresh Bake</span>
             </span>
           ) : (
-            <span className="rounded-full bg-black/75 text-white/90 backdrop-blur-xs px-2 py-0.5 text-[9px] font-bold shadow-2xs">
+            <span className="rounded-full bg-black/75 text-white/90 backdrop-blur-xs px-2 py-0.5 text-[11px] font-bold shadow-2xs">
               Paused
             </span>
           )}
 
           {imagesList.length > 1 && (
-            <span className="rounded-md bg-black/75 text-white backdrop-blur-xs px-1.5 py-0.5 text-[9px] font-mono font-bold">
+            <span className="rounded-md bg-black/75 text-white backdrop-blur-xs px-1.5 py-0.5 text-[11px] font-mono font-bold">
               📸 {imagesList.length}
             </span>
           )}
@@ -156,21 +156,25 @@ export function ProductAdminCard({
           {/* Portion/Weight or Serving details */}
           <div className="mt-1.5 flex flex-wrap items-center gap-1">
             {itemType === "weight" ? (
-              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[10px] font-bold text-berry-deep">
+              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[11px] font-bold text-berry-deep">
                 🎂 Tiered (250g–2kg)
               </span>
             ) : (product as any).unit_weight_grams || (product as any).serving_yield ? (
-              <span className="rounded-md bg-secondary/80 border border-border/50 px-1.5 py-0.5 text-[10px] font-bold text-cocoa">
+              <span className="rounded-md bg-secondary/80 border border-border/50 px-1.5 py-0.5 text-[11px] font-bold text-cocoa">
                 ⚖️ {(product as any).serving_yield ?? `${(product as any).unit_weight_grams}g`}
               </span>
             ) : (
-              <span className="rounded-md bg-secondary/60 px-1.5 py-0.5 text-[10px] text-muted-foreground font-medium">
+              <span className="rounded-md bg-secondary/60 px-1.5 py-0.5 text-[11px] text-muted-foreground font-medium">
                 Standard piece
               </span>
             )}
           </div>
 
-          {product.description && (
+          {isPlaceholderDescription(product.description) ? (
+            <p className="text-[11px] font-bold text-amber-700 dark:text-amber-400">
+              ⚠ Description still needs writing — customers see no description for this product.
+            </p>
+          ) : (
             <p className="mt-1.5 text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
               {product.description}
             </p>

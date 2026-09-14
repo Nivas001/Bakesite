@@ -247,7 +247,7 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
                               )}
                             </div>
                             {item.shortcut ? (
-                              <kbd className="relative shrink-0 rounded-lg border border-border/70 bg-card px-2 py-0.5 font-mono text-[10.5px] font-bold text-muted-foreground shadow-2xs">
+                              <kbd className="relative shrink-0 rounded-lg border border-border/70 bg-card px-2 py-0.5 font-mono text-[11px] font-bold text-muted-foreground shadow-2xs">
                                 {item.shortcut}
                               </kbd>
                             ) : null}
@@ -263,12 +263,12 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
               <div className="flex items-center justify-between border-t border-border/70 bg-secondary/20 px-4 py-2 text-[11px] text-muted-foreground">
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1">
-                    <kbd className="rounded border border-border px-1 text-[10px]">↑</kbd>
-                    <kbd className="rounded border border-border px-1 text-[10px]">↓</kbd>
+                    <kbd className="rounded border border-border px-1 text-[11px]">↑</kbd>
+                    <kbd className="rounded border border-border px-1 text-[11px]">↓</kbd>
                     <span>to navigate</span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="rounded border border-border px-1 text-[10px]">↵</kbd>
+                    <kbd className="rounded border border-border px-1 text-[11px]">↵</kbd>
                     <span>to select</span>
                   </span>
                 </div>

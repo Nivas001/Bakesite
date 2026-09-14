@@ -121,7 +121,7 @@ export function SiteHeader() {
             >
               {item.label}
               {item.badge && (
-                <span className="ml-1.5 rounded-full bg-berry/15 px-1.5 py-0.2 text-[9px] font-extrabold text-berry-deep">
+                <span className="ml-1.5 rounded-full bg-berry/15 px-1.5 py-0.2 text-[11px] font-extrabold text-berry-deep">
                   {item.badge}
                 </span>
               )}
@@ -176,7 +176,7 @@ export function SiteHeader() {
                 className="size-4.5 text-foreground transition-colors duration-700"
               />
               {count > 0 && (
-                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-berry text-[10px] font-bold text-berry-foreground shadow-xs animate-in zoom-in-75 ring-2 ring-background">
+                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-berry text-[11px] font-bold text-berry-foreground shadow-xs animate-in zoom-in-75 ring-2 ring-background">
                   {count > 9 ? "9+" : count}
                 </span>
               )}
@@ -264,7 +264,7 @@ export function SiteHeader() {
                     <p className="font-nimbus text-lg font-bold text-cocoa leading-tight">
                       Ani Bakes<span className="text-berry-deep">.</span>
                     </p>
-                    <p className="text-[10px] text-muted-foreground">Fresh small-batch bakery</p>
+                    <p className="text-[11px] text-muted-foreground">Fresh small-batch bakery</p>
                   </div>
                 </div>
 
@@ -289,7 +289,7 @@ export function SiteHeader() {
                         </div>
                         <div className="flex items-center gap-1.5">
                           {item.badge && (
-                            <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[9px] font-bold text-berry-deep">
+                            <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[11px] font-bold text-berry-deep">
                               {item.badge}
                             </span>
                           )}
@@ -316,7 +316,7 @@ export function SiteHeader() {
                     </div>
                     <div className="flex items-center gap-1.5">
                       {count > 0 && (
-                        <span className="rounded-full bg-berry px-2 py-0.5 text-[10px] font-bold text-berry-foreground">
+                        <span className="rounded-full bg-berry px-2 py-0.5 text-[11px] font-bold text-berry-foreground">
                           {count}
                         </span>
                       )}
@@ -392,7 +392,7 @@ export function SiteHeader() {
                       <LogIn className="size-4" />
                       <span>Sign in to Ani Bakes</span>
                     </Link>
-                    <p className="text-center text-[10px] text-muted-foreground">
+                    <p className="text-center text-[11px] text-muted-foreground">
                       Sign in for saved addresses & order tracking
                     </p>
                   </div>

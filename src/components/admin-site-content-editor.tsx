@@ -348,7 +348,7 @@ export function AdminSiteContentEditor() {
                 <Label htmlFor="sec-badge" className="text-xs font-bold text-cocoa">
                   {activeConfig.badgeLabel}
                 </Label>
-                <span className="text-[10px] text-muted-foreground font-mono">
+                <span className="text-[11px] text-muted-foreground font-mono">
                   {currentSection.badge?.length || 0} chars
                 </span>
               </div>
@@ -367,7 +367,7 @@ export function AdminSiteContentEditor() {
                 <Label htmlFor="sec-title" className="text-xs font-bold text-cocoa">
                   {activeConfig.titleLabel} <span className="text-berry-deep">*</span>
                 </Label>
-                <span className="text-[10px] text-muted-foreground font-mono">
+                <span className="text-[11px] text-muted-foreground font-mono">
                   {currentSection.title?.length || 0} chars
                 </span>
               </div>
@@ -386,7 +386,7 @@ export function AdminSiteContentEditor() {
                 <Label htmlFor="sec-desc" className="text-xs font-bold text-cocoa">
                   {activeConfig.descLabel}
                 </Label>
-                <span className="text-[10px] text-muted-foreground font-mono">
+                <span className="text-[11px] text-muted-foreground font-mono">
                   {currentSection.description?.length || 0} chars
                 </span>
               </div>
@@ -435,7 +435,7 @@ export function AdminSiteContentEditor() {
                         />
                         <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <div>
-                            <span className="text-[10px] font-bold text-muted-foreground">
+                            <span className="text-[11px] font-bold text-muted-foreground">
                               Pill Badge Label
                             </span>
                             <Input
@@ -448,7 +448,7 @@ export function AdminSiteContentEditor() {
                             />
                           </div>
                           <div>
-                            <span className="text-[10px] font-bold text-muted-foreground">
+                            <span className="text-[11px] font-bold text-muted-foreground">
                               Top Tag (Optional)
                             </span>
                             <Input
@@ -582,10 +582,10 @@ export function AdminSiteContentEditor() {
                 <span className="size-2 rounded-full bg-amber-400" />
                 <span className="size-2 rounded-full bg-emerald-400" />
               </div>
-              <span className="text-[10px] font-mono font-medium text-muted-foreground">
+              <span className="text-[11px] font-mono font-medium text-muted-foreground">
                 {activeConfig.page === "Homepage" ? "anibakes.com/" : "anibakes.com/about"}
               </span>
-              <span className="text-[10px] text-muted-foreground">100%</span>
+              <span className="text-[11px] text-muted-foreground">100%</span>
             </div>
 
             {/* Dynamic Section Mock View */}
@@ -693,7 +693,7 @@ export function AdminSiteContentEditor() {
                         {currentSection.title || "Interactive 3D Cake Atelier"}
                       </span>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full bg-white/10 text-amber-200 text-[10px] font-mono">
+                    <span className="px-2 py-0.5 rounded-full bg-white/10 text-amber-200 text-[11px] font-mono">
                       360° Orbit
                     </span>
                   </div>
@@ -753,13 +753,13 @@ export function AdminSiteContentEditor() {
                           alt={photo.label}
                           className="size-full object-cover"
                         />
-                        <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-black/60 backdrop-blur-xs rounded-md px-1.5 py-0.5 text-[9px] font-bold text-white truncate">
+                        <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-black/60 backdrop-blur-xs rounded-md px-1.5 py-0.5 text-[11px] font-bold text-white truncate">
                           {photo.label}
                         </div>
                       </div>
                     ))}
                   </div>
-                  <p className="text-[10px] text-muted-foreground font-mono">
+                  <p className="text-[11px] text-muted-foreground font-mono">
                     ‹ 1 / {galleryPhotos.length} › (Interactive Momentum Throw on page)
                   </p>
                 </div>

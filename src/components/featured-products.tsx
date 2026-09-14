@@ -160,13 +160,13 @@ export function FeaturedProducts({ products }: { products: CatalogProduct[] }) {
                   className="aspect-square w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 {discounted && (
-                  <span className="absolute left-2.5 top-2.5 sm:left-3.5 sm:top-3.5 rounded-full bg-berry px-2 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-xs font-semibold text-berry-foreground shadow-soft">
+                  <span className="absolute left-2.5 top-2.5 sm:left-3.5 sm:top-3.5 rounded-full bg-berry px-2 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-xs font-semibold text-berry-foreground shadow-soft">
                     {discountLabel(product.discount_type, product.discount_value)}
                   </span>
                 )}
                 <div className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 flex flex-col items-end">
                   {discounted && (
-                    <span className="text-[10px] sm:text-[11px] font-semibold text-foreground/80 line-through drop-shadow-xs mb-0.5">
+                    <span className="text-[11px] sm:text-[11px] font-semibold text-foreground/80 line-through drop-shadow-xs mb-0.5">
                       {formatCurrency(product.price)}
                     </span>
                   )}

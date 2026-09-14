@@ -262,7 +262,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                             <p className="text-xs font-bold text-cocoa leading-none">
                               Verified Baker
                             </p>
-                            <span className="text-[10px] text-muted-foreground">
+                            <span className="text-[11px] text-muted-foreground">
                               {new Date(review.created_at).toLocaleDateString("en-IN", {
                                 day: "numeric",
                                 month: "short",
@@ -272,7 +272,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                           </div>
                         </div>
 
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-300">
                           <ShieldCheck className="size-3 text-emerald-500" />
                           <span>Verified</span>
                         </span>
@@ -296,7 +296,7 @@ export function ProductReviews({ productId }: { productId: string }) {
                       )}
                     </div>
 
-                    <div className="text-[10px] text-muted-foreground/80 pt-1 border-t border-border/40 flex items-center justify-between">
+                    <div className="text-[11px] text-muted-foreground/80 pt-1 border-t border-border/40 flex items-center justify-between">
                       <span>Morning Bake Order</span>
                       <span className="font-semibold text-cocoa">Ani Bakes Kitchen</span>
                     </div>

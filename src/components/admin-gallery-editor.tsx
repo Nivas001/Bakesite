@@ -413,14 +413,14 @@ export function AdminGalleryEditor() {
                               className="size-full object-cover select-none pointer-events-none"
                             />
                             {isUploadingThis ? (
-                              <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white text-[9px] font-bold">
+                              <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white text-[11px] font-bold">
                                 <Loader2 className="size-4 animate-spin text-amber-300" />
                                 <span>Uploading</span>
                               </div>
                             ) : (
                               <label
                                 htmlFor={`upload-${photo.id}`}
-                                className="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 flex flex-col items-center justify-center text-white transition-opacity cursor-pointer text-[9px] font-bold gap-0.5"
+                                className="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 flex flex-col items-center justify-center text-white transition-opacity cursor-pointer text-[11px] font-bold gap-0.5"
                                 title="Click to upload custom photo"
                               >
                                 <Camera className="size-4 text-amber-300" />
@@ -444,7 +444,7 @@ export function AdminGalleryEditor() {
                           {/* Editable Fields: Badge Pill Label & Tag */}
                           <div className="flex-1 min-w-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
-                              <span className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                 Bottom Pill Badge Label
                               </span>
                               <Input
@@ -457,7 +457,7 @@ export function AdminGalleryEditor() {
                               />
                             </div>
                             <div>
-                              <span className="text-[9.5px] font-bold uppercase tracking-wider text-muted-foreground">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                 Top Tag (Optional)
                               </span>
                               <Input

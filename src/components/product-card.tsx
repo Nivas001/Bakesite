@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Minus, Plus } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import {
+  customerDescription,
   discountLabel,
   finalPrice,
   formatCurrency,
@@ -18,6 +19,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
   const price = finalPrice(displayBasePrice, product.discount_type, product.discount_value);
   const discounted = hasDiscount(product.discount_type, product.discount_value);
 
+  const description = customerDescription(product.description);
   const cartLine = lines.find((l) => l.productId === product.id);
   const quantityInCart = cartLine?.quantity ?? 0;
 
@@ -38,7 +40,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
           className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {discounted && (
-          <span className="absolute left-2.5 top-2.5 sm:left-3 sm:top-3 rounded-full bg-berry px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-semibold text-berry-foreground shadow-soft">
+          <span className="absolute left-2.5 top-2.5 sm:left-3 sm:top-3 rounded-full bg-berry px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] sm:text-xs font-semibold text-berry-foreground shadow-soft">
             {discountLabel(product.discount_type, product.discount_value)}
           </span>
         )}
@@ -48,7 +50,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
         <div className="absolute right-2.5 bottom-2.5 sm:right-3 sm:bottom-3">
           <span className="inline-flex items-baseline gap-1.5 rounded-full bg-card/92 px-2.5 py-1 shadow-soft backdrop-blur">
             {discounted && (
-              <s className="text-[10px] font-semibold text-muted-foreground sm:text-[11px]">
+              <s className="text-[11px] font-semibold text-muted-foreground sm:text-[11px]">
                 <span className="sr-only">Was </span>
                 {formatCurrency(displayBasePrice)}
               </s>
@@ -65,7 +67,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
       <div className="flex flex-1 flex-col justify-between px-0.5 sm:px-1 pt-2.5 sm:pt-3">
         <div className="flex flex-col">
           {/* Category & Weight Row */}
-          <div className="flex items-center justify-between gap-1 text-[9px] sm:text-[10px] h-4">
+          <div className="flex items-center justify-between gap-1 text-[11px] sm:text-[11px] h-4">
             <p className="uppercase tracking-wider font-bold text-muted-foreground/90 truncate">
               {product.category_name}
             </p>
@@ -96,20 +98,20 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
                 {product.weight_variants!.slice(0, 3).map((v) => (
                   <span
                     key={v.id}
-                    className="inline-block rounded-md bg-secondary/80 px-1.5 py-0.5 text-[8.5px] sm:text-[9.5px] font-bold text-muted-foreground border border-border/50 shrink-0"
+                    className="inline-block rounded-md bg-secondary/80 px-1.5 py-0.5 text-[11px] sm:text-[11px] font-bold text-muted-foreground border border-border/50 shrink-0"
                   >
                     {v.label.split(" ")[0]}
                   </span>
                 ))}
                 {product.weight_variants!.length > 3 && (
-                  <span className="text-[8.5px] sm:text-[9px] text-muted-foreground font-bold shrink-0">
+                  <span className="text-[11px] sm:text-[11px] text-muted-foreground font-bold shrink-0">
                     +{product.weight_variants!.length - 3} more
                   </span>
                 )}
               </div>
-            ) : product.description ? (
-              <p className="text-[9.5px] sm:text-[11px] text-muted-foreground line-clamp-1 leading-normal">
-                {product.description}
+            ) : description ? (
+              <p className="line-clamp-1 text-[11px] leading-normal text-muted-foreground">
+                {description}
               </p>
             ) : null}
           </div>
@@ -120,7 +122,7 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
           {quantityInCart === 0 ? (
             <button
               type="button"
-              className="inline-flex h-7 sm:h-8 items-center justify-center gap-1 rounded-full bg-berry px-2.5 sm:px-3.5 text-[10.5px] sm:text-xs font-semibold text-berry-foreground shadow-xs transition-all duration-200 hover:scale-105 hover:bg-berry/90 active:scale-95 cursor-pointer ml-auto"
+              className="inline-flex h-7 sm:h-8 items-center justify-center gap-1 rounded-full bg-berry px-2.5 sm:px-3.5 text-[11px] sm:text-xs font-semibold text-berry-foreground shadow-xs transition-all duration-200 hover:scale-105 hover:bg-berry/90 active:scale-95 cursor-pointer ml-auto"
               onClick={() => {
                 add({
                   productId: product.id,

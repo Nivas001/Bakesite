@@ -99,7 +99,7 @@ export function AdminProductForm({
             <span>New</span>
           </Button>
         ) : (
-          <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+          <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
             New Item
           </span>
         )}
@@ -295,7 +295,7 @@ export function AdminProductForm({
               <Layers className="size-3.5 text-berry-deep" />
               <span>3. Sizing Mode</span>
             </div>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[11px] text-muted-foreground">
               {form.item_type === "weight" ? "Cake tiers" : "Unit / piece"}
             </span>
           </div>
@@ -348,7 +348,7 @@ export function AdminProductForm({
           {form.item_type === "weight" ? (
             <div className="space-y-2 pt-1">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-muted-foreground">Tiered volume discounts</span>
+                <span className="text-[11px] text-muted-foreground">Tiered volume discounts</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -357,7 +357,7 @@ export function AdminProductForm({
                     setForm((f) => ({ ...f, weight_variants: calculated }));
                     toast.success(`Tiers recalculated for ₹${base} base!`);
                   }}
-                  className="text-[10px] font-bold text-berry-deep hover:underline cursor-pointer"
+                  className="text-[11px] font-bold text-berry-deep hover:underline cursor-pointer"
                 >
                   ⚡ Auto Tiers
                 </button>
@@ -366,7 +366,7 @@ export function AdminProductForm({
               <div className="space-y-1 overflow-x-auto rounded-xl border border-border/60 bg-card p-2">
                 <table className="w-full text-left text-[11px] border-collapse">
                   <thead>
-                    <tr className="border-b border-border/60 text-muted-foreground text-[9px] uppercase">
+                    <tr className="border-b border-border/60 text-muted-foreground text-[10px] uppercase">
                       <th className="py-1">Size</th>
                       <th className="py-1">Price (₹)</th>
                       <th className="py-1 text-right">Tag</th>
@@ -391,11 +391,11 @@ export function AdminProductForm({
                         </td>
                         <td className="py-1 text-right">
                           {v.savings_label ? (
-                            <span className="text-[9px] font-bold text-emerald-600 bg-emerald-500/10 px-1 py-0.5 rounded">
+                            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-500/10 px-1 py-0.5 rounded">
                               {v.savings_label}
                             </span>
                           ) : (
-                            <span className="text-[9px] text-muted-foreground">Base</span>
+                            <span className="text-[11px] text-muted-foreground">Base</span>
                           )}
                         </td>
                       </tr>
@@ -407,7 +407,7 @@ export function AdminProductForm({
           ) : (
             <div className="grid grid-cols-2 gap-2 pt-1">
               <div>
-                <Label htmlFor="side-unit-wt" className="text-[10px] font-semibold">
+                <Label htmlFor="side-unit-wt" className="text-[11px] font-semibold">
                   Unit Weight (g)
                 </Label>
                 <Input
@@ -420,7 +420,7 @@ export function AdminProductForm({
                 />
               </div>
               <div>
-                <Label htmlFor="side-serv-yield" className="text-[10px] font-semibold">
+                <Label htmlFor="side-serv-yield" className="text-[11px] font-semibold">
                   Portion Note
                 </Label>
                 <Input
@@ -442,7 +442,7 @@ export function AdminProductForm({
               <ImageIcon className="size-3.5 text-berry-deep" />
               <span>4. Photos ({attachedImages.length})</span>
             </div>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[11px] text-muted-foreground">
               {attachedImages.length > 0 ? "Carousel enabled" : "No photos"}
             </span>
           </div>
@@ -469,7 +469,7 @@ export function AdminProductForm({
                         }}
                       />
                       {isPinned && (
-                        <span className="absolute top-1 left-1 rounded bg-berry text-berry-foreground px-1 py-0.2 text-[8px] font-bold">
+                        <span className="absolute top-1 left-1 rounded bg-berry text-berry-foreground px-1 py-0.2 text-[11px] font-bold">
                           Cover
                         </span>
                       )}
@@ -483,12 +483,12 @@ export function AdminProductForm({
                             setForm((f) => ({ ...f, image_url: img }));
                             toast.success(`Photo #${idx + 1} pinned as cover!`);
                           }}
-                          className="text-[9px] font-bold text-berry-deep hover:underline cursor-pointer"
+                          className="text-[11px] font-bold text-berry-deep hover:underline cursor-pointer"
                         >
                           Pin
                         </button>
                       ) : (
-                        <span className="text-[9px] font-bold text-emerald-600">✓ Active</span>
+                        <span className="text-[11px] font-bold text-emerald-600">✓ Active</span>
                       )}
 
                       <button

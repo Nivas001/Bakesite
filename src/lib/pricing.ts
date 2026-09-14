@@ -122,3 +122,42 @@ export function formatCurrency(value: number): string {
     maximumFractionDigits: 0,
   }).format(value);
 }
+
+/**
+ * Obvious placeholder text that should never reach a customer.
+ *
+ * Descriptions are admin-entered, and drafts like "will update later" have
+ * shipped to the live catalogue before. Rather than rendering them, the card
+ * and detail views treat them as an absent description; the admin product list
+ * flags them separately so they can actually be written.
+ */
+const PLACEHOLDER_DESCRIPTIONS = [
+  "will update later",
+  "update later",
+  "to be updated",
+  "tbd",
+  "tba",
+  "todo",
+  "lorem ipsum",
+  "description",
+  "n/a",
+  "na",
+  "test",
+  "-",
+];
+
+/** True when a description is missing, blank or obvious placeholder text. */
+export function isPlaceholderDescription(description: string | null | undefined): boolean {
+  if (!description) return true;
+  const normalised = description
+    .trim()
+    .toLowerCase()
+    .replace(/[.!]+$/, "");
+  if (normalised.length === 0) return true;
+  return PLACEHOLDER_DESCRIPTIONS.includes(normalised);
+}
+
+/** The description to show a customer, or null when there is nothing worth showing. */
+export function customerDescription(description: string | null | undefined): string | null {
+  return isPlaceholderDescription(description) ? null : (description as string).trim();
+}

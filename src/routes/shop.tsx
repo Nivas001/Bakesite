@@ -6,7 +6,6 @@ import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { MagicInput } from "@/components/godui/magic-input";
 import { Combobox, type ComboboxOption } from "@/components/godui/combobox";
-import { MultiButton, type MultiButtonItem } from "@/components/godui/multi-button";
 import { TextAnimate } from "@/components/godui/text-animate";
 import { useFlag } from "@/lib/feature-flags";
 import {
@@ -151,7 +150,7 @@ function CategoryHorizontalLane({
             <h2 className="font-blogh text-xl sm:text-2xl lg:text-3xl font-bold text-cocoa uppercase tracking-wide">
               {categoryName}
             </h2>
-            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[10px] sm:text-xs font-bold text-cocoa/80 border border-border/60">
+            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-cocoa/80 border border-border/60">
               {products.length} {products.length === 1 ? "item" : "items"}
             </span>
           </div>
@@ -231,15 +230,26 @@ function CategoryHorizontalLane({
         )}
       </div>
 
-      {/* 💻 DESKTOP & TABLET VIEW: Exact 4-Cards per Row Horizontal Lane (Supports 1, 2, 3, 4 Rows) */}
+      {/* 💻 DESKTOP & TABLET VIEW: Exact 4-Cards per Row Horizontal Lane (Supports 1, 2, 3, 4 Rows)
+          A lane that cannot fill its row is laid out as a plain grid instead —
+          a single card against three empty columns reads as a loading failure
+          rather than a short category. */}
       <div
         ref={scrollRef}
-        className="hidden sm:flex overflow-x-auto gap-4 pb-4 pt-3.5 -mt-2 no-scrollbar snap-x snap-mandatory scroll-smooth"
+        className={
+          columns.length < 3
+            ? "-mt-2 hidden gap-4 pt-3.5 pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            : "no-scrollbar -mt-2 hidden snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pt-3.5 pb-4 sm:flex"
+        }
       >
         {columns.map((column, colIdx) => (
           <div
             key={colIdx}
-            className="snap-start shrink-0 sm:w-[calc(50%-8px)] md:w-[calc(33.333%-11px)] lg:w-[calc(25%-12px)] flex flex-col gap-4"
+            className={
+              columns.length < 3
+                ? "flex flex-col gap-4"
+                : "flex shrink-0 snap-start flex-col gap-4 sm:w-[calc(50%-8px)] md:w-[calc(33.333%-11px)] lg:w-[calc(25%-12px)]"
+            }
           >
             {column.map((product) => (
               <div key={product.id} className="h-full flex flex-col">
@@ -248,6 +258,26 @@ function CategoryHorizontalLane({
             ))}
           </div>
         ))}
+
+        {/* A short category cannot fill the row. Rather than leaving the
+            remaining columns blank — which reads as something failing to load —
+            the gap becomes an invitation to keep browsing. */}
+        {columns.length < 3 && (
+          <div className="hidden min-h-[18rem] flex-col items-center justify-center gap-2 rounded-[2rem] border-2 border-dashed border-border/80 bg-card/40 p-6 text-center sm:flex">
+            <span className="text-3xl" aria-hidden>
+              🧺
+            </span>
+            <p className="font-blogh text-sm font-bold tracking-wide text-cocoa uppercase">
+              A short range today
+            </p>
+            {/* Phrased without the category name as the subject — it may be
+                singular or plural, and "Brownies is baked" reads badly. */}
+            <p className="max-w-[24ch] text-[11px] leading-relaxed text-muted-foreground">
+              This range is baked in small batches, so the counter carries only what is fresh today.
+              More returns as it comes out of the oven.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -305,23 +335,18 @@ function Shop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const categoryItems: MultiButtonItem[] = useMemo(() => {
-    const allItem: MultiButtonItem = {
-      id: "all",
-      icon: Store,
-      label: "All",
-      onClick: () => handleCategoryChange(null),
-    };
-
-    const dynamicItems: MultiButtonItem[] = data.categories.map((c) => ({
-      id: c.slug,
-      icon: getCategoryIcon(c.slug),
-      label: c.name,
-      onClick: () => handleCategoryChange(c.slug),
-    }));
-
-    return [allItem, ...dynamicItems];
-  }, [data.categories]);
+  const categoryItems = useMemo(
+    () => [
+      { id: "all", slug: null as string | null, icon: Store, label: "All" },
+      ...data.categories.map((c) => ({
+        id: c.slug,
+        slug: c.slug as string | null,
+        icon: getCategoryIcon(c.slug),
+        label: c.name,
+      })),
+    ],
+    [data.categories],
+  );
 
   const isLaneMode = active === null && !search.trim() && sortBy === "featured";
 
@@ -354,17 +379,37 @@ function Shop() {
 
       {/* Filters Row: Category MultiButton Rail + Search + Sort */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4 justify-between border-b border-border/60 pb-4">
-        {/* Category MultiButton Action Rail */}
-        <div className="overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar shrink-0">
-          <MultiButton
-            items={categoryItems}
-            selectedId={active ?? "all"}
-            size="sm"
-            variant="outline"
-            highlightColor="var(--berry)"
-            className="shrink-0"
-          />
-        </div>
+        {/* Category rail. Every pill shows its name: the previous control only
+            labelled the selected item, leaving six unlabelled glyphs that are
+            not reliably distinguishable at this size. */}
+        <nav
+          aria-label="Filter by category"
+          className="no-scrollbar -mx-4 shrink-0 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0"
+        >
+          <ul className="flex items-center gap-1.5">
+            {categoryItems.map((item) => {
+              const Icon = item.icon;
+              const selected = (active ?? "all") === item.id;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryChange(item.slug)}
+                    aria-current={selected ? "true" : undefined}
+                    className={`flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
+                      selected
+                        ? "border-cocoa bg-cocoa text-background shadow-xs"
+                        : "border-border/70 bg-card text-cocoa hover:border-cocoa/40 hover:bg-secondary/60"
+                    }`}
+                  >
+                    <Icon className="size-3.5 shrink-0" />
+                    {item.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
         {/* Search & Sort Controls */}
         <div className="flex items-center gap-3 sm:ml-auto w-full sm:w-auto">

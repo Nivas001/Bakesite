@@ -185,9 +185,13 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <ScrollProgressBar />
+        {/* Lets keyboard and screen-reader users jump the header navigation. */}
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
         <div className="flex min-h-screen flex-col">
           <SiteHeader />
-          <main className="flex-1">
+          <main id="main-content" tabIndex={-1} className="flex-1">
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
           </main>

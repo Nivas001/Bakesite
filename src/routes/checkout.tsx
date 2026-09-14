@@ -417,11 +417,11 @@ function CheckoutPage() {
 
                             <div>
                               {isSelected ? (
-                                <span className="flex items-center gap-1 rounded-full bg-berry px-2 py-0.5 text-[10px] font-bold text-berry-foreground">
+                                <span className="flex items-center gap-1 rounded-full bg-berry px-2 py-0.5 text-[11px] font-bold text-berry-foreground">
                                   <Check className="h-3 w-3" /> Selected
                                 </span>
                               ) : (
-                                <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-semibold text-secondary-foreground">
+                                <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-semibold text-secondary-foreground">
                                   Earliest
                                 </span>
                               )}
@@ -452,11 +452,11 @@ function CheckoutPage() {
                               {weekdayShort}
                             </span>
                             {isSelected ? (
-                              <span className="flex items-center gap-0.5 rounded-full bg-berry px-1.5 py-0.5 text-[9px] font-bold text-berry-foreground">
+                              <span className="flex items-center gap-0.5 rounded-full bg-berry px-1.5 py-0.5 text-[11px] font-bold text-berry-foreground">
                                 <Check className="h-2.5 w-2.5" /> Selected
                               </span>
                             ) : (
-                              <span className="text-[10px] text-muted-foreground">
+                              <span className="text-[11px] text-muted-foreground">
                                 {monthShort}
                               </span>
                             )}
@@ -529,25 +529,25 @@ function CheckoutPage() {
                               <p className="font-sans text-xs font-bold text-foreground">
                                 {s.label.split("·")[0]?.trim()}
                               </p>
-                              <span className="text-[10px] text-muted-foreground font-medium">
+                              <span className="text-[11px] text-muted-foreground font-medium">
                                 ({s.label.split("·")[1]?.trim()})
                               </span>
                             </div>
-                            <p className="text-[10px] text-muted-foreground">{meta.tag}</p>
+                            <p className="text-[11px] text-muted-foreground">{meta.tag}</p>
                           </div>
                         </div>
 
                         <div>
                           {isSelected ? (
-                            <span className="flex items-center gap-1 rounded-full bg-berry px-2 py-0.5 text-[10px] font-bold text-berry-foreground">
+                            <span className="flex items-center gap-1 rounded-full bg-berry px-2 py-0.5 text-[11px] font-bold text-berry-foreground">
                               <Check className="h-3 w-3" /> Selected
                             </span>
                           ) : available ? (
-                            <span className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground">
+                            <span className="text-[11px] font-medium text-muted-foreground group-hover:text-foreground">
                               Select
                             </span>
                           ) : (
-                            <span className="text-[10px] font-medium text-destructive">Closed</span>
+                            <span className="text-[11px] font-medium text-destructive">Closed</span>
                           )}
                         </div>
                       </button>
@@ -628,7 +628,7 @@ function CheckoutPage() {
                               <Link
                                 to="/profile"
                                 search={{ returnTo: "/checkout" }}
-                                className="text-[10px] font-semibold text-berry-deep hover:underline"
+                                className="text-[11px] font-semibold text-berry-deep hover:underline"
                               >
                                 Edit
                               </Link>
@@ -646,7 +646,7 @@ function CheckoutPage() {
                                   <Link
                                     to="/profile"
                                     search={{ returnTo: "/checkout" }}
-                                    className="text-[10px] text-berry-deep hover:underline font-semibold"
+                                    className="text-[11px] text-berry-deep hover:underline font-semibold"
                                   >
                                     Adjust Pin on Map ➔
                                   </Link>
@@ -674,7 +674,7 @@ function CheckoutPage() {
                                 <Link
                                   to="/profile"
                                   search={{ returnTo: "/checkout" }}
-                                  className="text-[10px] font-bold text-berry-deep hover:underline shrink-0 ml-2"
+                                  className="text-[11px] font-bold text-berry-deep hover:underline shrink-0 ml-2"
                                 >
                                   Pin on Map →
                                 </Link>
@@ -730,7 +730,7 @@ function CheckoutPage() {
                               onChange={(e) => setAlternatePhone(e.target.value)}
                               className="rounded-xl h-9 text-xs"
                             />
-                            <p className="text-[10px] text-muted-foreground">
+                            <p className="text-[11px] text-muted-foreground">
                               The delivery rider will call this number upon arrival.
                             </p>
                           </div>
@@ -770,7 +770,7 @@ function CheckoutPage() {
                         return prev ? `${prev} · ${clean}` : clean;
                       });
                     }}
-                    className="rounded-full border border-border/70 bg-secondary/50 px-2.5 py-1 text-[10px] font-medium text-foreground hover:bg-berry/10 hover:border-berry/40 transition-colors cursor-pointer"
+                    className="rounded-full border border-border/70 bg-secondary/50 px-2.5 py-1 text-[11px] font-medium text-foreground hover:bg-berry/10 hover:border-berry/40 transition-colors cursor-pointer"
                   >
                     + {chip}
                   </button>

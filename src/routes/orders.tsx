@@ -345,7 +345,7 @@ function OrderCardItem({
                 {config.label}
               </span>
               <span
-                className={`text-[10px] font-mono font-bold tracking-wider opacity-75 ${config.subText}`}
+                className={`text-[11px] font-mono font-bold tracking-wider opacity-75 ${config.subText}`}
               >
                 #{order.id.slice(-6).toUpperCase()}
               </span>

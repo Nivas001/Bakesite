@@ -201,7 +201,7 @@ export function DeliverySecurityShowcase() {
 
               {/* Floating Badge */}
               <div className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10 pointer-events-none">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white px-3 py-1 text-[10px] sm:text-xs font-bold shadow-md">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white px-3 py-1 text-[11px] sm:text-xs font-bold shadow-md">
                   <Sparkles className="size-3 text-amber-300" />
                   <span>{active.badge}</span>
                 </span>
@@ -294,7 +294,7 @@ export function DeliverySecurityShowcase() {
                   <p className="text-[10px] sm:text-[11px] uppercase tracking-wider font-extrabold text-amber-900 dark:text-amber-200">
                     100% Intact Arrival Guarantee
                   </p>
-                  <p className="text-[10.5px] sm:text-xs text-muted-foreground leading-snug">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground leading-snug">
                     If anything shifts or gets damaged in transit, we will immediately re-bake and
                     re-deliver free of cost.
                   </p>

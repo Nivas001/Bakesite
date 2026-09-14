@@ -256,7 +256,7 @@ export function MemoryGame({ onWin, claimCouponFn }: MemoryGameProps) {
                       <span className="text-2xl sm:text-3xl opacity-80 group-hover:scale-110 transition-transform">
                         🧁
                       </span>
-                      <span className="mt-1 font-mono text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+                      <span className="mt-1 font-mono text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                         ANI BAKES
                       </span>
                     </div>
@@ -276,7 +276,7 @@ export function MemoryGame({ onWin, claimCouponFn }: MemoryGameProps) {
                       ) : (
                         <span className="text-3xl sm:text-4xl">{card.emoji}</span>
                       )}
-                      <span className="mt-1 font-sans text-[10px] sm:text-xs font-bold text-cocoa truncate max-w-[90%]">
+                      <span className="mt-1 font-sans text-[11px] sm:text-xs font-bold text-cocoa truncate max-w-[90%]">
                         {card.name}
                       </span>
                     </div>

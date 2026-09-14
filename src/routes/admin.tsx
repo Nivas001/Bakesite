@@ -253,7 +253,7 @@ function ProductAdminRow({
             </div>
           )}
           {imagesList.length > 1 && (
-            <span className="absolute bottom-1 right-1 rounded-md bg-black/75 px-1 py-0.2 text-[9px] font-bold text-white leading-tight">
+            <span className="absolute bottom-1 right-1 rounded-md bg-black/75 px-1 py-0.2 text-[11px] font-bold text-white leading-tight">
               📸 {imagesList.length}
             </span>
           )}
@@ -265,11 +265,11 @@ function ProductAdminRow({
 
             {/* Fresh to Order / Visibility Badge */}
             {product.is_active ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
                 🌿 Baked Fresh to Order
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-muted border border-border px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted border border-border px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
                 ⏸️ Paused from Menu
               </span>
             )}
@@ -284,7 +284,7 @@ function ProductAdminRow({
                   <span className="text-xs line-through text-muted-foreground font-normal">
                     {formatCurrency(price)}
                   </span>
-                  <span className="rounded bg-berry/15 px-1 py-0.5 text-[10px] font-bold text-berry-deep">
+                  <span className="rounded bg-berry/15 px-1 py-0.5 text-[11px] font-bold text-berry-deep">
                     {discountType === "percent" ? `${discountVal}% off` : `₹${discountVal} off`}
                   </span>
                 </>
@@ -294,23 +294,23 @@ function ProductAdminRow({
             </div>
 
             {categoryName && (
-              <span className="rounded-md bg-secondary/70 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+              <span className="rounded-md bg-secondary/70 px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
                 📁 {categoryName}
               </span>
             )}
 
             {(product as any).item_type === "weight" ? (
-              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[10px] font-bold text-berry-deep">
+              <span className="rounded-md bg-berry/10 border border-berry/20 px-1.5 py-0.5 text-[11px] font-bold text-berry-deep">
                 🎂 Weight-Scaled (250g–2kg)
               </span>
             ) : (product as any).unit_weight_grams || (product as any).serving_yield ? (
-              <span className="rounded-md bg-secondary/80 border border-border/50 px-1.5 py-0.5 text-[10px] font-bold text-cocoa">
+              <span className="rounded-md bg-secondary/80 border border-border/50 px-1.5 py-0.5 text-[11px] font-bold text-cocoa">
                 ⚖️ {(product as any).serving_yield ?? `${(product as any).unit_weight_grams}g`}
               </span>
             ) : null}
 
             {imagesList.length > 1 && (
-              <span className="rounded-md bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-400">
+              <span className="rounded-md bg-purple-500/10 border border-purple-500/20 px-1.5 py-0.5 text-[11px] font-bold text-purple-700 dark:text-purple-400">
                 🖼️ {imagesList.length} photos
               </span>
             )}
@@ -666,7 +666,7 @@ function AdminShopLayoutManager({
                       <h3 className="font-display text-base sm:text-lg font-bold text-cocoa truncate">
                         {cat.name}
                       </h3>
-                      <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] sm:text-xs font-bold text-cocoa/80 border border-border/60">
+                      <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] sm:text-xs font-bold text-cocoa/80 border border-border/60">
                         {catProducts.length} items
                       </span>
                     </div>
@@ -682,7 +682,7 @@ function AdminShopLayoutManager({
                 <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 self-end sm:self-auto shrink-0">
                   {/* Desktop Row Count Selector */}
                   <div className="flex items-center gap-1 bg-secondary/60 p-1 rounded-2xl border border-border/60">
-                    <span className="text-[10px] font-bold text-muted-foreground px-1.5 hidden sm:inline">
+                    <span className="text-[11px] font-bold text-muted-foreground px-1.5 hidden sm:inline">
                       Desktop Rows:
                     </span>
                     {[1, 2, 3, 4].map((r) => (
@@ -786,7 +786,7 @@ function AdminShopLayoutManager({
                             )}
                             <div className="min-w-0">
                               <p className="text-xs font-bold text-cocoa truncate">{prod.name}</p>
-                              <p className="text-[10px] text-muted-foreground">
+                              <p className="text-[11px] text-muted-foreground">
                                 {formatCurrency(prod.price)} &bull; 🌿 Baked Fresh
                               </p>
                             </div>
@@ -1792,7 +1792,7 @@ function AdminDashboard() {
                         </div>
                         {item.badge && (
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
                               isActive ? "bg-white/20 text-white" : item.badgeColor
                             }`}
                           >
@@ -1861,7 +1861,7 @@ function AdminDashboard() {
                   {activeTab === "gallery" && "About Page Gallery Atelier"}
                   {activeTab === "content_editor" && "Page Text & Copywriting Studio"}
                 </h1>
-                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
                   <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Live Kitchen
                 </span>
@@ -1887,7 +1887,7 @@ function AdminDashboard() {
                   Search bakes, tabs…
                 </span>
               </div>
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-md border border-border/70 bg-card px-1.5 py-0.5 text-[10px] font-mono font-bold text-muted-foreground shadow-2xs shrink-0">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-md border border-border/70 bg-card px-1.5 py-0.5 text-[11px] font-mono font-bold text-muted-foreground shadow-2xs shrink-0">
                 ⌘K
               </kbd>
             </button>
@@ -1980,7 +1980,7 @@ function AdminDashboard() {
                     <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
                       {formatCurrency(totalRevenue)}
                     </h3>
-                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
                       From confirmed & completed bakes
                     </p>
                   </div>
@@ -1998,7 +1998,7 @@ function AdminDashboard() {
                       Pending Approvals
                     </p>
                     <h3 className="font-display text-2xl font-bold text-cocoa mt-1">{pending}</h3>
-                    <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
+                    <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
                       {pending > 0 ? "Requires baker action" : "All orders up to date"}
                     </p>
                   </div>
@@ -2018,7 +2018,7 @@ function AdminDashboard() {
                     <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
                       {activeProducts.length}
                     </h3>
-                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
                       🌿 100% Baked Fresh to Order
                     </p>
                   </div>
@@ -2035,7 +2035,7 @@ function AdminDashboard() {
                     <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
                       {todayOrders.length}
                     </h3>
-                    <p className="text-[10px] text-cocoa/70 font-semibold mt-0.5">
+                    <p className="text-[11px] text-cocoa/70 font-semibold mt-0.5">
                       Deliveries & pickups for today
                     </p>
                   </div>
@@ -2054,7 +2054,7 @@ function AdminDashboard() {
                       <h3 className="font-display text-lg font-bold text-cocoa">
                         Today&apos;s Production Queue ({todayOrders.length})
                       </h3>
-                      <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
                         {todayISO}
                       </span>
                     </div>
@@ -2093,7 +2093,7 @@ function AdminDashboard() {
                               <span className="font-bold text-xs text-cocoa truncate">
                                 {order.contact_name}
                               </span>
-                              <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-cocoa">
+                              <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-cocoa">
                                 🕒 {order.slot_start.slice(0, 5)}–{order.slot_end.slice(0, 5)}
                               </span>
                             </div>
@@ -2108,7 +2108,7 @@ function AdminDashboard() {
                               {formatCurrency(order.total)}
                             </span>
                             <span
-                              className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                              className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
                                 order.status === "pending_approval"
                                   ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
                                   : order.status === "confirmed"
@@ -2130,7 +2130,7 @@ function AdminDashboard() {
                   <div className="flex items-center justify-between">
                     <h3 className="font-display text-lg font-bold text-cocoa flex items-center gap-1.5">
                       <span>Fresh Bake Menu</span>
-                      <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold">
+                      <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 text-[11px] font-bold">
                         {activeProducts.length} Active
                       </span>
                     </h3>
@@ -2164,7 +2164,7 @@ function AdminDashboard() {
                           )}
                           <div className="min-w-0">
                             <p className="text-xs font-bold text-cocoa truncate">{prod.name}</p>
-                            <p className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1">
+                            <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
                               <span>{formatCurrency(prod.price)}</span>
                               <span>&bull;</span>
                               {prod.is_active ? (
@@ -2203,7 +2203,7 @@ function AdminDashboard() {
                         🗂️
                       </div>
                       <p className="text-xs font-bold text-cocoa">Shop Layout</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">Reorder categories</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">Reorder categories</p>
                     </div>
 
                     <div
@@ -2214,7 +2214,7 @@ function AdminDashboard() {
                         🏷️
                       </div>
                       <p className="text-xs font-bold text-cocoa">Promo Codes</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
                         {offerCodes?.length ?? 0} active codes
                       </p>
                     </div>
@@ -2271,7 +2271,7 @@ function AdminDashboard() {
                       >
                         <span>{pill.label}</span>
                         <span
-                          className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                          className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${
                             isActive
                               ? "bg-background/20 text-background"
                               : "bg-background/80 text-foreground"
@@ -2782,7 +2782,7 @@ function AdminDashboard() {
                       >
                         <span>All</span>
                         <span
-                          className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                          className={`rounded-full px-1.5 py-0.2 text-[11px] font-bold ${
                             inventoryCategoryFilter === "all"
                               ? "bg-background/20 text-background"
                               : "bg-background/80 text-foreground"
@@ -2808,7 +2808,7 @@ function AdminDashboard() {
                           >
                             <span>{cat.name}</span>
                             <span
-                              className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                              className={`rounded-full px-1.5 py-0.2 text-[11px] font-bold ${
                                 isActive
                                   ? "bg-background/20 text-background"
                                   : "bg-background/80 text-foreground"
@@ -2832,7 +2832,7 @@ function AdminDashboard() {
                         >
                           <span>Uncategorised</span>
                           <span
-                            className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                            className={`rounded-full px-1.5 py-0.2 text-[11px] font-bold ${
                               inventoryCategoryFilter === "uncategorized"
                                 ? "bg-background/20 text-background"
                                 : "bg-background/80 text-foreground"
@@ -2977,7 +2977,7 @@ function AdminDashboard() {
                                 <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">
                                   {cat.name}
                                 </h3>
-                                <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                                <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
                                   {catProducts.length} {catProducts.length === 1 ? "bake" : "bakes"}
                                 </span>
                               </div>
@@ -3017,7 +3017,7 @@ function AdminDashboard() {
                               <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">
                                 Uncategorised
                               </h3>
-                              <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                              <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
                                 {sortedProducts.filter((p) => !p.category_id).length} bakes
                               </span>
                             </div>
@@ -3094,7 +3094,7 @@ function AdminDashboard() {
                               <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">
                                 {cat.name}
                               </h3>
-                              <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                              <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
                                 {catProducts.length} {catProducts.length === 1 ? "item" : "items"}
                               </span>
                             </div>
@@ -3132,7 +3132,7 @@ function AdminDashboard() {
                             <h3 className="font-display text-base sm:text-lg font-bold text-cocoa">
                               Uncategorised
                             </h3>
-                            <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                            <span className="rounded-full bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
                               {sortedProducts.filter((p) => !p.category_id).length} items
                             </span>
                           </div>
@@ -3301,7 +3301,7 @@ function AdminDashboard() {
                             <p className="text-sm font-bold text-foreground">{formattedDate}</p>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                                   isPast
                                     ? "bg-muted text-muted-foreground"
                                     : diffDays === 0
@@ -3501,7 +3501,7 @@ function AdminDashboard() {
                     {offerForm.id ? "Edit offer code" : "New offer code"}
                   </h2>
                   {offerForm.id && (
-                    <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[10px] font-bold text-berry-deep">
+                    <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[11px] font-bold text-berry-deep">
                       Editing #{offerForm.code}
                     </span>
                   )}
@@ -3586,7 +3586,7 @@ function AdminDashboard() {
                       className="rounded-xl h-9 text-xs mt-1"
                       onChange={(e) => setOfferForm((f) => ({ ...f, expires_at: e.target.value }))}
                     />
-                    <p className="mt-1 text-[10px] text-muted-foreground">
+                    <p className="mt-1 text-[11px] text-muted-foreground">
                       The code automatically expires past this timestamp.
                     </p>
                   </div>
@@ -3629,7 +3629,7 @@ function AdminDashboard() {
                             </>
                           )}
                         </span>
-                        <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
                           {offerForm.is_visible
                             ? "Public: All visitors can see and copy this code on the offers page."
                             : "Secret: Hidden from /offers. Share privately via newsletter or VIP messages."}
@@ -3652,7 +3652,7 @@ function AdminDashboard() {
                             ? "🟢 Active & Redeemable"
                             : "⚪ Deactivated / Paused"}
                         </span>
-                        <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">
+                        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
                           {offerForm.is_active
                             ? "Active: Customers can apply this code during checkout."
                             : "Deactivated: Code cannot be applied until reactivated."}
@@ -3754,7 +3754,7 @@ function AdminDashboard() {
 
                           {/* Active / Inactive / Expired Badge */}
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold border ${
+                            className={`rounded-full px-2 py-0.5 text-[11px] font-bold border ${
                               isExpired
                                 ? "bg-destructive/15 text-destructive border-destructive/30"
                                 : offer.is_active
@@ -3771,7 +3771,7 @@ function AdminDashboard() {
 
                           {/* Visibility Badge */}
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold border flex items-center gap-1 ${
+                            className={`rounded-full px-2 py-0.5 text-[11px] font-bold border flex items-center gap-1 ${
                               isSecret
                                 ? "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30"
                                 : "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30"
@@ -3809,24 +3809,24 @@ function AdminDashboard() {
                             const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
                             if (diffMs <= 0)
                               return (
-                                <span className="text-[10px] font-bold bg-destructive/15 text-destructive px-2 py-0.5 rounded-full border border-destructive/30">
+                                <span className="text-[11px] font-bold bg-destructive/15 text-destructive px-2 py-0.5 rounded-full border border-destructive/30">
                                   Expired
                                 </span>
                               );
                             if (diffDays <= 3)
                               return (
-                                <span className="text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
+                                <span className="text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 animate-pulse">
                                   ⚠️ Expires in {diffDays}d
                                 </span>
                               );
                             if (diffDays <= 7)
                               return (
-                                <span className="text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20">
+                                <span className="text-[11px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/20">
                                   Expires in {diffDays}d
                                 </span>
                               );
                             return (
-                              <span className="text-[10px] text-muted-foreground">
+                              <span className="text-[11px] text-muted-foreground">
                                 Expires{" "}
                                 {new Date(offer.expires_at).toLocaleDateString("en-IN", {
                                   day: "numeric",
@@ -3837,7 +3837,7 @@ function AdminDashboard() {
                             );
                           })()}
                           {offer.description && (
-                            <span className="text-[10px] text-muted-foreground italic">
+                            <span className="text-[11px] text-muted-foreground italic">
                               {offer.description}
                             </span>
                           )}
@@ -3851,7 +3851,7 @@ function AdminDashboard() {
                           size="sm"
                           variant="outline"
                           title="Copy promo code to clipboard"
-                          className="h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer hover:border-berry/40 hover:bg-berry/5"
+                          className="h-7 px-2 text-[11px] font-semibold rounded-lg cursor-pointer hover:border-berry/40 hover:bg-berry/5"
                           onClick={() => {
                             navigator.clipboard.writeText(offer.code);
                             toast.success(`Copied "${offer.code}" to clipboard!`);
@@ -3868,7 +3868,7 @@ function AdminDashboard() {
                               ? "Hide from /offers page"
                               : "Show on /offers page"
                           }
-                          className={`h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer ${
+                          className={`h-7 px-2 text-[11px] font-semibold rounded-lg cursor-pointer ${
                             offer.is_visible !== false
                               ? "border-purple-500/30 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10"
                               : "border-blue-500/30 text-blue-700 dark:text-blue-300 hover:bg-blue-500/10"
@@ -3910,7 +3910,7 @@ function AdminDashboard() {
                           size="sm"
                           variant="outline"
                           title={offer.is_active ? "Deactivate promo code" : "Activate promo code"}
-                          className={`h-7 px-2 text-[10px] font-semibold rounded-lg cursor-pointer ${
+                          className={`h-7 px-2 text-[11px] font-semibold rounded-lg cursor-pointer ${
                             offer.is_active
                               ? "border-amber-500/30 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10"
                               : "border-emerald-500/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/10"
@@ -3950,7 +3950,7 @@ function AdminDashboard() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 px-2 text-[10px] rounded-lg cursor-pointer hover:border-berry/40 font-semibold"
+                          className="h-7 px-2 text-[11px] rounded-lg cursor-pointer hover:border-berry/40 font-semibold"
                           onClick={() =>
                             setOfferForm({
                               id: offer.id,
@@ -3972,7 +3972,7 @@ function AdminDashboard() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 px-2 text-[10px] rounded-lg text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer font-semibold"
+                          className="h-7 px-2 text-[11px] rounded-lg text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer font-semibold"
                           onClick={() =>
                             run(async () => {
                               if (offer.id) {
@@ -4081,7 +4081,7 @@ function AdminDashboard() {
                       >
                         <span>{pill.label}</span>
                         <span
-                          className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                          className={`rounded-full px-1.5 py-0.5 text-[11px] font-bold ${
                             isActive
                               ? "bg-background/20 text-background"
                               : "bg-background/80 text-foreground"
@@ -4170,16 +4170,16 @@ function AdminDashboard() {
                                 {user.name}
                               </h3>
                               {user.emailVerification ? (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
                                   ✓ Verified
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-400">
                                   Pending Verification
                                 </span>
                               )}
                               {user.totalOrders > 0 && (
-                                <span className="rounded-full bg-berry/10 border border-berry/20 px-2 py-0.5 text-[10px] font-bold text-berry-deep">
+                                <span className="rounded-full bg-berry/10 border border-berry/20 px-2 py-0.5 text-[11px] font-bold text-berry-deep">
                                   {user.totalOrders} order{user.totalOrders === 1 ? "" : "s"}
                                 </span>
                               )}
@@ -4371,7 +4371,7 @@ function AdminDashboard() {
                   rows={3}
                   className="rounded-xl text-xs resize-none"
                 />
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-[11px] text-muted-foreground">
                   This note will be included in the automated email sent to the customer.
                 </p>
               </div>

@@ -162,7 +162,7 @@ function Offers() {
                       <span className="font-mono text-xs sm:text-sm font-black text-cocoa tracking-wider bg-secondary/80 px-2.5 py-1 rounded-lg border border-border/60">
                         {promo.code}
                       </span>
-                      <span className="rounded-full bg-berry px-2.5 py-0.5 text-[10px] sm:text-xs font-bold text-berry-foreground shadow-2xs">
+                      <span className="rounded-full bg-berry px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-berry-foreground shadow-2xs">
                         {promo.discount_type === "percent"
                           ? `${promo.discount_value}% OFF`
                           : `₹${promo.discount_value} OFF`}
@@ -177,7 +177,7 @@ function Offers() {
                   </div>
 
                   <div className="mt-3.5 flex items-center justify-between border-t border-dashed border-border/70 pt-2.5">
-                    <span className="text-[10px] font-medium text-muted-foreground/80">
+                    <span className="text-[11px] font-medium text-muted-foreground/80">
                       Exp:{" "}
                       {new Date(promo.expires_at).toLocaleDateString("en-IN", {
                         day: "numeric",

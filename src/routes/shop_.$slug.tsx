@@ -23,6 +23,7 @@ import { ProductCard } from "@/components/product-card";
 import { ProductReviews } from "@/components/product-reviews";
 import { useCart } from "@/lib/cart";
 import {
+  customerDescription,
   formatCurrency,
   finalPrice,
   hasDiscount,
@@ -46,7 +47,8 @@ export const Route = createFileRoute("/shop_/$slug")({
         {
           name: "description",
           content:
-            p?.description ?? "Order artisan fresh-baked treats handcrafted in small batches.",
+            customerDescription(p?.description) ??
+            "Order artisan fresh-baked treats handcrafted in small batches.",
         },
       ],
     };
@@ -219,7 +221,7 @@ function ProductDetailPage() {
               )}
 
               {/* Kitchen Freshness Pill */}
-              <span className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
+              <span className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[11px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
                 ✨ Fresh Small-Batch
               </span>
 
@@ -255,7 +257,7 @@ function ProductDetailPage() {
                   </button>
 
                   {/* Slide Counter Indicator */}
-                  <span className="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 rounded-full bg-black/60 backdrop-blur-md px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-white shadow-2xs">
+                  <span className="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 rounded-full bg-black/60 backdrop-blur-md px-2.5 py-0.5 text-[11px] sm:text-[11px] font-bold text-white shadow-2xs">
                     📸 {activeImageIndex + 1} / {galleryImages.length}
                   </span>
                 </>
@@ -303,7 +305,7 @@ function ProductDetailPage() {
                 {product.category_name ?? "Bakery Atelier"}
               </span>
               {(product.serving_yield || product.unit_weight_grams) && (
-                <span className="rounded-full bg-berry/10 border border-berry/25 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-berry-deep">
+                <span className="rounded-full bg-berry/10 border border-berry/25 px-2.5 py-0.5 text-[11px] sm:text-[11px] font-bold text-berry-deep">
                   ⚖️ {product.serving_yield ?? `${product.unit_weight_grams}g`}
                 </span>
               )}
@@ -344,7 +346,7 @@ function ProductDetailPage() {
                 <span className="text-xs font-bold text-cocoa uppercase tracking-wider">
                   🎂 Choose Cake Weight / Size
                 </span>
-                <span className="text-[10px] sm:text-[11px] text-muted-foreground">
+                <span className="text-[11px] sm:text-[11px] text-muted-foreground">
                   Tiered volume discounts applied
                 </span>
               </div>
@@ -369,7 +371,7 @@ function ProductDetailPage() {
                           {v.label}
                         </span>
                         {v.savings_label && (
-                          <span className="text-[9px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 px-1 py-0.5 rounded">
+                          <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/15 px-1 py-0.5 rounded">
                             {v.savings_label.split(" ")[0]} {v.savings_label.split(" ")[1]}
                           </span>
                         )}
@@ -378,7 +380,7 @@ function ProductDetailPage() {
                         {formatCurrency(vPrice)}
                       </span>
                       {v.serves && (
-                        <span className="text-[10px] text-muted-foreground mt-0.5">{v.serves}</span>
+                        <span className="text-[11px] text-muted-foreground mt-0.5">{v.serves}</span>
                       )}
                     </button>
                   );
@@ -393,7 +395,7 @@ function ProductDetailPage() {
               {TRUST_BADGES.map(({ icon: Icon, label, color }) => (
                 <span
                   key={label}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-2.5 py-0.5 text-[10px] sm:text-[11px] font-semibold text-cocoa shadow-2xs"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-2.5 py-0.5 text-[11px] sm:text-[11px] font-semibold text-cocoa shadow-2xs"
                 >
                   <Icon className={`size-3 sm:size-3.5 ${color}`} />
                   {label}
@@ -403,9 +405,9 @@ function ProductDetailPage() {
           )}
 
           {/* Description */}
-          {product.description && (
+          {customerDescription(product.description) && (
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              {product.description}
+              {customerDescription(product.description)}
             </p>
           )}
 
@@ -417,7 +419,7 @@ function ProductDetailPage() {
                   <Sparkles className="size-3.5" />
                   <span>How It Gets To You</span>
                 </span>
-                <span className="text-[10.5px] text-muted-foreground font-semibold">
+                <span className="text-[11px] text-muted-foreground font-semibold">
                   {quantityInCart > 0 ? "Step 2 of 3" : "Step 1 of 3"}
                 </span>
               </div>
@@ -500,7 +502,7 @@ function ProductDetailPage() {
             )}
           </div>
 
-          <p className="text-[10px] sm:text-[11px] text-muted-foreground">
+          <p className="text-[11px] sm:text-[11px] text-muted-foreground">
             🕐 Fresh morning bake. Small-batch artisan orders require 24 hours advance notice.
           </p>
         </div>
@@ -596,7 +598,7 @@ function ProductDetailPage() {
                   <div className={`absolute inset-0 bg-gradient-to-t ${cat.accentGlow}`} />
 
                   {/* Badge pill */}
-                  <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 rounded-full bg-background/90 backdrop-blur-md px-2 py-0.5 text-[9px] sm:text-[10px] font-bold text-cocoa border border-border/60 shadow-2xs">
+                  <span className="absolute top-1.5 left-1.5 sm:top-2 sm:left-2 rounded-full bg-background/90 backdrop-blur-md px-2 py-0.5 text-[11px] sm:text-[11px] font-bold text-cocoa border border-border/60 shadow-2xs">
                     {cat.tag}
                   </span>
                 </div>
@@ -609,7 +611,7 @@ function ProductDetailPage() {
                     </h3>
                     <Icon className="size-3.5 text-berry-deep shrink-0 hidden sm:block" />
                   </div>
-                  <p className="text-[10px] sm:text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] sm:text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
                     {cat.desc}
                   </p>
                 </div>

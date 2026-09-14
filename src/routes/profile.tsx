@@ -121,11 +121,11 @@ function ProfilePage() {
               Your details
             </h1>
             {hasValidPhone ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-[11px] sm:text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                 <CheckCircle2 className="size-3" /> Saved
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[10px] sm:text-xs font-semibold text-amber-700 dark:text-amber-300">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[11px] sm:text-xs font-semibold text-amber-700 dark:text-amber-300">
                 <AlertCircle className="size-3" /> Phone required
               </span>
             )}
@@ -195,7 +195,7 @@ function ProfilePage() {
                   required
                   className="rounded-xl h-9 sm:h-10 text-xs sm:text-sm"
                 />
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-[11px] text-muted-foreground">
                   Used by our delivery riders and bakers for slot arrival.
                 </p>
               </div>
@@ -205,7 +205,7 @@ function ProfilePage() {
                   <Label htmlFor="profile-email" className="text-[11px] sm:text-xs font-semibold">
                     Email address
                   </Label>
-                  <span className="text-[10px] text-muted-foreground font-medium">Account ID</span>
+                  <span className="text-[11px] text-muted-foreground font-medium">Account ID</span>
                 </div>
                 <Input
                   id="profile-email"
@@ -230,7 +230,7 @@ function ProfilePage() {
                   </h2>
                 </div>
                 {form.latitude != null && (
-                  <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
                     Pin set
                   </span>
                 )}
@@ -253,7 +253,7 @@ function ProfilePage() {
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <Label className="text-[11px] sm:text-xs font-semibold">Delivery map pin</Label>
-                  <span className="text-[10px] text-muted-foreground">Tap map to set</span>
+                  <span className="text-[11px] text-muted-foreground">Tap map to set</span>
                 </div>
 
                 <ClientOnly

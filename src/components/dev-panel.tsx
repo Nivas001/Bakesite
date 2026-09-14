@@ -88,7 +88,7 @@ export function DevPanel() {
           <Settings2 className="size-3.5" />
         </div>
         <span className="font-semibold">🛠 Dev Panel</span>
-        <span className="rounded-full bg-secondary/80 px-2 py-0.5 font-mono text-[10px]">
+        <span className="rounded-full bg-secondary/80 px-2 py-0.5 font-mono text-[11px]">
           {totalOn}/{total} on
         </span>
         {open ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}

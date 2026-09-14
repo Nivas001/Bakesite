@@ -122,7 +122,7 @@ function CartPage() {
                       {/* Variant & Portion Label Badge */}
                       {line.variantLabel && (
                         <div className="mt-0.5">
-                          <span className="inline-flex items-center gap-1 rounded-md bg-berry/10 border border-berry/25 px-1.5 py-0.5 text-[10px] sm:text-[11px] font-bold text-berry-deep">
+                          <span className="inline-flex items-center gap-1 rounded-md bg-berry/10 border border-berry/25 px-1.5 py-0.5 text-[11px] sm:text-[11px] font-bold text-berry-deep">
                             ⚖️ {line.variantLabel}
                           </span>
                         </div>
@@ -252,7 +252,7 @@ function CartPage() {
               </div>
               <div>
                 <p className="font-bold text-cocoa text-xs">Instant UPI & Card Payment</p>
-                <p className="text-[10px] text-muted-foreground">Secures your morning bake slot</p>
+                <p className="text-[11px] text-muted-foreground">Secures your morning bake slot</p>
               </div>
             </div>
             <div className="flex items-start gap-2 pt-1 border-t border-border/40">
