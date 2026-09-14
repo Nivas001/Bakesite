@@ -235,6 +235,16 @@ export function MemoryGame({ onWin, claimCouponFn }: MemoryGameProps) {
                   type="button"
                   onClick={() => handleCardClick(idx)}
                   disabled={isMatched}
+                  // The face is emoji and imagery only, so without this a
+                  // screen reader announces an unlabelled button.
+                  aria-label={
+                    isMatched
+                      ? `Card ${idx + 1}, matched: ${card.name}`
+                      : isFlipped
+                        ? `Card ${idx + 1}, showing ${card.name}`
+                        : `Card ${idx + 1}, face down. Activate to flip.`
+                  }
+                  aria-pressed={isFlipped}
                   className={`group relative h-24 sm:h-28 rounded-2xl p-1 text-center transition-all duration-300 transform-gpu cursor-pointer select-none ${
                     isMatched
                       ? "opacity-75 scale-95 border-2 border-emerald-500/60"

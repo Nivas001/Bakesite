@@ -263,106 +263,16 @@ function AuthPage() {
       {/* Center Section: Floating Card & Flanking Geometric Elements */}
       <div className="relative my-auto flex items-center justify-center w-full max-w-4xl mx-auto">
         {/* Bottom-Left Character & Geometric Pedestals (Desktop & Tablet) */}
-        <div className="hidden md:flex absolute -left-2 sm:left-2 lg:left-6 bottom-0 z-10 flex-col items-start pointer-events-none select-none">
-          <div className="relative">
-            {/* Doodled Sparkles */}
-            <div className="absolute -top-6 left-6 text-cocoa/50 font-mono text-sm select-none tracking-widest">
-              \ | /
-            </div>
-            {/* Character with laptop on pedestal blocks */}
-            <div className="relative w-36 sm:w-44 lg:w-52 h-44 sm:h-52 flex items-end">
-              <svg viewBox="0 0 200 220" className="w-full h-full drop-shadow-md">
-                {/* Base Step 1: White Box with rising arrow */}
-                <rect
-                  x="10"
-                  y="140"
-                  width="60"
-                  height="70"
-                  fill="#FFFFFF"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="text-cocoa"
-                  rx="4"
-                />
-                <path
-                  d="M25 195 L55 155 M38 155 L55 155 L55 172"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="text-cocoa"
-                />
-
-                {/* Base Step 2: Yellow Elevated Podium */}
-                <rect
-                  x="70"
-                  y="110"
-                  width="70"
-                  height="100"
-                  fill="#FCE38A"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="text-cocoa"
-                  rx="4"
-                />
-
-                {/* Baseline */}
-                <line
-                  x1="0"
-                  y1="210"
-                  x2="200"
-                  y2="210"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="text-cocoa"
-                />
-
-                {/* Character Sitting On Yellow Podium */}
-                {/* Hair */}
-                <path
-                  d="M75 35 C70 20, 95 15, 105 30 C115 35, 120 50, 110 60 C98 62, 85 55, 75 35 Z"
-                  fill="#1C1816"
-                />
-                <circle cx="70" cy="48" r="8" fill="#1C1816" />
-                {/* Face & Head */}
-                <circle cx="95" cy="50" r="14" fill="#FFE5D9" />
-                <path d="M92 48 Q95 52 98 48" fill="none" stroke="#1C1816" strokeWidth="2" />
-                {/* Patterned Top */}
-                <path d="M80 65 L115 65 L125 110 L75 110 Z" fill="#1C1816" />
-                {/* White accents on top */}
-                <line x1="85" y1="75" x2="90" y2="70" stroke="#FFF" strokeWidth="2" />
-                <line x1="100" y1="80" x2="105" y2="75" stroke="#FFF" strokeWidth="2" />
-                <line x1="90" y1="95" x2="95" y2="90" stroke="#FFF" strokeWidth="2" />
-                <line x1="110" y1="95" x2="115" y2="90" stroke="#FFF" strokeWidth="2" />
-                {/* Laptop */}
-                <path
-                  d="M125 90 L140 70 L145 92 L120 96 Z"
-                  fill="#F0918C"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="text-cocoa"
-                />
-                <rect x="110" y="94" width="28" height="5" fill="#C4123A" rx="2" />
-                {/* White Legs / Trousers */}
-                <path
-                  d="M85 110 L105 110 L115 160 L100 160 Z"
-                  fill="#FFFFFF"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="text-cocoa"
-                />
-                <path
-                  d="M105 110 L125 110 L145 160 L130 160 Z"
-                  fill="#FFFFFF"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="text-cocoa"
-                />
-                {/* Black Shoes */}
-                <path d="M95 160 L110 160 L115 170 L95 170 Z" fill="#1C1816" />
-                <path d="M130 160 L150 160 L155 172 L132 172 Z" fill="#1C1816" />
-              </svg>
-            </div>
-          </div>
+        {/* Left flourish: a real bake rather than generic stock artwork. */}
+        <div className="pointer-events-none absolute bottom-0 -left-2 z-10 hidden select-none md:flex sm:left-2 lg:left-6">
+          <img
+            src="/cakes/pink-bento-cake.webp"
+            alt=""
+            aria-hidden
+            loading="lazy"
+            decoding="async"
+            className="w-36 rotate-[-6deg] rounded-[1.75rem] border-4 border-white/90 object-cover shadow-lift sm:w-44 lg:w-52"
+          />
         </div>
 
         {/* Central Floating Card */}
@@ -442,8 +352,11 @@ function AuthPage() {
                     <form onSubmit={handleEmailSignIn} className="space-y-3.5">
                       {/* Email Input */}
                       <div className="space-y-1">
-                        <Label htmlFor="login-email" className="sr-only">
-                          Your Email
+                        <Label
+                          htmlFor="login-email"
+                          className="mb-1.5 block text-xs font-bold text-cocoa"
+                        >
+                          Email address
                         </Label>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-muted-foreground pointer-events-none" />
@@ -461,6 +374,12 @@ function AuthPage() {
 
                       {/* Password Input */}
                       <div className="space-y-1">
+                        <Label
+                          htmlFor="login-password"
+                          className="mb-1.5 block text-xs font-bold text-cocoa"
+                        >
+                          Password
+                        </Label>
                         <div className="relative">
                           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-muted-foreground pointer-events-none" />
                           <Input
@@ -602,71 +521,124 @@ function AuthPage() {
                   <form onSubmit={handleSignUp} className="space-y-3">
                     {/* Full Name & Phone in 2 Columns */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      <div className="relative">
-                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                        <Input
-                          id="reg-name"
-                          required
-                          placeholder="Your Name"
-                          value={signUpName}
-                          onChange={(e) => setSignUpName(e.target.value)}
-                          className="h-11 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-10 pr-3 text-xs sm:text-sm font-medium focus-visible:ring-berry"
-                        />
+                      <div>
+                        <Label
+                          htmlFor="reg-name"
+                          className="mb-1.5 block text-xs font-bold text-cocoa"
+                        >
+                          Full name
+                        </Label>
+                        <div className="relative">
+                          <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                          <Input
+                            id="reg-name"
+                            required
+                            placeholder="Your Name"
+                            value={signUpName}
+                            onChange={(e) => setSignUpName(e.target.value)}
+                            className="h-11 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-10 pr-3 text-xs sm:text-sm font-medium focus-visible:ring-berry"
+                          />
+                        </div>
                       </div>
 
-                      <div className="relative">
-                        <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-                        <Input
-                          id="reg-phone"
-                          type="tel"
-                          required
-                          placeholder="10-digit Phone"
-                          value={signUpPhone}
-                          onChange={(e) => setSignUpPhone(e.target.value)}
-                          className="h-11 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-10 pr-3 text-xs sm:text-sm font-medium focus-visible:ring-berry"
-                        />
+                      <div>
+                        <Label
+                          htmlFor="reg-phone"
+                          className="mb-1.5 block text-xs font-bold text-cocoa"
+                        >
+                          Mobile number
+                        </Label>
+                        <div className="relative">
+                          <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                          <Input
+                            id="reg-phone"
+                            type="tel"
+                            required
+                            placeholder="10-digit Phone"
+                            value={signUpPhone}
+                            onChange={(e) => setSignUpPhone(e.target.value)}
+                            className="h-11 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-10 pr-3 text-xs sm:text-sm font-medium focus-visible:ring-berry"
+                          />
+                        </div>
                       </div>
                     </div>
 
                     {/* Email Input */}
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-muted-foreground pointer-events-none" />
-                      <Input
-                        id="reg-email"
-                        type="email"
-                        required
-                        placeholder="Your Email"
-                        value={signUpEmail}
-                        onChange={(e) => setSignUpEmail(e.target.value)}
-                        className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-4 text-sm font-medium focus-visible:ring-berry"
-                      />
+                    <div>
+                      <Label
+                        htmlFor="reg-email"
+                        className="mb-1.5 block text-xs font-bold text-cocoa"
+                      >
+                        Email address
+                      </Label>
+                      <div className="relative">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-muted-foreground pointer-events-none" />
+                        <Input
+                          id="reg-email"
+                          type="email"
+                          required
+                          placeholder="Your Email"
+                          value={signUpEmail}
+                          onChange={(e) => setSignUpEmail(e.target.value)}
+                          className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-4 text-sm font-medium focus-visible:ring-berry"
+                        />
+                      </div>
                     </div>
 
                     {/* Password Input */}
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-muted-foreground pointer-events-none" />
-                      <Input
-                        id="reg-pass"
-                        type={showSignUpPassword ? "text" : "password"}
-                        required
-                        minLength={6}
-                        placeholder="Create Password (6+ chars)"
-                        value={signUpPassword}
-                        onChange={(e) => setSignUpPassword(e.target.value)}
-                        className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-11 text-sm font-medium focus-visible:ring-berry"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowSignUpPassword(!showSignUpPassword)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors cursor-pointer"
-                        aria-label={showSignUpPassword ? "Hide password" : "Show password"}
+                    <div>
+                      <Label
+                        htmlFor="reg-pass"
+                        className="mb-1.5 block text-xs font-bold text-cocoa"
                       >
-                        {showSignUpPassword ? (
-                          <EyeOff className="size-4" />
-                        ) : (
-                          <Eye className="size-4" />
-                        )}
-                      </button>
+                        Password
+                      </Label>
+                      <div className="relative">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 size-4.5 text-muted-foreground pointer-events-none" />
+                        <Input
+                          id="reg-pass"
+                          type={showSignUpPassword ? "text" : "password"}
+                          required
+                          minLength={8}
+                          placeholder="At least 8 characters"
+                          value={signUpPassword}
+                          onChange={(e) => setSignUpPassword(e.target.value)}
+                          className="h-12 rounded-2xl bg-[#F6F4EF] dark:bg-secondary/40 border-border/70 pl-11 pr-11 text-sm font-medium focus-visible:ring-berry"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition-colors cursor-pointer"
+                          aria-label={showSignUpPassword ? "Hide password" : "Show password"}
+                        >
+                          {showSignUpPassword ? (
+                            <EyeOff className="size-4" />
+                          ) : (
+                            <Eye className="size-4" />
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Requirements shown up front rather than revealed by a
+                          failed submit. */}
+                      <ul className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px]">
+                        {[
+                          { label: "At least 8 characters", ok: signUpPassword.length >= 8 },
+                          { label: "A letter", ok: /[a-zA-Z]/.test(signUpPassword) },
+                          { label: "A number", ok: /[0-9]/.test(signUpPassword) },
+                        ].map((rule) => (
+                          <li
+                            key={rule.label}
+                            className={
+                              rule.ok
+                                ? "font-semibold text-emerald-700 dark:text-emerald-400"
+                                : "text-muted-foreground"
+                            }
+                          >
+                            {rule.ok ? "✓" : "•"} {rule.label}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
 
                     {/* Primary Sign Up CTA */}
@@ -725,65 +697,16 @@ function AuthPage() {
         </div>
 
         {/* Bottom-Right Geometric Pedestals & Doodles (Desktop & Tablet) */}
-        <div className="hidden md:flex absolute -right-2 sm:right-2 lg:right-6 bottom-0 z-10 flex-col items-end pointer-events-none select-none">
-          <svg
-            viewBox="0 0 180 180"
-            className="w-32 sm:w-40 lg:w-48 h-32 sm:h-40 lg:h-48 drop-shadow-md"
-          >
-            {/* Rising Steam Puff / Doodles */}
-            <path
-              d="M120 40 C110 25, 135 15, 145 30 C155 40, 150 55, 135 60"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeDasharray="4 4"
-              className="text-berry-deep"
-            />
-            <path
-              d="M100 65 Q115 50 130 65"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="text-cocoa"
-            />
-
-            {/* White Step Box */}
-            <rect
-              x="20"
-              y="85"
-              width="60"
-              height="95"
-              fill="#FFFFFF"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              className="text-cocoa"
-              rx="4"
-            />
-
-            {/* Yellow Tall Step Box */}
-            <rect
-              x="80"
-              y="45"
-              width="70"
-              height="135"
-              fill="#FCE38A"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              className="text-cocoa"
-              rx="4"
-            />
-
-            {/* Baseline Connection */}
-            <line
-              x1="0"
-              y1="180"
-              x2="180"
-              y2="180"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              className="text-cocoa"
-            />
-          </svg>
+        {/* Right flourish. */}
+        <div className="pointer-events-none absolute right-2 bottom-0 z-10 hidden select-none md:flex lg:right-6">
+          <img
+            src="/products/artisan-croissant.jpg"
+            alt=""
+            aria-hidden
+            loading="lazy"
+            decoding="async"
+            className="w-32 rotate-[5deg] rounded-[1.75rem] border-4 border-white/90 object-cover shadow-lift sm:w-40 lg:w-44"
+          />
         </div>
       </div>
 
