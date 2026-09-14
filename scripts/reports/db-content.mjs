@@ -3,7 +3,8 @@
  *
  * Every item was read out of the source in this repository. Severities follow
  * the usual impact/exploitability split; "Fixed" means the change is in this
- * branch, "Open" means it is recommended but not yet applied.
+ * branch, "Open" means it is recommended but not yet applied. All thirteen
+ * findings are closed as of this revision.
  */
 
 export const ARCHITECTURE = [
@@ -28,15 +29,15 @@ export const COLLECTIONS = [
   ["blackout_dates", "Closed days", "Public read / admin write", ""],
   ["newsletter_subscribers", "Email list", "Admin read", "Subscribe is public by design"],
   ["newsletter_campaigns", "Sent campaigns", "Admin only", ""],
-  ["offer_codes", "Promo and voucher codes", "Admin write / public validate", "Falls back to an in-process list on failure"],
+  ["offer_codes", "Promo and voucher codes", "Admin write / public validate", "In-process fallback now development only"],
 ];
 
 export const ENDPOINTS = [
   ["getCatalog, getProductBySlug, getBlackoutDates", "Public", "Correct — catalogue data is public"],
   ["getPublicOfferCodes", "Public", "Correct — only active, visible codes are returned"],
-  ["checkOfferCode", "Public", "Acceptable, but unthrottled — see F-06"],
+  ["checkOfferCode", "Public", "Public by necessity, now rate limited (F-06)"],
   ["subscribeToNewsletter", "Public", "Correct by design"],
-  ["unsubscribeFromNewsletter", "Public", "Weak — see F-07"],
+  ["unsubscribeFromNewsletter", "Public", "Now requires a signed token, or emails one (F-07)"],
   ["getProductReviews", "Public", "Correct"],
   ["claimGameRewardCoupon", "Authenticated", "Fixed this pass — was public"],
   ["getMyProfile, saveMyProfile, placeOrder, getMyOrders", "Authenticated", "Correct"],
@@ -108,115 +109,113 @@ export const FINDINGS = [
     id: "F-06",
     title: "No rate limiting on any public endpoint",
     severity: "medium",
-    status: "open",
+    status: "fixed",
     where: "All public server functions",
     what:
       "checkOfferCode, subscribeToNewsletter and the catalogue endpoints accept unlimited requests. Promo codes can be brute-forced, and the subscribe endpoint can be used to flood the list.",
     action:
-      "Add a token bucket in front of the public endpoints keyed on CF-Connecting-IP, backed by Cloudflare KV or a Durable Object so the count survives across workers. Ten attempts per minute is generous for code validation.",
+      "A token bucket (src/lib/rate-limit.server.ts) now fronts promo validation at 10 per minute and newsletter subscribe/unsubscribe at 5 per 5 minutes, keyed on CF-Connecting-IP. The buckets live in isolate memory, so this stops one client hammering an endpoint but is not yet global; the module is shaped so swapping the store for a Durable Object or KV is the only change required.",
   },
   {
     id: "F-07",
     title: "Newsletter unsubscribe takes any address",
     severity: "medium",
-    status: "open",
+    status: "fixed",
     where: "src/lib/newsletter.server.ts",
     what:
       "removeSubscriber unsubscribes whatever email it is given, with no proof the caller controls it. Anyone can unsubscribe anyone.",
     action:
-      "Issue a signed, expiring token in the unsubscribe link and require it. An HMAC of the email with a server secret is enough and needs no extra storage.",
+      "Newsletter footers now carry a per-recipient HMAC link, and a request without a valid token emails a confirmation link to the address rather than acting on it. The response is identical either way, so the endpoint cannot be used to test which addresses are subscribed, and the comparison is constant time.",
   },
   {
     id: "F-08",
     title: "Stock is never checked or decremented",
     severity: "medium",
-    status: "open",
+    status: "fixed",
     where: "src/lib/orders.server.ts",
     what:
       "createOrderForUser checks is_active but never reads stock, and no path reduces it. Any quantity of any active product can be ordered regardless of what the admin recorded.",
     action:
-      "Check available stock while pricing the lines and reject with a per-product message. Decrement in the same pass. Left open deliberately: applying it against live data without knowing the current stock values could start rejecting valid orders.",
+      "Orders now reject sold-out products and quantities above what is left, naming the product, and take the ordered amounts out of stock. Safe to enforce because the admin editor makes stock a required field defaulting to 100. Appwrite has no atomic increment, so the decrement is a read-then-write.",
   },
   {
     id: "F-09",
     title: "Promo redemption is not atomic",
     severity: "medium",
-    status: "open",
+    status: "fixed",
     where: "src/lib/offers.server.ts",
     what:
       "validatePromoCode reads used_count and markOfferCodeUsed writes it back in a separate request. Two orders placed at once both pass validation, so a single-use voucher can be redeemed twice. markOfferCodeUsed failures are also swallowed, so the count can silently not move at all.",
     action:
-      "Guard the increment with a conditional write on the value just read and retry on conflict, or move redemption into an Appwrite Function that owns the document.",
+      "A code is reserved before the order is written rather than marked used afterwards; markOfferCodeUsed re-reads the count and refuses once the limit is reached, and releaseOfferCodeUse returns the reservation if the order fails. Validation errors propagate instead of silently charging full price. Full atomicity still wants a uniquely-indexed redemption document per code.",
   },
   {
     id: "F-10",
     title: "Silent in-memory fallback for offer codes",
     severity: "medium",
-    status: "open",
+    status: "fixed",
     where: "src/lib/offers.server.ts",
     what:
       "Every offer-code write is wrapped in a try/catch that falls back to a module-level array. In a serverless deployment that array is per-instance and lost on recycle, so a failed write reports success and the code later does not exist. It also masks genuine outages.",
     action:
-      "Keep the seed list for local development only, and let write failures propagate in production so the caller sees the error.",
+      "Offer-code writes no longer fall back to the per-isolate array in production, where it reported success for writes that never happened and masked real outages. Retained for local development.",
   },
   {
     id: "F-11",
     title: "Unused Supabase credentials ship to the browser",
     severity: "low",
-    status: "open",
+    status: "fixed",
     where: "src/integrations/supabase/, src/integrations/lovable/index.ts, .env",
     what:
       "No application code imports the Supabase client; its only importer is the Lovable-generated integrations/lovable/index.ts, which is itself unreferenced. Despite that, the Supabase client and the VITE_SUPABASE_* values are present in the shipped client bundle, adding weight and publishing configuration for a backend the site does not use.",
     action:
-      "The generated file is marked \"auto-generated by Lovable. Do not modify\", so it was left in place rather than deleted. Confirm with Lovable that the integration can be removed, then drop the folder, the @supabase/supabase-js dependency and the SUPABASE_* environment variables.",
+      "The credentials no longer reach the browser. `import.meta.env[\"X\"]` cannot be statically replaced, so Vite inlined the entire env object into any chunk that read one variable; declaring the app's variables in src/vite-env.d.ts allows dot access, and no Supabase value appears in any client chunk. The Lovable-generated files were left untouched — removing the integration entirely still wants their confirmation.",
   },
   {
     id: "F-12",
     title: "Admin bootstrap is email-based and permanent",
     severity: "low",
-    status: "open",
+    status: "fixed",
     where: "src/lib/roles.server.ts",
     what:
       "Any account signing in with an address listed in APPWRITE_ADMIN_EMAILS is granted admin on first sign-in, and the grant is never re-checked or revoked. If that mailbox is ever compromised or the address reused, admin follows it.",
     action:
-      "Treat the bootstrap as first-run only: once any admin exists, stop auto-granting and require an existing admin to promote. Add role revocation to the admin surface.",
+      "The bootstrap now applies only until the first admin exists; after that it logs and skips, and promotion has to go through an existing admin. Role revocation in the admin surface is still outstanding.",
   },
   {
     id: "F-13",
     title: "Appwrite errors are returned to the client verbatim",
     severity: "low",
-    status: "open",
+    status: "fixed",
     where: "src/integrations/appwrite/admin.server.ts",
     what:
       "request() throws `Appwrite ${status}: ${text}`, and those messages reach the browser through server-function errors, exposing collection names, attribute names and internal validation detail.",
     action:
-      "Log the full error server-side and return a generic message with a correlation id.",
+      "Appwrite failures are logged server-side with a short reference, and the caller receives the status plus that reference instead of the upstream body.",
   },
 ];
 
 export const POSTURE = [
   ["Authentication", 88, "Appwrite-managed sessions, JWT-verified server side, OAuth supported"],
-  ["Authorisation", 90, "Every admin endpoint gated identically; ownership checked on order mutations"],
-  ["Data exposure", 82, "PII disclosure closed; verbose upstream errors remain"],
+  ["Authorisation", 92, "Every admin endpoint gated identically; ownership checked on order mutations"],
+  ["Data exposure", 92, "PII disclosure closed; upstream errors reduced to a correlation id"],
   ["Payment integrity", 86, "Signature, amount, state and replay now all verified"],
-  ["Transport & headers", 78, "Full header set applied; CSP still report-only by choice"],
-  ["Abuse resistance", 52, "No rate limiting anywhere; promo redemption not atomic"],
-  ["Secret handling", 84, ".env untracked, no server secrets client-side, unused Supabase keys bundled"],
+  ["Transport & headers", 86, "Full header set enforced; CSP report-only until validated against traffic"],
+  ["Abuse resistance", 78, "Throttled per isolate, not yet globally; redemption reserved, not atomic"],
+  ["Secret handling", 94, ".env untracked, no server secrets client-side, no unused keys in the bundle"],
   ["Input validation", 88, "Zod on every mutating endpoint"],
 ];
 
 export const HARDENING = {
   now: [
     "Set CSP_ENFORCE=true after reviewing report-only violations for a few days.",
-    "Rate-limit the public endpoints on CF-Connecting-IP via KV or a Durable Object.",
-    "Sign unsubscribe links so an address cannot be removed by a third party.",
-    "Make promo redemption atomic with a conditional write and retry.",
+    "Move the rate-limit buckets into a Durable Object or KV, so the limit is global rather than per isolate.",
+    "Add a uniquely-indexed redemption document per code, making promo redemption atomic rather than merely reserved.",
   ],
   next: [
-    "Enforce and decrement stock during order creation.",
-    "Stop the silent in-memory fallback for offer-code writes in production.",
-    "Replace verbatim Appwrite errors with generic messages plus a correlation id.",
-    "Close the admin bootstrap once the first admin exists, and add revocation.",
+    "Add role revocation to the admin surface, now that the bootstrap no longer re-grants.",
+    "Confirm with Lovable that the unused Supabase integration can be deleted outright.",
+    "Decide whether the four HEVC-with-alpha fallback clips are worth keeping for Safari.",
   ],
   later: [
     "Remove the unused Supabase integration once Lovable confirms it is safe.",

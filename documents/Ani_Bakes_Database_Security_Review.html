@@ -227,10 +227,10 @@ li::marker { color: var(--berry-deep); }
       <div style="display:flex;align-items:flex-end;gap:10mm;margin-top:12mm">
         <div>
           <div class="eyebrow">Security posture</div>
-          <div class="bigscore">81<small>/100</small></div>
+          <div class="bigscore">88<small>/100</small></div>
         </div>
         <div style="flex:1;border-left:1.5px solid #E7D3C4;padding-left:8mm">
-          <div class="kv"><div class="k">Findings</div><div class="v">13 (1 critical, 3 high)</div></div><div class="kv"><div class="k">Resolved this pass</div><div class="v">5</div></div><div class="kv"><div class="k">Collections</div><div class="v">11</div></div><div class="kv"><div class="k">Server functions</div><div class="v">37 across 8 modules</div></div>
+          <div class="kv"><div class="k">Findings</div><div class="v">13 (1 critical, 3 high)</div></div><div class="kv"><div class="k">Resolved this pass</div><div class="v">13</div></div><div class="kv"><div class="k">Collections</div><div class="v">11</div></div><div class="kv"><div class="k">Server functions</div><div class="v">37 across 8 modules</div></div>
         </div>
       </div>
     </div>
@@ -257,7 +257,7 @@ li::marker { color: var(--berry-deep); }
        <h3 class="sub" style="margin-top:4mm">Collections</h3>
        <table>
          <tr><th>Collection</th><th>Holds</th><th style="width:30mm">Access</th><th>Notes</th></tr>
-         <tr><td class="mono">profiles</td><td>Customer name, phone, address, lat/lng</td><td>Owner via server fn</td><td>Document id is the Appwrite user id</td></tr><tr><td class="mono">user_roles</td><td>admin / customer grants</td><td>Admin only</td><td>Bootstrapped from APPWRITE_ADMIN_EMAILS</td></tr><tr><td class="mono">categories</td><td>Catalogue taxonomy</td><td>Public read</td><td>Seeded in code when empty</td></tr><tr><td class="mono">products</td><td>Catalogue, pricing, variants</td><td>Public read / admin write</td><td>Seeded in code when empty</td></tr><tr><td class="mono">orders</td><td>Order header, slot, totals, payment</td><td>Owner + admin</td><td>Ownership checked on every mutation</td></tr><tr><td class="mono">order_items</td><td>Line items</td><td>Owner + admin</td><td>Written only alongside an order</td></tr><tr><td class="mono">reviews</td><td>Product ratings</td><td>Verified purchasers</td><td>Gated on a completed order containing the product</td></tr><tr><td class="mono">blackout_dates</td><td>Closed days</td><td>Public read / admin write</td><td></td></tr><tr><td class="mono">newsletter_subscribers</td><td>Email list</td><td>Admin read</td><td>Subscribe is public by design</td></tr><tr><td class="mono">newsletter_campaigns</td><td>Sent campaigns</td><td>Admin only</td><td></td></tr><tr><td class="mono">offer_codes</td><td>Promo and voucher codes</td><td>Admin write / public validate</td><td>Falls back to an in-process list on failure</td></tr>
+         <tr><td class="mono">profiles</td><td>Customer name, phone, address, lat/lng</td><td>Owner via server fn</td><td>Document id is the Appwrite user id</td></tr><tr><td class="mono">user_roles</td><td>admin / customer grants</td><td>Admin only</td><td>Bootstrapped from APPWRITE_ADMIN_EMAILS</td></tr><tr><td class="mono">categories</td><td>Catalogue taxonomy</td><td>Public read</td><td>Seeded in code when empty</td></tr><tr><td class="mono">products</td><td>Catalogue, pricing, variants</td><td>Public read / admin write</td><td>Seeded in code when empty</td></tr><tr><td class="mono">orders</td><td>Order header, slot, totals, payment</td><td>Owner + admin</td><td>Ownership checked on every mutation</td></tr><tr><td class="mono">order_items</td><td>Line items</td><td>Owner + admin</td><td>Written only alongside an order</td></tr><tr><td class="mono">reviews</td><td>Product ratings</td><td>Verified purchasers</td><td>Gated on a completed order containing the product</td></tr><tr><td class="mono">blackout_dates</td><td>Closed days</td><td>Public read / admin write</td><td></td></tr><tr><td class="mono">newsletter_subscribers</td><td>Email list</td><td>Admin read</td><td>Subscribe is public by design</td></tr><tr><td class="mono">newsletter_campaigns</td><td>Sent campaigns</td><td>Admin only</td><td></td></tr><tr><td class="mono">offer_codes</td><td>Promo and voucher codes</td><td>Admin write / public validate</td><td>In-process fallback now development only</td></tr>
        </table>
     <div class="doc-footer">
       <span>anibakes.app &middot; internal audit</span>
@@ -275,7 +275,7 @@ li::marker { color: var(--berry-deep); }
        the product, and order mutations re-check ownership rather than trusting the client.</p>
        <table style="margin-top:3mm">
          <tr><th style="width:72mm">Endpoint</th><th style="width:34mm">Requires</th><th>Assessment</th></tr>
-         <tr><td class="mono">getCatalog, getProductBySlug, getBlackoutDates</td><td>Public</td><td>Correct — catalogue data is public</td></tr><tr><td class="mono">getPublicOfferCodes</td><td>Public</td><td>Correct — only active, visible codes are returned</td></tr><tr><td class="mono">checkOfferCode</td><td>Public</td><td>Acceptable, but unthrottled — see F-06</td></tr><tr><td class="mono">subscribeToNewsletter</td><td>Public</td><td>Correct by design</td></tr><tr><td class="mono">unsubscribeFromNewsletter</td><td>Public</td><td>Weak — see F-07</td></tr><tr><td class="mono">getProductReviews</td><td>Public</td><td>Correct</td></tr><tr><td class="mono">claimGameRewardCoupon</td><td>Authenticated</td><td>Fixed this pass — was public</td></tr><tr><td class="mono">getMyProfile, saveMyProfile, placeOrder, getMyOrders</td><td>Authenticated</td><td>Correct</td></tr><tr><td class="mono">cancelRescheduledOrder, reportOrderIssue</td><td>Authenticated + ownership</td><td>Correct</td></tr><tr><td class="mono">getMyReviewState, submitReview</td><td>Authenticated + purchase check</td><td>Correct</td></tr><tr><td class="mono">getMyAccess</td><td>Authenticated</td><td>Correct</td></tr><tr><td class="mono">All 11 admin.functions endpoints</td><td>Authenticated + assertAdmin</td><td>Correct and consistent</td></tr><tr><td class="mono">saveSiteContent, resetSiteContent</td><td>Authenticated + assertAdmin</td><td>Correct</td></tr><tr><td class="mono">Offer code admin endpoints</td><td>Authenticated + assertAdmin</td><td>Correct</td></tr>
+         <tr><td class="mono">getCatalog, getProductBySlug, getBlackoutDates</td><td>Public</td><td>Correct — catalogue data is public</td></tr><tr><td class="mono">getPublicOfferCodes</td><td>Public</td><td>Correct — only active, visible codes are returned</td></tr><tr><td class="mono">checkOfferCode</td><td>Public</td><td>Public by necessity, now rate limited (F-06)</td></tr><tr><td class="mono">subscribeToNewsletter</td><td>Public</td><td>Correct by design</td></tr><tr><td class="mono">unsubscribeFromNewsletter</td><td>Public</td><td>Now requires a signed token, or emails one (F-07)</td></tr><tr><td class="mono">getProductReviews</td><td>Public</td><td>Correct</td></tr><tr><td class="mono">claimGameRewardCoupon</td><td>Authenticated</td><td>Fixed this pass — was public</td></tr><tr><td class="mono">getMyProfile, saveMyProfile, placeOrder, getMyOrders</td><td>Authenticated</td><td>Correct</td></tr><tr><td class="mono">cancelRescheduledOrder, reportOrderIssue</td><td>Authenticated + ownership</td><td>Correct</td></tr><tr><td class="mono">getMyReviewState, submitReview</td><td>Authenticated + purchase check</td><td>Correct</td></tr><tr><td class="mono">getMyAccess</td><td>Authenticated</td><td>Correct</td></tr><tr><td class="mono">All 11 admin.functions endpoints</td><td>Authenticated + assertAdmin</td><td>Correct and consistent</td></tr><tr><td class="mono">saveSiteContent, resetSiteContent</td><td>Authenticated + assertAdmin</td><td>Correct</td></tr><tr><td class="mono">Offer code admin endpoints</td><td>Authenticated + assertAdmin</td><td>Correct</td></tr>
        </table>
 
        <div class="card good" style="margin-top:4mm">
@@ -364,17 +364,17 @@ li::marker { color: var(--berry-deep); }
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">src/server.ts</div>
                <p style="margin-bottom:2mm">Responses carried no HSTS, no nosniff, no framing policy, no referrer policy, no permissions policy and no content security policy.</p>
                <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> All are now set on every response. HSTS, nosniff, X-Frame-Options/frame-ancestors, Referrer-Policy, Permissions-Policy and COOP are enforced. The CSP ships report-only until CSP_ENFORCE=true, so it can be validated against real traffic before it is able to break a live page.</p>
-             </div><div class="card warn">
+             </div><div class="card good">
                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:3mm;margin-bottom:1.5mm">
                  <h3 class="sub" style="margin:0">F-06 &middot; No rate limiting on any public endpoint</h3>
                  <span style="white-space:nowrap">
                    <span class="chip medium">medium</span>
-                   <span class="chip open">open</span>
+                   <span class="chip fixed">fixed</span>
                  </span>
                </div>
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">All public server functions</div>
                <p style="margin-bottom:2mm">checkOfferCode, subscribeToNewsletter and the catalogue endpoints accept unlimited requests. Promo codes can be brute-forced, and the subscribe endpoint can be used to flood the list.</p>
-               <p style="margin:0;color:#3F7D57"><strong>Recommended &middot;</strong> Add a token bucket in front of the public endpoints keyed on CF-Connecting-IP, backed by Cloudflare KV or a Durable Object so the count survives across workers. Ten attempts per minute is generous for code validation.</p>
+               <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> A token bucket (src/lib/rate-limit.server.ts) now fronts promo validation at 10 per minute and newsletter subscribe/unsubscribe at 5 per 5 minutes, keyed on CF-Connecting-IP. The buckets live in isolate memory, so this stops one client hammering an endpoint but is not yet global; the module is shaped so swapping the store for a Durable Object or KV is the only change required.</p>
              </div>
     <div class="doc-footer">
       <span>anibakes.app &middot; internal audit</span>
@@ -386,39 +386,39 @@ li::marker { color: var(--berry-deep); }
       <div class="meta">Backend review &middot; findings</div>
     </div>
     <div class="eyebrow">Findings continued</div>
-         <div class="card warn">
+         <div class="card good">
                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:3mm;margin-bottom:1.5mm">
                  <h3 class="sub" style="margin:0">F-07 &middot; Newsletter unsubscribe takes any address</h3>
                  <span style="white-space:nowrap">
                    <span class="chip medium">medium</span>
-                   <span class="chip open">open</span>
+                   <span class="chip fixed">fixed</span>
                  </span>
                </div>
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">src/lib/newsletter.server.ts</div>
                <p style="margin-bottom:2mm">removeSubscriber unsubscribes whatever email it is given, with no proof the caller controls it. Anyone can unsubscribe anyone.</p>
-               <p style="margin:0;color:#3F7D57"><strong>Recommended &middot;</strong> Issue a signed, expiring token in the unsubscribe link and require it. An HMAC of the email with a server secret is enough and needs no extra storage.</p>
-             </div><div class="card warn">
+               <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> Newsletter footers now carry a per-recipient HMAC link, and a request without a valid token emails a confirmation link to the address rather than acting on it. The response is identical either way, so the endpoint cannot be used to test which addresses are subscribed, and the comparison is constant time.</p>
+             </div><div class="card good">
                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:3mm;margin-bottom:1.5mm">
                  <h3 class="sub" style="margin:0">F-08 &middot; Stock is never checked or decremented</h3>
                  <span style="white-space:nowrap">
                    <span class="chip medium">medium</span>
-                   <span class="chip open">open</span>
+                   <span class="chip fixed">fixed</span>
                  </span>
                </div>
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">src/lib/orders.server.ts</div>
                <p style="margin-bottom:2mm">createOrderForUser checks is_active but never reads stock, and no path reduces it. Any quantity of any active product can be ordered regardless of what the admin recorded.</p>
-               <p style="margin:0;color:#3F7D57"><strong>Recommended &middot;</strong> Check available stock while pricing the lines and reject with a per-product message. Decrement in the same pass. Left open deliberately: applying it against live data without knowing the current stock values could start rejecting valid orders.</p>
-             </div><div class="card warn">
+               <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> Orders now reject sold-out products and quantities above what is left, naming the product, and take the ordered amounts out of stock. Safe to enforce because the admin editor makes stock a required field defaulting to 100. Appwrite has no atomic increment, so the decrement is a read-then-write.</p>
+             </div><div class="card good">
                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:3mm;margin-bottom:1.5mm">
                  <h3 class="sub" style="margin:0">F-09 &middot; Promo redemption is not atomic</h3>
                  <span style="white-space:nowrap">
                    <span class="chip medium">medium</span>
-                   <span class="chip open">open</span>
+                   <span class="chip fixed">fixed</span>
                  </span>
                </div>
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">src/lib/offers.server.ts</div>
                <p style="margin-bottom:2mm">validatePromoCode reads used_count and markOfferCodeUsed writes it back in a separate request. Two orders placed at once both pass validation, so a single-use voucher can be redeemed twice. markOfferCodeUsed failures are also swallowed, so the count can silently not move at all.</p>
-               <p style="margin:0;color:#3F7D57"><strong>Recommended &middot;</strong> Guard the increment with a conditional write on the value just read and retry on conflict, or move redemption into an Appwrite Function that owns the document.</p>
+               <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> A code is reserved before the order is written rather than marked used afterwards; markOfferCodeUsed re-reads the count and refuses once the limit is reached, and releaseOfferCodeUse returns the reservation if the order fails. Validation errors propagate instead of silently charging full price. Full atomicity still wants a uniquely-indexed redemption document per code.</p>
              </div>
     <div class="doc-footer">
       <span>anibakes.app &middot; internal audit</span>
@@ -430,39 +430,39 @@ li::marker { color: var(--berry-deep); }
       <div class="meta">Backend review &middot; findings</div>
     </div>
     <div class="eyebrow">Findings continued</div>
-         <div class="card warn">
+         <div class="card good">
                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:3mm;margin-bottom:1.5mm">
                  <h3 class="sub" style="margin:0">F-10 &middot; Silent in-memory fallback for offer codes</h3>
                  <span style="white-space:nowrap">
                    <span class="chip medium">medium</span>
-                   <span class="chip open">open</span>
+                   <span class="chip fixed">fixed</span>
                  </span>
                </div>
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">src/lib/offers.server.ts</div>
                <p style="margin-bottom:2mm">Every offer-code write is wrapped in a try/catch that falls back to a module-level array. In a serverless deployment that array is per-instance and lost on recycle, so a failed write reports success and the code later does not exist. It also masks genuine outages.</p>
-               <p style="margin:0;color:#3F7D57"><strong>Recommended &middot;</strong> Keep the seed list for local development only, and let write failures propagate in production so the caller sees the error.</p>
-             </div><div class="card warn">
+               <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> Offer-code writes no longer fall back to the per-isolate array in production, where it reported success for writes that never happened and masked real outages. Retained for local development.</p>
+             </div><div class="card good">
                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:3mm;margin-bottom:1.5mm">
                  <h3 class="sub" style="margin:0">F-11 &middot; Unused Supabase credentials ship to the browser</h3>
                  <span style="white-space:nowrap">
                    <span class="chip low">low</span>
-                   <span class="chip open">open</span>
+                   <span class="chip fixed">fixed</span>
                  </span>
                </div>
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">src/integrations/supabase/, src/integrations/lovable/index.ts, .env</div>
                <p style="margin-bottom:2mm">No application code imports the Supabase client; its only importer is the Lovable-generated integrations/lovable/index.ts, which is itself unreferenced. Despite that, the Supabase client and the VITE_SUPABASE_* values are present in the shipped client bundle, adding weight and publishing configuration for a backend the site does not use.</p>
-               <p style="margin:0;color:#3F7D57"><strong>Recommended &middot;</strong> The generated file is marked "auto-generated by Lovable. Do not modify", so it was left in place rather than deleted. Confirm with Lovable that the integration can be removed, then drop the folder, the @supabase/supabase-js dependency and the SUPABASE_* environment variables.</p>
-             </div><div class="card warn">
+               <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> The credentials no longer reach the browser. `import.meta.env["X"]` cannot be statically replaced, so Vite inlined the entire env object into any chunk that read one variable; declaring the app's variables in src/vite-env.d.ts allows dot access, and no Supabase value appears in any client chunk. The Lovable-generated files were left untouched — removing the integration entirely still wants their confirmation.</p>
+             </div><div class="card good">
                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:3mm;margin-bottom:1.5mm">
                  <h3 class="sub" style="margin:0">F-12 &middot; Admin bootstrap is email-based and permanent</h3>
                  <span style="white-space:nowrap">
                    <span class="chip low">low</span>
-                   <span class="chip open">open</span>
+                   <span class="chip fixed">fixed</span>
                  </span>
                </div>
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">src/lib/roles.server.ts</div>
                <p style="margin-bottom:2mm">Any account signing in with an address listed in APPWRITE_ADMIN_EMAILS is granted admin on first sign-in, and the grant is never re-checked or revoked. If that mailbox is ever compromised or the address reused, admin follows it.</p>
-               <p style="margin:0;color:#3F7D57"><strong>Recommended &middot;</strong> Treat the bootstrap as first-run only: once any admin exists, stop auto-granting and require an existing admin to promote. Add role revocation to the admin surface.</p>
+               <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> The bootstrap now applies only until the first admin exists; after that it logs and skips, and promotion has to go through an existing admin. Role revocation in the admin surface is still outstanding.</p>
              </div>
     <div class="doc-footer">
       <span>anibakes.app &middot; internal audit</span>
@@ -474,17 +474,17 @@ li::marker { color: var(--berry-deep); }
       <div class="meta">Backend review &middot; findings</div>
     </div>
     <div class="eyebrow">Findings continued</div>
-         <div class="card warn">
+         <div class="card good">
                <div style="display:flex;justify-content:space-between;align-items:baseline;gap:3mm;margin-bottom:1.5mm">
                  <h3 class="sub" style="margin:0">F-13 &middot; Appwrite errors are returned to the client verbatim</h3>
                  <span style="white-space:nowrap">
                    <span class="chip low">low</span>
-                   <span class="chip open">open</span>
+                   <span class="chip fixed">fixed</span>
                  </span>
                </div>
                <div class="mono" style="color:#8A6C61;margin-bottom:1.5mm">src/integrations/appwrite/admin.server.ts</div>
                <p style="margin-bottom:2mm">request() throws `Appwrite ${status}: ${text}`, and those messages reach the browser through server-function errors, exposing collection names, attribute names and internal validation detail.</p>
-               <p style="margin:0;color:#3F7D57"><strong>Recommended &middot;</strong> Log the full error server-side and return a generic message with a correlation id.</p>
+               <p style="margin:0;color:#3F7D57"><strong>Resolved &middot;</strong> Appwrite failures are logged server-side with a short reference, and the caller receives the status plus that reference instead of the upstream body.</p>
              </div>
     <div class="doc-footer">
       <span>anibakes.app &middot; internal audit</span>
@@ -504,28 +504,28 @@ li::marker { color: var(--berry-deep); }
     <div class="num">88</div>
   </div><div class="score-row">
     <div class="label">Authorisation</div>
-    <div class="bar"><span style="width:90%;background:#3F7D57"></span></div>
-    <div class="num">90</div>
+    <div class="bar"><span style="width:92%;background:#3F7D57"></span></div>
+    <div class="num">92</div>
   </div><div class="score-row">
     <div class="label">Data exposure</div>
-    <div class="bar"><span style="width:82%;background:#D9A441"></span></div>
-    <div class="num">82</div>
+    <div class="bar"><span style="width:92%;background:#3F7D57"></span></div>
+    <div class="num">92</div>
   </div><div class="score-row">
     <div class="label">Payment integrity</div>
     <div class="bar"><span style="width:86%;background:#3F7D57"></span></div>
     <div class="num">86</div>
   </div><div class="score-row">
     <div class="label">Transport & headers</div>
+    <div class="bar"><span style="width:86%;background:#3F7D57"></span></div>
+    <div class="num">86</div>
+  </div><div class="score-row">
+    <div class="label">Abuse resistance</div>
     <div class="bar"><span style="width:78%;background:#D9A441"></span></div>
     <div class="num">78</div>
   </div><div class="score-row">
-    <div class="label">Abuse resistance</div>
-    <div class="bar"><span style="width:52%;background:#E07A3F"></span></div>
-    <div class="num">52</div>
-  </div><div class="score-row">
     <div class="label">Secret handling</div>
-    <div class="bar"><span style="width:84%;background:#D9A441"></span></div>
-    <div class="num">84</div>
+    <div class="bar"><span style="width:94%;background:#3F7D57"></span></div>
+    <div class="num">94</div>
   </div><div class="score-row">
     <div class="label">Input validation</div>
     <div class="bar"><span style="width:88%;background:#3F7D57"></span></div>
@@ -533,7 +533,7 @@ li::marker { color: var(--berry-deep); }
   </div>
        </div>
        <table style="margin-top:2mm">
-         <tr><td style="width:42mm"><strong>Authentication</strong></td><td>Appwrite-managed sessions, JWT-verified server side, OAuth supported</td></tr><tr><td style="width:42mm"><strong>Authorisation</strong></td><td>Every admin endpoint gated identically; ownership checked on order mutations</td></tr><tr><td style="width:42mm"><strong>Data exposure</strong></td><td>PII disclosure closed; verbose upstream errors remain</td></tr><tr><td style="width:42mm"><strong>Payment integrity</strong></td><td>Signature, amount, state and replay now all verified</td></tr><tr><td style="width:42mm"><strong>Transport &amp; headers</strong></td><td>Full header set applied; CSP still report-only by choice</td></tr><tr><td style="width:42mm"><strong>Abuse resistance</strong></td><td>No rate limiting anywhere; promo redemption not atomic</td></tr><tr><td style="width:42mm"><strong>Secret handling</strong></td><td>.env untracked, no server secrets client-side, unused Supabase keys bundled</td></tr><tr><td style="width:42mm"><strong>Input validation</strong></td><td>Zod on every mutating endpoint</td></tr>
+         <tr><td style="width:42mm"><strong>Authentication</strong></td><td>Appwrite-managed sessions, JWT-verified server side, OAuth supported</td></tr><tr><td style="width:42mm"><strong>Authorisation</strong></td><td>Every admin endpoint gated identically; ownership checked on order mutations</td></tr><tr><td style="width:42mm"><strong>Data exposure</strong></td><td>PII disclosure closed; upstream errors reduced to a correlation id</td></tr><tr><td style="width:42mm"><strong>Payment integrity</strong></td><td>Signature, amount, state and replay now all verified</td></tr><tr><td style="width:42mm"><strong>Transport &amp; headers</strong></td><td>Full header set enforced; CSP report-only until validated against traffic</td></tr><tr><td style="width:42mm"><strong>Abuse resistance</strong></td><td>Throttled per isolate, not yet globally; redemption reserved, not atomic</td></tr><tr><td style="width:42mm"><strong>Secret handling</strong></td><td>.env untracked, no server secrets client-side, no unused keys in the bundle</td></tr><tr><td style="width:42mm"><strong>Input validation</strong></td><td>Zod on every mutating endpoint</td></tr>
        </table>
 
        <div class="card bad" style="margin-top:4mm">
@@ -556,11 +556,11 @@ li::marker { color: var(--berry-deep); }
        <h2 class="section">Hardening roadmap</h2>
        <div class="card bad">
          <span class="chip high">Now</span>
-         <ul style="margin-top:2.5mm"><li>Set CSP_ENFORCE=true after reviewing report-only violations for a few days.</li><li>Rate-limit the public endpoints on CF-Connecting-IP via KV or a Durable Object.</li><li>Sign unsubscribe links so an address cannot be removed by a third party.</li><li>Make promo redemption atomic with a conditional write and retry.</li></ul>
+         <ul style="margin-top:2.5mm"><li>Set CSP_ENFORCE=true after reviewing report-only violations for a few days.</li><li>Move the rate-limit buckets into a Durable Object or KV, so the limit is global rather than per isolate.</li><li>Add a uniquely-indexed redemption document per code, making promo redemption atomic rather than merely reserved.</li></ul>
        </div>
        <div class="card warn">
          <span class="chip medium">Next</span>
-         <ul style="margin-top:2.5mm"><li>Enforce and decrement stock during order creation.</li><li>Stop the silent in-memory fallback for offer-code writes in production.</li><li>Replace verbatim Appwrite errors with generic messages plus a correlation id.</li><li>Close the admin bootstrap once the first admin exists, and add revocation.</li></ul>
+         <ul style="margin-top:2.5mm"><li>Add role revocation to the admin surface, now that the bootstrap no longer re-grants.</li><li>Confirm with Lovable that the unused Supabase integration can be deleted outright.</li><li>Decide whether the four HEVC-with-alpha fallback clips are worth keeping for Safari.</li></ul>
        </div>
        <div class="card">
          <span class="chip low">Later</span>

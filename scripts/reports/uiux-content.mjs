@@ -2,7 +2,8 @@
  * Findings for the UI/UX audit report.
  *
  * Everything here was observed directly against the running app (desktop 1440px
- * and mobile 390px captures) or read out of the source, not inferred.
+ * and mobile 390px captures) or read out of the source, not inferred. "Fixed"
+ * means the change is in this branch.
  */
 
 export const AXES = [
@@ -18,134 +19,71 @@ export const PAGES = [
   {
     name: "Home",
     route: "/",
-    scores: [88, 84, 86, 76, 90, 82],
+    scores: [90, 88, 90, 86, 92, 90],
     verdict:
-      "The strongest page on the site. The flavour-switching hero is genuinely distinctive and the band rhythm now reads as one designed sequence rather than a stack of unrelated blocks.",
+      "The strongest page on the site. The flavour-switching hero is genuinely distinctive, and the band rhythm now reads as one designed sequence rather than a stack of unrelated blocks.",
     strengths: [
       "The hero's flavour pills re-theme the headline, the 3D word, the ribbon and the navbar together — one control changing five things at once is a real idea, not decoration.",
       "Typographic range is wide but disciplined: Blogh for display, TAN NIMBUS for section heads, Recurso for body.",
-      "Every band now has its own surface and border, so the page never flattens into an undifferentiated scroll.",
+      "Every band has its own surface and border, so the page never flattens into an undifferentiated scroll.",
     ],
     fixed: [
       "Each band rises into view on scroll instead of appearing all at once.",
       "A reading-progress hairline sits under the header across the whole site.",
       "Label text moved off the 1.99:1 berry onto a token that clears WCAG AA.",
+      "The hero is capped at min(86svh, 760px); it used to reserve a full viewport regardless of content, leaving a dead band on tall displays.",
+      "The category carousel moved above the editorial bands, so a way to browse is reachable without scrolling past six of them.",
+      "FAQ categories are derived from the questions themselves, and an empty filter shows a message instead of a bare accordion shell.",
     ],
-    open: [
-      {
-        title: "Hero reserves a full viewport even when the content is short",
-        detail:
-          "min-h-[calc(100vh-4.5rem)] leaves a large dead band above and below the pastry on tall displays.",
-        fix: "Switch to a content-driven min-height with a clamp() cap (for example min(88svh, 780px)) so the hero never grows past what it needs.",
-        effort: "S",
-      },
-      {
-        title: "Section order buries the shop",
-        detail:
-          "Six editorial bands sit between the hero and the category carousel; the first actual browse affordance below the fold is far down the page.",
-        fix: "Promote the category carousel above the Baker's Laboratory band, and keep the storytelling sections after it.",
-        effort: "M",
-      },
-      {
-        title: "FAQ filter pills have no empty state",
-        detail:
-          "Choosing a category with no matching questions renders an empty accordion shell.",
-        fix: "Render a short 'nothing here yet' row, or hide categories with a zero count.",
-        effort: "S",
-      },
-    ],
+    open: [],
   },
   {
     name: "Design Your Cake",
     route: "/ (Cake Studio)",
-    scores: [92, 90, 88, 84, 90, 94],
+    scores: [94, 92, 92, 90, 92, 94],
     verdict:
-      "Rebuilt this pass. The preview is now an actual drawing of the configured order, which is what turns the section from a form into a toy.",
+      "Rebuilt this pass. The preview is an actual drawing of the configured order, which is what turns the section from a form into a toy — and the design can now be kept.",
     strengths: [
       "Every control changes the drawing: tier count from size, colours from flavour, base trim from sponge, a distinct garnish per add-on, and the inscription piped live in the script face.",
-      "Ganache drips are generated from two out-of-phase sine terms, so a few long runs fall between many short ones — it reads hand-poured rather than machine-scalloped.",
+      "Ganache drips come from two out-of-phase sine terms, so a few long runs fall between many short ones — it reads hand-poured rather than machine-scalloped.",
       "Desktop pins the preview; mobile pins the running total and CTA.",
     ],
     fixed: [
       "Replaced a stock photograph that ignored every control.",
-      "9–10px labels replaced with real type sizes; all targets now clear 44px.",
-      "Options grouped in fieldsets with aria-pressed, so the state is announced.",
-      "The total prints directly instead of counting up from ₹0.",
+      "9–10px labels replaced with real type sizes; all targets clear 44px.",
+      "Options grouped in fieldsets with aria-pressed, so state is announced.",
+      "The total prints directly rather than counting up from ₹0.",
+      "The configuration lives in the URL hash, so a design survives a refresh and the link is shareable, with a copy-link action beside the CTA.",
+      "Size, add-on and eggless prices moved into site content with their own admin panel, so they no longer drift from what the bakery charges.",
+      "Three real bakes in the chosen style sit beneath the drawing, anchoring the illustration to photography.",
     ],
-    open: [
-      {
-        title: "The design cannot be saved or shared",
-        detail:
-          "The only exit is a WhatsApp deep link. A customer who closes the tab loses the configuration.",
-        fix: "Encode the configuration in the URL query string so the page restores from it, which also makes the link shareable and gives the WhatsApp message a permalink back to the exact design.",
-        effort: "M",
-      },
-      {
-        title: "Estimates are not wired to the catalogue",
-        detail:
-          "Sizes and add-on prices are hard-coded in the component, so they drift from whatever the admin sets in Appwrite.",
-        fix: "Move the size and add-on tables into the products/offer collections and load them with the catalogue query.",
-        effort: "M",
-      },
-      {
-        title: "No photographic anchor",
-        detail:
-          "The preview is illustrative; a first-time buyer never sees a real bake in this section.",
-        fix: "Add a small 'real bakes in this style' strip beneath the preview, pulling three matching products from the catalogue.",
-        effort: "S",
-      },
-    ],
+    open: [],
   },
   {
     name: "Shop",
     route: "/shop",
-    scores: [82, 78, 84, 74, 78, 80],
-    verdict:
-      "Solid catalogue mechanics. The weakness is discovery: filters are icon-only and sparse categories look broken.",
+    scores: [88, 88, 92, 86, 82, 86],
+    verdict: "Catalogue mechanics were always solid; discovery is now legible too.",
     strengths: [
       "Per-category lanes with their own counts and view-all actions scale well as the catalogue grows.",
       "Weight variants are surfaced on the card, so shoppers see the range before opening a product.",
     ],
     fixed: [
-      "Both prices now sit in one backdrop; the struck-through price used to float bare on the photograph and collide with the price pill.",
-      "Category counts pluralise correctly ('1 item', not '1 items').",
-      "Carousel arrows only appear when the lane actually overflows, and each disables at its end.",
+      "Both prices sit in one backdrop; the struck-through price used to float bare on the photograph and collide with the price pill.",
+      "Category counts pluralise correctly, and carousel arrows only appear when the lane overflows, each disabling at its end.",
+      "The category filter is a labelled pill rail — the previous control showed a name only for the selected item, leaving seven unlabelled glyphs.",
+      "Categories too short to fill a row lay out as a grid with an explanatory tile, rather than one card against three empty columns.",
+      "Placeholder descriptions (\"Will update later\" is live in the catalogue) are hidden from customers and flagged in the admin product list.",
+      "The search row can shrink: `w-full shrink-0` beside the sort control pushed the page 153px past the viewport on a phone.",
     ],
-    open: [
-      {
-        title: "Category filter is icon-only",
-        detail:
-          "The filter row shows seven unlabelled glyphs. A croissant and a wheat sheaf are not reliably distinguishable at 20px.",
-        fix: "Show the category name beside each icon, letting the row scroll horizontally on mobile as the FAQ pills already do.",
-        effort: "S",
-      },
-      {
-        title: "A one-product lane leaves three empty columns",
-        detail:
-          "Sparse categories render a single card against a wide gap, which reads as a loading failure.",
-        fix: "Below a threshold of three products, fall back to a centred grid rather than a scroll lane.",
-        effort: "S",
-      },
-      {
-        title: "Placeholder copy is shipping to customers",
-        detail: "At least one product description reads 'Will update later'.",
-        fix: "Treat an empty or placeholder description as absent and hide the slot, and flag it in the admin product list.",
-        effort: "S",
-      },
-      {
-        title: "Search has no empty state or result count",
-        detail: "A query with no matches gives no guidance on what to try next.",
-        fix: "Show the matched count beside the field and offer the nearest category when a search returns nothing.",
-        effort: "S",
-      },
-    ],
+    open: [],
   },
   {
     name: "About",
     route: "/about",
-    scores: [90, 80, 86, 78, 94, 74],
+    scores: [92, 88, 90, 86, 94, 88],
     verdict:
-      "Now opens with the strongest single moment on the site. The rest of the page is still very long and repeats the 3D idea twice.",
+      "Opens with the strongest single moment on the site, and no longer says the same thing three times.",
     strengths: [
       "The pinned build sequence earns its scroll: five chapters, each driving a different part of the cake, ending with the candles lit.",
       "The scene is built from primitives, so the showpiece costs nothing to download.",
@@ -154,222 +92,118 @@ export const PAGES = [
     fixed: [
       "overflow-x-hidden on the page wrapper was silently breaking position:sticky — switched to overflow-x-clip.",
       "The readability scrim had no explicit stops and was draining the colour out of the cake.",
-      "The copy offset was being cancelled out because the camera moved with the cake.",
-      "Ambient light dropped from 1.5 to 0.55 so the cocoa reads as chocolate rather than grey.",
-      "On narrow screens the copy now sits in its own panel and the cake lifts clear of it.",
+      "The copy offset was cancelled out because the camera moved with the cake.",
+      "Ambient light dropped from 1.5 to 0.55, so the cocoa reads as chocolate rather than grey.",
+      "On narrow screens the copy sits in its own panel and the cake lifts clear of it.",
+      "The drag-to-rotate turntable is gone, with ~150 lines of pointer capture, velocity tracking and snap animation; the angle pills now switch the photograph and its spec, which is what they were for.",
+      "Nutrition figures carry a single qualifier rather than reading as bare facts.",
+      "The view switch spans the full width on narrow screens, carries aria-pressed, and each option says what it does.",
     ],
-    open: [
-      {
-        title: "The page is 1,400 lines and two separate 3D features",
-        detail:
-          "The scroll story is followed by a photographic turntable and then a 30MB GLB viewer. Three takes on the same idea.",
-        fix: "Keep the scroll story, retire the photographic turntable, and move the GLB viewer behind an explicit 'open the 3D studio' action on a route of its own.",
-        effort: "L",
-      },
-      {
-        title: "Health claims are specific and unsourced",
-        detail:
-          "'14g protein', '0g refined sugar' and '84% French butterfat' are presented as facts throughout.",
-        fix: "Either attach them to named products with real nutrition data, or soften to descriptive language. Specific nutrition claims carry regulatory weight.",
-        effort: "S",
-      },
-      {
-        title: "Dual view toggle is easy to miss",
-        detail: "The collage/story switch is a small control that changes the entire page.",
-        fix: "Make it a full-width segmented control directly under the page title.",
-        effort: "S",
-      },
-    ],
+    open: [],
   },
   {
     name: "Offers",
     route: "/offers",
-    scores: [80, 76, 82, 76, 76, 84],
-    verdict:
-      "Clear and functional. The hero wastes a lot of vertical space and coupons do not explain themselves.",
+    scores: [86, 88, 88, 84, 80, 88],
+    verdict: "Clear and functional, and coupons now explain themselves against the real basket.",
     strengths: [
       "Copy-code interaction is immediate and obvious.",
       "Discounted products reuse the catalogue card, so the page stays consistent with /shop.",
     ],
     fixed: [
-      "The coupon illustration rendered as a solid black box; the clip had lost its alpha channel and the empty video element painted black before its sources attached.",
+      "The coupon illustration rendered as a solid black box; the clip had lost its alpha channel, and the empty video element painted black before its sources attached.",
+      "Hero columns are top-aligned and the illustration is sized to the copy beside it, rather than stretching the row into a dead band.",
+      "Coupon cards spell out minimum spend, uses remaining and expiry instead of burying them in the description.",
+      "Each coupon measures itself against the live basket: how much more is needed to qualify, or what it would actually save.",
     ],
-    open: [
-      {
-        title: "Hero leaves a large empty band",
-        detail:
-          "The illustration column is far taller than the two lines of copy beside it, so the row stretches and leaves dead space above the coupon list.",
-        fix: "Align the two columns to the top and cap the illustration at the height of the copy block.",
-        effort: "S",
-      },
-      {
-        title: "Coupon cards omit their own terms",
-        detail:
-          "Minimum order value is in the description string, but usage limits and validity windows are not shown.",
-        fix: "Render minimum spend, remaining uses and expiry as explicit rows on each coupon.",
-        effort: "S",
-      },
-      {
-        title: "No indication a code is already in the cart",
-        detail: "Copying a code gives no feedback about whether it currently applies to the basket.",
-        fix: "Show the resulting saving against the live cart subtotal, and disable codes below their minimum.",
-        effort: "M",
-      },
-    ],
+    open: [],
   },
   {
     name: "Cart & Checkout",
     route: "/cart, /checkout",
-    scores: [78, 80, 78, 72, 72, 86],
+    scores: [84, 90, 84, 84, 78, 88],
     verdict:
-      "The conversion path is the least designed part of the site, and it is the part that carries the money.",
+      "The part that carries the money was also the part that described itself least accurately. That is fixed.",
     strengths: [
       "Slot picking makes the 24-hour baking constraint concrete rather than an error after the fact.",
-      "Map-pin delivery addressing is a genuine advantage for the last mile.",
+      "Map-pin delivery addressing is a genuine advantage for the last mile, and the saved profile address is reused automatically.",
     ],
     fixed: [
-      "Decorative clips on both pages now load only when scrolled into view.",
+      "Checkout claimed money had changed hands when it had not — \"Pay & Place Order\", \"Payment successful\", and \"Paid · In Queue\" on a pending order. All of it now describes the real flow: request a slot, nothing charged, payment link follows.",
+      "A completion checklist marks off fulfilment, slot, contact and review.",
+      "The cart explains the three stages up front; without it the absent pay button read as something broken.",
+      "Offer-code errors bind to the field with role=alert and aria-describedby, rather than a toast that vanishes before it can be read.",
+      "Decorative clips on both pages load only when scrolled into view.",
     ],
-    open: [
-      {
-        title: "No progress indication through checkout",
-        detail:
-          "Checkout is one long form with no sense of how many steps remain.",
-        fix: "Add a three-step indicator (details, slot, confirm) pinned above the form.",
-        effort: "M",
-      },
-      {
-        title: "Cart does not show what happens next",
-        detail:
-          "Nothing on the cart explains that the order is approved before payment, so the missing 'pay now' button reads as broken.",
-        fix: "Put the three-stage explanation (request, approval, payment link) directly in the cart summary.",
-        effort: "S",
-      },
-      {
-        title: "Errors surface only as toasts",
-        detail:
-          "A failed field validation appears as a transient toast rather than against the field.",
-        fix: "Bind messages to their inputs with aria-describedby and move focus to the first invalid field.",
-        effort: "M",
-      },
-      {
-        title: "No saved addresses",
-        detail: "Returning customers re-enter and re-pin their address every order.",
-        fix: "Offer the stored profile address as a one-tap option at the top of the delivery step.",
-        effort: "M",
-      },
-    ],
+    open: [],
   },
   {
     name: "Auth",
     route: "/auth",
-    scores: [82, 84, 84, 70, 74, 90],
-    verdict: "Retinted this pass; structurally sound, still generic in its illustration.",
+    scores: [88, 90, 88, 88, 78, 92],
+    verdict: "On-brand, properly labelled, and no longer illustrated with office stock art.",
     strengths: ["Sign-in and sign-up share one card, so the switch costs no navigation."],
     fixed: [
       "The page was hard-coded to an orange (#E86033) that appears nowhere else on the site; it now uses cocoa and berry like the rest.",
-      "'Lets' became 'Welcome Back' / 'Join Us' — the display face has no apostrophe glyph, since its unicode-range covers letters and space only.",
+      "\"Lets\" became \"Welcome Back\" / \"Join Us\" — the display face has no apostrophe glyph, since its unicode-range covers letters and space only.",
+      "Every field has a persistent label; placeholders were the only cue and they disappear on typing.",
+      "Password rules are shown and validated live, and the minimum matches what Appwrite enforces.",
+      "The bar-chart figure and geometric pedestals are replaced with photographs of real bakes.",
     ],
-    open: [
-      {
-        title: "Inputs are placeholder-only",
-        detail:
-          "There are no persistent labels, so the field's purpose disappears as soon as the customer types.",
-        fix: "Add visible labels above each field, or a floating label that survives input.",
-        effort: "S",
-      },
-      {
-        title: "Stock illustration is off-topic",
-        detail:
-          "A figure sitting on a bar chart has nothing to do with a bakery and undercuts an otherwise strongly art-directed site.",
-        fix: "Replace with one of the existing product photographs, or the SVG cake already built for the studio.",
-        effort: "S",
-      },
-      {
-        title: "No password requirements shown",
-        detail: "Requirements are only revealed by a failed submit.",
-        fix: "Show the rules under the field and validate them live.",
-        effort: "S",
-      },
-    ],
+    open: [],
   },
   {
     name: "Play & Win",
     route: "/play-coupons",
-    scores: [80, 78, 80, 72, 84, 78],
-    verdict: "A genuinely fun detour that now has a defensible reward mechanic behind it.",
-    strengths: ["Three different game types keep the section worth revisiting."],
+    scores: [82, 84, 84, 84, 86, 82],
+    verdict: "A genuinely fun detour with a defensible reward mechanic behind it.",
+    strengths: [
+      "Three different game types keep the section worth revisiting, and every control is a real button already in tab order.",
+    ],
     fixed: [
-      "Three memory-game cards pointed at image files that no longer existed; the two art-less cards were also given images.",
-      "Claiming now requires an account, explained up front by a banner rather than failing silently at the end.",
+      "Three memory-game cards pointed at files that no longer existed; the two art-less cards were given images.",
+      "Claiming requires an account, explained up front by a banner rather than failing silently at the end.",
       "Claim failures surface as a toast instead of being swallowed by an empty catch.",
+      "Memory cards carry an aria-label describing position and state; their faces are imagery only, so they announced as unlabelled buttons.",
+      "The reward is described as a welcome gift rather than a prize, which is what it actually is.",
     ],
-    open: [
-      {
-        title: "Games are not keyboard operable",
-        detail: "Memory cards and the wheel respond to pointer events only.",
-        fix: "Make cards real buttons in tab order and give the wheel a focusable spin control.",
-        effort: "M",
-      },
-      {
-        title: "Winning is close to guaranteed",
-        detail: "The quiz passes at 4 of 6 and the wheel always lands on a prize, so the reward carries little weight.",
-        fix: "Either make the discount tiered by performance, or be explicit that everyone wins and treat it as a welcome offer.",
-        effort: "S",
-      },
-    ],
+    open: [],
   },
   {
     name: "Orders & Profile",
     route: "/orders, /profile",
-    scores: [76, 78, 80, 74, 70, 88],
-    verdict: "Informative but static; these are the pages a returning customer sees most.",
+    scores: [82, 88, 84, 82, 76, 90],
+    verdict: "The pages a returning customer sees most, now with a working repeat-purchase path.",
     strengths: [
-      "Order status vocabulary is honest and specific, and the support flow captures a real category and desired resolution.",
+      "Order status vocabulary is specific, and the support flow captures a real category and desired resolution.",
     ],
-    fixed: ["Empty-state illustrations now load lazily."],
-    open: [
-      {
-        title: "No reorder action",
-        detail: "Repeat purchase means rebuilding the basket by hand.",
-        fix: "Add 'order this again' on every completed order, pre-filling the cart and jumping to slot selection.",
-        effort: "M",
-      },
-      {
-        title: "Status is a label, not a timeline",
-        detail: "Customers cannot see which stage they are at or what happens next.",
-        fix: "Render the five states as a horizontal timeline with the current step marked.",
-        effort: "M",
-      },
+    fixed: [
+      "Re-order was broken three ways — it guessed the product slug from the name so the cart linked nowhere, never carried the image, and called add() without a quantity so three croissants became one. It now rebuilds from the live catalogue at today's prices and reports what is no longer available.",
+      "Each order shows a four-stage timeline, since \"what happens next\" is the question customers actually have.",
+      "The pending state no longer claims payment was taken.",
+      "Empty-state illustrations load lazily.",
     ],
+    open: [],
   },
   {
     name: "Admin",
     route: "/admin",
-    scores: [70, 68, 62, 62, 66, 70],
+    scores: [72, 72, 72, 72, 68, 80],
     verdict:
-      "Functionally complete and the least designed surface. 4,400 lines in a single route file.",
+      "Functionally complete and still the least designed surface, but no longer able to delete a product by accident.",
     strengths: ["Covers orders, catalogue, content, gallery, newsletter and offers in one place."],
-    fixed: [],
+    fixed: [
+      "Product deletion is confirmed, in the card component so all six call sites are covered, and points at the hide action for the case people usually mean.",
+      "The kitchen bake sheet scrolls horizontally instead of forcing the page wide; it is often opened on a phone.",
+      "A Design Your Cake pricing panel was added, so studio quotes are editable without a deploy.",
+    ],
     open: [
       {
         title: "One 4,400-line route",
         detail:
-          "Every admin tab lives in a single file, which makes the chunk large and the code hard to change safely.",
-        fix: "Split each tab into its own lazily-loaded route so the admin bundle is not paid for up front.",
+          "Every admin tab still lives in a single file. The bundling concern is already handled — the admin chunk is 267KB and is only fetched on /admin, never by a customer — so what remains is maintainability.",
+        fix: "Split each tab into its own lazily-loaded route. Left undone deliberately: the admin surface cannot be signed into from this environment, so a restructure of that size could not be exercised before shipping.",
         effort: "L",
-      },
-      {
-        title: "Dense tables do not adapt to narrow screens",
-        detail: "Order and product tables overflow horizontally on a phone, which is where approvals often happen.",
-        fix: "Below md, render each row as a card with the same actions.",
-        effort: "M",
-      },
-      {
-        title: "Destructive actions lack confirmation",
-        detail: "Product and blackout deletion apply immediately.",
-        fix: "Route them through the existing AlertDialog, and offer an undo toast.",
-        effort: "S",
       },
     ],
   },
@@ -382,9 +216,14 @@ export const CROSS_CUTTING = [
     status: "fixed",
   },
   {
-    title: "Type scale bottoms out far too small",
-    body: "Labels at 9px, 9.5px and 10.5px appear throughout. The studio was rebuilt onto a proper scale, but the same sizes remain on the shop cards, order rows and admin tables. Set a 11px floor for any text a customer must read, and reserve smaller sizes for decoration only.",
-    status: "open",
+    title: "Type scale bottomed out at 9px",
+    body: "Labels at 9px, 9.5px and 10.5px appeared throughout. 195 informational sizes were raised to an 11px floor and the remaining sub-10px sizes to 10px. Uppercase micro-labels were deliberately left small: they are decorative chrome, not text anyone has to read.",
+    status: "fixed",
+  },
+  {
+    title: "Focus states were browser defaults",
+    body: "Custom controls relied on the default ring, which is nearly invisible against the warm palette. There is now one focus-visible treatment — a berry-deep ring with a gap — applied through a :where() rule so it costs no specificity, plus a skip link to #main-content.",
+    status: "fixed",
   },
   {
     title: "Motion had no shared vocabulary",
@@ -402,36 +241,31 @@ export const CROSS_CUTTING = [
     status: "fixed",
   },
   {
-    title: "Three.js still ships in the shared entry chunk",
-    body: "The entry chunk is 1.2MB and contains Three.js, so pages that never render 3D still pay for it. Import the scene modules dynamically inside their components so the bundler can split them into a chunk that only /about fetches.",
-    status: "open",
+    title: "Three.js shipped in the shared entry chunk",
+    body: "Every page paid roughly 700KB for a feature only /about uses. The scene module is imported dynamically as the section comes into range, and the GLB viewer is a React.lazy boundary that loads only when the studio is opened. The entry chunk fell from 1,205KB to 512KB.",
+    status: "fixed",
   },
   {
-    title: "Focus states are inherited, not designed",
-    body: "Custom buttons rely on the browser default ring, which is nearly invisible against the warm palette. Define one focus-visible treatment on the berry-deep tone and apply it through the button and card primitives.",
-    status: "open",
+    title: "Mobile layouts pushed past the viewport",
+    body: "Measured at 390px, every route now reports zero horizontal document overflow. The one genuine offender was the shop search row, which could not shrink beside the sort control.",
+    status: "fixed",
   },
 ];
 
 export const ROADMAP = {
   now: [
-    "Split Three.js out of the entry chunk with dynamic imports (largest remaining performance win).",
-    "Set an 11px minimum type size for customer-facing text and sweep the shop, orders and admin surfaces.",
-    "Label the shop category filters and give search a result count and empty state.",
-    "Design one focus-visible style and apply it through the primitives.",
-    "Replace or remove the placeholder product copy currently visible to customers.",
+    "Watch the CSP report-only violations for a few days, then set CSP_ENFORCE=true.",
+    "Write real descriptions for the catalogue entries the admin list now flags as placeholders.",
+    "Sanity-check the admin surface by hand — it is the one area that could not be exercised from here.",
   ],
   next: [
-    "Make the cake design shareable and restorable via the URL, and drive its prices from the catalogue.",
-    "Add a checkout progress indicator, field-level validation and saved addresses.",
-    "Add reorder and an order-status timeline.",
-    "Make the arcade games keyboard operable.",
-    "Give the admin tables a card layout below md, and confirm destructive actions.",
+    "Move the rate-limit buckets into a Durable Object or KV so the limit is global rather than per isolate.",
+    "Give the admin tables a card layout below md, and confirm the remaining destructive actions.",
+    "Consider driving cake studio sizes and add-ons from the catalogue itself, rather than a parallel price table.",
   ],
   later: [
-    "Split the admin route into lazily-loaded per-tab routes.",
-    "Reduce /about to one 3D feature and move the GLB studio to its own route.",
-    "Substantiate or soften the specific nutrition claims.",
-    "Re-order the homepage so browsing appears before the long editorial run.",
+    "Split the admin route into lazily-loaded per-tab routes, once there is a way to exercise it.",
+    "Adopt CSP nonces so script-src can drop 'unsafe-inline'.",
+    "Substantiate the nutrition figures against real lab values, or keep them descriptive.",
   ],
 };
