@@ -45,6 +45,7 @@ import { DevPanel } from "@/components/dev-panel";
 import { AdminNewsletter } from "@/components/admin-newsletter";
 import { AdminCustomerMoments } from "@/components/admin-customer-moments";
 import { AdminSiteContentEditor } from "@/components/admin-site-content-editor";
+import { AdminCakePricing } from "@/components/admin-cake-pricing";
 import { AdminGalleryEditor } from "@/components/admin-gallery-editor";
 import { type ProductForm, EMPTY_FORM } from "@/components/admin-product-editor-dialog";
 import { AdminProductForm } from "@/components/admin-product-form";
@@ -4258,8 +4259,11 @@ function AdminDashboard() {
               <AdminGalleryEditor />
             </TabsContent>
 
-            <TabsContent value="content_editor" className="mt-0">
+            <TabsContent value="content_editor" className="mt-0 space-y-8">
               <AdminSiteContentEditor />
+              {/* Studio prices are numbers rather than copy, so they get their
+                  own panel instead of being forced into the section editor. */}
+              <AdminCakePricing />
             </TabsContent>
           </Tabs>
         </main>

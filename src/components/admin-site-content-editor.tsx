@@ -35,7 +35,16 @@ import {
   type GalleryPhoto,
 } from "@/lib/site-content";
 
-type SectionKey = keyof SiteContent;
+/**
+ * The copy sections this editor manages.
+ *
+ * Narrowed away from `keyof SiteContent` because site content also carries the
+ * cake studio's price table, which is numbers rather than badge/title/body and
+ * has its own panel (AdminCakePricing).
+ */
+type SectionKey = {
+  [K in keyof SiteContent]: SiteContent[K] extends SectionContent ? K : never;
+}[keyof SiteContent];
 
 interface SectionConfig {
   key: SectionKey;

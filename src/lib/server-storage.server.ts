@@ -75,6 +75,20 @@ export function loadAppState(): AppStateStorage {
           product_weights: parsed.product_weights ?? {},
           site_content: parsed.site_content
             ? {
+                // Merged from defaults so content saved before a field existed
+                // still loads with that field present.
+                cake_studio_pricing: {
+                  ...DEFAULT_SITE_CONTENT.cake_studio_pricing,
+                  ...(parsed.site_content.cake_studio_pricing || {}),
+                  sizes: {
+                    ...DEFAULT_SITE_CONTENT.cake_studio_pricing.sizes,
+                    ...(parsed.site_content.cake_studio_pricing?.sizes || {}),
+                  },
+                  addons: {
+                    ...DEFAULT_SITE_CONTENT.cake_studio_pricing.addons,
+                    ...(parsed.site_content.cake_studio_pricing?.addons || {}),
+                  },
+                },
                 home_lab: {
                   ...DEFAULT_SITE_CONTENT.home_lab,
                   ...(parsed.site_content.home_lab || {}),

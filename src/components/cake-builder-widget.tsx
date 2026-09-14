@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { Check, Leaf, MessageCircle, Sparkles, Wand2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, Leaf, Link2, MessageCircle, Sparkles, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/motion/reveal";
 import { CakePreview, type CakeShape } from "@/components/cake-studio/cake-preview";
 import { formatCurrency } from "@/lib/pricing";
+import { useSiteContent } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
 
 interface SizeOption {
@@ -30,6 +31,8 @@ interface FlavourOption {
   frosting: string;
   frostingLight: string;
   drip: string;
+  /** Real bakes in this style, so the preview is anchored to photography. */
+  photos: string[];
 }
 
 interface AddonOption {
@@ -89,6 +92,11 @@ const FLAVOURS: FlavourOption[] = [
     frosting: "#F7C9D3",
     frostingLight: "#FFE9EF",
     drip: "#E05A7A",
+    photos: [
+      "/cakes/pink-bento-cake.webp",
+      "/cakes/coral-heart-cake.webp",
+      "/products/strawberry-cake.jpg",
+    ],
   },
   {
     id: "truffle",
@@ -98,6 +106,11 @@ const FLAVOURS: FlavourOption[] = [
     frosting: "#7A5638",
     frostingLight: "#A87F57",
     drip: "#2A150C",
+    photos: [
+      "/cakes/belgian-truffle-cake.webp",
+      "/cakes/royal-gold-brownie.webp",
+      "/products/chocolate-cake.jpg",
+    ],
   },
   {
     id: "lavender",
@@ -107,6 +120,11 @@ const FLAVOURS: FlavourOption[] = [
     frosting: "#CDBDE6",
     frostingLight: "#EBE2F8",
     drip: "#7C5FA8",
+    photos: [
+      "/cakes/lavender-pearl-cake.webp",
+      "/cakes/butterfly-lilac-cake.webp",
+      "/products/vanilla-cake.jpg",
+    ],
   },
   {
     id: "biscoff",
@@ -116,6 +134,11 @@ const FLAVOURS: FlavourOption[] = [
     frosting: "#E3B57E",
     frostingLight: "#F8E2C2",
     drip: "#9C5B22",
+    photos: [
+      "/cakes/biscoff-herringbone-cake.webp",
+      "/cakes/biscoff-nut-brownie.webp",
+      "/products/rosemilk-tea-cake.jpg",
+    ],
   },
 ];
 
@@ -133,6 +156,44 @@ const PRESET_MESSAGES = ["Happy Birthday", "Happy Anniversary", "Congratulations
 const EGGLESS_SURCHARGE = 60;
 const MAX_MESSAGE = 26;
 
+/** Everything needed to rebuild a design, kept short enough for a URL. */
+interface CakeConfig {
+  size: string;
+  sponge: string;
+  flavour: string;
+  addons: string[];
+  eggless: boolean;
+  message: string;
+}
+
+const CONFIG_KEY = "cake";
+
+/**
+ * Reads a shared design out of the URL hash.
+ *
+ * The hash is used rather than a query string so this works without the route
+ * declaring search params, and so sharing a design never triggers a navigation.
+ */
+function readConfigFromUrl(): Partial<CakeConfig> | null {
+  if (typeof window === "undefined") return null;
+  const raw = new URLSearchParams(window.location.hash.replace(/^#/, "")).get(CONFIG_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(decodeURIComponent(escape(atob(raw)))) as Partial<CakeConfig>;
+  } catch {
+    return null;
+  }
+}
+
+function writeConfigToUrl(config: CakeConfig): void {
+  if (typeof window === "undefined") return;
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(config))));
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  params.set(CONFIG_KEY, encoded);
+  // replaceState, so dragging through options does not fill the back button.
+  window.history.replaceState(null, "", `${window.location.pathname}#${params.toString()}`);
+}
+
 export function CakeBuilderWidget() {
   const [size, setSize] = useState<SizeOption>(SIZES[1]!);
   const [sponge, setSponge] = useState<SpongeOption>(SPONGES[0]!);
@@ -140,16 +201,56 @@ export function CakeBuilderWidget() {
   const [addons, setAddons] = useState<string[]>(["berries", "gold"]);
   const [eggless, setEggless] = useState(false);
   const [message, setMessage] = useState("Happy Birthday");
+  const [copied, setCopied] = useState(false);
+
+  // Prices come from site content so the bakery can change them without a
+  // deploy; the values in SIZES/ADDONS are the fallback.
+  const { content: siteContent } = useSiteContent();
+  const pricing = siteContent.cake_studio_pricing;
+  const basePriceFor = (option: SizeOption) => pricing?.sizes?.[option.id] ?? option.basePrice;
+  const addonPriceFor = (option: AddonOption) => pricing?.addons?.[option.id] ?? option.price;
+  const egglessSurcharge = pricing?.egglessSurcharge ?? EGGLESS_SURCHARGE;
+
+  // Restore a shared or previously-open design. Runs once: after this the URL
+  // follows the state rather than the other way round.
+  useEffect(() => {
+    const shared = readConfigFromUrl();
+    if (!shared) return;
+    const nextSize = SIZES.find((o) => o.id === shared.size);
+    const nextSponge = SPONGES.find((o) => o.id === shared.sponge);
+    const nextFlavour = FLAVOURS.find((o) => o.id === shared.flavour);
+    if (nextSize) setSize(nextSize);
+    if (nextSponge) setSponge(nextSponge);
+    if (nextFlavour) setFlavour(nextFlavour);
+    if (Array.isArray(shared.addons)) {
+      setAddons(shared.addons.filter((id) => ADDONS.some((a) => a.id === id)));
+    }
+    if (typeof shared.eggless === "boolean") setEggless(shared.eggless);
+    if (typeof shared.message === "string") setMessage(shared.message.slice(0, MAX_MESSAGE));
+  }, []);
+
+  // Keep the address bar in step, so the design survives a refresh and the link
+  // can simply be copied.
+  useEffect(() => {
+    writeConfigToUrl({
+      size: size.id,
+      sponge: sponge.id,
+      flavour: flavour.id,
+      addons,
+      eggless,
+      message,
+    });
+  }, [size, sponge, flavour, addons, eggless, message]);
 
   function toggleAddon(id: string) {
     setAddons((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
-  const addonTotal = addons.reduce(
-    (sum, id) => sum + (ADDONS.find((a) => a.id === id)?.price ?? 0),
-    0,
-  );
-  const total = size.basePrice + addonTotal + (eggless ? EGGLESS_SURCHARGE : 0);
+  const addonTotal = addons.reduce((sum, id) => {
+    const option = ADDONS.find((a) => a.id === id);
+    return sum + (option ? addonPriceFor(option) : 0);
+  }, 0);
+  const total = basePriceFor(size) + addonTotal + (eggless ? egglessSurcharge : 0);
 
   const addonNames = addons
     .map((id) => ADDONS.find((a) => a.id === id)?.name)
@@ -223,7 +324,27 @@ export function CakeBuilderWidget() {
                   />
                 </div>
 
-                <div className="relative flex flex-wrap gap-1.5 border-t border-[#2C1810]/10 px-5 py-3.5 dark:border-white/10">
+                {/* Real bakes in this style. The drawing above shows the exact
+                    configuration; these show what it actually looks like. */}
+                <div className="relative border-t border-[#2C1810]/10 px-5 pt-3.5 dark:border-white/10">
+                  <p className="mb-2 text-[10px] font-black tracking-[0.18em] text-muted-foreground uppercase">
+                    Bakes we have made in this style
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {flavour.photos.map((photo) => (
+                      <img
+                        key={photo}
+                        src={photo}
+                        alt={`An Ani Bakes cake in the ${flavour.name} style`}
+                        loading="lazy"
+                        decoding="async"
+                        className="aspect-square w-full rounded-xl border border-border/60 object-cover"
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="relative flex flex-wrap gap-1.5 px-5 py-3.5">
                   <PreviewChip label={size.name} />
                   <PreviewChip label={sponge.name} />
                   {eggless && <PreviewChip label="Eggless" tone="emerald" />}
@@ -246,7 +367,7 @@ export function CakeBuilderWidget() {
                     <p className="font-sans text-sm font-bold text-foreground">{option.name}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">{option.serves}</p>
                     <p className="mt-1.5 text-sm font-black text-cocoa">
-                      {formatCurrency(option.basePrice)}
+                      {formatCurrency(basePriceFor(option))}
                     </p>
                     <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
                       {option.blurb}
@@ -323,7 +444,9 @@ export function CakeBuilderWidget() {
                         <p className="truncate font-sans text-xs font-bold text-foreground">
                           {option.name}
                         </p>
-                        <p className="text-xs font-semibold text-cocoa">+₹{option.price}</p>
+                        <p className="text-xs font-semibold text-cocoa">
+                          +₹{addonPriceFor(option)}
+                        </p>
                       </div>
                     </div>
                   </OptionCard>
@@ -343,8 +466,8 @@ export function CakeBuilderWidget() {
               >
                 <Leaf className={cn("size-4", eggless ? "text-white" : "text-emerald-500")} />
                 {eggless
-                  ? `Eggless recipe · +${formatCurrency(EGGLESS_SURCHARGE)}`
-                  : `Make it eggless · +${formatCurrency(EGGLESS_SURCHARGE)}`}
+                  ? `Eggless recipe · +${formatCurrency(egglessSurcharge)}`
+                  : `Make it eggless · +${formatCurrency(egglessSurcharge)}`}
               </button>
             </Step>
 
@@ -399,7 +522,7 @@ export function CakeBuilderWidget() {
                   <div className="flex justify-end gap-2">
                     <dt>Base</dt>
                     <dd className="font-semibold text-foreground">
-                      {formatCurrency(size.basePrice)}
+                      {formatCurrency(basePriceFor(size))}
                     </dd>
                   </div>
                   <div className="flex justify-end gap-2">
@@ -410,7 +533,7 @@ export function CakeBuilderWidget() {
                     <div className="flex justify-end gap-2">
                       <dt>Eggless</dt>
                       <dd className="font-semibold text-foreground">
-                        {formatCurrency(EGGLESS_SURCHARGE)}
+                        {formatCurrency(egglessSurcharge)}
                       </dd>
                     </div>
                   )}
@@ -431,6 +554,30 @@ export function CakeBuilderWidget() {
                   Send this design on WhatsApp
                 </a>
               </Button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    setCopied(true);
+                    window.setTimeout(() => setCopied(false), 2500);
+                  } catch {
+                    setCopied(false);
+                  }
+                }}
+                className="mt-2 flex min-h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-cocoa transition-colors hover:bg-secondary/60"
+              >
+                {copied ? (
+                  <>
+                    <Check className="size-3.5 text-emerald-600" /> Link copied
+                  </>
+                ) : (
+                  <>
+                    <Link2 className="size-3.5" /> Copy a link to this design
+                  </>
+                )}
+              </button>
+
               <p className="mt-2 text-center text-xs text-muted-foreground">
                 An estimate, not a charge. We confirm the final price and your slot before anything
                 is baked.

@@ -21,11 +21,30 @@ export interface GallerySectionContent extends SectionContent {
   photos: GalleryPhoto[];
 }
 
+/**
+ * Prices behind the Design Your Cake studio.
+ *
+ * Only the numbers live here. The names, colours and garnishes stay in the
+ * component because each one drives how the preview is drawn — but the prices
+ * were hard-coded too, so they drifted from whatever the bakery actually
+ * charges. This puts them where an admin can change them.
+ */
+export interface CakeStudioPricing {
+  /** Base price per size id, matching the ids in cake-builder-widget. */
+  sizes: Record<string, number>;
+  /** Surcharge per add-on id. */
+  addons: Record<string, number>;
+  egglessSurcharge: number;
+}
+
 export interface SiteContent {
   // Homepage sections
   home_lab: SectionContent;
   home_faq: SectionContent;
   home_cta: SectionContent;
+
+  /** Studio pricing (numbers only — see CakeStudioPricing). */
+  cake_studio_pricing: CakeStudioPricing;
 
   // About page sections
   about_3d: SectionContent;
@@ -50,6 +69,11 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     title: "Tomorrow morning could smell a lot better.",
     description:
       "Reserve your next-day slot now. We mix and bake fresh at dawn for your chosen arrival window.",
+  },
+  cake_studio_pricing: {
+    sizes: { bento: 550, layer6: 1250, feast8: 1850, slab: 1450 },
+    addons: { berries: 100, gold: 120, blossoms: 80, pearls: 50, spheres: 150, candles: 40 },
+    egglessSurcharge: 60,
   },
   about_3d: {
     badge: "Interactive 3D Cake Atelier",
@@ -157,6 +181,18 @@ export function getStoredSiteContent(): SiteContent {
     if (!raw) return DEFAULT_SITE_CONTENT;
     const parsed = JSON.parse(raw);
     return {
+      cake_studio_pricing: {
+        ...DEFAULT_SITE_CONTENT.cake_studio_pricing,
+        ...(parsed.cake_studio_pricing || {}),
+        sizes: {
+          ...DEFAULT_SITE_CONTENT.cake_studio_pricing.sizes,
+          ...(parsed.cake_studio_pricing?.sizes || {}),
+        },
+        addons: {
+          ...DEFAULT_SITE_CONTENT.cake_studio_pricing.addons,
+          ...(parsed.cake_studio_pricing?.addons || {}),
+        },
+      },
       home_lab: { ...DEFAULT_SITE_CONTENT.home_lab, ...(parsed.home_lab || {}) },
       home_faq: { ...DEFAULT_SITE_CONTENT.home_faq, ...(parsed.home_faq || {}) },
       home_cta: { ...DEFAULT_SITE_CONTENT.home_cta, ...(parsed.home_cta || {}) },
