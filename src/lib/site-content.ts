@@ -76,10 +76,10 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     egglessSurcharge: 60,
   },
   about_3d: {
-    badge: "Interactive 3D Cake Atelier",
-    title: "Interactive 3D Cake Atelier",
+    badge: "Signature Cake, Angle by Angle",
+    title: "Our signature cake, angle by angle",
     description:
-      "Explore our signature wellness bakes in full 3D with interactive ingredient breakdown and crumb texture inspection.",
+      "Four views of the same bake, with what goes into each one. The full 3D studio is a tap away below.",
   },
   about_delivery: {
     badge: "Safe & Damage-Proof Courier Shield",
