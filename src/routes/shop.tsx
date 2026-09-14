@@ -412,10 +412,13 @@ function Shop() {
         </nav>
 
         {/* Search & Sort Controls */}
-        <div className="flex items-center gap-3 sm:ml-auto w-full sm:w-auto">
-          {/* Search Bar with GodUI 3D MagicInput */}
+        <div className="flex w-full min-w-0 items-center gap-3 sm:ml-auto sm:w-auto">
+          {/* Search Bar with GodUI 3D MagicInput.
+              `w-full` with `shrink-0` beside the sort control pushed this row
+              153px past the viewport on a phone; it needs to be allowed to
+              shrink below its content width. */}
           {showSearch && (
-            <div className="w-full sm:w-52 lg:w-60 shrink-0">
+            <div className="min-w-0 flex-1 sm:w-52 sm:flex-none lg:w-60">
               <MagicInput
                 size="sm"
                 rainbow

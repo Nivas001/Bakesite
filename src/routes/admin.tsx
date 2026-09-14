@@ -4765,8 +4765,10 @@ function KitchenBakeSheetDialog({
               No active baking orders scheduled for {formatBakeSheetDate(selectedDate)}.
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-border/90 bg-card shadow-soft">
-              <table className="w-full text-left text-xs border-collapse">
+            // Scrolls rather than forcing the page wide: this bake sheet is
+            // often opened on a phone in the kitchen.
+            <div className="overflow-x-auto rounded-2xl border border-border/90 bg-card shadow-soft">
+              <table className="w-full min-w-[34rem] border-collapse text-left text-xs">
                 <thead>
                   <tr className="border-b border-border/80 bg-muted/60 text-[11px] font-extrabold uppercase tracking-wider text-muted-foreground">
                     <th className="py-3 px-4 w-12 text-center">Done</th>

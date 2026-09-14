@@ -2,6 +2,17 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { isPlaceholderDescription, formatCurrency } from "@/lib/pricing";
 import { Copy, Trash2, Eye, EyeOff, Pin, CheckCircle2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function ProductAdminCard({
   product,
@@ -223,15 +234,40 @@ export function ProductAdminCard({
               </Button>
             )}
 
-            <Button
-              size="sm"
-              variant="ghost"
-              title="Delete Product"
-              className="size-8 p-0 rounded-xl text-destructive hover:bg-destructive/15 hover:text-destructive cursor-pointer"
-              onClick={onDelete}
-            >
-              <Trash2 className="size-3.5" />
-            </Button>
+            {/* Confirmed here rather than at each call site, so every screen
+                that renders this card is covered. Deleting a product was
+                previously immediate and irreversible. */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  title="Delete Product"
+                  className="size-8 cursor-pointer rounded-xl p-0 text-destructive hover:bg-destructive/15 hover:text-destructive"
+                >
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="rounded-3xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete “{product.name}”?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This removes the product from the counter permanently. Past orders keep their
+                    record of it. To take it off the shop without deleting it, use the hide button
+                    instead.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-xl">Keep it</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={onDelete}
+                    className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete permanently
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </div>
