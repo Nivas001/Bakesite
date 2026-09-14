@@ -102,6 +102,10 @@ function CheckoutPage() {
     description?: string | null;
   } | null>(null);
   const [validatingPromo, setValidatingPromo] = useState(false);
+  // Bound to the field with aria-describedby rather than shown only as a
+  // toast, which vanishes before it can be read and is never associated with
+  // the input that caused it.
+  const [promoError, setPromoError] = useState<string | null>(null);
 
   // Alternate delivery contact state
   const [useAlternateContact, setUseAlternateContact] = useState(false);
@@ -145,9 +149,10 @@ function CheckoutPage() {
 
   async function handleApplyPromo() {
     if (!promoCodeInput.trim()) {
-      toast.error("Please enter an offer code.");
+      setPromoError("Please enter an offer code.");
       return;
     }
+    setPromoError(null);
     setValidatingPromo(true);
     try {
       const res = await validatePromoFn({
@@ -161,7 +166,7 @@ function CheckoutPage() {
         `Offer code "${res.code}" applied! Saved ${formatCurrency(res.discountAmount)}`,
       );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Invalid offer code");
+      setPromoError(err instanceof Error ? err.message : "That offer code is not valid.");
     } finally {
       setValidatingPromo(false);
     }
@@ -357,27 +362,46 @@ function CheckoutPage() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="e.g. WELCOME10"
-                      value={promoCodeInput}
-                      onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleApplyPromo();
-                        }
-                      }}
-                      className="uppercase font-mono text-sm tracking-wider rounded-xl bg-background/50 focus:bg-background"
-                    />
-                    <Button
-                      type="button"
-                      disabled={validatingPromo || !promoCodeInput.trim()}
-                      onClick={handleApplyPromo}
-                      className="bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl px-5 font-semibold text-xs shrink-0"
-                    >
-                      {validatingPromo ? "Checking…" : "Apply"}
-                    </Button>
+                  <div className="space-y-1.5">
+                    <div className="flex gap-2">
+                      <Input
+                        id="promo-code"
+                        placeholder="e.g. WELCOME10"
+                        value={promoCodeInput}
+                        aria-invalid={promoError ? true : undefined}
+                        aria-describedby={promoError ? "promo-code-error" : undefined}
+                        onChange={(e) => {
+                          setPromoCodeInput(e.target.value.toUpperCase());
+                          if (promoError) setPromoError(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleApplyPromo();
+                          }
+                        }}
+                        className={`rounded-xl bg-background/50 font-mono text-sm tracking-wider uppercase focus:bg-background ${
+                          promoError ? "border-destructive focus-visible:ring-destructive" : ""
+                        }`}
+                      />
+                      <Button
+                        type="button"
+                        disabled={validatingPromo || !promoCodeInput.trim()}
+                        onClick={handleApplyPromo}
+                        className="bg-berry text-berry-foreground hover:bg-berry/90 rounded-xl px-5 font-semibold text-xs shrink-0"
+                      >
+                        {validatingPromo ? "Checking…" : "Apply"}
+                      </Button>
+                    </div>
+                    {promoError && (
+                      <p
+                        id="promo-code-error"
+                        role="alert"
+                        className="text-xs font-semibold text-destructive"
+                      >
+                        {promoError}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
