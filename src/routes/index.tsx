@@ -168,14 +168,15 @@ function Home() {
         {/* 4. Interactive Cake Customizer Simulator */}
         <CakeBuilderWidget />
 
-        {/* 5. The Baker's Laboratory Bento Grid */}
+        {/* 5. Category Counter Showcase — placed before the editorial bands so a
+            visitor reaches a way to browse without scrolling past six of them. */}
+        <CategoryPeekCarousel categories={data.categories} products={data.products} />
+
+        {/* 6. The Baker's Laboratory Bento Grid */}
         <BakerLaboratoryBento />
 
         {/* 6. Polaroid Moments Wall (Real Celebrations) */}
         <PolaroidMomentsWall />
-
-        {/* 7. Category Counter Showcase: Peek-Ahead Coverflow Carousel */}
-        <CategoryPeekCarousel categories={data.categories} products={data.products} />
 
         {/* 8. Frequently Asked Questions (Enhanced Elevated Background) */}
         <Reveal variant="rise" className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-10">
@@ -220,17 +221,24 @@ function Home() {
 
               {/* Single-Column GodUI Spring Accordion */}
               <div className="mx-auto max-w-3xl">
-                <Accordion
-                  type="single"
-                  collapsible
-                  animation="spring"
-                  items={filteredFaqs.map((faq, i) => ({
-                    value: `faq-${selectedFaqCategory}-${i}`,
-                    title: faq.question,
-                    content: faq.answer,
-                  }))}
-                  className="rounded-2xl sm:rounded-3xl border-2 border-[#2C1810]/15 dark:border-border/80 bg-card/95 shadow-soft backdrop-blur-md divide-y divide-border/60"
-                />
+                {filteredFaqs.length === 0 ? (
+                  <p className="rounded-2xl border-2 border-dashed border-border/70 bg-card/60 px-5 py-8 text-center text-sm text-muted-foreground">
+                    Nothing here yet — pick another topic, or ask us on WhatsApp and we will add the
+                    answer.
+                  </p>
+                ) : (
+                  <Accordion
+                    type="single"
+                    collapsible
+                    animation="spring"
+                    items={filteredFaqs.map((faq, i) => ({
+                      value: `faq-${selectedFaqCategory}-${i}`,
+                      title: faq.question,
+                      content: faq.answer,
+                    }))}
+                    className="rounded-2xl sm:rounded-3xl border-2 border-[#2C1810]/15 dark:border-border/80 bg-card/95 shadow-soft backdrop-blur-md divide-y divide-border/60"
+                  />
+                )}
               </div>
             </div>
           </section>

@@ -149,7 +149,9 @@ export function HeroRevampSection() {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       style={{ backgroundColor: activeFlavor.canvasBg }}
-      className="w-full min-h-0 lg:min-h-[calc(100vh-4.5rem)] flex flex-col justify-between text-[#3A1C14] overflow-hidden relative transition-colors duration-700 pt-6 sm:pt-10 lg:pt-14 pb-1 sm:pb-2"
+      // Capped rather than a full viewport: on a tall display the old value left
+      // a large dead band above and below the pastry.
+      className="w-full min-h-0 lg:min-h-[min(86svh,760px)] flex flex-col justify-between text-[#3A1C14] overflow-hidden relative transition-colors duration-700 pt-6 sm:pt-10 lg:pt-14 pb-1 sm:pb-2"
     >
       {/* Ambient Soft Glows */}
       <div

@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { getCatalog } from "@/lib/catalog.functions";
 import { getPublicOfferCodes } from "@/lib/offers.functions";
 import { ProductCard } from "@/components/product-card";
-import { hasDiscount } from "@/lib/pricing";
+import { formatCurrency, hasDiscount } from "@/lib/pricing";
+import { useCart } from "@/lib/cart";
 import {
   Tag,
   Copy,
@@ -68,6 +69,8 @@ function Offers() {
   const showConfetti = useFlag("ff_offers_confetti");
 
   const offers = data.products.filter((p) => hasDiscount(p.discount_type, p.discount_value));
+  // Live basket total, so each coupon can say what it would actually save.
+  const { total: cartSubtotal } = useCart();
 
   // Dynamic products array feeding into DriftWall (updates automatically when products are added)
   const driftItems = useMemo(() => {
@@ -93,7 +96,9 @@ function Offers() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-10 space-y-10 sm:space-y-16">
       {/* 1. Offers Hero Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8">
+      {/* Top-aligned: the illustration is much taller than the two lines of
+          copy beside it, and centring stretched the row into a dead band. */}
+      <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start sm:gap-8">
         <div className="flex flex-col gap-1.5 sm:gap-2 flex-1">
           <h1 className="font-blogh text-3xl sm:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide">
             Special offers & coupons
@@ -105,11 +110,13 @@ function Offers() {
         </div>
 
         {/* 3D Animated Coupons Blueprint (Unboxed & Generously Sized) */}
-        <div className="flex items-center justify-center shrink-0 self-center md:self-auto">
+        <div className="flex shrink-0 items-start justify-center self-center md:self-start">
           <LazyVideo
             src="/illustration/3d-blueprint-blue-coupons-with-percent-symbol-retail-discount-marketing"
             formats={["webm", "mov"]}
-            className="size-36 sm:size-48 md:size-56 lg:size-60 object-contain pointer-events-none drop-shadow-xl"
+            // Sized to the copy beside it rather than to the artwork, so the row does
+            // not stretch into a dead band.
+            className="pointer-events-none size-32 object-contain drop-shadow-xl sm:size-40 md:size-44"
           />
         </div>
       </div>
@@ -176,13 +183,59 @@ function Offers() {
                     </p>
                   </div>
 
+                  {/* Terms spelled out rather than left inside the description,
+                      so minimum spend and remaining uses are always visible. */}
+                  <dl className="mt-2.5 space-y-1 text-[11px]">
+                    <div className="flex justify-between gap-2">
+                      <dt className="text-muted-foreground">Minimum order</dt>
+                      <dd className="font-semibold text-cocoa">
+                        {promo.min_order_amount > 0
+                          ? formatCurrency(promo.min_order_amount)
+                          : "None"}
+                      </dd>
+                    </div>
+                    {typeof promo.usage_limit === "number" && promo.usage_limit < 1000 && (
+                      <div className="flex justify-between gap-2">
+                        <dt className="text-muted-foreground">Uses left</dt>
+                        <dd className="font-semibold text-cocoa">
+                          {Math.max(0, promo.usage_limit - (promo.used_count ?? 0))} of{" "}
+                          {promo.usage_limit}
+                        </dd>
+                      </div>
+                    )}
+                    <div className="flex justify-between gap-2">
+                      <dt className="text-muted-foreground">Valid until</dt>
+                      <dd className="font-semibold text-cocoa">
+                        {new Date(promo.expires_at).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </dd>
+                    </div>
+                  </dl>
+
                   <div className="mt-3.5 flex items-center justify-between border-t border-dashed border-border/70 pt-2.5">
-                    <span className="text-[11px] font-medium text-muted-foreground/80">
-                      Exp:{" "}
-                      {new Date(promo.expires_at).toLocaleDateString("en-IN", {
-                        day: "numeric",
-                        month: "short",
-                      })}
+                    {/* Measured against the live basket, so the customer can see
+                        whether the code actually applies before copying it. */}
+                    <span className="text-[11px] font-semibold">
+                      {cartSubtotal <= 0 ? (
+                        <span className="text-muted-foreground/80">Add bakes to see savings</span>
+                      ) : cartSubtotal < promo.min_order_amount ? (
+                        <span className="text-amber-700 dark:text-amber-400">
+                          {formatCurrency(promo.min_order_amount - cartSubtotal)} more to qualify
+                        </span>
+                      ) : (
+                        <span className="text-emerald-700 dark:text-emerald-400">
+                          Saves{" "}
+                          {formatCurrency(
+                            promo.discount_type === "percent"
+                              ? Math.round((cartSubtotal * promo.discount_value) / 100)
+                              : Math.min(cartSubtotal, promo.discount_value),
+                          )}{" "}
+                          on your cart
+                        </span>
+                      )}
                     </span>
 
                     <div className="relative">
