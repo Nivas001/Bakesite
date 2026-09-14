@@ -377,7 +377,7 @@ function Shop() {
         </p>
       </div>
 
-      {/* Filters Row: Category MultiButton Rail + Search + Sort */}
+      {/* Filters row: category rail, search, sort */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4 justify-between border-b border-border/60 pb-4">
         {/* Category rail. Every pill shows its name: the previous control only
             labelled the selected item, leaving six unlabelled glyphs that are
