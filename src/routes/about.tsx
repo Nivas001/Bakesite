@@ -42,17 +42,17 @@ import { CakeScrollStory } from "@/components/about/cake-scroll-story";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Us — Ani Bakes Wellness & Artisan Bakery" },
+      { title: "About Us — Aniii Bakes Wellness & Artisan Bakery" },
       {
         name: "description",
         content:
-          "Explore the craft behind Ani Bakes: 36-hour wild fermentation, healthy indulgence with zero refined sugars, and 100% pure butter bakes.",
+          "Explore the craft behind Aniii Bakes: 36-hour wild fermentation, healthy indulgence with zero refined sugars, and 100% pure butter bakes.",
       },
-      { property: "og:title", content: "About Us — Ani Bakes Wellness Bakery" },
+      { property: "og:title", content: "About Us — Aniii Bakes Wellness Bakery" },
       {
         property: "og:description",
         content:
-          "Explore the craft behind Ani Bakes: 36-hour wild fermentation, healthy indulgence with zero refined sugars, and 100% pure butter bakes.",
+          "Explore the craft behind Aniii Bakes: 36-hour wild fermentation, healthy indulgence with zero refined sugars, and 100% pure butter bakes.",
       },
     ],
   }),
@@ -200,7 +200,7 @@ const STORY_CHAPTERS = [
     title: "INDULGENCE WITH A HEALTHY TWIST",
     subtitle: "Re-imagining classic French baking for modern vitality.",
     narrative:
-      "In 2024, our founder embarked on a mission to solve a glaring problem in pastry: bakery treats looked irresistible but were loaded with inflammatory refined sugars, artificial premixes, and industrial palm oils. We asked ourselves — what if a chocolate muffin had 14g of clean protein, zero refined sugars, and the velvety crumb of a Parisian boulangerie? After 300+ recipe iterations, Ani Bakes was born.",
+      "In 2024, our founder embarked on a mission to solve a glaring problem in pastry: bakery treats looked irresistible but were loaded with inflammatory refined sugars, artificial premixes, and industrial palm oils. We asked ourselves — what if a chocolate muffin had 14g of clean protein, zero refined sugars, and the velvety crumb of a Parisian boulangerie? After 300+ recipe iterations, Aniii Bakes was born.",
     badge: "100% Monkfruit & Dates",
     icon: Sparkles,
     themeColor: "from-[#FFE8F0] via-[#FFD8E6] to-[#FFC2DA]",
@@ -299,7 +299,7 @@ export function AboutUsPage() {
               <span>Artisan Craft & Wellness Philosophy</span>
             </div>
             <h1 className="font-nimbus text-3xl sm:text-5xl lg:text-6xl font-bold text-cocoa leading-tight">
-              About Ani Bakes
+              About Aniii Bakes
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground mt-2 max-w-xl leading-relaxed">
               Where artisan bakery tradition meets modern wellness. Handcrafted with 100% French
@@ -1066,7 +1066,7 @@ export function AboutUsPage() {
                   />
                   <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md rounded-2xl border-2 border-[#2C1810] p-3 shadow-md">
                     <p className="font-blogh text-xs sm:text-sm text-[#2C1810] uppercase text-center">
-                      Ani Bakes · Certified Artisan Standard
+                      Aniii Bakes · Certified Artisan Standard
                     </p>
                   </div>
                 </div>

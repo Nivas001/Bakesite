@@ -267,7 +267,7 @@ export function MemoryGame({ onWin, claimCouponFn }: MemoryGameProps) {
                         🧁
                       </span>
                       <span className="mt-1 font-mono text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                        ANI BAKES
+                        ANIII BAKES
                       </span>
                     </div>
 

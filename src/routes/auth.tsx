@@ -35,12 +35,12 @@ export const Route = createFileRoute("/auth")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign in — Ani Bakes Bakery" },
+      { title: "Sign in — Aniii Bakes Bakery" },
       {
         name: "description",
         content: "Sign in with your email or Google account to place and track bakery orders.",
       },
-      { property: "og:title", content: "Sign in — Ani Bakes Bakery" },
+      { property: "og:title", content: "Sign in — Aniii Bakes Bakery" },
       { property: "og:description", content: "Sign in to place and track your bakery orders." },
     ],
   }),

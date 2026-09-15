@@ -149,7 +149,7 @@ export function QuizGame({ onWin, claimCouponFn }: QuizGameProps) {
     try {
       const reward = await claimCouponFn({
         gameId: "quiz",
-        gameName: "Ani Bakes Confectionery Trivia Quiz",
+        gameName: "Aniii Bakes Confectionery Trivia Quiz",
       });
       onWin({
         code: reward.code,

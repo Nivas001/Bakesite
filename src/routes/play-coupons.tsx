@@ -24,16 +24,16 @@ import { useAuth } from "@/hooks/use-appwrite-auth";
 export const Route = createFileRoute("/play-coupons")({
   head: () => ({
     meta: [
-      { title: "Play & Win Bakery Coupons — Ani Bakes Bakery" },
+      { title: "Play & Win Bakery Coupons — Aniii Bakes Bakery" },
       {
         name: "description",
         content:
-          "Play our confectionery trivia, memory match, or spin the wheel to win a single-use 15% discount coupon at Ani Bakes.",
+          "Play our confectionery trivia, memory match, or spin the wheel to win a single-use 15% discount coupon at Aniii Bakes.",
       },
-      { property: "og:title", content: "Play & Win Bakery Coupons — Ani Bakes Bakery" },
+      { property: "og:title", content: "Play & Win Bakery Coupons — Aniii Bakes Bakery" },
       {
         property: "og:description",
-        content: "Play bakery mini-games and win exclusive 15% off promo codes at Ani Bakes.",
+        content: "Play bakery mini-games and win exclusive 15% off promo codes at Aniii Bakes.",
       },
     ],
   }),

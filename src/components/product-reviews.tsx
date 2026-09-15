@@ -298,7 +298,7 @@ export function ProductReviews({ productId }: { productId: string }) {
 
                     <div className="text-[11px] text-muted-foreground/80 pt-1 border-t border-border/40 flex items-center justify-between">
                       <span>Morning Bake Order</span>
-                      <span className="font-semibold text-cocoa">Ani Bakes Kitchen</span>
+                      <span className="font-semibold text-cocoa">Aniii Bakes Kitchen</span>
                     </div>
                   </article>
                 );

@@ -237,7 +237,7 @@ export function CakeScrollStory() {
   return (
     <section
       ref={sectionRef}
-      aria-label="How an Ani Bakes celebration cake is built"
+      aria-label="How an Aniii Bakes celebration cake is built"
       className="relative h-[460vh] w-full sm:h-[520vh]"
     >
       {/* Pinned stage */}

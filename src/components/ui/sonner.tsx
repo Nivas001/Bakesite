@@ -7,6 +7,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       className="toaster group"
       position="bottom-center"
+      // Clears the phone tab bar, which is fixed to the bottom of the screen.
+      mobileOffset={{ bottom: "4.5rem" }}
       toastOptions={{
         className:
           "!w-auto !max-w-fit mx-auto !rounded-full !px-4 !py-2 sm:!px-5 sm:!py-2.5 !bg-card/85 !backdrop-blur-2xl !border !border-border/80 !shadow-lift !text-cocoa !font-sans !text-xs !font-semibold !text-center !inline-flex !items-center !justify-center gap-2",

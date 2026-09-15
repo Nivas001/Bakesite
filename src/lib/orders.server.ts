@@ -408,7 +408,7 @@ export async function reportOrderIssueForUser(userId: string, input: ReportOrder
   });
 
   const whatsappMessage = encodeURIComponent(
-    `Hi Ani Bakes Studio! 🥐 I am reporting an issue with my completed order #${order.$id.slice(-6).toUpperCase()}.\n\n` +
+    `Hi Aniii Bakes Studio! 🥐 I am reporting an issue with my completed order #${order.$id.slice(-6).toUpperCase()}.\n\n` +
       `• Issue: ${catLabel}\n` +
       `• Details: ${input.description.trim()}\n` +
       `• Preferred Resolution: ${input.preferredResolution}\n\n` +

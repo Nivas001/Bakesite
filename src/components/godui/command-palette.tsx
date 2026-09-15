@@ -272,7 +272,7 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
                     <span>to select</span>
                   </span>
                 </div>
-                <span className="font-medium text-berry-deep">Ani Bakes Studio</span>
+                <span className="font-medium text-berry-deep">Aniii Bakes Studio</span>
               </div>
             </motion.div>
           </div>

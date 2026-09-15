@@ -16,8 +16,8 @@ export const Route = createFileRoute("/unsubscribe")({
   }),
   head: () => ({
     meta: [
-      { title: "Unsubscribe from Newsletter — Ani Bakes Bakery" },
-      { name: "description", content: "Take a break from Ani Bakes fresh bakes newsletter." },
+      { title: "Unsubscribe from Newsletter — Aniii Bakes Bakery" },
+      { name: "description", content: "Take a break from Aniii Bakes fresh bakes newsletter." },
       { name: "robots", content: "noindex" },
     ],
   }),

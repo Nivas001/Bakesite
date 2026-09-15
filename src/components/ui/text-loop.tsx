@@ -85,7 +85,7 @@ const buildPath = (shape: TextLoopShape, curviness: number, ribbonWidth: number,
 };
 
 export function TextLoop({
-  text = "Ani Bakes ✦ Fresh Dawn Bakes",
+  text = "Aniii Bakes ✦ Fresh Dawn Bakes",
   shape = "wave",
   path,
   speed = 48,

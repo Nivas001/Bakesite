@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
   createBlackout,
   deleteBlackout,
@@ -27,11 +27,7 @@ import {
   saveAdminOfferCode,
   deleteAdminOfferCode,
 } from "@/lib/offers.functions";
-import {
-  formatCurrency,
-  generateSmartCakeWeightVariants,
-  type ProductWeightVariant,
-} from "@/lib/pricing";
+import { formatCurrency, generateSmartCakeWeightVariants } from "@/lib/pricing";
 import { TIME_SLOTS, toISODate } from "@/lib/slots";
 import {
   Dialog,
@@ -55,11 +51,9 @@ import {
   CheckCircle2,
   XCircle,
   Camera,
-  Trash2,
   Eye,
   EyeOff,
   Lock,
-  Unlock,
   ChefHat,
   Printer,
   ArrowUp,
@@ -80,15 +74,10 @@ import {
   BarChart3,
   Menu,
   X,
-  ChevronRight,
   Plus,
   RefreshCw,
   Copy,
-  Sparkles,
   ExternalLink,
-  Pin,
-  PinOff,
-  ImageIcon,
   FileText,
   Grid,
   List,
@@ -97,6 +86,15 @@ import {
   Search,
 } from "lucide-react";
 import { CommandPalette, type CommandGroup } from "@/components/godui/command-palette";
+import {
+  ADMIN_SECTIONS,
+  ADMIN_SECTION_GROUPS,
+  AdminCard,
+  AdminEmpty,
+  AdminSectionHeading,
+  AdminStat,
+  type AdminSectionId,
+} from "@/components/admin/admin-chrome";
 
 export type AdminSearch = {
   tab?: string | undefined;
@@ -114,16 +112,16 @@ export const Route = createFileRoute("/admin")({
   },
   head: () => ({
     meta: [
-      { title: "Bakery admin — Ani Bakes" },
+      { title: "Bakery admin — Aniii Bakes" },
       {
         name: "description",
-        content: "Manage orders, inventory and closed dates for Ani Bakes Bakery.",
+        content: "Manage orders, inventory and closed dates for Aniii Bakes Bakery.",
       },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Bakery admin — Ani Bakes" },
+      { property: "og:title", content: "Bakery admin — Aniii Bakes" },
       {
         property: "og:description",
-        content: "Order approvals and inventory for Ani Bakes Bakery.",
+        content: "Order approvals and inventory for Aniii Bakes Bakery.",
       },
     ],
   }),
@@ -1387,82 +1385,18 @@ function AdminDashboard() {
     }
   };
 
-  const NAV_GROUPS = [
+  /**
+   * Counts shown beside a nav item. Only where a number tells the baker
+   * something — a badge reading "Editor" or "12 Shots" is decoration.
+   */
+  const navBadges: Partial<Record<AdminSectionId, { text: string; urgent?: boolean } | undefined>> =
     {
-      title: "Core Operations",
-      items: [
-        { id: "overview", label: "Dashboard", icon: LayoutDashboard, badge: null },
-        {
-          id: "orders",
-          label: "Orders & Slots",
-          icon: ShoppingBag,
-          badge: pending > 0 ? `${pending} new` : null,
-          badgeColor: "bg-amber-500 text-white font-bold animate-pulse",
-        },
-        {
-          id: "inventory",
-          label: "Products & Menu",
-          icon: Package,
-          badge: data.products.length,
-          badgeColor: "bg-secondary text-muted-foreground",
-        },
-        { id: "shop_layout", label: "Shop & Categories", icon: Layers, badge: null },
-      ],
-    },
-    {
-      title: "Customers & Growth",
-      items: [
-        {
-          id: "users",
-          label: "Customer Accounts",
-          icon: Users,
-          badge: usersList.length,
-          badgeColor: "bg-secondary text-muted-foreground",
-        },
-        {
-          id: "offers",
-          label: "Promo Codes",
-          icon: Tag,
-          badge: offerCodes?.length ?? 0,
-          badgeColor: "bg-secondary text-muted-foreground",
-        },
-        { id: "newsletter", label: "Newsletter", icon: Mail, badge: null },
-        {
-          id: "reviews",
-          label: "Reviews & Moments",
-          icon: Star,
-          badge: null,
-        },
-      ],
-    },
-    {
-      title: "Bakery Configuration",
-      items: [
-        {
-          id: "calendar",
-          label: "Closed Dates",
-          icon: Calendar,
-          badge: data.blackouts?.length ?? 0,
-          badgeColor: "bg-secondary text-muted-foreground",
-        },
-        { id: "analytics", label: "Analytics", icon: BarChart3, badge: null },
-        {
-          id: "gallery",
-          label: "Gallery Atelier",
-          icon: Camera,
-          badge: "12 Shots",
-          badgeColor: "bg-berry/15 text-berry-deep font-bold",
-        },
-        {
-          id: "content_editor",
-          label: "Page Text & Copy",
-          icon: FileText,
-          badge: "Editor",
-          badgeColor: "bg-berry/15 text-berry-deep font-bold",
-        },
-      ],
-    },
-  ];
+      orders: pending > 0 ? { text: `${pending} new`, urgent: true } : undefined,
+      inventory: { text: String(data.products.length) },
+      users: { text: String(usersList.length) },
+      offers: { text: String(offerCodes?.length ?? 0) },
+      calendar: { text: String(data.blackouts?.length ?? 0) },
+    };
 
   const [commandOpen, setCommandOpen] = useState(false);
 
@@ -1472,8 +1406,8 @@ function AdminDashboard() {
       items: [
         {
           id: "nav-overview",
-          label: "Atelier Dashboard Overview",
-          description: "Revenue, today's schedule, and performance stats",
+          label: "Dashboard",
+          description: "What needs doing today, at a glance",
           icon: <LayoutDashboard className="size-4" />,
           shortcut: "G O",
           keywords: ["home", "dashboard", "stats", "metrics", "summary", "overview"],
@@ -1481,8 +1415,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-orders",
-          label: "Orders & Kitchen Slots",
-          description: "Customer orders, kitchen slots, and approvals",
+          label: "Orders",
+          description: "Approve, reschedule or cancel customer orders",
           icon: <ShoppingBag className="size-4" />,
           shortcut: "G S",
           keywords: [
@@ -1498,8 +1432,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-inventory",
-          label: "Products, Menu & Pricing",
-          description: "Edit bakes, set prices, manage discounts, upload images",
+          label: "Products",
+          description: "Add bakes, set prices, hide what you are not making",
           icon: <Package className="size-4" />,
           shortcut: "G P",
           keywords: [
@@ -1517,8 +1451,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-layout",
-          label: "Shop Page & Category Arrangement",
-          description: "Reorder categories, set desktop rows, and sequence products",
+          label: "Shop layout",
+          description: "Choose the order categories and products appear in",
           icon: <Layers className="size-4" />,
           shortcut: "G L",
           keywords: ["layout", "categories", "rows", "sequencing", "reorder", "shop layout"],
@@ -1526,8 +1460,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-offers",
-          label: "Promotions & Discount Codes",
-          description: "Create and manage customer promo codes and coupons",
+          label: "Discount codes",
+          description: "Create and expire the codes customers type at checkout",
           icon: <Tag className="size-4" />,
           shortcut: "G D",
           keywords: ["coupons", "discounts", "promo codes", "offers", "vouchers", "promotions"],
@@ -1535,8 +1469,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-calendar",
-          label: "Holiday & Closed Kitchen Dates",
-          description: "Set blackout dates and closure periods",
+          label: "Closed dates",
+          description: "Block days you are not baking so no slots can be booked",
           icon: <Calendar className="size-4" />,
           shortcut: "G C",
           keywords: [
@@ -1551,8 +1485,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-users",
-          label: "Customer Accounts & Profiles",
-          description: "View customer profiles, orders, and contact details",
+          label: "Customers",
+          description: "Everyone with an account, and how to reach them",
           icon: <Users className="size-4" />,
           shortcut: "G U",
           keywords: ["users", "customers", "accounts", "profiles", "members"],
@@ -1560,8 +1494,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-newsletter",
-          label: "Newsletter Subscribers & Broadcasts",
-          description: "Email subscriber list and broadcast campaigns",
+          label: "Newsletter",
+          description: "Write and send an email to your subscribers",
           icon: <Mail className="size-4" />,
           shortcut: "G N",
           keywords: ["newsletter", "subscribers", "broadcast", "email marketing"],
@@ -1569,8 +1503,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-reviews",
-          label: "Customer Moments & Reviews",
-          description: "Moderate customer review submissions and stories",
+          label: "Reviews & photos",
+          description: "Customer reviews and the celebration photos on the homepage",
           icon: <Star className="size-4" />,
           shortcut: "G R",
           keywords: ["reviews", "ratings", "feedback", "testimonials", "moments"],
@@ -1578,8 +1512,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-analytics",
-          label: "Bakery Analytics & Reports",
-          description: "Sales trends, top sellers, and revenue breakdowns",
+          label: "Sales reports",
+          description: "Revenue, best sellers and how the week is going",
           icon: <BarChart3 className="size-4" />,
           shortcut: "G A",
           keywords: ["analytics", "revenue", "sales", "earnings", "reports", "charts"],
@@ -1587,8 +1521,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-content",
-          label: "Copywriting Studio & Page Text",
-          description: "Edit hero banners, brand story, and page copy",
+          label: "Website text",
+          description: "Edit the headings and paragraphs on the public pages",
           icon: <FileText className="size-4" />,
           shortcut: "G T",
           keywords: ["content", "editor", "text", "hero text", "story", "copywriting", "copy"],
@@ -1596,8 +1530,8 @@ function AdminDashboard() {
         },
         {
           id: "nav-gallery",
-          label: "Atelier & Bakes Gallery Studio",
-          description: "Drag-and-swap 360° photo sequence, edit pill labels and photos",
+          label: "About page gallery",
+          description: "The photo wall shown on the About page",
           icon: <Camera className="size-4" />,
           shortcut: "G G",
           keywords: [
@@ -1717,35 +1651,36 @@ function AdminDashboard() {
     handleEditProduct,
   ]);
 
+  const section = ADMIN_SECTIONS[activeTab] ?? ADMIN_SECTIONS["overview"]!;
+
   return (
-    <div className="min-h-screen w-full bg-background flex flex-col lg:flex-row">
+    <div className="flex min-h-screen w-full flex-col bg-background lg:flex-row">
       {/* Mobile Drawer Backdrop */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs lg:hidden transition-opacity"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs transition-opacity lg:hidden"
         />
       )}
 
-      {/* Left Sidebar Navigation */}
+      {/* ── Sidebar ─────────────────────────────────────────────────── */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-72 border-r border-border/70 bg-card/95 backdrop-blur-md p-5 flex flex-col justify-between transition-transform duration-200 lg:static lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-50 flex w-72 flex-col justify-between border-r border-border/70 bg-card/95 p-4 backdrop-blur-md transition-transform duration-200 lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
         }`}
       >
-        <div className="space-y-6">
-          {/* Brand Header */}
+        <div className="min-h-0 space-y-5 overflow-y-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="size-9 rounded-2xl bg-berry/15 text-berry-deep flex items-center justify-center font-blogh font-bold text-lg shadow-2xs">
-                🎂
+              <div className="flex size-9 items-center justify-center rounded-2xl bg-berry/15 text-berry-deep shadow-2xs">
+                <ChefHat className="size-4.5" />
               </div>
               <div>
-                <h2 className="font-blogh text-base font-bold text-cocoa uppercase tracking-wide">
-                  Ani Bakes
+                <h2 className="font-nimbus text-base leading-tight font-bold text-cocoa">
+                  Aniii Bakes
                 </h2>
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
-                  Atelier Control
+                <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+                  Bakery admin
                 </p>
               </div>
             </div>
@@ -1754,23 +1689,24 @@ function AdminDashboard() {
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden size-8 p-0 rounded-xl"
+              className="size-8 rounded-xl p-0 lg:hidden"
+              aria-label="Close menu"
             >
               <X className="size-4" />
             </Button>
           </div>
 
-          {/* Nav Items Grouped */}
-          <nav className="space-y-5">
-            {NAV_GROUPS.map((group) => (
-              <div key={group.title} className="space-y-1">
-                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+          <nav className="space-y-4">
+            {ADMIN_SECTION_GROUPS.map((group) => (
+              <div key={group.title}>
+                <p className="px-3 text-[10px] font-bold tracking-wider text-muted-foreground/70 uppercase">
                   {group.title}
                 </p>
-                <div className="space-y-0.5 pt-1">
+                <div className="space-y-0.5 pt-1.5">
                   {group.items.map((item) => {
                     const IconComp = item.icon;
                     const isActive = activeTab === item.id;
+                    const badge = navBadges[item.id];
                     return (
                       <button
                         key={item.id}
@@ -1779,25 +1715,31 @@ function AdminDashboard() {
                           setActiveTab(item.id);
                           setSidebarOpen(false);
                         }}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
+                        aria-current={isActive ? "page" : undefined}
+                        title={item.description}
+                        className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-2xl px-3 py-2 text-xs font-semibold transition-all ${
                           isActive
                             ? "bg-berry text-berry-foreground shadow-soft"
                             : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="flex min-w-0 items-center gap-2.5">
                           <IconComp
                             className={`size-4 shrink-0 ${isActive ? "text-berry-foreground" : "text-cocoa/70"}`}
                           />
                           <span className="truncate">{item.label}</span>
                         </div>
-                        {item.badge && (
+                        {badge && (
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                              isActive ? "bg-white/20 text-white" : item.badgeColor
+                            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums ${
+                              isActive
+                                ? "bg-white/20 text-white"
+                                : badge.urgent
+                                  ? "bg-amber-500 text-white"
+                                  : "bg-secondary text-muted-foreground"
                             }`}
                           >
-                            {item.badge}
+                            {badge.text}
                           </span>
                         )}
                       </button>
@@ -1809,86 +1751,81 @@ function AdminDashboard() {
           </nav>
         </div>
 
-        {/* Sidebar Footer Controls */}
-        <div className="pt-4 border-t border-border/60 space-y-2">
+        <div className="space-y-2 border-t border-border/60 pt-3">
           <Button
             type="button"
             size="sm"
             variant="outline"
             onClick={() => setBakeSheetOpen(true)}
-            className="w-full rounded-2xl h-9 text-xs font-semibold flex items-center justify-center gap-2 hover:border-berry/40 cursor-pointer"
+            className="flex h-9 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl text-xs font-semibold hover:border-berry/40"
           >
-            📋 <span>Kitchen Bake Sheet</span>
+            <Printer className="size-3.5" />
+            <span>Print today&apos;s bake sheet</span>
           </Button>
 
           <Link
             to="/shop"
             target="_blank"
-            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-secondary/70 hover:bg-secondary text-cocoa h-9 text-xs font-semibold transition-colors"
+            className="flex h-9 w-full items-center justify-center gap-2 rounded-2xl bg-secondary/70 text-xs font-semibold text-cocoa transition-colors hover:bg-secondary"
           >
             <ExternalLink className="size-3.5" />
-            <span>Open Public Storefront</span>
+            <span>Open the shop</span>
           </Link>
         </div>
       </aside>
 
-      {/* Main Full-Width Content Container */}
-      <div className="flex-1 min-w-0 flex flex-col">
-        {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 border-b border-border/70 bg-background/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4 shadow-2xs">
-          <div className="flex items-center gap-3 min-w-0">
+      {/* ── Main column ─────────────────────────────────────────────── */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-border/70 bg-background/95 px-4 py-3 shadow-2xs backdrop-blur-md sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden size-9 p-0 rounded-2xl"
+              className="size-9 rounded-2xl p-0 lg:hidden"
+              aria-label="Open menu"
             >
               <Menu className="size-4" />
             </Button>
 
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h1 className="font-blogh text-lg sm:text-xl font-bold text-cocoa uppercase tracking-wide truncate">
-                  {activeTab === "overview" && "Atelier Overview"}
-                  {activeTab === "orders" && "Orders & Kitchen Slots"}
-                  {activeTab === "inventory" && "Bakery Menu & Catalog"}
-                  {activeTab === "shop_layout" && "Shop Page & Category Arrangement"}
-                  {activeTab === "users" && "Customer Accounts & Loyalty"}
-                  {activeTab === "offers" && "Promotions & Discount Codes"}
-                  {activeTab === "calendar" && "Holiday & Closed Dates"}
-                  {activeTab === "newsletter" && "Newsletter Subscribers"}
-                  {activeTab === "reviews" && "Customer Reviews & Community"}
-                  {activeTab === "analytics" && "Bakery Analytics & Reports"}
-                  {activeTab === "gallery" && "About Page Gallery Atelier"}
-                  {activeTab === "content_editor" && "Page Text & Copywriting Studio"}
+                <h1 className="truncate text-base font-bold text-cocoa sm:text-lg">
+                  {section.label}
                 </h1>
-                <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
-                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live Kitchen
-                </span>
+                {pending > 0 && activeTab !== "orders" && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("orders")}
+                    className="hidden shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-bold text-amber-800 transition-colors hover:bg-amber-500/25 sm:inline-flex dark:text-amber-300"
+                  >
+                    <span className="size-1.5 animate-pulse rounded-full bg-amber-500" />
+                    {pending} waiting for you
+                  </button>
+                )}
               </div>
-              <p className="text-[11px] text-muted-foreground hidden sm:block truncate">
-                {pending} pending approval &bull; {activeProducts.length} active bakes &bull;{" "}
-                {todayOrders.length} orders scheduled today
+              {/* Says what this screen is for, so nobody has to open a tab to
+                  find out what lives in it. */}
+              <p className="hidden truncate text-[11px] text-muted-foreground sm:block">
+                {section.description}
               </p>
             </div>
           </div>
 
-          {/* Center/Right: Quick Command Palette Search Trigger & Actions */}
-          <div className="flex items-center gap-2.5 shrink-0 ml-auto">
+          <div className="ml-auto flex shrink-0 items-center gap-2.5">
             <button
               type="button"
               onClick={() => setCommandOpen(true)}
-              className="flex items-center gap-2 rounded-2xl border border-border/80 bg-secondary/50 hover:bg-secondary/90 px-3 py-1.5 text-xs text-muted-foreground transition-all duration-150 shadow-2xs hover:border-berry/40 cursor-pointer w-36 sm:w-56 md:w-64 justify-between"
-              title="Open Command Palette (⌘K / Ctrl+K)"
+              className="flex w-36 cursor-pointer items-center justify-between gap-2 rounded-2xl border border-border/80 bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground shadow-2xs transition-all duration-150 hover:border-berry/40 hover:bg-secondary/90 sm:w-56 md:w-64"
+              title="Search (Ctrl+K)"
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <Search className="size-3.5 text-berry-deep shrink-0" />
-                <span className="truncate font-medium text-cocoa/80 text-left text-[11px] sm:text-xs">
-                  Search bakes, tabs…
+              <div className="flex min-w-0 items-center gap-2">
+                <Search className="size-3.5 shrink-0 text-berry-deep" />
+                <span className="truncate text-left text-[11px] font-medium text-cocoa/80 sm:text-xs">
+                  Search orders, bakes, pages…
                 </span>
               </div>
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-md border border-border/70 bg-card px-1.5 py-0.5 text-[11px] font-mono font-bold text-muted-foreground shadow-2xs shrink-0">
+              <kbd className="hidden shrink-0 items-center gap-0.5 rounded-md border border-border/70 bg-card px-1.5 py-0.5 font-mono text-[11px] font-bold text-muted-foreground shadow-2xs sm:inline-flex">
                 ⌘K
               </kbd>
             </button>
@@ -1898,7 +1835,7 @@ function AdminDashboard() {
               size="sm"
               variant="outline"
               onClick={() => refresh()}
-              className="rounded-2xl h-9 px-2.5 sm:px-3 text-xs font-semibold hover:border-berry/40 flex items-center gap-1.5 cursor-pointer"
+              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-2xl px-2.5 text-xs font-semibold hover:border-berry/40 sm:px-3"
             >
               <RefreshCw className="size-3.5 text-muted-foreground" />
               <span className="hidden md:inline">Refresh</span>
@@ -1907,22 +1844,11 @@ function AdminDashboard() {
             <Button
               type="button"
               size="sm"
-              onClick={() => {
-                setForm(EMPTY_FORM);
-                setEditingProductId(null);
-                setActiveTab("inventory");
-                setTimeout(() => {
-                  const el = document.getElementById("side-name");
-                  if (el) {
-                    el.focus();
-                    el.scrollIntoView({ behavior: "smooth", block: "center" });
-                  }
-                }, 120);
-              }}
-              className="rounded-2xl h-9 px-3 sm:px-3.5 text-xs font-bold bg-berry text-berry-foreground hover:bg-berry/90 shadow-soft flex items-center gap-1.5 cursor-pointer"
+              onClick={handleNewProduct}
+              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-2xl bg-berry px-3 text-xs font-bold text-berry-foreground shadow-soft hover:bg-berry/90 sm:px-3.5"
             >
               <Plus className="size-4" />
-              <span className="hidden sm:inline">New Bake</span>
+              <span className="hidden sm:inline">New bake</span>
             </Button>
           </div>
         </header>
@@ -1931,295 +1857,305 @@ function AdminDashboard() {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* OVERVIEW TAB CONTENT */}
-            <TabsContent value="overview" className="mt-0 space-y-6">
-              {/* Executive Welcome & Live Summary Banner */}
-              <div className="rounded-3xl border border-border/80 bg-linear-to-br from-card via-card to-secondary/30 p-6 sm:p-8 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-2 max-w-xl">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-berry/15 text-berry-deep px-3 py-1 text-xs font-bold uppercase tracking-wider">
-                    ✨ Daily Bakehouse Briefing
-                  </span>
-                  <h2 className="font-blogh text-2xl sm:text-3xl font-bold text-cocoa uppercase tracking-wide">
-                    Welcome to the Kitchen Command Hub
-                  </h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    You have{" "}
-                    <strong>
-                      {pending} order{pending === 1 ? "" : "s"}
-                    </strong>{" "}
-                    awaiting kitchen confirmation and{" "}
-                    <strong>
-                      {todayOrders.length} order{todayOrders.length === 1 ? "" : "s"}
-                    </strong>{" "}
-                    scheduled for today&apos;s deliveries and counter pickups.
-                  </p>
-                </div>
+            {/* ── DASHBOARD ─────────────────────────────────────────── */}
+            <TabsContent value="overview" className="mt-0 space-y-5">
+              {/* What needs doing, before anything else.
+                  The dashboard used to open with a welcome banner and four
+                  revenue tiles; the one thing that actually needs a decision —
+                  an order waiting for approval — was the second tile in. */}
+              <div
+                className={`rounded-3xl border p-5 shadow-soft sm:p-6 ${
+                  pending > 0
+                    ? "border-amber-500/40 bg-linear-to-br from-amber-500/12 to-card"
+                    : "border-emerald-500/30 bg-linear-to-br from-emerald-500/10 to-card"
+                }`}
+              >
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-start gap-3.5">
+                    <span
+                      className={`grid size-11 shrink-0 place-items-center rounded-2xl shadow-2xs ${
+                        pending > 0
+                          ? "bg-amber-500 text-white"
+                          : "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                      }`}
+                    >
+                      {pending > 0 ? (
+                        <AlertTriangle className="size-5" />
+                      ) : (
+                        <CheckCircle2 className="size-5" />
+                      )}
+                    </span>
+                    <div className="max-w-xl">
+                      <h2 className="text-lg font-bold text-cocoa sm:text-xl">
+                        {pending > 0
+                          ? `${pending} order${pending === 1 ? "" : "s"} waiting for your approval`
+                          : "Nothing is waiting on you"}
+                      </h2>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                        {pending > 0
+                          ? "Nobody has been charged yet. Approve an order to send its payment link, or reschedule it if the oven is full."
+                          : "Every order has been dealt with. New requests will show up here the moment they arrive."}{" "}
+                        {todayOrders.length > 0
+                          ? `${todayOrders.length} order${todayOrders.length === 1 ? " is" : "s are"} due today.`
+                          : "Nothing is due today."}
+                      </p>
+                    </div>
+                  </div>
 
-                <div className="flex flex-wrap items-center gap-3 shrink-0">
-                  <Button
-                    onClick={() => setActiveTab("orders")}
-                    className="rounded-2xl bg-cocoa text-background hover:bg-cocoa/90 h-10 px-4 text-xs font-bold shadow-soft cursor-pointer"
-                  >
-                    View Orders Queue ({pending})
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setBakeSheetOpen(true)}
-                    className="rounded-2xl h-10 px-4 text-xs font-bold hover:border-berry/40 cursor-pointer"
-                  >
-                    📋 Open Kitchen Bake Sheet
-                  </Button>
+                  <div className="flex shrink-0 flex-wrap items-center gap-2.5">
+                    <Button
+                      onClick={() => {
+                        setOrderStatusFilter(pending > 0 ? "pending_approval" : "all");
+                        setActiveTab("orders");
+                      }}
+                      className="h-10 cursor-pointer rounded-2xl bg-cocoa px-4 text-xs font-bold text-background shadow-soft hover:bg-cocoa/90"
+                    >
+                      {pending > 0
+                        ? `Review ${pending} order${pending === 1 ? "" : "s"}`
+                        : "Open orders"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setBakeSheetOpen(true)}
+                      className="flex h-10 cursor-pointer items-center gap-1.5 rounded-2xl px-4 text-xs font-bold hover:border-berry/40"
+                    >
+                      <Printer className="size-3.5" />
+                      Bake sheet
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              {/* 4 Executive KPI Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Confirmed Revenue
-                    </p>
-                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
-                      {formatCurrency(totalRevenue)}
-                    </h3>
-                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
-                      From confirmed & completed bakes
-                    </p>
-                  </div>
-                  <div className="size-12 rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center text-xl shadow-2xs">
-                    💰
-                  </div>
-                </div>
-
-                <div
-                  onClick={() => setActiveTab("orders")}
-                  className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3 hover:border-amber-500/50 cursor-pointer transition-all hover:shadow-lift"
-                >
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Pending Approvals
-                    </p>
-                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">{pending}</h3>
-                    <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-0.5">
-                      {pending > 0 ? "Requires baker action" : "All orders up to date"}
-                    </p>
-                  </div>
-                  <div className="size-12 rounded-2xl bg-amber-500/15 text-amber-600 flex items-center justify-center text-xl shadow-2xs">
-                    🛎️
-                  </div>
-                </div>
-
-                <div
+              {/* The numbers. */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <AdminStat
+                  label="Money taken"
+                  value={formatCurrency(totalRevenue)}
+                  footnote="Confirmed and completed orders"
+                  icon={CheckCircle2}
+                  tone="good"
+                />
+                <AdminStat
+                  label="Waiting for approval"
+                  value={pending}
+                  footnote={pending > 0 ? "Needs a decision from you" : "All caught up"}
+                  icon={AlertTriangle}
+                  tone={pending > 0 ? "warning" : "neutral"}
+                  onClick={() => {
+                    setOrderStatusFilter("pending_approval");
+                    setActiveTab("orders");
+                  }}
+                />
+                <AdminStat
+                  label="Due today"
+                  value={todayOrders.length}
+                  footnote={formatBakeSheetDate(todayISO)}
+                  icon={Calendar}
+                  tone="info"
+                />
+                <AdminStat
+                  label="Bakes on sale"
+                  value={activeProducts.length}
+                  footnote={`${data.products.length - activeProducts.length} hidden from the shop`}
+                  icon={Package}
                   onClick={() => setActiveTab("inventory")}
-                  className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3 hover:border-emerald-500/50 cursor-pointer transition-all hover:shadow-lift"
-                >
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Active Menu Items
-                    </p>
-                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
-                      {activeProducts.length}
-                    </h3>
-                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-0.5">
-                      🌿 100% Baked Fresh to Order
-                    </p>
-                  </div>
-                  <div className="size-12 rounded-2xl bg-emerald-500/15 text-emerald-600 flex items-center justify-center text-xl shadow-2xs">
-                    🧁
-                  </div>
-                </div>
-
-                <div className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Today&apos;s Production
-                    </p>
-                    <h3 className="font-display text-2xl font-bold text-cocoa mt-1">
-                      {todayOrders.length}
-                    </h3>
-                    <p className="text-[11px] text-cocoa/70 font-semibold mt-0.5">
-                      Deliveries & pickups for today
-                    </p>
-                  </div>
-                  <div className="size-12 rounded-2xl bg-purple-500/15 text-purple-600 flex items-center justify-center text-xl shadow-2xs">
-                    📅
-                  </div>
-                </div>
+                />
               </div>
 
-              {/* 2-Column Bento Grid: Today's Orders & Fresh Bake Menu */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* Left Column: Today's Kitchen Production Queue */}
-                <div className="lg:col-span-7 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-display text-lg font-bold text-cocoa">
-                        Today&apos;s Production Queue ({todayOrders.length})
-                      </h3>
-                      <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-bold text-muted-foreground">
-                        {todayISO}
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setActiveTab("orders")}
-                      className="text-xs font-bold text-berry-deep hover:underline p-0 h-auto cursor-pointer"
-                    >
-                      View All Orders →
-                    </Button>
-                  </div>
-
-                  {todayOrders.length === 0 ? (
-                    <div className="rounded-3xl border border-dashed border-border/80 bg-card/60 p-8 text-center">
-                      <p className="text-3xl mb-2">🧁</p>
-                      <h4 className="font-display text-sm font-bold text-cocoa">
-                        No Bakes Scheduled for Today
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Upcoming orders will appear here automatically on their delivery slot date.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {todayOrders.slice(0, 5).map((order) => (
-                        <div
-                          key={order.id}
-                          className="rounded-2xl border border-border/70 bg-card p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-berry/30 transition-colors"
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+                {/* Today's run sheet. */}
+                <div className="lg:col-span-7">
+                  <AdminCard>
+                    <AdminSectionHeading
+                      title={`Due today (${todayOrders.length})`}
+                      hint="Everything with a delivery or pickup slot on today's date."
+                      action={
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("orders")}
+                          className="cursor-pointer text-xs font-bold text-berry-deep hover:underline"
                         >
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono text-xs font-bold text-cocoa">
-                                #{order.id.slice(-6)}
+                          All orders →
+                        </button>
+                      }
+                    />
+
+                    {todayOrders.length === 0 ? (
+                      <AdminEmpty
+                        icon={Calendar}
+                        title="Nothing scheduled for today"
+                        hint="Orders appear here on the morning of their slot."
+                      />
+                    ) : (
+                      <ul className="space-y-2.5">
+                        {todayOrders.slice(0, 6).map((order) => (
+                          <li
+                            key={order.id}
+                            className="flex flex-col justify-between gap-3 rounded-2xl border border-border/70 bg-background/60 p-3.5 transition-colors hover:border-berry/30 sm:flex-row sm:items-center"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-md bg-secondary px-1.5 py-0.5 font-mono text-[11px] font-bold text-cocoa">
+                                  #{order.id.slice(-6).toUpperCase()}
+                                </span>
+                                <span className="truncate text-xs font-bold text-cocoa">
+                                  {order.contact_name}
+                                </span>
+                                <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-cocoa tabular-nums">
+                                  {order.slot_start.slice(0, 5)}–{order.slot_end.slice(0, 5)}
+                                </span>
+                                <span className="text-[11px] font-semibold text-muted-foreground capitalize">
+                                  {order.fulfilment_type}
+                                </span>
+                              </div>
+                              <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                                {order.order_items
+                                  .map((i: any) => `${i.quantity}× ${i.product_name}`)
+                                  .join(", ")}
+                              </p>
+                            </div>
+                            <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
+                              <span className="font-display text-sm font-bold text-cocoa">
+                                {formatCurrency(order.total)}
                               </span>
-                              <span className="font-bold text-xs text-cocoa truncate">
-                                {order.contact_name}
-                              </span>
-                              <span className="rounded-md bg-secondary/80 px-2 py-0.5 text-[11px] font-bold text-cocoa">
-                                🕒 {order.slot_start.slice(0, 5)}–{order.slot_end.slice(0, 5)}
+                              <span
+                                className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${
+                                  STATUS_BADGE_STYLES[order.status] ??
+                                  "bg-secondary text-muted-foreground border-border"
+                                }`}
+                              >
+                                {STATUS_LABELS[order.status] ?? order.status}
                               </span>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                              {order.order_items
-                                .map((i: any) => `${i.quantity}× ${i.product_name}`)
-                                .join(", ")}
-                            </p>
-                          </div>
-                          <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
-                            <span className="font-display text-sm font-bold text-cocoa">
-                              {formatCurrency(order.total)}
-                            </span>
-                            <span
-                              className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
-                                order.status === "pending_approval"
-                                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
-                                  : order.status === "confirmed"
-                                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
-                                    : "bg-secondary text-muted-foreground"
-                              }`}
-                            >
-                              {order.status.replace("_", " ")}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                          </li>
+                        ))}
+                        {todayOrders.length > 6 && (
+                          <li className="pt-1 text-center text-[11px] font-semibold text-muted-foreground">
+                            +{todayOrders.length - 6} more due today
+                          </li>
+                        )}
+                      </ul>
+                    )}
+                  </AdminCard>
                 </div>
 
-                {/* Right Column: Fresh Bake Atelier Menu */}
-                <div className="lg:col-span-5 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-display text-lg font-bold text-cocoa flex items-center gap-1.5">
-                      <span>Fresh Bake Menu</span>
-                      <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 text-[11px] font-bold">
-                        {activeProducts.length} Active
-                      </span>
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setActiveTab("inventory")}
-                      className="text-xs font-bold text-berry-deep hover:underline p-0 h-auto cursor-pointer"
-                    >
-                      Manage Menu →
-                    </Button>
-                  </div>
+                <div className="space-y-5 lg:col-span-5">
+                  {/* Hidden bakes are the most common "why isn't it on the site?"
+                      question, so they get their own panel rather than being a
+                      row in a long product list. */}
+                  <AdminCard>
+                    <AdminSectionHeading
+                      title="Hidden from the shop"
+                      hint="Paused bakes customers cannot see or order."
+                      action={
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab("inventory")}
+                          className="cursor-pointer text-xs font-bold text-berry-deep hover:underline"
+                        >
+                          Manage →
+                        </button>
+                      }
+                    />
 
-                  <div className="space-y-2.5">
-                    {data.products.slice(0, 5).map((prod) => (
-                      <div
-                        key={prod.id}
-                        className="flex items-center justify-between gap-3 p-3 rounded-2xl border border-border/70 bg-card shadow-2xs hover:border-berry/30 transition-colors"
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          {prod.image_url ? (
-                            <img
-                              src={prod.image_url}
-                              alt={prod.name}
-                              className="size-10 rounded-xl object-cover border border-border/50 shrink-0"
-                            />
-                          ) : (
-                            <div className="size-10 rounded-xl bg-secondary flex items-center justify-center text-base">
-                              🥖
-                            </div>
-                          )}
-                          <div className="min-w-0">
-                            <p className="text-xs font-bold text-cocoa truncate">{prod.name}</p>
-                            <p className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
-                              <span>{formatCurrency(prod.price)}</span>
-                              <span>&bull;</span>
-                              {prod.is_active ? (
-                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                                  🌿 Fresh to order
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground">Paused</span>
-                              )}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEditProduct(prod)}
-                            className="size-8 p-0 rounded-xl hover:bg-secondary cursor-pointer text-xs font-semibold"
-                            title="Edit bake"
-                          >
-                            ✏️
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Quick Shortcuts Cards */}
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div
-                      onClick={() => setActiveTab("shop_layout")}
-                      className="p-3.5 rounded-2xl border border-border/70 bg-card hover:border-berry/40 transition-all cursor-pointer shadow-2xs group"
-                    >
-                      <div className="text-lg mb-1 group-hover:scale-110 transition-transform">
-                        🗂️
-                      </div>
-                      <p className="text-xs font-bold text-cocoa">Shop Layout</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">Reorder categories</p>
-                    </div>
-
-                    <div
-                      onClick={() => setActiveTab("offers")}
-                      className="p-3.5 rounded-2xl border border-border/70 bg-card hover:border-berry/40 transition-all cursor-pointer shadow-2xs group"
-                    >
-                      <div className="text-lg mb-1 group-hover:scale-110 transition-transform">
-                        🏷️
-                      </div>
-                      <p className="text-xs font-bold text-cocoa">Promo Codes</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {offerCodes?.length ?? 0} active codes
+                    {data.products.filter((p) => !p.is_active).length === 0 ? (
+                      <p className="rounded-2xl border border-border/60 bg-background/60 px-3.5 py-3 text-xs text-muted-foreground">
+                        Every bake in your catalogue is live on the shop.
                       </p>
+                    ) : (
+                      <ul className="space-y-2">
+                        {data.products
+                          .filter((p) => !p.is_active)
+                          .slice(0, 4)
+                          .map((prod) => (
+                            <li
+                              key={prod.id}
+                              className="flex items-center justify-between gap-3 rounded-2xl border border-border/70 bg-background/60 p-2.5"
+                            >
+                              <div className="flex min-w-0 items-center gap-2.5">
+                                {prod.image_url ? (
+                                  <img
+                                    src={prod.image_url}
+                                    alt=""
+                                    className="size-9 shrink-0 rounded-xl border border-border/50 object-cover"
+                                  />
+                                ) : (
+                                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary text-cocoa">
+                                    <Package className="size-4" />
+                                  </span>
+                                )}
+                                <div className="min-w-0">
+                                  <p className="truncate text-xs font-bold text-cocoa">
+                                    {prod.name}
+                                  </p>
+                                  <p className="text-[11px] text-muted-foreground">
+                                    {formatCurrency(prod.price)}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleToggleActiveProduct(prod)}
+                                className="h-8 shrink-0 cursor-pointer rounded-xl px-2.5 text-[11px] font-bold"
+                              >
+                                <Eye className="mr-1 size-3.5" />
+                                Show
+                              </Button>
+                            </li>
+                          ))}
+                      </ul>
+                    )}
+                  </AdminCard>
+
+                  <AdminCard>
+                    <AdminSectionHeading title="Jump to" />
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {(
+                        [
+                          { id: "inventory", icon: Plus, label: "Add a bake", hint: "New product" },
+                          {
+                            id: "calendar",
+                            icon: Calendar,
+                            label: "Close a date",
+                            hint: `${data.blackouts?.length ?? 0} blocked`,
+                          },
+                          {
+                            id: "offers",
+                            icon: Tag,
+                            label: "Discount codes",
+                            hint: `${offerCodes?.length ?? 0} set up`,
+                          },
+                          {
+                            id: "shop_layout",
+                            icon: Layers,
+                            label: "Shop layout",
+                            hint: "Reorder categories",
+                          },
+                        ] as const
+                      ).map((shortcut) => {
+                        const ShortcutIcon = shortcut.icon;
+                        return (
+                          <button
+                            key={shortcut.label}
+                            type="button"
+                            onClick={() =>
+                              shortcut.label === "Add a bake"
+                                ? handleNewProduct()
+                                : setActiveTab(shortcut.id)
+                            }
+                            className="group cursor-pointer rounded-2xl border border-border/70 bg-background/60 p-3.5 text-left shadow-2xs transition-all hover:border-berry/40"
+                          >
+                            <ShortcutIcon className="size-4 text-berry-deep transition-transform group-hover:scale-110" />
+                            <p className="mt-1.5 text-xs font-bold text-cocoa">{shortcut.label}</p>
+                            <p className="mt-0.5 text-[11px] text-muted-foreground">
+                              {shortcut.hint}
+                            </p>
+                          </button>
+                        );
+                      })}
                     </div>
-                  </div>
+                  </AdminCard>
                 </div>
               </div>
             </TabsContent>
@@ -2231,10 +2167,10 @@ function AdminDashboard() {
                 {/* Status Filter Tabs with Counts */}
                 <div className="flex flex-wrap items-center gap-1.5">
                   {[
-                    { id: "all", label: "All Orders", count: data.orders.length },
+                    { id: "all", label: "All orders", count: data.orders.length },
                     {
                       id: "pending_approval",
-                      label: "Kitchen Queue",
+                      label: "Waiting for approval",
                       count: data.orders.filter((o) => o.status === "pending_approval").length,
                     },
                     {
@@ -2294,16 +2230,15 @@ function AdminDashboard() {
                       onChange={(e) => setOrderSearchQuery(e.target.value)}
                       className="h-9 text-xs pl-8 rounded-xl bg-background"
                     />
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">
-                      🔍
-                    </span>
+                    <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
                     {orderSearchQuery && (
                       <button
                         type="button"
                         onClick={() => setOrderSearchQuery("")}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
+                        aria-label="Clear search"
+                        className="absolute top-1/2 right-2.5 grid size-5 -translate-y-1/2 cursor-pointer place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground"
                       >
-                        ✕
+                        <X className="size-3" />
                       </button>
                     )}
                   </div>
@@ -2317,7 +2252,7 @@ function AdminDashboard() {
                       className="h-9 rounded-xl border-berry/40 bg-berry/10 text-berry-deep hover:bg-berry/20 font-bold text-xs gap-1.5 shadow-2xs cursor-pointer"
                     >
                       <ChefHat className="size-3.5" />
-                      <span>Kitchen Bake Sheet</span>
+                      <span>Bake sheet</span>
                     </Button>
 
                     <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
@@ -2328,79 +2263,32 @@ function AdminDashboard() {
                       onChange={(e) => setOrderSortBy(e.target.value)}
                       className="h-9 rounded-xl border border-input bg-background px-3 py-1 text-xs font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
                     >
-                      <option value="priority">Priority (Pending ➔ Confirmed ➔ Done)</option>
-                      <option value="date_asc">Delivery Date (Earliest First)</option>
-                      <option value="date_desc">Delivery Date (Latest First)</option>
-                      <option value="amount_desc">Order Amount (High to Low)</option>
-                      <option value="amount_asc">Order Amount (Low to High)</option>
-                      <option value="newest">Newest Orders First</option>
+                      <option value="priority">Needs attention first</option>
+                      <option value="date_asc">Delivery date, soonest first</option>
+                      <option value="date_desc">Delivery date, latest first</option>
+                      <option value="amount_desc">Order value, high to low</option>
+                      <option value="amount_asc">Order value, low to high</option>
+                      <option value="newest">Most recently placed</option>
                     </select>
                   </div>
                 </div>
               </div>
 
-              {/* Orders Summary Stats Bar */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  {
-                    label: "Pending Review",
-                    value: data.orders.filter((o) => o.status === "pending_approval").length,
-                    color: "bg-amber-500/15 border-amber-500/30 text-amber-700 dark:text-amber-400",
-                    icon: "🛎️",
-                    filter: "pending_approval",
-                  },
-                  {
-                    label: "Confirmed",
-                    value: data.orders.filter((o) => o.status === "confirmed").length,
-                    color:
-                      "bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400",
-                    icon: "✅",
-                    filter: "confirmed",
-                  },
-                  {
-                    label: "Today's Orders",
-                    value: todayOrders.length,
-                    color:
-                      "bg-purple-500/15 border-purple-500/30 text-purple-700 dark:text-purple-400",
-                    icon: "📅",
-                    filter: "all",
-                  },
-                  {
-                    label: "Revenue (Confirmed)",
-                    value: formatCurrency(
-                      data.orders
-                        .filter((o) => o.status === "confirmed" || o.status === "completed")
-                        .reduce((s, o) => s + Number(o.total || 0), 0),
-                    ),
-                    color: "bg-blue-500/15 border-blue-500/30 text-blue-700 dark:text-blue-400",
-                    icon: "💰",
-                    filter: "all",
-                  },
-                ].map((stat) => (
-                  <button
-                    key={stat.label}
-                    type="button"
-                    onClick={() => setOrderStatusFilter(stat.filter)}
-                    className={`flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-all hover:shadow-lift cursor-pointer ${stat.color} ${orderStatusFilter === stat.filter && stat.filter !== "all" ? "shadow-soft ring-2 ring-current ring-offset-1" : ""}`}
-                  >
-                    <span className="text-xl">{stat.icon}</span>
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-wider opacity-80">
-                        {stat.label}
-                      </p>
-                      <p className="font-display text-lg font-extrabold">{stat.value}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              {/* A count of what the current filter is showing. The four
+                  coloured tiles that used to sit here repeated the counts
+                  already printed on the filter pills above. */}
+              <p className="px-1 text-xs font-semibold text-muted-foreground">
+                Showing {sortedOrders.length} of {data.orders.length} orders
+                {orderSearchQuery ? ` matching “${orderSearchQuery}”` : ""}
+              </p>
 
               {/* Orders Cards Grid */}
               {sortedOrders.length === 0 ? (
                 <div className="rounded-3xl border border-dashed border-border p-12 text-center">
                   <p className="text-sm font-medium text-muted-foreground">
                     {orderSearchQuery || orderStatusFilter !== "all"
-                      ? "No orders match your filter criteria."
-                      : "No orders yet."}
+                      ? "No orders match this filter."
+                      : "No orders have come in yet."}
                   </p>
                   {(orderSearchQuery || orderStatusFilter !== "all") && (
                     <Button
@@ -2534,13 +2422,13 @@ function AdminDashboard() {
                                       : "https://anibakes.app";
                                   const myOrdersUrl = `${origin}/orders`;
 
-                                  let message = `🎂 *Ani Bakes Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;
+                                  let message = `🎂 *Aniii Bakes Bakery — Order #${shortId}*\n\nHi ${order.contact_name ?? "there"},\n`;
                                   if (order.status === "pending_approval") {
                                     message += `We have received your payment of *${formatCurrency(Number(order.total))}*! Our head baker is reviewing the schedule for your requested slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Requested Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order:* ${myOrdersUrl}\n\nThank you!`;
                                   } else if (order.status === "confirmed") {
-                                    message += `Your bakery order is *confirmed*! Our bakers will prepare it fresh for your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order here:* ${myOrdersUrl}\n\nThank you for choosing Ani Bakes!`;
+                                    message += `Your bakery order is *confirmed*! Our bakers will prepare it fresh for your slot.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *Track your order here:* ${myOrdersUrl}\n\nThank you for choosing Aniii Bakes!`;
                                   } else if (order.status === "rescheduled") {
-                                    message += `Update on your order: The head baker has adjusted your scheduled baking slot to *${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})*.\n\n📦 *Items:*\n${itemsText}\n\n👉 *View details on our site:* ${myOrdersUrl}\n\nAni Bakes Bakery`;
+                                    message += `Update on your order: The head baker has adjusted your scheduled baking slot to *${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})*.\n\n📦 *Items:*\n${itemsText}\n\n👉 *View details on our site:* ${myOrdersUrl}\n\nAniii Bakes Bakery`;
                                   } else {
                                     message += `Here is your order summary for *${formatCurrency(Number(order.total))}*.\n\n📦 *Items:*\n${itemsText}\n\n🕒 *Slot:* ${order.slot_date} (${order.slot_start.slice(0, 5)} - ${order.slot_end.slice(0, 5)})\n\n👉 *View order:* ${myOrdersUrl}`;
                                   }
@@ -4004,7 +3892,7 @@ function AdminDashboard() {
                     {usersList.length}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Accounts created on Ani Bakes
+                    Accounts created on Aniii Bakes
                   </p>
                 </div>
 
@@ -4702,7 +4590,7 @@ function KitchenBakeSheetDialog({
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-2xl font-black tracking-tight text-black">
-                  ANI BAKES — MORNING KITCHEN BAKE SHEET
+                  ANIII BAKES — MORNING KITCHEN BAKE SHEET
                 </h1>
                 <p className="text-sm font-bold text-gray-800 mt-1">
                   📅 Baking Date: {formatBakeSheetDateWithWeekday(selectedDate)}

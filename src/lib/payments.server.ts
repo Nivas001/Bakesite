@@ -35,7 +35,7 @@ export async function createPaymentLink(input: {
       amount: Math.round(input.amount * 100),
       currency: "INR",
       accept_partial: false,
-      description: `Ani Bakes order ${input.orderId.slice(0, 8)}`,
+      description: `Aniii Bakes order ${input.orderId.slice(0, 8)}`,
       reference_id: input.orderId,
       customer: {
         name: input.name ?? undefined,

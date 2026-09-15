@@ -1,72 +1,92 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  LayoutGrid,
+  Rows3,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  Store,
+  Tag,
+  X,
+} from "lucide-react";
 import { getCatalog } from "@/lib/catalog.functions";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MagicInput } from "@/components/godui/magic-input";
 import { Combobox, type ComboboxOption } from "@/components/godui/combobox";
 import { TextAnimate } from "@/components/godui/text-animate";
 import { useFlag } from "@/lib/feature-flags";
-import {
-  Search,
-  X,
-  ArrowUpDown,
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  Store,
-  Flame,
-  PieChart,
-  Cake,
-  Coffee,
-  Croissant,
-  Wheat,
-  Cookie,
-} from "lucide-react";
-import type { CatalogProduct } from "@/lib/pricing";
+import { categoryVisual } from "@/lib/category-visuals";
+import { finalPrice, formatCurrency, type CatalogProduct } from "@/lib/pricing";
 
-function getCategoryIcon(slug: string | null) {
-  switch (slug) {
-    case "brownies":
-      return Flame;
-    case "cheesecakes":
-      return PieChart;
-    case "cakes":
-      return Cake;
-    case "tea-cakes":
-      return Coffee;
-    case "pastries":
-      return Croissant;
-    case "breads":
-      return Wheat;
-    case "cookies":
-      return Cookie;
-    default:
-      return Store;
-  }
-}
+type SortKey = "featured" | "price_asc" | "price_desc" | "name_asc";
+type ViewKey = "lanes" | "grid";
+type PriceKey = "all" | "under_200" | "200_500" | "over_500";
 
 const SORT_OPTIONS: ComboboxOption[] = [
-  { label: "Featured", value: "featured", description: "Curated bakery highlights" },
-  { label: "Price: Low to High", value: "price_asc", description: "Most affordable treats first" },
-  { label: "Price: High to Low", value: "price_desc", description: "Signature gourmet specials" },
-  { label: "Name: A to Z", value: "name_asc", description: "Alphabetical catalog order" },
+  { label: "Featured", value: "featured", description: "The order our baker arranges the counter" },
+  { label: "Price: Low to High", value: "price_asc", description: "Cheapest first" },
+  { label: "Price: High to Low", value: "price_desc", description: "Signature specials first" },
+  { label: "Name: A to Z", value: "name_asc", description: "Alphabetical" },
+];
+
+const PRICE_BANDS: Array<{ id: PriceKey; label: string; test: (price: number) => boolean }> = [
+  { id: "all", label: "Any price", test: () => true },
+  { id: "under_200", label: "Under ₹200", test: (p) => p < 200 },
+  { id: "200_500", label: "₹200 – ₹500", test: (p) => p >= 200 && p <= 500 },
+  { id: "over_500", label: "Over ₹500", test: (p) => p > 500 },
 ];
 
 const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCatalog() });
 
+export type ShopSearch = {
+  category?: string | undefined;
+  q?: string | undefined;
+  sort?: SortKey | undefined;
+  view?: ViewKey | undefined;
+  price?: PriceKey | undefined;
+};
+
+function asSort(value: unknown): SortKey | undefined {
+  return value === "price_asc" || value === "price_desc" || value === "name_asc"
+    ? value
+    : value === "featured"
+      ? "featured"
+      : undefined;
+}
+
+function asPrice(value: unknown): PriceKey | undefined {
+  return PRICE_BANDS.some((band) => band.id === value) ? (value as PriceKey) : undefined;
+}
+
 export const Route = createFileRoute("/shop")({
+  /**
+   * The browse state lives in the URL rather than in component state so a
+   * category can be linked to — the homepage explorer, a campaign link and the
+   * browser back button all depend on it.
+   */
+  validateSearch: (search: Record<string, unknown>): ShopSearch => ({
+    category: typeof search["category"] === "string" ? search["category"] : undefined,
+    q: typeof search["q"] === "string" ? search["q"] : undefined,
+    sort: asSort(search["sort"]),
+    view: search["view"] === "grid" || search["view"] === "lanes" ? search["view"] : undefined,
+    price: asPrice(search["price"]),
+  }),
   head: () => ({
     meta: [
-      { title: "Shop all bakes — Ani Bakes Bakery" },
+      { title: "Shop all bakes — Aniii Bakes Bakery" },
       {
         name: "description",
         content:
-          "Browse cakes, cookies, brownies, cheesecakes and pastries from Ani Bakes, baked fresh for your slot.",
+          "Browse cakes, cookies, brownies, cheesecakes and pastries from Aniii Bakes, baked fresh for your slot.",
       },
-      { property: "og:title", content: "Shop all bakes — Ani Bakes Bakery" },
+      { property: "og:title", content: "Shop all bakes — Aniii Bakes Bakery" },
       {
         property: "og:description",
         content: "Cakes, brownies, cheesecakes and tea-cakes baked fresh to order.",
@@ -77,38 +97,33 @@ export const Route = createFileRoute("/shop")({
   component: Shop,
 });
 
-/**
- * Horizontal Category Lane with responsive 4-cards-per-row layout, 1-4 row support, and 2-column mobile bento showcase
- */
-function CategoryHorizontalLane({
-  categoryName,
-  categorySlug,
+/* ------------------------------------------------------------------ */
+/* Category lane                                                       */
+/* ------------------------------------------------------------------ */
+
+function CategoryLane({
+  name,
+  slug,
   description,
   products,
-  layoutRows = 1,
   onViewAll,
 }: {
-  categoryName: string;
-  categorySlug: string;
+  name: string;
+  slug: string;
   description: string | null;
   products: CatalogProduct[];
-  layoutRows?: number;
   onViewAll: (slug: string) => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  // A category with only a couple of products does not overflow, so its arrows
-  // would do nothing. Track the real overflow and hide them when there is none.
   const [overflow, setOverflow] = useState({ left: false, right: false });
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-
     const measure = () => {
       const max = el.scrollWidth - el.clientWidth;
       setOverflow({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
     };
-
     measure();
     el.addEventListener("scroll", measure, { passive: true });
     const observer = new ResizeObserver(measure);
@@ -119,59 +134,60 @@ function CategoryHorizontalLane({
     };
   }, [products.length]);
 
-  const scroll = (direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const containerWidth = scrollRef.current.clientWidth;
-      const scrollAmount = direction === "left" ? -containerWidth * 0.85 : containerWidth * 0.85;
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
+  function scroll(direction: "left" | "right") {
+    const el = scrollRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.85;
+    el.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
+  }
 
   if (products.length === 0) return null;
 
-  const rows = Math.min(4, Math.max(1, layoutRows));
-
-  // Chunk into columns of `rows` items for desktop horizontal multi-row layout
-  const columns: CatalogProduct[][] = [];
-  for (let i = 0; i < products.length; i += rows) {
-    columns.push(products.slice(i, i + rows));
-  }
-
-  // On mobile: pick top 4 items for 2x2 bento showcase
-  const mobileTopProducts = products.slice(0, 4);
+  const visual = categoryVisual(slug);
+  const Icon = visual.icon;
+  const from = Math.min(
+    ...products.map((p) => finalPrice(p.price, p.discount_type, p.discount_value)),
+  );
 
   return (
-    <section className="space-y-3.5 py-5 border-b border-border/40 last:border-b-0">
-      {/* Category Row Header */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="size-2 rounded-full bg-berry" />
-            <h2 className="font-blogh text-xl sm:text-2xl lg:text-3xl font-bold text-cocoa uppercase tracking-wide">
-              {categoryName}
-            </h2>
-            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[11px] sm:text-xs font-bold text-cocoa/80 border border-border/60">
-              {products.length} {products.length === 1 ? "item" : "items"}
-            </span>
-          </div>
-          {description && (
-            <p className="text-xs text-muted-foreground max-w-lg leading-relaxed hidden sm:block">
-              {description}
+    <section
+      id={`lane-${slug}`}
+      className="scroll-mt-32 rounded-3xl border border-border/60 bg-card/50 p-3.5 sm:p-5"
+    >
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <span
+            className={`grid size-10 shrink-0 place-items-center rounded-2xl bg-linear-to-br ${visual.tint} text-cocoa sm:size-11`}
+          >
+            <Icon className="size-5" />
+          </span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-blogh text-lg font-bold tracking-wide text-cocoa uppercase sm:text-2xl">
+                {name}
+              </h2>
+              <span className="rounded-full border border-border/60 bg-secondary px-2 py-0.5 text-[11px] font-bold text-cocoa/80">
+                {products.length} {products.length === 1 ? "item" : "items"}
+              </span>
+              <span className="rounded-full border border-berry/25 bg-berry/10 px-2 py-0.5 text-[11px] font-bold text-berry-deep">
+                from {formatCurrency(from)}
+              </span>
+            </div>
+            <p className="mt-0.5 max-w-xl text-[11px] leading-relaxed text-muted-foreground sm:text-xs">
+              {description || visual.blurb}
             </p>
-          )}
+          </div>
         </div>
 
-        {/* Action Controls: View All Button & Arrow Buttons */}
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Desktop/Tablet Scroll Arrows */}
+        <div className="flex shrink-0 items-center gap-2">
           {(overflow.left || overflow.right) && (
-            <div className="hidden sm:flex items-center gap-1">
+            <div className="hidden items-center gap-1 sm:flex">
               <button
                 type="button"
                 onClick={() => scroll("left")}
                 disabled={!overflow.left}
-                aria-label={`Scroll ${categoryName} left`}
-                className="flex size-8 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs disabled:cursor-default disabled:opacity-35 disabled:hover:bg-card"
+                aria-label={`Scroll ${name} left`}
+                className="grid size-8 cursor-pointer place-items-center rounded-full border border-border/80 bg-card text-cocoa shadow-2xs transition-all hover:bg-secondary active:scale-95 disabled:cursor-default disabled:opacity-35"
               >
                 <ChevronLeft className="size-4" />
               </button>
@@ -179,130 +195,121 @@ function CategoryHorizontalLane({
                 type="button"
                 onClick={() => scroll("right")}
                 disabled={!overflow.right}
-                aria-label={`Scroll ${categoryName} right`}
-                className="flex size-8 items-center justify-center rounded-full border border-border/80 bg-card text-cocoa hover:bg-secondary active:scale-95 transition-all cursor-pointer shadow-2xs disabled:cursor-default disabled:opacity-35 disabled:hover:bg-card"
+                aria-label={`Scroll ${name} right`}
+                className="grid size-8 cursor-pointer place-items-center rounded-full border border-border/80 bg-card text-cocoa shadow-2xs transition-all hover:bg-secondary active:scale-95 disabled:cursor-default disabled:opacity-35"
               >
                 <ChevronRight className="size-4" />
               </button>
             </div>
           )}
-
-          {/* View All Products Button */}
-          <Button
+          <button
             type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onViewAll(categorySlug)}
-            className="rounded-full border-berry/30 hover:border-berry text-berry-deep hover:bg-berry/10 font-bold text-xs h-8 px-3.5 shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+            onClick={() => onViewAll(slug)}
+            className="group hidden h-8 cursor-pointer items-center gap-1.5 rounded-full border border-berry/30 px-3.5 text-xs font-bold text-berry-deep shadow-2xs transition-all hover:border-berry hover:bg-berry/10 sm:inline-flex"
           >
-            <span>View all {categoryName}</span>
-            <ArrowRight className="size-3.5" />
-          </Button>
+            <span>See all</span>
+            <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+          </button>
         </div>
-      </div>
+      </header>
 
-      {description && (
-        <p className="text-xs text-muted-foreground leading-relaxed sm:hidden">{description}</p>
-      )}
-
-      {/* 📱 MOBILE VIEW: Clean 2-Column Grid (Shows 4 Featured Cards + View All Button) */}
-      <div className="sm:hidden space-y-3">
-        <div className="grid grid-cols-2 gap-2.5 pt-2 pb-2">
-          {mobileTopProducts.map((product) => (
-            <div key={product.id} className="min-w-0 h-full flex flex-col">
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </div>
-
-        {products.length > 4 && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => onViewAll(categorySlug)}
-            className="w-full rounded-2xl border-berry/30 text-berry-deep hover:bg-berry/10 font-bold text-xs h-10 shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <span>
-              View all {products.length} {categoryName}
-            </span>
-            <ArrowRight className="size-3.5" />
-          </Button>
-        )}
-      </div>
-
-      {/* 💻 DESKTOP & TABLET VIEW: Exact 4-Cards per Row Horizontal Lane (Supports 1, 2, 3, 4 Rows)
-          A lane that cannot fill its row is laid out as a plain grid instead —
-          a single card against three empty columns reads as a loading failure
-          rather than a short category. */}
       <div
         ref={scrollRef}
-        className={
-          columns.length < 3
-            ? "-mt-2 hidden gap-4 pt-3.5 pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            : "no-scrollbar -mt-2 hidden snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pt-3.5 pb-4 sm:flex"
-        }
+        className="no-scrollbar mt-3.5 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2 sm:gap-4"
       >
-        {columns.map((column, colIdx) => (
+        {products.map((product) => (
           <div
-            key={colIdx}
-            className={
-              columns.length < 3
-                ? "flex flex-col gap-4"
-                : "flex shrink-0 snap-start flex-col gap-4 sm:w-[calc(50%-8px)] md:w-[calc(33.333%-11px)] lg:w-[calc(25%-12px)]"
-            }
+            key={product.id}
+            className="flex w-[63%] shrink-0 snap-start flex-col sm:w-[calc(50%-8px)] md:w-[calc(33.333%-11px)] lg:w-[calc(25%-12px)]"
           >
-            {column.map((product) => (
-              <div key={product.id} className="h-full flex flex-col">
-                <ProductCard product={product} />
-              </div>
-            ))}
+            <ProductCard product={product} />
           </div>
         ))}
 
-        {/* A short category cannot fill the row. Rather than leaving the
-            remaining columns blank — which reads as something failing to load —
-            the gap becomes an invitation to keep browsing. */}
-        {columns.length < 3 && (
-          <div className="hidden min-h-[18rem] flex-col items-center justify-center gap-2 rounded-[2rem] border-2 border-dashed border-border/80 bg-card/40 p-6 text-center sm:flex">
+        {/* A counter with one or two bakes cannot fill the row, and three empty
+            columns read as something failing to load rather than as a short
+            range. This takes up exactly the slack. */}
+        {products.length < 4 && (
+          <div className="hidden min-w-48 flex-1 flex-col items-center justify-center gap-1.5 rounded-[2rem] border-2 border-dashed border-border/70 bg-card/40 p-6 text-center sm:flex">
             <span className="text-3xl" aria-hidden>
               🧺
             </span>
             <p className="font-blogh text-sm font-bold tracking-wide text-cocoa uppercase">
               A short range today
             </p>
-            {/* Phrased without the category name as the subject — it may be
-                singular or plural, and "Brownies is baked" reads badly. */}
-            <p className="max-w-[24ch] text-[11px] leading-relaxed text-muted-foreground">
-              This range is baked in small batches, so the counter carries only what is fresh today.
-              More returns as it comes out of the oven.
+            <p className="max-w-[26ch] text-[11px] leading-relaxed text-muted-foreground">
+              Baked in small batches, so the counter only carries what is fresh. More appears as it
+              comes out of the oven.
             </p>
           </div>
         )}
       </div>
+
+      <button
+        type="button"
+        onClick={() => onViewAll(slug)}
+        className="mt-1 flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl border border-berry/30 text-xs font-bold text-berry-deep shadow-2xs transition-colors hover:bg-berry/10 sm:hidden"
+      >
+        <span>
+          See all {products.length} {name.toLowerCase()}
+        </span>
+        <ArrowRight className="size-3.5" />
+      </button>
     </section>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Page                                                                */
+/* ------------------------------------------------------------------ */
+
 function Shop() {
   const { data } = useSuspenseQuery(catalogQuery);
-  const [active, setActive] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"featured" | "price_asc" | "price_desc" | "name_asc">(
-    "featured",
-  );
-  const [filterKey, setFilterKey] = useState(0);
+  const navigate = useNavigate({ from: Route.fullPath });
+  const search = Route.useSearch();
 
   const showSearch = useFlag("ff_shop_search") ?? true;
   const showStagger = useFlag("ff_shop_stagger") ?? true;
 
-  // Filtered products list for Grid Mode
-  const products = useMemo(() => {
-    let list = active
-      ? data.products.filter((p) => p.category_slug === active)
+  const category = search.category ?? null;
+  const query = search.q ?? "";
+  const sortBy: SortKey = search.sort ?? "featured";
+  const priceBand: PriceKey = search.price ?? "all";
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // The search box is typed into far more often than the URL should change, so
+  // the field is local and pushed into the URL once the typing settles.
+  const [draftQuery, setDraftQuery] = useState(query);
+  useEffect(() => setDraftQuery(query), [query]);
+  useEffect(() => {
+    if (draftQuery === query) return;
+    const id = window.setTimeout(() => {
+      patch({ q: draftQuery.trim() ? draftQuery : undefined });
+    }, 250);
+    return () => window.clearTimeout(id);
+  }, [draftQuery]);
+
+  function patch(next: Partial<ShopSearch>) {
+    navigate({
+      search: (prev: ShopSearch) => ({ ...prev, ...next }),
+      replace: true,
+    });
+  }
+
+  const hasFilters = Boolean(category || query.trim() || priceBand !== "all");
+  // Lanes are the default way in; any filter collapses to a single flat grid so
+  // the result count means something.
+  const view: ViewKey = hasFilters ? "grid" : (search.view ?? "lanes");
+
+  const priceTest = PRICE_BANDS.find((band) => band.id === priceBand)?.test ?? (() => true);
+
+  const filtered = useMemo(() => {
+    let list = category
+      ? data.products.filter((p) => p.category_slug === category)
       : [...data.products];
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
+    if (query.trim()) {
+      const q = query.toLowerCase();
       list = list.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
@@ -311,223 +318,435 @@ function Shop() {
       );
     }
 
+    if (priceBand !== "all") {
+      list = list.filter((p) => priceTest(finalPrice(p.price, p.discount_type, p.discount_value)));
+    }
+
     if (sortBy === "price_asc") {
-      list.sort((a, b) => a.price - b.price);
+      list.sort(
+        (a, b) =>
+          finalPrice(a.price, a.discount_type, a.discount_value) -
+          finalPrice(b.price, b.discount_type, b.discount_value),
+      );
     } else if (sortBy === "price_desc") {
-      list.sort((a, b) => b.price - a.price);
+      list.sort(
+        (a, b) =>
+          finalPrice(b.price, b.discount_type, b.discount_value) -
+          finalPrice(a.price, a.discount_type, a.discount_value),
+      );
     } else if (sortBy === "name_asc") {
       list.sort((a, b) => a.name.localeCompare(b.name));
     }
+
     return list;
-  }, [active, search, sortBy, data.products]);
+  }, [category, query, sortBy, priceBand, data.products, priceTest]);
 
-  // Group products by category for Horizontal Lanes Mode
-  const categorizedProducts = useMemo(() => {
-    return data.categories.map((category) => ({
-      category,
-      products: data.products.filter((p) => p.category_slug === category.slug),
-    }));
-  }, [data.categories, data.products]);
+  const lanes = useMemo(
+    () =>
+      data.categories
+        .map((c) => ({
+          category: c,
+          products: data.products.filter((p) => p.category_slug === c.slug),
+        }))
+        .filter((lane) => lane.products.length > 0),
+    [data.categories, data.products],
+  );
 
-  function handleCategoryChange(slug: string | null) {
-    setActive(slug);
-    setFilterKey((k) => k + 1);
+  const counterFloor = useMemo(() => {
+    const prices = data.products.map((p) => finalPrice(p.price, p.discount_type, p.discount_value));
+    return prices.length ? Math.min(...prices) : 0;
+  }, [data.products]);
+
+  const activeCategory = category
+    ? (data.categories.find((c) => c.slug === category) ?? null)
+    : null;
+
+  function openCategory(slug: string | null) {
+    patch({ category: slug ?? undefined });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  const categoryItems = useMemo(
-    () => [
-      { id: "all", slug: null as string | null, icon: Store, label: "All" },
-      ...data.categories.map((c) => ({
-        id: c.slug,
-        slug: c.slug as string | null,
-        icon: getCategoryIcon(c.slug),
-        label: c.name,
-      })),
-    ],
-    [data.categories],
-  );
+  function clearAll() {
+    navigate({ search: {}, replace: true });
+    setDraftQuery("");
+  }
 
-  const isLaneMode = active === null && !search.trim() && sortBy === "featured";
-
-  const activeCategoryObj = useMemo(() => {
-    if (!active) return null;
-    return data.categories.find((c) => c.slug === active) ?? null;
-  }, [active, data.categories]);
-
-  return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12 space-y-6 sm:space-y-8">
-      {/* Header Banner */}
-      <div className="flex flex-col gap-1 sm:gap-2">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-berry/10 border border-berry/30 px-3.5 py-1 text-[10.5px] sm:text-xs font-bold uppercase tracking-wider text-berry-deep w-fit">
-          <Sparkles className="size-3.5" />
-          <span>Fresh Small-Batch Counter</span>
-        </div>
-        <TextAnimate
-          as="h1"
-          animation="blurInUp"
-          by="word"
-          className="font-blogh text-3xl sm:text-5xl lg:text-6xl font-bold text-cocoa uppercase tracking-wide leading-tight"
+  const categoryRail = (
+    <ul className="flex items-center gap-1.5 lg:flex-wrap">
+      <li>
+        <button
+          type="button"
+          onClick={() => openCategory(null)}
+          aria-current={!category ? "true" : undefined}
+          className={`flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
+            !category
+              ? "border-cocoa bg-cocoa text-background shadow-xs"
+              : "border-border/70 bg-card text-cocoa hover:border-cocoa/40 hover:bg-secondary/60"
+          }`}
         >
-          The bakery counter
-        </TextAnimate>
-        <p className="max-w-xl text-xs sm:text-sm text-muted-foreground leading-relaxed">
-          Explore our signature brownies, velvety cheesecakes, celebration cakes, and morning tea
-          cakes baked fresh on the day of your slot.
-        </p>
-      </div>
-
-      {/* Filters row: category rail, search, sort */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-4 justify-between border-b border-border/60 pb-4">
-        {/* Category rail. Every pill shows its name: the previous control only
-            labelled the selected item, leaving six unlabelled glyphs that are
-            not reliably distinguishable at this size. */}
-        <nav
-          aria-label="Filter by category"
-          className="no-scrollbar -mx-4 shrink-0 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0"
-        >
-          <ul className="flex items-center gap-1.5">
-            {categoryItems.map((item) => {
-              const Icon = item.icon;
-              const selected = (active ?? "all") === item.id;
-              return (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    onClick={() => handleCategoryChange(item.slug)}
-                    aria-current={selected ? "true" : undefined}
-                    className={`flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
-                      selected
-                        ? "border-cocoa bg-cocoa text-background shadow-xs"
-                        : "border-border/70 bg-card text-cocoa hover:border-cocoa/40 hover:bg-secondary/60"
-                    }`}
-                  >
-                    <Icon className="size-3.5 shrink-0" />
-                    {item.label}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        {/* Search & Sort Controls */}
-        <div className="flex w-full min-w-0 items-center gap-3 sm:ml-auto sm:w-auto">
-          {/* Search Bar with GodUI 3D MagicInput.
-              `w-full` with `shrink-0` beside the sort control pushed this row
-              153px past the viewport on a phone; it needs to be allowed to
-              shrink below its content width. */}
-          {showSearch && (
-            <div className="min-w-0 flex-1 sm:w-52 sm:flex-none lg:w-60">
-              <MagicInput
-                size="sm"
-                rainbow
-                depth="focus"
-                icon={<Search className="size-3.5" />}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onClear={() => setSearch("")}
-                placeholder="Search any products..."
-                className="w-full text-xs font-semibold text-cocoa"
-              />
-            </div>
-          )}
-
-          {/* Sort Dropdown with GodUI Combobox */}
-          <div className="shrink-0">
-            <Combobox
-              options={SORT_OPTIONS}
-              value={sortBy}
-              onChange={(val) => setSortBy(val as any)}
-              searchable={false}
-              icon={<ArrowUpDown className="size-3.5" />}
-              placeholder="Sort bakes…"
-              className="w-auto"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* VIEW MODE 1: Curated Horizontal Category Lanes (When "All" is active with no search/sort overrides) */}
-      {isLaneMode ? (
-        <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
-          {categorizedProducts.map(({ category, products: catProducts }) => (
-            <CategoryHorizontalLane
-              key={category.id}
-              categoryName={category.name}
-              categorySlug={category.slug}
-              description={category.description}
-              products={catProducts}
-              layoutRows={(category as any).layout_rows ?? 1}
-              onViewAll={handleCategoryChange}
-            />
-          ))}
-        </div>
-      ) : (
-        /* VIEW MODE 2: Full Responsive Product Grid (When specific category or search/sort is active) */
-        <div className="space-y-6 animate-in fade-in duration-300">
-          {/* Active filter banner with Back button */}
-          <div className="flex items-center justify-between bg-secondary/30 p-3.5 rounded-2xl border border-border/60">
-            <div className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-berry" />
-              <p className="text-xs sm:text-sm font-bold text-cocoa">
-                Showing {products.length} {products.length === 1 ? "item" : "items"}{" "}
-                {activeCategoryObj ? `in ${activeCategoryObj.name}` : ""}
-                {search ? ` matching "${search}"` : ""}
-              </p>
-            </div>
+          <Store className="size-3.5 shrink-0" />
+          All
+          <span className="rounded-full bg-black/10 px-1.5 text-[10px] tabular-nums dark:bg-white/15">
+            {data.products.length}
+          </span>
+        </button>
+      </li>
+      {lanes.map(({ category: c, products }) => {
+        const Icon = categoryVisual(c.slug).icon;
+        const selected = category === c.slug;
+        return (
+          <li key={c.id}>
             <button
               type="button"
-              onClick={() => {
-                handleCategoryChange(null);
-                setSearch("");
-                setSortBy("featured");
-              }}
-              className="text-xs font-bold text-berry-deep hover:underline cursor-pointer"
+              onClick={() => openCategory(c.slug)}
+              aria-current={selected ? "true" : undefined}
+              className={`flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
+                selected
+                  ? "border-cocoa bg-cocoa text-background shadow-xs"
+                  : "border-border/70 bg-card text-cocoa hover:border-cocoa/40 hover:bg-secondary/60"
+              }`}
             >
-              ← Back to category lanes
-            </button>
-          </div>
-
-          {products.length === 0 ? (
-            <div className="flex flex-col items-center justify-center text-center py-16 gap-3">
-              <span className="text-5xl">🥐</span>
-              <p className="font-display text-lg font-bold text-cocoa">No bakes found</p>
-              <p className="text-xs text-muted-foreground max-w-xs">
-                {search
-                  ? `No results for "${search}". Try another keyword.`
-                  : "Nothing in this category right now."}
-              </p>
-              <Button
-                size="sm"
-                variant="outline"
-                className="rounded-full text-xs mt-1 cursor-pointer"
-                onClick={() => {
-                  handleCategoryChange(null);
-                  setSearch("");
-                }}
+              <Icon className="size-3.5 shrink-0" />
+              {c.name}
+              <span
+                className={`rounded-full px-1.5 text-[10px] tabular-nums ${
+                  selected ? "bg-white/20" : "bg-secondary"
+                }`}
               >
-                Show all bakes
-              </Button>
-            </div>
-          ) : (
-            <div
-              key={showStagger ? filterKey : undefined}
-              className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 lg:gap-6 pt-2 pb-2"
+                {products.length}
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+
+  const priceRail = (
+    <ul className="flex flex-wrap items-center gap-1.5">
+      {PRICE_BANDS.map((band) => {
+        const selected = priceBand === band.id;
+        return (
+          <li key={band.id}>
+            <button
+              type="button"
+              onClick={() => patch({ price: band.id === "all" ? undefined : band.id })}
+              aria-pressed={selected}
+              className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-bold transition-all ${
+                selected
+                  ? "border-berry bg-berry/15 text-berry-deep"
+                  : "border-border/70 bg-card text-cocoa hover:bg-secondary/60"
+              }`}
             >
-              {products.map((product, index) => (
+              {band.label}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+
+  return (
+    <div className="w-full pb-10">
+      <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-6 sm:space-y-7 sm:py-10">
+        {/* ── Counter header ─────────────────────────────────────────── */}
+        <header className="relative overflow-hidden rounded-3xl border border-border/70 bg-linear-to-br from-card via-card to-secondary/40 p-5 shadow-soft sm:rounded-4xl sm:p-8">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-24 -right-20 size-64 rounded-full bg-berry/10 blur-3xl"
+          />
+          <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="min-w-0">
+              <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-berry/30 bg-berry/10 px-3.5 py-1 text-[10.5px] font-bold tracking-wider text-berry-deep uppercase sm:text-xs">
+                <Sparkles className="size-3.5" />
+                <span>Fresh small-batch counter</span>
+              </span>
+              <TextAnimate
+                as="h1"
+                animation="blurInUp"
+                by="word"
+                className="mt-1.5 font-blogh text-3xl leading-tight font-bold tracking-wide text-cocoa uppercase sm:text-5xl lg:text-6xl"
+              >
+                The bakery counter
+              </TextAnimate>
+              <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                Everything here is baked the morning of your slot. Browse a counter below, or search
+                for something specific.
+              </p>
+            </div>
+
+            {/* At a glance — answers "what is actually available" before scrolling. */}
+            <dl className="grid shrink-0 grid-cols-3 gap-2 lg:w-72">
+              {[
+                { label: "Bakes today", value: String(data.products.length) },
+                { label: "Counters", value: String(lanes.length) },
+                { label: "Starting at", value: formatCurrency(counterFloor) },
+              ].map((stat) => (
                 <div
-                  key={product.id}
-                  className={`h-full flex flex-col ${showStagger ? "animate-scale-in" : ""}`}
-                  style={showStagger ? { animationDelay: `${index * 30}ms` } : undefined}
+                  key={stat.label}
+                  className="rounded-2xl border border-border/70 bg-card/80 p-2.5 text-center shadow-2xs"
                 >
-                  <ProductCard product={product} />
+                  <dt className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+                    {stat.label}
+                  </dt>
+                  <dd className="mt-0.5 font-blogh text-base font-bold text-cocoa tabular-nums sm:text-lg">
+                    {stat.value}
+                  </dd>
                 </div>
               ))}
+            </dl>
+          </div>
+        </header>
+
+        {/* ── Sticky toolbar ─────────────────────────────────────────── */}
+        <div className="sticky top-16 z-30 -mx-4 border-y border-border/60 bg-background/85 px-4 py-2.5 backdrop-blur-xl sm:mx-0 sm:rounded-3xl sm:border sm:px-4 sm:shadow-2xs">
+          <div className="flex items-center gap-2">
+            {/* Desktop category rail */}
+            <nav
+              aria-label="Filter by category"
+              className="no-scrollbar hidden min-w-0 flex-1 overflow-x-auto md:block"
+            >
+              {categoryRail}
+            </nav>
+
+            {/* Mobile: filters trigger */}
+            <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border/80 bg-card px-3.5 text-xs font-bold text-cocoa shadow-2xs transition-colors hover:bg-secondary/60 md:hidden"
+                >
+                  <SlidersHorizontal className="size-3.5" />
+                  <span>Filters</span>
+                  {hasFilters && <span className="size-1.5 rounded-full bg-berry" />}
+                </button>
+              </SheetTrigger>
+              <SheetContent
+                side="bottom"
+                className="max-h-[85vh] overflow-y-auto rounded-t-3xl p-5"
+              >
+                <div className="space-y-5">
+                  <div>
+                    <p className="mb-2 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
+                      Counter
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">{categoryRail}</div>
+                  </div>
+                  <div>
+                    <p className="mb-2 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
+                      Price
+                    </p>
+                    {priceRail}
+                  </div>
+                  <div>
+                    <p className="mb-2 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
+                      Sort by
+                    </p>
+                    <Combobox
+                      options={SORT_OPTIONS}
+                      value={sortBy}
+                      onChange={(val) => patch({ sort: (val as SortKey) || undefined })}
+                      searchable={false}
+                      placeholder="Sort bakes…"
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={clearAll}
+                      className="flex-1 rounded-2xl text-xs font-bold"
+                    >
+                      Clear all
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => setFiltersOpen(false)}
+                      className="flex-1 rounded-2xl bg-cocoa text-xs font-bold text-background"
+                    >
+                      Show {filtered.length} bakes
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            {showSearch && (
+              <div className="min-w-0 flex-1 md:max-w-56 md:flex-none lg:max-w-64">
+                <MagicInput
+                  size="sm"
+                  rainbow
+                  depth="focus"
+                  icon={<Search className="size-3.5" />}
+                  value={draftQuery}
+                  onChange={(e) => setDraftQuery(e.target.value)}
+                  onClear={() => setDraftQuery("")}
+                  placeholder="Search bakes…"
+                  className="w-full text-xs font-semibold text-cocoa"
+                />
+              </div>
+            )}
+
+            <div className="hidden shrink-0 lg:block">
+              <Combobox
+                options={SORT_OPTIONS}
+                value={sortBy}
+                onChange={(val) => patch({ sort: (val as SortKey) || undefined })}
+                searchable={false}
+                placeholder="Sort bakes…"
+                className="w-auto"
+              />
             </div>
-          )}
+
+            {/* View switch — only meaningful while nothing is filtered. */}
+            {!hasFilters && (
+              <div className="hidden shrink-0 items-center gap-0.5 rounded-full border border-border/70 bg-card p-0.5 sm:flex">
+                {(
+                  [
+                    { id: "lanes", icon: Rows3, label: "Category lanes" },
+                    { id: "grid", icon: LayoutGrid, label: "One big grid" },
+                  ] as const
+                ).map((option) => {
+                  const Icon = option.icon;
+                  const selected = view === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => patch({ view: option.id })}
+                      aria-label={option.label}
+                      title={option.label}
+                      className={`grid size-8 cursor-pointer place-items-center rounded-full transition-all ${
+                        selected
+                          ? "bg-cocoa text-background shadow-2xs"
+                          : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      <Icon className="size-4" />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Price rail, desktop only — on phones it lives in the sheet. */}
+          <div className="mt-2 hidden md:block">{priceRail}</div>
         </div>
-      )}
+
+        {/* ── Active filters ─────────────────────────────────────────── */}
+        {hasFilters && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-cocoa">
+              {filtered.length} {filtered.length === 1 ? "bake" : "bakes"}
+            </span>
+            {activeCategory && (
+              <FilterChip
+                label={activeCategory.name}
+                onClear={() => patch({ category: undefined })}
+              />
+            )}
+            {query.trim() && <FilterChip label={`“${query}”`} onClear={() => setDraftQuery("")} />}
+            {priceBand !== "all" && (
+              <FilterChip
+                label={PRICE_BANDS.find((b) => b.id === priceBand)?.label ?? ""}
+                onClear={() => patch({ price: undefined })}
+              />
+            )}
+            <button
+              type="button"
+              onClick={clearAll}
+              className="cursor-pointer text-xs font-bold text-berry-deep hover:underline"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
+
+        {/* ── Results ────────────────────────────────────────────────── */}
+        {view === "lanes" ? (
+          <div className="animate-in fade-in space-y-4 duration-300 sm:space-y-5">
+            {lanes.map(({ category: c, products }) => (
+              <CategoryLane
+                key={c.id}
+                name={c.name}
+                slug={c.slug}
+                description={c.description}
+                products={products}
+                onViewAll={openCategory}
+              />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-border/70 bg-card/50 py-16 text-center">
+            <span className="text-5xl">🥐</span>
+            <p className="font-blogh text-lg font-bold tracking-wide text-cocoa uppercase">
+              Nothing matches that
+            </p>
+            <p className="max-w-xs text-xs text-muted-foreground">
+              {query
+                ? `No bake matches “${query}” with these filters.`
+                : "This combination of filters has nothing on the counter today."}
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={clearAll}
+              className="mt-1 cursor-pointer rounded-full text-xs"
+            >
+              Show the whole counter
+            </Button>
+          </div>
+        ) : (
+          <div
+            key={`${category}-${query}-${sortBy}-${priceBand}`}
+            className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:gap-6 xl:grid-cols-4"
+          >
+            {filtered.map((product, index) => (
+              <div
+                key={product.id}
+                className={`flex h-full flex-col ${showStagger ? "animate-scale-in" : ""}`}
+                style={
+                  showStagger ? { animationDelay: `${Math.min(index, 12) * 30}ms` } : undefined
+                }
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* A grid of one category ends abruptly; offer the way back out. */}
+        {view === "grid" && hasFilters && filtered.length > 0 && (
+          <div className="flex justify-center pt-1">
+            <button
+              type="button"
+              onClick={clearAll}
+              className="inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-2xl border border-border/80 bg-card px-5 text-xs font-bold text-cocoa shadow-2xs transition-colors hover:bg-secondary/60"
+            >
+              <Tag className="size-3.5 text-berry-deep" />
+              Back to every counter
+            </button>
+          </div>
+        )}
+      </div>
     </div>
+  );
+}
+
+function FilterChip({ label, onClear }: { label: string; onClear: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-berry/30 bg-berry/10 py-1 pr-1 pl-2.5 text-xs font-bold text-berry-deep">
+      {label}
+      <button
+        type="button"
+        onClick={onClear}
+        aria-label={`Remove ${label} filter`}
+        className="grid size-4.5 cursor-pointer place-items-center rounded-full bg-berry/20 transition-colors hover:bg-berry/40"
+      >
+        <X className="size-3" />
+      </button>
+    </span>
   );
 }

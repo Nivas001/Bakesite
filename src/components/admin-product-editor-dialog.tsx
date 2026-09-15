@@ -120,7 +120,7 @@ export function ProductEditorDialog({
                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
                   {form.id
                     ? `Updating "${form.name || "bake"}" with real-time storefront synchronization.`
-                    : "Add a new freshly baked recipe to the Ani Bakes catalog."}
+                    : "Add a new freshly baked recipe to the Aniii Bakes catalog."}
                 </DialogDescription>
               </div>
             </div>

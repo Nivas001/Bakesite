@@ -1,5 +1,5 @@
 /**
- * Feature Flags — Ani Bakes Bakery
+ * Feature Flags — Aniii Bakes Bakery
  *
  * All UI enhancement flags stored in localStorage.
  * Flags can be toggled from the Admin Dev Panel.
@@ -79,7 +79,7 @@ export const FEATURE_FLAGS: Record<FlagKey, FlagDefinition> = {
   ff_typewriter: {
     label: "Hero Typewriter Effect",
     description:
-      "The subtitle below 'Ani Bakes' types out words one by one — cycling through 'fresh croissants', 'celebration cakes', 'artisan sourdoughs'. Adds life and keeps visitors reading a moment longer.",
+      "The subtitle below 'Aniii Bakes' types out words one by one — cycling through 'fresh croissants', 'celebration cakes', 'artisan sourdoughs'. Adds life and keeps visitors reading a moment longer.",
     category: "Home Page",
     emoji: "⌨️",
     defaultValue: true,

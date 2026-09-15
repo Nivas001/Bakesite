@@ -25,7 +25,7 @@ export const CAMPAIGN_PRESETS = {
     badge: "Bakery Announcement",
     badgeColor: "#c94a29",
     badgeBg: "#fcedea",
-    defaultSubject: "Fresh News from Ani Bakes Counter",
+    defaultSubject: "Fresh News from Aniii Bakes Counter",
     defaultBody: `Hi there,\n\nWe have some exciting news from our kitchen! Starting this week, we're introducing new morning baking slots and fresh seasonal recipes.\n\nEvery single item continues to be hand-mixed, slow-proofed, and baked fresh the morning of your chosen delivery slot.\n\nThank you for being part of our neighbourhood bakery family!`,
     defaultCtaLabel: "Browse the Counter →",
     defaultCtaUrl: "https://anibakes.app/shop",
@@ -260,7 +260,7 @@ export function buildNewsletterHtml(
                   <td align="center">
                     <span style="font-size: 28px; line-height: 1; display: inline-block; margin-bottom: 6px;">🥐</span>
                     <h1 class="serif-heading" style="margin: 0; font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; color: #381c10; letter-spacing: -0.01em;">
-                      Ani Bakes
+                      Aniii Bakes
                     </h1>
                     <p style="margin: 4px 0 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #946b5a;">
                       Fresh Small-Batch Bakes · Pondicherry
@@ -335,7 +335,7 @@ export function buildNewsletterHtml(
           <tr>
             <td style="background-color: #f7ede3; padding: 26px 28px 24px; text-align: center; border-top: 1px solid #edd9cd;">
               <p class="serif-heading" style="margin: 0 0 4px; font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; font-size: 16px; font-weight: 700; color: #43281c;">
-                Ani Bakes Bakery
+                Aniii Bakes Bakery
               </p>
               <p style="margin: 0 0 14px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 11px; line-height: 1.5; color: #876c5f;">
                 Everything is baked fresh the morning of your chosen slot · Pondicherry, India

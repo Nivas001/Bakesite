@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/dialog";
 import {
   ChefHat,
-  CheckCircle2,
   Clock,
   PackageCheck,
   XCircle,
@@ -33,7 +32,6 @@ import {
   ChevronUp,
   ArrowRight,
   RotateCw,
-  ShoppingBag,
   Flame,
   Calendar,
   CreditCard,
@@ -75,15 +73,15 @@ export type OrderRecord = {
 export const Route = createFileRoute("/orders")({
   head: () => ({
     meta: [
-      { title: "Your orders — Ani Bakes Bakery" },
+      { title: "Your orders — Aniii Bakes Bakery" },
       {
         name: "description",
-        content: "Track live status and reorder fresh morning bakes from Ani Bakes.",
+        content: "Track live status and reorder fresh morning bakes from Aniii Bakes.",
       },
-      { property: "og:title", content: "Your orders — Ani Bakes Bakery" },
+      { property: "og:title", content: "Your orders — Aniii Bakes Bakery" },
       {
         property: "og:description",
-        content: "Track live status and reorder fresh morning bakes from Ani Bakes.",
+        content: "Track live status and reorder fresh morning bakes from Aniii Bakes.",
       },
     ],
   }),
@@ -486,35 +484,18 @@ function OrderCardItem({
             </div>
           )}
 
-          {/* 3. Mini Baker Status Stepper (For Active Non-Rescheduled Orders) */}
-          {!isFulfilled && !isCancelled && !isRescheduled && (
+          {/* 3. What is happening right now, in words.
+              The three-segment bar that used to sit here said the same thing as
+              the timeline directly above it, in a different scale — two
+              progress meters for one order. Only the sentence survives. */}
+          {!isCancelled && !isRescheduled && (
             <div
-              className={`rounded-2xl ${config.innerBoxBg} p-3 sm:p-3.5 border ${config.innerBoxBorder} space-y-2`}
+              className={`rounded-2xl ${config.innerBoxBg} p-3 border ${config.innerBoxBorder} flex items-start gap-2.5`}
             >
-              <div className="flex items-center justify-between text-xs font-bold">
-                <span className={`inline-flex items-center gap-1.5 ${config.headerText}`}>
-                  <Flame className="size-3.5 text-amber-500" /> Morning Bake Status
-                </span>
-                <span className={`text-[10px] font-mono uppercase font-bold ${config.subText}`}>
-                  Stage 0{config.step}/03
-                </span>
-              </div>
+              <Flame className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
               <p className={`text-xs leading-relaxed font-medium ${config.subText}`}>
                 {config.desc}
               </p>
-
-              {/* Visual 3-Stage Progress Bar */}
-              <div className="grid grid-cols-3 gap-1.5 pt-1">
-                <div
-                  className={`h-1.5 rounded-full ${config.step >= 1 ? "bg-amber-600" : "bg-black/10 dark:bg-white/10"}`}
-                />
-                <div
-                  className={`h-1.5 rounded-full ${config.step >= 2 ? "bg-amber-500" : "bg-black/10 dark:bg-white/10"}`}
-                />
-                <div
-                  className={`h-1.5 rounded-full ${config.step >= 3 ? "bg-emerald-500" : "bg-black/10 dark:bg-white/10"}`}
-                />
-              </div>
             </div>
           )}
 
@@ -772,6 +753,22 @@ function OrdersPage() {
     (o) => o.status === "completed" || o.status === "delivered",
   ).length;
 
+  /**
+   * Money actually taken. `paid_at` is the source of truth; the statuses below
+   * are only reached after the payment link is settled, so they cover rows
+   * written before the timestamp existed.
+   */
+  const lifetimeSpend = orders
+    .filter(
+      (o) =>
+        o.paid_at ||
+        o.status === "confirmed" ||
+        o.status === "rescheduled" ||
+        o.status === "completed" ||
+        o.status === "delivered",
+    )
+    .reduce((sum, o) => sum + Number(o.total || 0), 0);
+
   function handleOpenSupport(order?: OrderRecord) {
     setSelectedSupportOrder(order ?? null);
     setSupportModalOpen(true);
@@ -808,84 +805,107 @@ function OrdersPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+      {/* Page header — the three numbers a customer opens this page for sit
+          beside the title instead of being buried in the filter labels. */}
+      <header className="relative overflow-hidden rounded-3xl border border-border/70 bg-linear-to-br from-card via-card to-secondary/40 p-5 shadow-soft sm:rounded-4xl sm:p-7">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-24 -right-20 size-60 rounded-full bg-amber-400/10 blur-3xl"
+        />
+        <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-3 py-0.5 text-[11px] font-bold tracking-wider text-amber-900 uppercase sm:text-xs dark:text-amber-300">
               <Sparkles className="size-3.5" />
-              <span>Live Order Tracking</span>
+              <span>Live order tracking</span>
             </span>
+            <h1 className="mt-1.5 font-blogh text-3xl leading-tight font-bold tracking-wide text-cocoa uppercase sm:text-4xl lg:text-5xl">
+              Your orders
+            </h1>
+            <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
+              Handcrafted in small batches every dawn from 4:00 AM.
+            </p>
           </div>
-          <h1 className="font-blogh text-3xl sm:text-4xl lg:text-5xl font-bold text-cocoa leading-tight uppercase tracking-wide">
-            Your Orders
-          </h1>
-        </div>
 
-        {/* Top-Right: Help & Support Trigger */}
-        <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => handleOpenSupport()}
-            className="rounded-full border-cocoa/30 bg-card text-cocoa hover:bg-cocoa/10 font-bold text-xs h-9 px-4 shadow-2xs cursor-pointer flex items-center gap-1.5"
-          >
-            <HelpCircle className="size-4 text-berry-deep" />
-            <span>Help & Support</span>
-          </Button>
-        </div>
-      </div>
+          <div className="flex flex-col items-stretch gap-3 lg:items-end">
+            <dl className="grid grid-cols-3 gap-2 lg:w-80">
+              {[
+                { label: "In the queue", value: String(activeCount) },
+                { label: "Delivered", value: String(completedCount) },
+                { label: "Spent with us", value: formatCurrency(lifetimeSpend) },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="rounded-2xl border border-border/70 bg-card/80 p-2.5 text-center shadow-2xs"
+                >
+                  <dt className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+                    {stat.label}
+                  </dt>
+                  <dd className="mt-0.5 font-blogh text-base font-bold text-cocoa tabular-nums sm:text-lg">
+                    {stat.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
 
-      {/* Filter Tabs & Quick Stat Pills */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-secondary/50 border border-border/60">
-          <button
-            type="button"
-            onClick={() => setFilter("all")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filter === "all"
-                ? "bg-cocoa text-background shadow-2xs"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            All Orders ({orders.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilter("active")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filter === "active"
-                ? "bg-cocoa text-background shadow-2xs"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Active Slots ({activeCount})
-          </button>
-          <button
-            type="button"
-            onClick={() => setFilter("completed")}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              filter === "completed"
-                ? "bg-cocoa text-background shadow-2xs"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Delivered ({completedCount})
-          </button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleOpenSupport()}
+              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full border-cocoa/30 bg-card px-4 text-xs font-bold text-cocoa shadow-2xs hover:bg-cocoa/10 lg:w-fit"
+            >
+              <HelpCircle className="size-4 text-berry-deep" />
+              <span>Help &amp; Support</span>
+            </Button>
+          </div>
         </div>
+      </header>
 
-        <span className="text-xs font-semibold text-muted-foreground hidden sm:inline-block font-sans">
-          Handcrafted in small batches every dawn from 4:00 AM
-        </span>
+      {/* Filter tabs */}
+      <div className="no-scrollbar -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <div className="inline-flex items-center gap-1.5 rounded-2xl border border-border/60 bg-secondary/50 p-1">
+          {(
+            [
+              { id: "all", label: "All orders", count: orders.length },
+              { id: "active", label: "In the queue", count: activeCount },
+              { id: "completed", label: "Delivered", count: completedCount },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setFilter(tab.id)}
+              aria-pressed={filter === tab.id}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold whitespace-nowrap transition-all ${
+                filter === tab.id
+                  ? "bg-cocoa text-background shadow-2xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {tab.label}
+              <span
+                className={`rounded-full px-1.5 text-[10px] tabular-nums ${
+                  filter === tab.id ? "bg-white/20" : "bg-card text-cocoa"
+                }`}
+              >
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Orders Grid (1 Col Mobile, 2 Cols Tablet & Desktop) */}
       {filteredOrders.length === 0 ? (
-        <div className="rounded-3xl border border-border/70 bg-card p-10 text-center space-y-3 font-sans">
-          <p className="font-bold text-base text-foreground">No orders found under this filter.</p>
+        <div className="space-y-3 rounded-3xl border-2 border-dashed border-border/70 bg-card/60 p-10 text-center font-sans">
+          <span className="text-4xl">📭</span>
+          <p className="text-base font-bold text-foreground">
+            {filter === "active"
+              ? "Nothing in the bake queue right now."
+              : "No delivered orders yet."}
+          </p>
           <p className="text-xs text-muted-foreground">
-            Select 'All Orders' to view your complete order history.
+            Switch to All orders to see your complete history.
           </p>
           <Button
             variant="outline"

@@ -16,7 +16,7 @@ export async function sendEmail(input: {
   attachments?: EmailAttachment[] | undefined;
 }): Promise<void> {
   const apiKey = process.env["RESEND_API_KEY"];
-  const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
+  const bakeryName = process.env["BAKERY_NAME"] || "Aniii Bakes";
   const senderEmail = process.env["SENDER_EMAIL"] || `${bakeryName} <orders@anibakes.app>`;
 
   if (!input.to || !apiKey) {

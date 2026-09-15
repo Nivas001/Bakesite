@@ -48,9 +48,9 @@ export async function removeSubscriber(email: string, token?: string) {
     const link = `https://anibakes.app/unsubscribe?email=${encodeURIComponent(cleanEmail)}&token=${await createUnsubscribeToken(cleanEmail)}`;
     await sendEmail({
       to: cleanEmail,
-      subject: "Confirm your Ani Bakes unsubscribe",
+      subject: "Confirm your Aniii Bakes unsubscribe",
       text: `Open this link to stop receiving our newsletter: ${link}`,
-      html: `<p>Tap below to stop receiving the Ani Bakes newsletter.</p><p><a href="${link}">Confirm unsubscribe</a></p><p>If you did not ask for this, you can ignore this email — nothing has changed.</p>`,
+      html: `<p>Tap below to stop receiving the Aniii Bakes newsletter.</p><p><a href="${link}">Confirm unsubscribe</a></p><p>If you did not ask for this, you can ignore this email — nothing has changed.</p>`,
     });
     // Reported identically whether or not the address is on the list, so this
     // cannot be used to test which addresses are subscribed.

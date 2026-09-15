@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import {
   Menu,
+  Search,
   ShoppingBag,
   User,
   Home,
@@ -20,17 +21,18 @@ import { useIsAdmin } from "@/hooks/use-admin";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useHeroNavbarTheme } from "@/lib/hero-navbar-theme";
+import { formatCurrency } from "@/lib/pricing";
 
 const NAV = [
-  { to: "/", label: "Home", icon: Home, badge: null },
-  { to: "/shop", label: "Shop", icon: Store, badge: null },
-  { to: "/about", label: "About", icon: Sparkles, badge: null },
-  { to: "/offers", label: "Offers", icon: Tag, badge: null },
-  { to: "/orders", label: "Orders", icon: Package, badge: null },
+  { to: "/", label: "Home", icon: Home, exact: true },
+  { to: "/shop", label: "Shop", icon: Store, exact: false },
+  { to: "/about", label: "About", icon: Sparkles, exact: false },
+  { to: "/offers", label: "Offers", icon: Tag, exact: false },
+  { to: "/orders", label: "Orders", icon: Package, exact: false },
 ] as const;
 
 export function SiteHeader() {
-  const { count } = useCart();
+  const { count, total } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAdmin } = useIsAdmin();
@@ -60,6 +62,8 @@ export function SiteHeader() {
   const activeBgColor = isHeroActive ? (bgColor ?? "#F5C2CD") : null;
   const activeTextColor = isHeroActive ? (textColor ?? "#3A1018") : null;
   const showBorder = scrollY > 20 || !isHeroActive;
+  // A tall header eats a third of a phone screen once you start scrolling.
+  const condensed = scrollY > 80;
 
   return (
     <header
@@ -76,28 +80,34 @@ export function SiteHeader() {
           ? showBorder
             ? "border-[#2C1810]/15 shadow-[0_4px_24px_0_rgba(0,0,0,0.04)]"
             : "border-transparent shadow-none"
-          : "border-border/50 bg-background/65 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_4px_24px_0_rgba(0,0,0,0.04)]"
+          : "border-border/50 bg-background/70 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_4px_24px_0_rgba(0,0,0,0.04)]"
       } transition-all duration-700`}
     >
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 sm:gap-4 px-3.5 sm:px-6">
-        {/* Brand Logo with Liquid Glass Pill */}
+      <div
+        className={`mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-3.5 transition-[height] duration-300 sm:gap-4 sm:px-6 ${
+          condensed ? "h-14" : "h-16"
+        }`}
+      >
+        {/* Brand */}
         <Link
           to="/"
           className="group flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all hover:bg-black/5"
         >
           <span
             style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
-            className="font-nimbus text-xl sm:text-2xl font-bold tracking-tight text-cocoa transition-colors duration-700 group-hover:scale-[1.02]"
+            className={`font-nimbus font-bold tracking-tight text-cocoa transition-all duration-500 group-hover:scale-[1.02] ${
+              condensed ? "text-lg sm:text-xl" : "text-xl sm:text-2xl"
+            }`}
           >
-            Ani Bakes
+            Aniii Bakes
           </span>
           <span
             style={isHeroActive && dotColor ? { backgroundColor: dotColor } : undefined}
-            className="flex size-2 rounded-full bg-berry animate-pulse transition-colors duration-700"
+            className="flex size-2 animate-pulse rounded-full bg-berry transition-colors duration-700"
           />
         </Link>
 
-        {/* Desktop Navigation with Floating Frosted Glass Pills */}
+        {/* Desktop navigation */}
         <nav
           style={
             isHeroActive
@@ -107,53 +117,27 @@ export function SiteHeader() {
                 }
               : undefined
           }
-          className="hidden md:flex items-center gap-1 rounded-full border border-border/60 bg-secondary/35 p-1 backdrop-blur-md shadow-2xs transition-colors duration-700"
+          className="hidden items-center gap-1 rounded-full border border-border/60 bg-secondary/35 p-1 shadow-2xs backdrop-blur-md transition-colors duration-700 md:flex"
         >
           {NAV.map((item) => (
             <Link
               key={item.to}
               to={item.to}
+              activeOptions={{ exact: item.exact }}
               style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
-              className="relative rounded-full px-3.5 py-1 text-xs lg:text-sm font-semibold text-muted-foreground whitespace-nowrap transition-all hover:bg-card hover:text-foreground hover:shadow-2xs active:scale-95"
+              className="relative rounded-full px-3.5 py-1 text-xs font-semibold whitespace-nowrap text-muted-foreground transition-all hover:bg-card hover:text-foreground hover:shadow-2xs active:scale-95 lg:text-sm"
               activeProps={{
                 className: "bg-card text-cocoa font-bold shadow-xs ring-1 ring-border/80",
               }}
             >
               {item.label}
-              {item.badge && (
-                <span className="ml-1.5 rounded-full bg-berry/15 px-1.5 py-0.2 text-[11px] font-extrabold text-berry-deep">
-                  {item.badge}
-                </span>
-              )}
             </Link>
           ))}
         </nav>
 
-        {/* Right Action Icons (Admin, Cart, Account, Mobile Menu) */}
+        {/* Right-hand actions */}
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Admin Portal Button */}
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            style={
-              isHeroActive
-                ? {
-                    backgroundColor: "rgba(255, 255, 255, 0.45)",
-                    borderColor: "rgba(44, 24, 16, 0.15)",
-                    color: activeTextColor ?? undefined,
-                  }
-                : undefined
-            }
-            className="inline-flex rounded-full border-berry/30 bg-berry/10 text-berry-deep hover:bg-berry/20 text-xs font-semibold h-8 px-2.5 sm:px-3 shadow-2xs backdrop-blur-xs transition-colors duration-700"
-          >
-            <Link to="/admin">
-              <ShieldCheck className="mr-1 sm:mr-1.5 size-3.5" />
-              <span>Admin</span>
-            </Link>
-          </Button>
-
-          {/* Cart Icon with Liquid Glow Badge */}
+          {/* Jump straight to browsing rather than making people find the nav. */}
           <Button
             asChild
             variant="ghost"
@@ -167,23 +151,77 @@ export function SiteHeader() {
                   }
                 : undefined
             }
-            className="relative size-9 rounded-full border border-border/40 bg-card/60 backdrop-blur-md shadow-2xs transition-all hover:bg-secondary hover:scale-105 active:scale-95"
-            aria-label="Cart"
+            className="hidden size-9 rounded-full border border-border/40 bg-card/60 shadow-2xs backdrop-blur-md transition-all hover:scale-105 hover:bg-secondary active:scale-95 lg:inline-flex"
+            aria-label="Search bakes"
           >
-            <Link to="/cart">
-              <ShoppingBag
+            <Link to="/shop">
+              <Search
                 style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
-                className="size-4.5 text-foreground transition-colors duration-700"
+                className="size-4 text-foreground transition-colors duration-700"
               />
-              {count > 0 && (
-                <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-berry text-[11px] font-bold text-berry-foreground shadow-xs animate-in zoom-in-75 ring-2 ring-background">
-                  {count > 9 ? "9+" : count}
-                </span>
-              )}
             </Link>
           </Button>
 
-          {/* Auth State Button */}
+          {/* Admin portal — only for accounts that actually have access. It used
+              to be shown to every visitor, who then hit an "admins only" wall. */}
+          {isAdmin && (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              style={
+                isHeroActive
+                  ? {
+                      backgroundColor: "rgba(255, 255, 255, 0.45)",
+                      borderColor: "rgba(44, 24, 16, 0.15)",
+                      color: activeTextColor ?? undefined,
+                    }
+                  : undefined
+              }
+              className="inline-flex h-8 rounded-full border-berry/30 bg-berry/10 px-2.5 text-xs font-semibold text-berry-deep shadow-2xs backdrop-blur-xs transition-colors duration-700 hover:bg-berry/20 sm:px-3"
+            >
+              <Link to="/admin">
+                <ShieldCheck className="mr-1 size-3.5 sm:mr-1.5" />
+                <span>Admin</span>
+              </Link>
+            </Button>
+          )}
+
+          {/* Cart — shows the running total on desktop, where there is room. */}
+          <Link
+            to="/cart"
+            aria-label={count > 0 ? `Cart, ${count} items` : "Cart"}
+            style={
+              isHeroActive
+                ? {
+                    backgroundColor: "rgba(255, 255, 255, 0.45)",
+                    borderColor: "rgba(44, 24, 16, 0.12)",
+                    color: activeTextColor ?? undefined,
+                  }
+                : undefined
+            }
+            className="relative flex h-9 items-center gap-1.5 rounded-full border border-border/40 bg-card/60 px-2.5 shadow-2xs backdrop-blur-md transition-all hover:scale-105 hover:bg-secondary active:scale-95"
+          >
+            <ShoppingBag
+              style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
+              className="size-4.5 text-foreground transition-colors duration-700"
+            />
+            {count > 0 && (
+              <>
+                <span className="animate-in zoom-in-75 absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-berry text-[11px] font-bold text-berry-foreground shadow-xs ring-2 ring-background sm:hidden">
+                  {count > 9 ? "9+" : count}
+                </span>
+                <span
+                  style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
+                  className="hidden text-xs font-bold text-cocoa tabular-nums sm:inline"
+                >
+                  {formatCurrency(total)}
+                </span>
+              </>
+            )}
+          </Link>
+
+          {/* Auth */}
           {session ? (
             <div className="flex items-center gap-1">
               <Button
@@ -199,7 +237,7 @@ export function SiteHeader() {
                       }
                     : undefined
                 }
-                className="hidden text-xs font-semibold text-muted-foreground hover:text-foreground sm:inline-flex h-8 px-3 rounded-full border border-border/40 bg-card/40 backdrop-blur-xs transition-colors duration-700"
+                className="hidden h-8 rounded-full border border-border/40 bg-card/40 px-3 text-xs font-semibold text-muted-foreground backdrop-blur-xs transition-colors duration-700 hover:text-foreground sm:inline-flex"
               >
                 <Link to="/profile">
                   <User className="mr-1.5 size-3.5" />
@@ -210,8 +248,9 @@ export function SiteHeader() {
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
+                aria-label="Sign out"
                 style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
-                className="hidden text-xs font-semibold text-muted-foreground hover:text-destructive sm:inline-flex h-8 px-2.5 rounded-full hover:bg-destructive/10 transition-colors duration-700"
+                className="hidden h-8 rounded-full px-2.5 text-xs font-semibold text-muted-foreground transition-colors duration-700 hover:bg-destructive/10 hover:text-destructive sm:inline-flex"
               >
                 <LogOut className="size-3.5" />
               </Button>
@@ -229,7 +268,7 @@ export function SiteHeader() {
                     }
                   : undefined
               }
-              className="hidden bg-berry text-berry-foreground hover:bg-berry/90 sm:inline-flex h-8 sm:h-9 px-4 rounded-full text-xs sm:text-sm font-semibold shadow-soft whitespace-nowrap transition-all duration-700"
+              className="hidden h-8 rounded-full bg-berry px-4 text-xs font-semibold whitespace-nowrap text-berry-foreground shadow-soft transition-all duration-700 hover:bg-berry/90 sm:inline-flex sm:h-9 sm:text-sm"
             >
               <Link to="/auth" search={{ redirect: undefined }}>
                 Sign in
@@ -237,14 +276,15 @@ export function SiteHeader() {
             </Button>
           )}
 
-          {/* Mobile Drawer */}
+          {/* Mobile drawer — secondary destinations only; the primary five live
+              in the tab bar at the bottom of the screen. */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 style={isHeroActive && activeTextColor ? { color: activeTextColor } : undefined}
-                className="md:hidden transition-colors duration-700"
+                className="transition-colors duration-700 md:hidden"
                 aria-label="Menu"
               >
                 <Menu className="size-5" />
@@ -252,17 +292,16 @@ export function SiteHeader() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="flex flex-col justify-between w-72 sm:w-80 p-5 bg-background"
+              className="flex w-72 flex-col justify-between bg-background p-5 sm:w-80"
             >
-              {/* Drawer Top Header & Navigation */}
               <div>
-                <div className="flex items-center gap-2 pb-5 mb-4 border-b border-border/60">
+                <div className="mb-4 flex items-center gap-2 border-b border-border/60 pb-5">
                   <div className="flex size-8 items-center justify-center rounded-xl bg-berry/10 text-berry-deep">
                     <Sparkles className="size-4" />
                   </div>
                   <div>
-                    <p className="font-nimbus text-lg font-bold text-cocoa leading-tight">
-                      Ani Bakes<span className="text-berry-deep">.</span>
+                    <p className="font-nimbus text-lg leading-tight font-bold text-cocoa">
+                      Aniii Bakes<span className="text-berry-deep">.</span>
                     </p>
                     <p className="text-[11px] text-muted-foreground">Fresh small-batch bakery</p>
                   </div>
@@ -275,6 +314,7 @@ export function SiteHeader() {
                       <Link
                         key={item.to}
                         to={item.to}
+                        activeOptions={{ exact: item.exact }}
                         onClick={() => setOpen(false)}
                         className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-secondary/70 active:scale-[0.98]"
                         activeProps={{ className: "bg-secondary font-semibold text-cocoa" }}
@@ -283,23 +323,15 @@ export function SiteHeader() {
                           <div className="flex size-8 items-center justify-center rounded-xl bg-secondary/80 text-muted-foreground transition-colors group-hover:bg-berry group-hover:text-berry-foreground">
                             <Icon className="size-4" />
                           </div>
-                          <span className="text-sm font-medium text-foreground group-hover:text-berry-deep transition-colors">
+                          <span className="text-sm font-medium text-foreground transition-colors group-hover:text-berry-deep">
                             {item.label}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          {item.badge && (
-                            <span className="rounded-full bg-berry/15 px-2 py-0.5 text-[11px] font-bold text-berry-deep">
-                              {item.badge}
-                            </span>
-                          )}
-                          <ChevronRight className="size-4 text-muted-foreground/40 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
-                        </div>
+                        <ChevronRight className="size-4 text-muted-foreground/40 transition-all group-hover:translate-x-0.5 group-hover:text-foreground" />
                       </Link>
                     );
                   })}
 
-                  {/* Cart quick link inside drawer */}
                   <Link
                     to="/cart"
                     onClick={() => setOpen(false)}
@@ -310,39 +342,39 @@ export function SiteHeader() {
                       <div className="flex size-8 items-center justify-center rounded-xl bg-secondary/80 text-muted-foreground transition-colors group-hover:bg-berry group-hover:text-berry-foreground">
                         <ShoppingBag className="size-4" />
                       </div>
-                      <span className="text-sm font-medium text-foreground group-hover:text-berry-deep transition-colors">
+                      <span className="text-sm font-medium text-foreground transition-colors group-hover:text-berry-deep">
                         Cart
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       {count > 0 && (
-                        <span className="rounded-full bg-berry px-2 py-0.5 text-[11px] font-bold text-berry-foreground">
-                          {count}
+                        <span className="rounded-full bg-berry px-2 py-0.5 text-[11px] font-bold text-berry-foreground tabular-nums">
+                          {formatCurrency(total)}
                         </span>
                       )}
-                      <ChevronRight className="size-4 text-muted-foreground/40 group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+                      <ChevronRight className="size-4 text-muted-foreground/40 transition-all group-hover:translate-x-0.5 group-hover:text-foreground" />
                     </div>
                   </Link>
 
-                  {/* Admin link inside drawer */}
-                  <Link
-                    to="/admin"
-                    onClick={() => setOpen(false)}
-                    className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-berry/10 active:scale-[0.98]"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-8 items-center justify-center rounded-xl bg-berry/15 text-berry-deep">
-                        <ShieldCheck className="size-4" />
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setOpen(false)}
+                      className="group flex items-center justify-between rounded-2xl px-3 py-2.5 transition-all duration-200 hover:bg-berry/10 active:scale-[0.98]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex size-8 items-center justify-center rounded-xl bg-berry/15 text-berry-deep">
+                          <ShieldCheck className="size-4" />
+                        </div>
+                        <span className="text-sm font-semibold text-berry-deep">Admin portal</span>
                       </div>
-                      <span className="text-sm font-semibold text-berry-deep">Admin Portal</span>
-                    </div>
-                    <ChevronRight className="size-4 text-berry-deep/50 group-hover:translate-x-0.5 transition-all" />
-                  </Link>
+                      <ChevronRight className="size-4 text-berry-deep/50 transition-all group-hover:translate-x-0.5" />
+                    </Link>
+                  )}
                 </nav>
               </div>
 
-              {/* Drawer Bottom: Highlighted Sign In / Account Section */}
-              <div className="pt-4 border-t border-border/60">
+              <div className="border-t border-border/60 pt-4">
                 {session ? (
                   <div className="flex flex-col gap-2">
                     <Link
@@ -350,8 +382,8 @@ export function SiteHeader() {
                       onClick={() => setOpen(false)}
                       className="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-3 shadow-2xs transition-all hover:border-berry/50 hover:bg-secondary/40 active:scale-[0.98]"
                     >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-berry/15 text-berry-deep font-bold text-xs">
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-berry/15 text-xs font-bold text-berry-deep">
                           {session.name ? (
                             session.name.slice(0, 2).toUpperCase()
                           ) : (
@@ -359,15 +391,15 @@ export function SiteHeader() {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-foreground truncate">
+                          <p className="truncate text-xs font-bold text-foreground">
                             {session.name || "My Account"}
                           </p>
-                          <p className="text-[11px] text-muted-foreground truncate">
+                          <p className="truncate text-[11px] text-muted-foreground">
                             {session.email}
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="size-4 text-muted-foreground shrink-0" />
+                      <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
                     </Link>
                     <button
                       type="button"
@@ -375,7 +407,7 @@ export function SiteHeader() {
                         signOut();
                         setOpen(false);
                       }}
-                      className="flex items-center justify-center gap-2 w-full rounded-xl py-2 text-xs font-medium text-muted-foreground hover:text-berry-deep transition-colors cursor-pointer"
+                      className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-berry-deep"
                     >
                       <LogOut className="size-3.5" />
                       <span>Sign out</span>
@@ -387,13 +419,13 @@ export function SiteHeader() {
                       to="/auth"
                       search={{ redirect: undefined }}
                       onClick={() => setOpen(false)}
-                      className="flex items-center justify-center gap-2 w-full rounded-2xl bg-berry px-4 py-3 text-sm font-bold text-berry-foreground shadow-soft transition-all duration-200 hover:bg-berry/90 hover:shadow-lift active:scale-95"
+                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-berry px-4 py-3 text-sm font-bold text-berry-foreground shadow-soft transition-all duration-200 hover:bg-berry/90 hover:shadow-lift active:scale-95"
                     >
                       <LogIn className="size-4" />
-                      <span>Sign in to Ani Bakes</span>
+                      <span>Sign in to Aniii Bakes</span>
                     </Link>
                     <p className="text-center text-[11px] text-muted-foreground">
-                      Sign in for saved addresses & order tracking
+                      Sign in for saved addresses &amp; order tracking
                     </p>
                   </div>
                 )}

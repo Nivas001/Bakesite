@@ -49,7 +49,7 @@ export const PACKAGING_SLIDES: PackagingSlide[] = [
     tag: "Cellar-Cool Transit",
     badge: "Wax Quality Seal",
     image: "/packaging/sealed-gift-delivery-box.webp",
-    desc: "Delivered in bespoke white-and-blush rigid packaging embossed with gold foil Ani Bakes branding. Tied with our signature satin berry ribbon and sealed with a certified head baker wax badge, housed within an insulated courier thermal tote.",
+    desc: "Delivered in bespoke white-and-blush rigid packaging embossed with gold foil Aniii Bakes branding. Tied with our signature satin berry ribbon and sealed with a certified head baker wax badge, housed within an insulated courier thermal tote.",
     perks: [
       "Heavyweight crush-proof rigid carton",
       "Signature satin berry ribbon wrap",

@@ -34,7 +34,7 @@ export function SiteFooter() {
         target="_blank"
         rel="noreferrer"
         aria-label="Instagram"
-        title="Follow Ani Bakes on Instagram"
+        title="Follow Aniii Bakes on Instagram"
         className="group flex size-10 items-center justify-center rounded-2xl border border-border/80 bg-card/80 shadow-2xs transition-all duration-200 hover:scale-110 hover:shadow-soft hover:border-pink-300 dark:hover:border-pink-500/50"
       >
         <img
@@ -56,7 +56,7 @@ export function SiteFooter() {
         target="_blank"
         rel="noreferrer"
         aria-label="WhatsApp"
-        title="Chat with Ani Bakes on WhatsApp"
+        title="Chat with Aniii Bakes on WhatsApp"
         className="group flex size-10 items-center justify-center rounded-2xl border border-border/80 bg-card/80 shadow-2xs transition-all duration-200 hover:scale-110 hover:shadow-soft hover:border-emerald-300 dark:hover:border-emerald-500/50"
       >
         <img
@@ -127,7 +127,7 @@ export function SiteFooter() {
             {/* 1. Brand Bio: Hidden on mobile (<640px), visible on tablet & desktop */}
             <div className="hidden sm:block">
               <p className="font-nimbus text-2xl font-bold text-cocoa">
-                Ani Bakes<span className="text-berry-deep">.</span>
+                Aniii Bakes<span className="text-berry-deep">.</span>
               </p>
               <p className="mt-2 max-w-xs text-sm text-muted-foreground">
                 A small-batch neighbourhood bakery. Everything is baked the morning of your slot.
@@ -198,7 +198,7 @@ export function SiteFooter() {
           <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
             <span>
               © {new Date().getFullYear()}{" "}
-              <span className="font-nimbus font-bold text-cocoa text-sm">Ani Bakes</span> Bakery
+              <span className="font-nimbus font-bold text-cocoa text-sm">Aniii Bakes</span> Bakery
             </span>
             <span className="flex items-center gap-1.5">
               Baked with <Heart className="size-3 text-berry-deep animate-pulse" /> in Pondicherry

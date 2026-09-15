@@ -270,7 +270,7 @@ export function AdminNewsletter({ subscribers, campaigns, products = [], onSend 
               </span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Branded email formatted in Playfair Display & Inter with custom Ani Bakes header,
+              Branded email formatted in Playfair Display & Inter with custom Aniii Bakes header,
               footer, product showcase, and attachment support.
             </p>
           </div>

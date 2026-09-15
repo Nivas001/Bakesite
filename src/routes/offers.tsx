@@ -28,16 +28,16 @@ const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCat
 export const Route = createFileRoute("/offers")({
   head: () => ({
     meta: [
-      { title: "Bakery offers & coupons — Ani Bakes Bakery" },
+      { title: "Bakery offers & coupons — Aniii Bakes Bakery" },
       {
         name: "description",
         content:
-          "Discounted cakes, cookies, pastries and promo codes at Ani Bakes, updated every week.",
+          "Discounted cakes, cookies, pastries and promo codes at Aniii Bakes, updated every week.",
       },
-      { property: "og:title", content: "Bakery offers & coupons — Ani Bakes Bakery" },
+      { property: "og:title", content: "Bakery offers & coupons — Aniii Bakes Bakery" },
       {
         property: "og:description",
-        content: "This week's discounted bakes and promo codes at Ani Bakes.",
+        content: "This week's discounted bakes and promo codes at Aniii Bakes.",
       },
     ],
   }),

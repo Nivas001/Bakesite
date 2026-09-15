@@ -114,7 +114,7 @@ export function OrderSupportDialog({
   }
 
   const directHelplineUrl = encodeURIComponent(
-    `Hi Ani Bakes Studio! 🥐 I need some help and support regarding my orders.`,
+    `Hi Aniii Bakes Studio! 🥐 I need some help and support regarding my orders.`,
   );
 
   return (

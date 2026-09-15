@@ -17,6 +17,7 @@ import { SiteHeader } from "../components/site-header";
 import { SiteFooter } from "../components/site-footer";
 import { Toaster } from "../components/ui/sonner";
 import { ScrollToTop } from "../components/scroll-to-top";
+import { MobileTabBar } from "../components/mobile-tab-bar";
 import { ScrollProgressBar } from "../components/motion/scroll-progress-bar";
 
 /** Microsoft Clarity heatmaps/analytics — only injected once a project id is set. */
@@ -97,13 +98,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Ani Bakes Bakery" },
+      { title: "Aniii Bakes Bakery" },
       {
         name: "description",
         content: "Small-batch cakes, cookies and pastries baked fresh for your chosen slot.",
       },
-      { name: "author", content: "Ani Bakes Bakery" },
-      { property: "og:title", content: "Ani Bakes Bakery" },
+      { name: "author", content: "Aniii Bakes Bakery" },
+      { property: "og:title", content: "Aniii Bakes Bakery" },
       {
         property: "og:description",
         content: "Small-batch cakes, cookies and pastries baked fresh for your chosen slot.",
@@ -189,7 +190,8 @@ function RootComponent() {
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
-        <div className="flex min-h-screen flex-col">
+        {/* The bottom padding clears the phone tab bar, which is fixed. */}
+        <div className="flex min-h-screen flex-col pb-14 md:pb-0">
           <SiteHeader />
           <main id="main-content" tabIndex={-1} className="flex-1">
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
@@ -199,6 +201,7 @@ function RootComponent() {
         </div>
         <Toaster position="bottom-center" />
         <ScrollToTop />
+        <MobileTabBar />
       </CartProvider>
     </QueryClientProvider>
   );

@@ -208,7 +208,7 @@ export function CakeStudioCarousel() {
   };
 
   const whatsappMessage = encodeURIComponent(
-    `Hi Ani Bakes! 🥐 I would like to order the "${activeSlide.title}" (${activeSlide.price}) custom cake for an upcoming celebration. Can we customize the message and date?`,
+    `Hi Aniii Bakes! 🥐 I would like to order the "${activeSlide.title}" (${activeSlide.price}) custom cake for an upcoming celebration. Can we customize the message and date?`,
   );
 
   return (

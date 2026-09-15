@@ -68,6 +68,6 @@
   <path d="M 300 65 C 286 88, 288 100, 300 104 C 312 100, 314 88, 300 65 Z" fill="url(#goldG)" />
 
   <!-- Text -->
-  <text x="300" y="530" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="800" fill="#2C1810" letter-spacing="3">ANI BAKES ATELIER</text>
+  <text x="300" y="530" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="800" fill="#2C1810" letter-spacing="3">ANIII BAKES ATELIER</text>
   <text x="300" y="556" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#9F1239" letter-spacing="1">FRESH SMALL-BATCH BAKERY</text>
 </svg>

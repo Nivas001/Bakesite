@@ -43,7 +43,7 @@ export const Route = createFileRoute("/shop_/$slug")({
     const p = loaderData?.product;
     return {
       meta: [
-        { title: p ? `${p.name} | Ani Bakes Artisan Bakery` : "Product Details | Ani Bakes" },
+        { title: p ? `${p.name} | Aniii Bakes Artisan Bakery` : "Product Details | Aniii Bakes" },
         {
           name: "description",
           content:

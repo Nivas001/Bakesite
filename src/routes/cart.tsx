@@ -8,9 +8,9 @@ import { LazyVideo } from "@/components/motion/lazy-video";
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
-      { title: "Your cart — Ani Bakes Bakery" },
-      { name: "description", content: "Review your Ani Bakes bakes before choosing a slot." },
-      { property: "og:title", content: "Your cart — Ani Bakes Bakery" },
+      { title: "Your cart — Aniii Bakes Bakery" },
+      { name: "description", content: "Review your Aniii Bakes bakes before choosing a slot." },
+      { property: "og:title", content: "Your cart — Aniii Bakes Bakery" },
       { property: "og:description", content: "Review your bakes before choosing a slot." },
     ],
   }),

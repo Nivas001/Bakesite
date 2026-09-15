@@ -258,7 +258,7 @@ export function CakeBuilderWidget() {
     .join(", ");
 
   const whatsappText = encodeURIComponent(
-    `Hi Ani Bakes! I designed a cake in your studio:\n\n` +
+    `Hi Aniii Bakes! I designed a cake in your studio:\n\n` +
       `• Size: ${size.name} (${size.serves})\n` +
       `• Sponge: ${sponge.name}\n` +
       `• Flavour: ${flavour.name} — ${flavour.cream}\n` +
@@ -335,7 +335,7 @@ export function CakeBuilderWidget() {
                       <img
                         key={photo}
                         src={photo}
-                        alt={`An Ani Bakes cake in the ${flavour.name} style`}
+                        alt={`An Aniii Bakes cake in the ${flavour.name} style`}
                         loading="lazy"
                         decoding="async"
                         className="aspect-square w-full rounded-xl border border-border/60 object-cover"

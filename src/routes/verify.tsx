@@ -12,8 +12,8 @@ export const Route = createFileRoute("/verify")({
   }),
   head: () => ({
     meta: [
-      { title: "Email Verification — Ani Bakes Bakery" },
-      { name: "description", content: "Verify your email address for Ani Bakes Bakery." },
+      { title: "Email Verification — Aniii Bakes Bakery" },
+      { name: "description", content: "Verify your email address for Aniii Bakes Bakery." },
     ],
   }),
   component: VerifyPage,

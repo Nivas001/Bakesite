@@ -17,7 +17,7 @@ export async function notifyAdminNewOrder(input: {
 }): Promise<void> {
   const adminPhone = process.env["BAKERY_ADMIN_PHONE"] ?? null;
   const adminEmail = process.env["ADMIN_EMAIL"] ?? null;
-  const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
+  const bakeryName = process.env["BAKERY_NAME"] || "Aniii Bakes";
   const shortId = input.orderId.slice(0, 8);
 
   const text = `New Paid ${bakeryName} order #${shortId} from ${input.customerName ?? "a customer"} for ${input.slot} — ${formatINR(input.total)}. Review and confirm kitchen baking schedule in your admin dashboard.`;
@@ -44,7 +44,7 @@ export async function notifyCustomerOrderPlaced(input: {
 }): Promise<void> {
   const shortId = input.orderId.slice(0, 8);
   const appUrl = getAppUrl();
-  const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
+  const bakeryName = process.env["BAKERY_NAME"] || "Aniii Bakes";
   const ordersPageUrl = `${appUrl}/orders`;
 
   const body = `Hi ${input.name ?? "there"},\n\nThank you for ordering with ${bakeryName}!\n\nWe have received your payment of ${formatINR(input.total)} for order #${shortId}.\n\n🕒 Requested Slot: ${input.slot}\n👨‍🍳 Status: In Kitchen Queue — The head baker is reviewing oven capacity & scheduling your fresh bakes.\n\nYou can track your live order status anytime here:\n👉 ${ordersPageUrl}\n\n${bakeryName}`;
@@ -73,7 +73,7 @@ export async function notifyCustomerOrderRescheduled(input: {
 }): Promise<void> {
   const shortId = input.orderId.slice(0, 8);
   const appUrl = getAppUrl();
-  const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
+  const bakeryName = process.env["BAKERY_NAME"] || "Aniii Bakes";
   const ordersPageUrl = `${appUrl}/orders`;
 
   const reasonText = input.reason?.trim()
@@ -107,7 +107,7 @@ export async function notifyCustomerOrderUpdate(input: {
 }): Promise<void> {
   const shortId = input.orderId.slice(0, 8);
   const appUrl = getAppUrl();
-  const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
+  const bakeryName = process.env["BAKERY_NAME"] || "Aniii Bakes";
   const ordersPageUrl = `${appUrl}/orders`;
 
   const messages: Record<string, string> = {
@@ -148,7 +148,7 @@ export async function sendReviewRequest(input: {
   name: string | null;
   email?: string | null | undefined;
 }): Promise<void> {
-  const bakeryName = process.env["BAKERY_NAME"] || "Ani Bakes";
+  const bakeryName = process.env["BAKERY_NAME"] || "Aniii Bakes";
   await sendEmail({
     to: input.email ?? null,
     subject: `How were your bakes? — ${bakeryName}`,

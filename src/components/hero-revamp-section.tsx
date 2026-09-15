@@ -311,7 +311,7 @@ export function HeroRevampSection() {
       {/* 4. [BOTTOM WAVE]: Kinetic TextLoop Ribbon */}
       <div className="w-full mt-2 sm:mt-4 overflow-hidden select-none pointer-events-auto">
         <TextLoop
-          text="Ani Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
+          text="Aniii Bakes ✦ Fresh Sunrise Dawn Bakes ✦ Wild Sourdough Ferment ✦ Zero Preservatives ✦ Small-Batch Studio"
           shape="wave"
           speed={48}
           direction="forward"
