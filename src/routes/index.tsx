@@ -65,7 +65,7 @@ function Home() {
       <div className="w-full space-y-10 pt-6 sm:space-y-16 sm:pt-10">
         <AssuranceStrip />
         <CravingExplorer categories={data.categories} products={data.products} />
-        <ProductFilm products={data.products} />
+        <ProductFilm />
         <DailyCounter products={data.products} />
         <HowItWorks />
         <CakeStudioCarousel />
