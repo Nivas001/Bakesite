@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Check, Leaf, Link2, MessageCircle, Sparkles, Wand2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/motion/reveal";
 import { CakePreview, type CakeShape } from "@/components/cake-studio/cake-preview";
 import { formatCurrency } from "@/lib/pricing";
@@ -153,8 +152,17 @@ const ADDONS: AddonOption[] = [
 
 const PRESET_MESSAGES = ["Happy Birthday", "Happy Anniversary", "Congratulations", "Best Mum Ever"];
 
+const STEPS = [
+  { id: "size", label: "Size" },
+  { id: "sponge", label: "Sponge" },
+  { id: "flavour", label: "Flavour" },
+  { id: "finish", label: "Finish" },
+  { id: "message", label: "Message" },
+] as const;
+
 const EGGLESS_SURCHARGE = 60;
 const MAX_MESSAGE = 26;
+const WHATSAPP_NUMBER = "917448724920";
 
 /** Everything needed to rebuild a design, kept short enough for a URL. */
 interface CakeConfig {
@@ -194,6 +202,16 @@ function writeConfigToUrl(config: CakeConfig): void {
   window.history.replaceState(null, "", `${window.location.pathname}#${params.toString()}`);
 }
 
+/**
+ * The design-your-own-cake studio.
+ *
+ * Rebuilt as a bench: the drawing of the cake sits on the left under a header
+ * that reads like an order docket, and the choices run down the right as five
+ * numbered steps with a jump rail above them. The running total is docked to
+ * the bottom of the viewport on phones and to the column on desktop, so the
+ * price is never more than a glance away while the options are being worked
+ * through.
+ */
 export function CakeBuilderWidget() {
   const [size, setSize] = useState<SizeOption>(SIZES[1]!);
   const [sponge, setSponge] = useState<SpongeOption>(SPONGES[0]!);
@@ -269,42 +287,77 @@ export function CakeBuilderWidget() {
       `Could you confirm slot availability?`,
   );
 
+  function jumpToStep(id: string) {
+    document.getElementById(`cake-step-${id}`)?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }
+
   return (
     <section className="py-10 sm:py-16">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+        {/* ── Heading ───────────────────────────────────────────────── */}
         <Reveal variant="fade-up">
-          <div className="mb-7 max-w-2xl sm:mb-10">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-amber-900 dark:text-amber-300">
-              <Wand2 className="size-3.5" />
-              Design your cake
-            </span>
-            <h2 className="mt-3 font-nimbus text-3xl font-bold leading-[1.1] text-cocoa sm:text-5xl">
-              Build it here. We bake it at dawn.
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Every choice below redraws the cake on the left. When it looks right, send it over on
-              WhatsApp and we will confirm your slot.
-            </p>
+          <div className="mb-6 flex flex-col gap-4 sm:mb-9 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-3.5 py-1 text-[11px] font-black tracking-[0.18em] text-amber-900 uppercase dark:text-amber-300">
+                <Wand2 className="size-3.5" />
+                Design your cake
+              </span>
+              <h2 className="mt-3 font-nimbus text-[clamp(1.75rem,5vw,3.25rem)] leading-[1.05] font-bold text-cocoa">
+                Build it here. We bake it at dawn.
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Every choice below redraws the cake beside it. When it looks right, send it over on
+                WhatsApp and we will confirm your slot.
+              </p>
+            </div>
+
+            {/* Jump rail — five steps, tappable, so a long form has a map. */}
+            <nav aria-label="Jump to a step" className="shrink-0">
+              <ol className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4 lg:mx-0 lg:px-0">
+                {STEPS.map((step, index) => (
+                  <li key={step.id}>
+                    <button
+                      type="button"
+                      onClick={() => jumpToStep(step.id)}
+                      className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-border/70 bg-card px-3 text-[11px] font-bold whitespace-nowrap text-cocoa shadow-2xs transition-colors hover:border-cocoa/40 hover:bg-secondary/60"
+                    >
+                      <span className="grid size-4 place-items-center rounded-full bg-cocoa text-[9px] font-black text-background">
+                        {index + 1}
+                      </span>
+                      {step.label}
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </nav>
           </div>
         </Reveal>
 
         <div className="grid gap-5 lg:grid-cols-12 lg:gap-7">
-          {/* ------------------------------------------------- live preview */}
+          {/* ── Live preview ────────────────────────────────────────── */}
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-24">
-              <div className="relative overflow-hidden rounded-[2rem] border-2 border-[#2C1810]/12 bg-gradient-to-b from-[#FFF8EE] to-[#FBE9DA] shadow-lift dark:border-white/10 dark:from-[#1E120A] dark:to-[#140B05]">
+              <div className="relative overflow-hidden rounded-[2rem] border-2 border-[#2C1810]/12 bg-linear-to-b from-[#FFF8EE] to-[#FBE9DA] shadow-lift dark:border-white/10 dark:from-[#1E120A] dark:to-[#140B05]">
+                <div
+                  aria-hidden
+                  className="worktop-grid pointer-events-none absolute inset-0 opacity-60"
+                />
                 <div
                   aria-hidden
                   className="pointer-events-none absolute -top-16 -right-16 size-52 rounded-full bg-amber-300/25 blur-3xl"
                 />
 
-                <div className="relative flex items-center justify-between gap-3 px-5 pt-5">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
-                      Live preview
+                {/* Docket header */}
+                <div className="relative flex items-center justify-between gap-3 border-b border-dashed border-[#2C1810]/12 px-5 py-3.5 dark:border-white/10">
+                  <div className="min-w-0">
+                    <p className="font-mono text-[10px] font-black tracking-[0.2em] text-muted-foreground uppercase">
+                      Your design
                     </p>
-                    <p className="font-sans text-sm font-bold leading-tight text-cocoa">
-                      {flavour.name}
+                    <p className="truncate font-sans text-sm leading-tight font-bold text-cocoa">
+                      {size.name} · {flavour.name}
                     </p>
                   </div>
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-1 text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
@@ -312,6 +365,7 @@ export function CakeBuilderWidget() {
                   </span>
                 </div>
 
+                {/* The drawing */}
                 <div className="relative mx-auto aspect-square w-full max-w-sm px-3">
                   <CakePreview
                     shape={size.shape}
@@ -324,10 +378,32 @@ export function CakeBuilderWidget() {
                   />
                 </div>
 
+                {/* A running spec of the current design, so what has been
+                    chosen is readable without scrolling back up the steps. */}
+                <dl className="relative grid grid-cols-2 gap-x-4 gap-y-2 border-t border-dashed border-[#2C1810]/12 px-5 py-3.5 text-xs dark:border-white/10">
+                  <SpecRow label="Sponge" value={sponge.name} />
+                  <SpecRow label="Cream" value={flavour.cream} />
+                  <SpecRow
+                    label="Finishing"
+                    value={addons.length ? `${addons.length} garnishes` : "Clean finish"}
+                  />
+                  <SpecRow label="Recipe" value={eggless ? "Eggless" : "Standard egg"} />
+                  {message.trim() && (
+                    <div className="col-span-2">
+                      <dt className="font-mono text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+                        Piped
+                      </dt>
+                      <dd className="truncate font-script text-base text-cocoa dark:text-foreground">
+                        “{message.trim()}”
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+
                 {/* Real bakes in this style. The drawing above shows the exact
                     configuration; these show what it actually looks like. */}
-                <div className="relative border-t border-[#2C1810]/10 px-5 pt-3.5 dark:border-white/10">
-                  <p className="mb-2 text-[10px] font-black tracking-[0.18em] text-muted-foreground uppercase">
+                <div className="relative border-t border-[#2C1810]/10 px-5 pt-3.5 pb-4 dark:border-white/10">
+                  <p className="mb-2 font-mono text-[10px] font-black tracking-[0.18em] text-muted-foreground uppercase">
                     Bakes we have made in this style
                   </p>
                   <div className="grid grid-cols-3 gap-2">
@@ -338,25 +414,18 @@ export function CakeBuilderWidget() {
                         alt={`An Aniii Bakes cake in the ${flavour.name} style`}
                         loading="lazy"
                         decoding="async"
-                        className="aspect-square w-full rounded-xl border border-border/60 object-cover"
+                        className="aspect-square w-full rounded-xl border border-border/60 object-cover transition-transform duration-500 hover:scale-105"
                       />
                     ))}
                   </div>
-                </div>
-
-                <div className="relative flex flex-wrap gap-1.5 px-5 py-3.5">
-                  <PreviewChip label={size.name} />
-                  <PreviewChip label={sponge.name} />
-                  {eggless && <PreviewChip label="Eggless" tone="emerald" />}
-                  {addons.length > 0 && <PreviewChip label={`${addons.length} garnishes`} />}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ----------------------------------------------------- controls */}
+          {/* ── Controls ────────────────────────────────────────────── */}
           <div className="space-y-4 lg:col-span-7">
-            <Step index={1} title="Size and servings">
+            <Step id="size" index={1} title="Size and servings" aside={size.name}>
               <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
                 {SIZES.map((option) => (
                   <OptionCard
@@ -366,7 +435,7 @@ export function CakeBuilderWidget() {
                   >
                     <p className="font-sans text-sm font-bold text-foreground">{option.name}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">{option.serves}</p>
-                    <p className="mt-1.5 text-sm font-black text-cocoa">
+                    <p className="mt-1.5 font-mono text-sm font-black text-cocoa tabular-nums dark:text-foreground">
                       {formatCurrency(basePriceFor(option))}
                     </p>
                     <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
@@ -377,7 +446,7 @@ export function CakeBuilderWidget() {
               </div>
             </Step>
 
-            <Step index={2} title="Sponge">
+            <Step id="sponge" index={2} title="Sponge" aside={sponge.name}>
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
                 {SPONGES.map((option) => (
                   <OptionCard
@@ -386,7 +455,7 @@ export function CakeBuilderWidget() {
                     onClick={() => setSponge(option)}
                   >
                     <span
-                      className="mb-2 block size-7 rounded-full border border-black/10 shadow-inner"
+                      className="mb-2 block size-8 rounded-full border border-black/10 shadow-inner"
                       style={{ backgroundColor: option.colour }}
                     />
                     <p className="font-sans text-sm font-bold text-foreground">{option.name}</p>
@@ -396,7 +465,7 @@ export function CakeBuilderWidget() {
               </div>
             </Step>
 
-            <Step index={3} title="Flavour and cream">
+            <Step id="flavour" index={3} title="Flavour and cream" aside={flavour.name}>
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 {FLAVOURS.map((option) => (
                   <OptionCard
@@ -406,7 +475,7 @@ export function CakeBuilderWidget() {
                   >
                     <div className="flex items-start gap-3">
                       <span
-                        className="mt-0.5 size-8 shrink-0 rounded-full border-2 border-white shadow-sm"
+                        className="mt-0.5 size-9 shrink-0 rounded-full border-2 border-white shadow-sm"
                         style={{
                           background: `linear-gradient(135deg, ${option.frostingLight}, ${option.drip})`,
                         }}
@@ -416,7 +485,7 @@ export function CakeBuilderWidget() {
                         <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
                           {option.cream}
                         </p>
-                        <p className="mt-1 text-[10px] font-black uppercase tracking-wider text-berry-deep">
+                        <p className="mt-1 font-mono text-[10px] font-black tracking-wider text-berry-deep uppercase">
                           {option.badge}
                         </p>
                       </div>
@@ -427,6 +496,7 @@ export function CakeBuilderWidget() {
             </Step>
 
             <Step
+              id="finish"
               index={4}
               title="Finishing touches"
               aside={addonTotal > 0 ? `+${formatCurrency(addonTotal)}` : "Optional"}
@@ -444,7 +514,7 @@ export function CakeBuilderWidget() {
                         <p className="truncate font-sans text-xs font-bold text-foreground">
                           {option.name}
                         </p>
-                        <p className="text-xs font-semibold text-cocoa">
+                        <p className="font-mono text-xs font-bold text-cocoa tabular-nums dark:text-foreground">
                           +₹{addonPriceFor(option)}
                         </p>
                       </div>
@@ -472,6 +542,7 @@ export function CakeBuilderWidget() {
             </Step>
 
             <Step
+              id="message"
               index={5}
               title="Hand-piped inscription"
               aside={`${message.length}/${MAX_MESSAGE}`}
@@ -486,7 +557,7 @@ export function CakeBuilderWidget() {
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 placeholder="Happy 25th, Maya"
-                className="h-12 w-full rounded-xl border border-input bg-background px-4 text-base font-semibold placeholder:font-normal placeholder:text-muted-foreground focus:ring-2 focus:ring-cocoa/30 focus:outline-none"
+                className="h-12 w-full rounded-xl border border-input bg-background px-4 font-script text-xl placeholder:font-sans placeholder:text-base placeholder:font-normal placeholder:text-muted-foreground focus:ring-2 focus:ring-cocoa/30 focus:outline-none"
               />
               <div className="mt-2.5 flex flex-wrap gap-1.5">
                 {PRESET_MESSAGES.map((preset) => (
@@ -494,7 +565,13 @@ export function CakeBuilderWidget() {
                     key={preset}
                     type="button"
                     onClick={() => setMessage(preset)}
-                    className="min-h-9 cursor-pointer rounded-full bg-secondary/60 px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-secondary"
+                    aria-pressed={message === preset}
+                    className={cn(
+                      "min-h-9 cursor-pointer rounded-full px-3.5 text-xs font-semibold transition-colors",
+                      message === preset
+                        ? "bg-cocoa text-background"
+                        : "bg-secondary/60 text-foreground hover:bg-secondary",
+                    )}
                   >
                     {preset}
                   </button>
@@ -502,83 +579,87 @@ export function CakeBuilderWidget() {
               </div>
             </Step>
 
-            {/* ------------------------------------------------- order summary */}
+            {/* ── Order docket ──────────────────────────────────────── */}
             {/* Sticky on narrow screens so the running total and the CTA stay
                 in reach while the visitor works through the options. */}
-            <div className="sticky bottom-0 z-20 -mx-4 rounded-t-3xl border-2 border-b-0 border-cocoa/15 bg-card/95 p-5 shadow-lift backdrop-blur-md sm:-mx-6 lg:static lg:mx-0 lg:rounded-3xl lg:border-b-2 lg:bg-card lg:backdrop-blur-none">
-              <div className="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
-                    Estimated total
-                  </p>
-                  {/* Rendered directly rather than counted up: a price that
-                      reads ₹0 for even a moment is worse than one that simply
-                      changes. */}
-                  <p className="mt-1 font-nimbus text-4xl leading-none font-bold text-cocoa">
-                    {formatCurrency(total)}
-                  </p>
-                </div>
-                <dl className="text-right text-xs text-muted-foreground">
-                  <div className="flex justify-end gap-2">
-                    <dt>Base</dt>
-                    <dd className="font-semibold text-foreground">
-                      {formatCurrency(basePriceFor(size))}
-                    </dd>
+            <div className="sticky bottom-0 z-20 -mx-4 overflow-hidden rounded-t-3xl border-2 border-b-0 border-cocoa/15 bg-card/95 shadow-lift backdrop-blur-md sm:-mx-6 lg:static lg:mx-0 lg:rounded-3xl lg:border-b-2 lg:bg-card lg:backdrop-blur-none">
+              <div className="p-5">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="font-mono text-[10px] font-black tracking-[0.18em] text-muted-foreground uppercase">
+                      Estimated total
+                    </p>
+                    {/* Rendered directly rather than counted up: a price that
+                        reads ₹0 for even a moment is worse than one that simply
+                        changes. */}
+                    <p className="mt-1 font-nimbus text-4xl leading-none font-bold text-cocoa dark:text-foreground">
+                      {formatCurrency(total)}
+                    </p>
                   </div>
-                  <div className="flex justify-end gap-2">
-                    <dt>Finishing</dt>
-                    <dd className="font-semibold text-foreground">{formatCurrency(addonTotal)}</dd>
-                  </div>
-                  {eggless && (
-                    <div className="flex justify-end gap-2">
-                      <dt>Eggless</dt>
-                      <dd className="font-semibold text-foreground">
-                        {formatCurrency(egglessSurcharge)}
+                  <dl className="space-y-0.5 text-right text-xs text-muted-foreground">
+                    <div className="flex justify-end gap-3">
+                      <dt>Base · {size.name}</dt>
+                      <dd className="font-mono font-semibold text-foreground tabular-nums">
+                        {formatCurrency(basePriceFor(size))}
                       </dd>
                     </div>
-                  )}
-                </dl>
-              </div>
+                    <div className="flex justify-end gap-3">
+                      <dt>Finishing · {addons.length}</dt>
+                      <dd className="font-mono font-semibold text-foreground tabular-nums">
+                        {formatCurrency(addonTotal)}
+                      </dd>
+                    </div>
+                    {eggless && (
+                      <div className="flex justify-end gap-3">
+                        <dt>Eggless</dt>
+                        <dd className="font-mono font-semibold text-foreground tabular-nums">
+                          {formatCurrency(egglessSurcharge)}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
 
-              <Button
-                asChild
-                className="mt-4 h-12 w-full cursor-pointer rounded-2xl bg-cocoa text-base font-bold text-background shadow-lift transition-transform hover:scale-[1.01] hover:bg-cocoa/90 active:scale-[0.99]"
-              >
                 <a
-                  href={`https://wa.me/917448724920?text=${whatsappText}`}
+                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappText}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-center gap-2"
+                  className="group relative mt-4 flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-cocoa text-base font-bold text-background shadow-lift transition-transform hover:scale-[1.01] active:scale-[0.99]"
                 >
                   <MessageCircle className="size-5 text-emerald-400" />
                   Send this design on WhatsApp
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 bg-white/20 opacity-0 group-hover:animate-sheen-sweep group-hover:opacity-100"
+                  />
                 </a>
-              </Button>
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(window.location.href);
-                    setCopied(true);
-                    window.setTimeout(() => setCopied(false), 2500);
-                  } catch {
-                    setCopied(false);
-                  }
-                }}
-                className="mt-2 flex min-h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-cocoa transition-colors hover:bg-secondary/60"
-              >
-                {copied ? (
-                  <>
-                    <Check className="size-3.5 text-emerald-600" /> Link copied
-                  </>
-                ) : (
-                  <>
-                    <Link2 className="size-3.5" /> Copy a link to this design
-                  </>
-                )}
-              </button>
 
-              <p className="mt-2 text-center text-xs text-muted-foreground">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(window.location.href);
+                      setCopied(true);
+                      window.setTimeout(() => setCopied(false), 2500);
+                    } catch {
+                      setCopied(false);
+                    }
+                  }}
+                  className="mt-2 flex min-h-9 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-bold text-cocoa transition-colors hover:bg-secondary/60 dark:text-foreground"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="size-3.5 text-emerald-600" /> Link copied
+                    </>
+                  ) : (
+                    <>
+                      <Link2 className="size-3.5" /> Copy a link to this design
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <p className="border-t border-dashed border-border/70 bg-secondary/35 px-5 py-2.5 text-center text-xs text-muted-foreground">
                 An estimate, not a charge. We confirm the final price and your slot before anything
                 is baked.
               </p>
@@ -590,27 +671,25 @@ export function CakeBuilderWidget() {
   );
 }
 
-function PreviewChip({ label, tone }: { label: string; tone?: "emerald" }) {
+function SpecRow({ label, value }: { label: string; value: string }) {
   return (
-    <span
-      className={cn(
-        "rounded-full border px-2.5 py-1 text-[11px] font-bold",
-        tone === "emerald"
-          ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300"
-          : "border-border/70 bg-card/80 text-cocoa dark:text-foreground",
-      )}
-    >
-      {label}
-    </span>
+    <div className="min-w-0">
+      <dt className="font-mono text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+        {label}
+      </dt>
+      <dd className="truncate text-[13px] font-bold text-cocoa dark:text-foreground">{value}</dd>
+    </div>
   );
 }
 
 function Step({
+  id,
   index,
   title,
   aside,
   children,
 }: {
+  id: string;
   index: number;
   title: string;
   aside?: string;
@@ -618,7 +697,10 @@ function Step({
 }) {
   return (
     <Reveal variant="fade-up" delay={index * 40}>
-      <fieldset className="rounded-3xl border border-border/80 bg-card p-4 shadow-soft sm:p-5">
+      <fieldset
+        id={`cake-step-${id}`}
+        className="scroll-mt-24 rounded-3xl border border-border/80 bg-card p-4 shadow-soft sm:p-5"
+      >
         <legend className="sr-only">{title}</legend>
         <div className="mb-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
@@ -628,7 +710,9 @@ function Step({
             <h3 className="font-sans text-sm font-bold text-foreground sm:text-base">{title}</h3>
           </div>
           {aside && (
-            <span className="shrink-0 text-xs font-bold text-muted-foreground">{aside}</span>
+            <span className="max-w-[45%] shrink-0 truncate rounded-full bg-secondary/70 px-2.5 py-1 text-[11px] font-bold text-cocoa dark:text-foreground">
+              {aside}
+            </span>
           )}
         </div>
         {children}
@@ -652,10 +736,10 @@ function OptionCard({
       onClick={onClick}
       aria-pressed={selected}
       className={cn(
-        "relative min-h-11 cursor-pointer rounded-2xl border p-3 text-left transition-all",
+        "relative min-h-11 cursor-pointer overflow-hidden rounded-2xl border p-3 text-left transition-all duration-200",
         selected
           ? "border-cocoa bg-cocoa/10 ring-2 ring-cocoa"
-          : "border-border/80 bg-background/50 hover:border-cocoa/40 hover:bg-secondary/40",
+          : "border-border/80 bg-background/50 hover:-translate-y-0.5 hover:border-cocoa/40 hover:bg-secondary/40 hover:shadow-soft",
       )}
     >
       {selected && (

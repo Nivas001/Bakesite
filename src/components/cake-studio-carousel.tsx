@@ -1,14 +1,17 @@
-import { useState, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
-  Sparkles,
   ArrowRight,
   ChevronLeft,
   ChevronRight,
   MessageCircle,
+  Pause,
+  Play,
+  Sparkles,
   Users,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { usePrefersReducedMotion } from "@/lib/motion";
 
 export interface CakeSlide {
   id: string;
@@ -155,427 +158,348 @@ export const CAKE_SLIDES: CakeSlide[] = [
   },
 ];
 
+const WHATSAPP_NUMBER = "917448724920";
+/** How long each slide holds before the lookbook turns itself. */
+const AUTOPLAY_MS = 6000;
+
+/**
+ * The custom-cake lookbook.
+ *
+ * Rebuilt around a single stage: one large photograph with the design's details
+ * sitting on it, a filmstrip of every other design underneath, and a progress
+ * ring on the turn arrows so it is obvious the lookbook advances on its own.
+ *
+ * The previous version maintained two entirely separate layouts — a phone card
+ * and a desktop split — which meant two sets of markup to keep in step and a
+ * desktop layout locked to a fixed 580px height that clipped longer titles. One
+ * responsive stage replaces both.
+ */
 export function CakeStudioCarousel() {
   const [current, setCurrent] = useState(0);
+  const [playing, setPlaying] = useState(true);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const stripRef = useRef<HTMLUListElement>(null);
   const touchStartX = useRef<number | null>(null);
+  const reduced = usePrefersReducedMotion();
 
   const activeSlide = CAKE_SLIDES[current]!;
 
-  const handleNext = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % CAKE_SLIDES.length);
+  const goTo = useCallback((index: number) => {
+    setCurrent(((index % CAKE_SLIDES.length) + CAKE_SLIDES.length) % CAKE_SLIDES.length);
+  }, []);
+  const handleNext = useCallback(() => goTo(current + 1), [current, goTo]);
+  const handlePrev = useCallback(() => goTo(current - 1), [current, goTo]);
+
+  // --------------------------------------------------------------- autoplay
+  // Paused whenever the visitor takes over, whenever the section is off screen,
+  // and entirely for anyone who prefers reduced motion.
+  const [onScreen, setOnScreen] = useState(false);
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setOnScreen(Boolean(entry?.isIntersecting)),
+      { threshold: 0.35 },
+    );
+    observer.observe(stage);
+    return () => observer.disconnect();
   }, []);
 
-  const handlePrev = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + CAKE_SLIDES.length) % CAKE_SLIDES.length);
-  }, []);
+  useEffect(() => {
+    if (!playing || reduced || !onScreen) return;
+    const id = window.setTimeout(handleNext, AUTOPLAY_MS);
+    return () => window.clearTimeout(id);
+  }, [playing, reduced, onScreen, handleNext, current]);
 
-  // Touch Swipe Handlers for Mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0]?.clientX ?? null;
-  };
+  // Keep the active thumbnail in view as the lookbook turns.
+  useEffect(() => {
+    const strip = stripRef.current;
+    const thumb = strip?.querySelector<HTMLElement>(`[data-index="${current}"]`);
+    thumb?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }, [current]);
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  // ------------------------------------------------------------ interaction
+  function handleTouchStart(event: React.TouchEvent) {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+    setPlaying(false);
+  }
+
+  function handleTouchEnd(event: React.TouchEvent) {
     if (touchStartX.current === null) return;
-    const touchEndX = e.changedTouches[0]?.clientX ?? null;
-    if (touchEndX === null) return;
-    const diff = touchStartX.current - touchEndX;
+    const endX = event.changedTouches[0]?.clientX ?? null;
+    if (endX === null) return;
+    const diff = touchStartX.current - endX;
     if (Math.abs(diff) > 40) {
       if (diff > 0) handleNext();
       else handlePrev();
     }
     touchStartX.current = null;
-  };
+  }
 
-  // 3D Tilt calculation (Desktop)
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -5;
-    const rotateY = ((x - centerX) / centerX) * 5;
-    setTilt({ x: rotateX, y: rotateY });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0 });
-    setIsHovered(false);
-  };
+  function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
+    if (reduced || !stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: y * -4, y: x * 4 });
+  }
 
   const whatsappMessage = encodeURIComponent(
     `Hi Aniii Bakes! 🥐 I would like to order the "${activeSlide.title}" (${activeSlide.price}) custom cake for an upcoming celebration. Can we customize the message and date?`,
   );
 
   return (
-    <section className="relative overflow-hidden py-8 sm:py-14 bg-secondary/20 border-y border-border/70">
-      {/* Ambient Background Glows */}
-      <div className="absolute -left-20 top-1/3 size-72 rounded-full bg-berry/10 blur-3xl pointer-events-none" />
-      <div className="absolute -right-20 bottom-10 size-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+    <section className="relative overflow-hidden border-y border-border/70 bg-secondary/25 py-8 sm:py-14">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-1/3 -left-20 size-72 rounded-full bg-berry/10 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-20 bottom-10 size-80 rounded-full bg-amber-500/10 blur-3xl"
+      />
 
-      <div className="mx-auto w-full max-w-6xl px-4">
-        {/* Section Header */}
-        <div className="flex flex-row items-end justify-between gap-3 mb-4 sm:mb-6">
-          <div>
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-berry-deep block mb-1">
+      <div className="relative mx-auto w-full max-w-6xl px-4">
+        {/* ── Heading + transport controls ──────────────────────────── */}
+        <header className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
+          <div className="min-w-0">
+            <span className="mb-1 block text-[10px] font-black tracking-[0.2em] text-berry-deep uppercase sm:text-xs">
               Custom Celebration Studio
             </span>
-            <h2 className="font-blogh text-xl sm:text-3xl lg:text-5xl font-bold text-cocoa leading-[1.1] uppercase tracking-wide">
+            <h2 className="font-blogh text-[clamp(1.4rem,4.6vw,3rem)] leading-[1.05] font-bold tracking-wide text-cocoa uppercase">
               Bespoke bakes for core memories
             </h2>
           </div>
 
-          {/* Carousel Navigation Controls */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <span className="text-xs sm:text-sm font-sans font-medium text-muted-foreground tracking-widest tabular-nums">
-              <strong className="text-cocoa font-bold">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <span className="font-mono text-xs font-bold tracking-widest text-muted-foreground tabular-nums sm:text-sm">
+              <strong className="font-black text-cocoa">
                 {String(current + 1).padStart(2, "0")}
-              </strong>{" "}
-              / {String(CAKE_SLIDES.length).padStart(2, "0")}
+              </strong>
+              <span className="mx-0.5">/</span>
+              {String(CAKE_SLIDES.length).padStart(2, "0")}
             </span>
+
+            {!reduced && (
+              <button
+                type="button"
+                onClick={() => setPlaying((value) => !value)}
+                aria-pressed={playing}
+                aria-label={playing ? "Pause the lookbook" : "Play the lookbook"}
+                className="grid size-8 cursor-pointer place-items-center rounded-full border border-border/80 bg-card text-cocoa shadow-2xs transition-all hover:bg-secondary active:scale-95 sm:size-10"
+              >
+                {playing ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
+              </button>
+            )}
 
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={handlePrev}
-                aria-label="Previous Cake"
-                className="flex size-8 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer"
+                onClick={() => {
+                  setPlaying(false);
+                  handlePrev();
+                }}
+                aria-label="Previous design"
+                className="grid size-8 cursor-pointer place-items-center rounded-full border border-border/80 bg-card text-cocoa shadow-2xs transition-all hover:bg-secondary active:scale-95 sm:size-10"
               >
                 <ChevronLeft className="size-3.5 sm:size-4" />
               </button>
               <button
                 type="button"
-                onClick={handleNext}
-                aria-label="Next Cake"
-                className="flex size-8 sm:size-10 items-center justify-center rounded-full border border-border/80 bg-card text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer"
+                onClick={() => {
+                  setPlaying(false);
+                  handleNext();
+                }}
+                aria-label="Next design"
+                className="grid size-8 cursor-pointer place-items-center rounded-full border border-border/80 bg-card text-cocoa shadow-2xs transition-all hover:bg-secondary active:scale-95 sm:size-10"
               >
                 <ChevronRight className="size-3.5 sm:size-4" />
               </button>
             </div>
           </div>
-        </div>
+        </header>
 
-        {/* 📱 MOBILE & TABLET VIEW: Single-View Unified Celebration Stage (<1024px) */}
+        {/* ── The stage ─────────────────────────────────────────────── */}
         <div
+          ref={stageRef}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
-          className="block lg:hidden rounded-3xl border border-border/80 bg-card overflow-hidden shadow-soft transition-all duration-300"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setTilt({ x: 0, y: 0 })}
+          className="group relative overflow-hidden rounded-[1.75rem] border border-border/80 bg-cocoa shadow-lift sm:rounded-[2.25rem]"
+          style={{ perspective: "1400px" }}
         >
-          {/* Top Stage Photo (54% height of card) */}
-          <div className="relative aspect-[16/11] sm:aspect-[16/9] w-full overflow-hidden bg-secondary/40">
-            <img
-              key={activeSlide.image}
-              src={activeSlide.image}
-              alt={activeSlide.title}
-              className="size-full object-cover select-none transition-all duration-500"
+          {/* Photograph. All slides stay mounted and cross-fade, so turning
+              the page never shows a gap while the next image decodes. */}
+          <div
+            className="relative aspect-4/5 w-full transition-transform duration-300 ease-out sm:aspect-16/10 lg:aspect-21/9"
+            style={{
+              transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
+              transformStyle: "preserve-3d",
+            }}
+          >
+            {CAKE_SLIDES.map((slide, index) => (
+              <img
+                key={slide.id}
+                src={slide.image}
+                alt={index === current ? slide.title : ""}
+                aria-hidden={index !== current}
+                loading={index === 0 ? "eager" : "lazy"}
+                decoding="async"
+                className={cn(
+                  "absolute inset-0 size-full object-cover transition-all duration-700 ease-out",
+                  index === current ? "scale-100 opacity-100" : "scale-105 opacity-0",
+                )}
+              />
+            ))}
+
+            {/* Readability washes: from the bottom everywhere, and from the
+                left on wide screens where the detail panel sits. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-linear-to-t from-cocoa via-cocoa/45 via-45% to-transparent to-75%"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 lg:bg-linear-to-r lg:from-cocoa/88 lg:to-transparent lg:to-60%"
+            />
 
-            {/* Top Badge Floating */}
-            <div className="absolute top-2.5 right-2.5 z-10 pointer-events-none">
-              <span className="inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white px-2.5 py-0.5 text-[11px] font-bold shadow-xs">
-                <Sparkles className="size-3 text-amber-300" />
-                <span>{activeSlide.badge}</span>
-              </span>
-            </div>
+            {/* Badge */}
+            <span className="pointer-events-none absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/55 px-3 py-1 text-[11px] font-bold text-white shadow-lg backdrop-blur-md sm:top-4 sm:right-4">
+              <Sparkles className="size-3.5 text-amber-300" />
+              {activeSlide.badge}
+            </span>
 
-            {/* Top Subtitle Floating */}
-            <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
-              <span className="inline-flex items-center rounded-full bg-background/90 backdrop-blur-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-berry-deep border border-border/60 shadow-2xs">
+            {/* Design details, sitting on the photograph */}
+            <div
+              key={activeSlide.id}
+              className="absolute inset-x-0 bottom-0 p-4 sm:p-6 lg:max-w-xl lg:p-8"
+              style={{ animation: "fade-up 600ms cubic-bezier(0.16,1,0.3,1) both" }}
+            >
+              <span className="text-[10px] font-black tracking-[0.2em] text-amber-300 uppercase sm:text-[11px]">
                 {activeSlide.subtitle}
               </span>
-            </div>
+              <h3 className="mt-1.5 font-blogh text-[clamp(1.15rem,3.4vw,2rem)] leading-tight font-bold tracking-wide text-white uppercase">
+                {activeSlide.title}
+              </h3>
+              <p className="mt-2 hidden max-w-lg text-[13px] leading-relaxed text-white/75 sm:block">
+                {activeSlide.story}
+              </p>
 
-            {/* Overlay Prev / Next Touch Arrows on Photo */}
-            <button
-              type="button"
-              onClick={handlePrev}
-              aria-label="Previous slide"
-              className="absolute left-2 top-1/2 -translate-y-1/2 flex size-7 sm:size-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md border border-white/20 shadow-sm active:scale-90"
-            >
-              <ChevronLeft className="size-4" />
-            </button>
-            <button
-              type="button"
-              onClick={handleNext}
-              aria-label="Next slide"
-              className="absolute right-2 top-1/2 -translate-y-1/2 flex size-7 sm:size-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md border border-white/20 shadow-sm active:scale-90"
-            >
-              <ChevronRight className="size-4" />
-            </button>
-          </div>
-
-          {/* Bottom Info Deck (Single-view compact specifications & WhatsApp CTA) */}
-          <div className="p-3.5 sm:p-5 space-y-2.5 sm:space-y-3">
-            {/* Row 1: Title + Starting Price */}
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                <h3 className="font-blogh text-base sm:text-xl font-bold text-cocoa leading-tight uppercase tracking-wide truncate">
-                  {activeSlide.title}
-                </h3>
-              </div>
-              <div className="text-right shrink-0">
-                <span className="font-sans text-xl sm:text-2xl font-black text-cocoa tabular-nums">
-                  {activeSlide.price}
-                </span>
-              </div>
-            </div>
-
-            {/* Row 2: Micro Portion & Occasion Badges */}
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="flex items-center gap-1.5 rounded-xl bg-secondary/60 px-2.5 py-1.5 border border-border/60">
-                <Users className="size-3.5 text-berry-deep shrink-0" />
-                <span className="font-bold text-cocoa text-[11px] sm:text-xs truncate">
+              {/* Facts */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
+                  <Users className="size-3.5 text-berry" />
                   {activeSlide.serves}
                 </span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded-xl bg-secondary/60 px-2.5 py-1.5 border border-border/60">
-                <Sparkles className="size-3.5 text-amber-500 shrink-0" />
-                <span className="font-bold text-cocoa text-[11px] sm:text-xs truncate">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
+                  <Sparkles className="size-3.5 text-amber-300" />
                   {activeSlide.occasion}
                 </span>
-              </div>
-            </div>
-
-            {/* Row 3: Action Buttons */}
-            <div className="pt-0.5 flex items-center gap-2">
-              <Button
-                asChild
-                className="flex-1 rounded-2xl bg-cocoa text-white hover:bg-cocoa/90 font-bold text-xs sm:text-sm h-10 shadow-lift cursor-pointer"
-              >
-                <a
-                  href={`https://wa.me/917448724920?text=${whatsappMessage}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center justify-center gap-1.5"
-                >
-                  <MessageCircle className="size-4 text-emerald-400" />
-                  <span>Order on WhatsApp</span>
-                </a>
-              </Button>
-
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-2xl border-border/80 text-xs font-bold text-cocoa h-10 px-3 shrink-0"
-              >
-                <Link to="/shop">
-                  <span>Counter</span>
-                  <ArrowRight className="size-3 ml-1" />
-                </Link>
-              </Button>
-            </div>
-
-            {/* Row 4: Bullet Dot Indicators */}
-            <div className="flex items-center justify-center gap-1.5 pt-1">
-              {CAKE_SLIDES.map((slide, idx) => (
-                <button
-                  key={slide.id}
-                  type="button"
-                  aria-label={`Jump to ${slide.title}`}
-                  onClick={() => setCurrent(idx)}
-                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                    current === idx
-                      ? "w-5 bg-berry shadow-2xs"
-                      : "w-1.5 bg-border/80 hover:bg-muted-foreground"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* 🖥️ DESKTOP VIEW: Spacious 2-Column Locked-Height Studio Grid (>=1024px) */}
-        <div className="hidden lg:grid grid-cols-[34%_63%] gap-[3%] items-stretch h-[580px]">
-          {/* Left Column: Modern Bento Interior Card */}
-          <div className="flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-6 shadow-soft h-full">
-            <div className="space-y-4">
-              {/* Top Row: Category Subtitle + Badge */}
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-extrabold uppercase tracking-widest text-berry-deep truncate">
-                  {activeSlide.subtitle}
-                </span>
-                <span className="rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider shrink-0">
-                  {activeSlide.badge}
-                </span>
-              </div>
-
-              {/* Title & Description in Blogh & Inter */}
-              <div>
-                <h3 className="font-blogh text-2xl font-bold text-cocoa leading-tight uppercase tracking-wide">
-                  {activeSlide.title}
-                </h3>
-                <p className="mt-2 text-[13px] text-muted-foreground leading-relaxed line-clamp-3">
-                  {activeSlide.story}
-                </p>
-              </div>
-
-              {/* Modern Mini-Bento Interior Grid */}
-              <div className="grid grid-cols-2 gap-2 pt-1">
-                {/* Bento Item 1: Servings */}
-                <div className="rounded-2xl bg-secondary/50 p-3 border border-border/60 flex items-center gap-2.5">
-                  <div className="size-8 rounded-xl bg-berry/10 flex items-center justify-center shrink-0">
-                    <Users className="size-4 text-berry-deep" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground block">
-                      Portion
-                    </span>
-                    <span className="text-[13px] font-bold text-cocoa truncate block">
-                      {activeSlide.serves}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Bento Item 2: Occasion */}
-                <div className="rounded-2xl bg-secondary/50 p-3 border border-border/60 flex items-center gap-2.5">
-                  <div className="size-8 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
-                    <Sparkles className="size-4 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground block">
-                      Best For
-                    </span>
-                    <span className="text-[13px] font-bold text-cocoa truncate block">
-                      {activeSlide.occasion}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tags Slot */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {activeSlide.tags.slice(0, 4).map((tag) => (
+                {activeSlide.tags.slice(0, 2).map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center rounded-full border border-border/80 bg-secondary/40 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-2xs"
+                    className="hidden items-center rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-white/80 backdrop-blur-sm lg:inline-flex"
                   >
                     {tag}
                   </span>
                 ))}
               </div>
-            </div>
 
-            {/* Bottom Actions Slot */}
-            <div className="pt-4 border-t border-border/70 mt-4 space-y-3">
-              <div className="flex items-baseline justify-between">
+              {/* Price and the two ways out */}
+              <div className="mt-4 flex flex-wrap items-end gap-x-4 gap-y-3">
                 <div>
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                  <p className="text-[10px] font-bold tracking-wider text-white/55 uppercase">
                     Starting from
                   </p>
-                  <p className="font-sans text-3xl font-extrabold text-cocoa tracking-tight tabular-nums">
+                  <p className="font-blogh text-2xl leading-none font-bold text-white tabular-nums sm:text-3xl">
                     {activeSlide.price}
                   </p>
                 </div>
-                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                  ✓ Baked Fresh to Order
-                </span>
-              </div>
 
-              <div className="flex flex-col gap-2">
-                <Button
-                  asChild
-                  size="default"
-                  className="w-full rounded-2xl bg-cocoa text-white hover:bg-cocoa/90 font-bold text-sm shadow-lift h-11 transition-all hover:scale-[1.01] cursor-pointer"
-                >
+                <div className="flex flex-1 flex-wrap items-center gap-2">
                   <a
-                    href={`https://wa.me/917448724920?text=${whatsappMessage}`}
+                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-center gap-2"
+                    className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl bg-amber-400 px-4 text-xs font-black text-[#2A1509] shadow-lift transition-transform hover:scale-[1.02] active:scale-95 sm:text-sm"
                   >
-                    <MessageCircle className="size-4 text-emerald-400" />
-                    <span>Order Design via WhatsApp</span>
+                    <MessageCircle className="size-4" />
+                    Design this on WhatsApp
                   </a>
-                </Button>
-
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="w-full rounded-2xl border-border/80 hover:border-cocoa/40 text-xs font-semibold text-muted-foreground hover:text-cocoa h-8.5"
-                >
-                  <Link to="/shop">
-                    <span>Browse All Daily Counter Bakes</span>
-                    <ArrowRight className="size-3 ml-1" />
+                  <Link
+                    to="/shop"
+                    className="inline-flex h-11 items-center justify-center gap-1.5 rounded-2xl border border-white/20 px-4 text-xs font-bold text-white/85 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    Daily counter
+                    <ArrowRight className="size-3.5" />
                   </Link>
-                </Button>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Right Column: 3D Showcase Card with Refined Tags & Bottom Overlay */}
-          <div
-            ref={containerRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={handleMouseLeave}
-            className="relative h-full rounded-3xl overflow-hidden border border-border/80 bg-card shadow-lift transition-all duration-200 group flex items-center justify-center"
-            style={{
-              perspective: "1200px",
-            }}
-          >
-            {/* 3D Tilted Inner Wrapper */}
-            <div
-              className="relative w-full h-full transition-transform duration-200 ease-out"
-              style={{
-                transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${isHovered ? 1.012 : 1})`,
-                transformStyle: "preserve-3d",
-              }}
-            >
-              {/* Product Photograph */}
-              <img
-                key={activeSlide.image}
-                src={activeSlide.image}
-                alt={activeSlide.title}
-                className="w-full h-full object-cover select-none transition-all duration-500"
+            {/* Swipe affordance — phones only, and only until the first turn. */}
+            {current === 0 && (
+              <span className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black/45 px-3 py-1 text-[10px] font-bold tracking-wider text-white/80 uppercase backdrop-blur-sm sm:hidden">
+                Swipe to browse
+              </span>
+            )}
+
+            {/* Autoplay progress — a hairline that fills across each hold.
+                Keyed on the slide so it restarts with every turn. */}
+            {playing && !reduced && onScreen && (
+              <span
+                key={`${activeSlide.id}-progress`}
+                aria-hidden
+                className="animate-progress-fill pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-amber-400/80"
+                style={{ "--progress-duration": `${AUTOPLAY_MS}ms` } as React.CSSProperties}
               />
-
-              {/* Dynamic Gradient Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/10 pointer-events-none" />
-
-              {/* Floating Badge (Top Right) */}
-              <div className="absolute top-4 right-4 z-10 pointer-events-none">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/25 text-white px-3.5 py-1.5 text-xs font-bold shadow-lg">
-                  <Sparkles className="size-3.5 text-amber-300" />
-                  <span>{activeSlide.badge}</span>
-                </span>
-              </div>
-
-              {/* Caption & Indicator Bullets (Bottom Overlay) */}
-              <div className="absolute bottom-4 left-4 right-4 z-10 flex items-end justify-between gap-4 p-5 rounded-2xl bg-black/55 backdrop-blur-md border border-white/20 text-white">
-                <div className="min-w-0">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-300 block mb-0.5">
-                    Artisan Custom Creation
-                  </span>
-                  <p className="font-blogh text-xl font-bold text-white leading-tight uppercase tracking-wide truncate">
-                    {activeSlide.title}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {CAKE_SLIDES.map((slide, idx) => (
-                    <button
-                      key={slide.id}
-                      type="button"
-                      aria-label={`Jump to ${slide.title}`}
-                      onClick={() => setCurrent(idx)}
-                      className={`h-2 rounded-full transition-all cursor-pointer ${
-                        current === idx
-                          ? "w-7 bg-amber-300 shadow-xs"
-                          : "w-2 bg-white/40 hover:bg-white/80"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
+
+        {/* ── Filmstrip ─────────────────────────────────────────────── */}
+        <ul
+          ref={stripRef}
+          className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 sm:mt-4 sm:gap-2.5"
+        >
+          {CAKE_SLIDES.map((slide, index) => {
+            const selected = index === current;
+            return (
+              <li key={slide.id} data-index={index} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlaying(false);
+                    goTo(index);
+                  }}
+                  aria-label={`Show ${slide.title}`}
+                  aria-current={selected ? "true" : undefined}
+                  className={cn(
+                    "group relative block cursor-pointer overflow-hidden rounded-2xl border-2 transition-all duration-300",
+                    selected
+                      ? "w-28 border-cocoa shadow-soft sm:w-36"
+                      : "w-16 border-transparent opacity-60 hover:opacity-100 sm:w-20",
+                  )}
+                >
+                  <img
+                    src={slide.image}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-4/3 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {selected && (
+                    <span className="absolute inset-x-0 bottom-0 truncate bg-linear-to-t from-black/80 to-transparent px-2 pt-4 pb-1 text-[9px] font-bold text-white uppercase">
+                      {slide.price}
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </section>
   );

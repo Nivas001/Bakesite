@@ -3,27 +3,17 @@ import { useState, useRef, lazy, Suspense } from "react";
 import {
   Sparkles,
   Heart,
-  ShieldCheck,
   Flame,
   ArrowRight,
-  RotateCw,
-  Check,
   Wheat,
-  Droplets,
   Leaf,
   Layers,
   ChevronRight,
   ChevronLeft,
-  Eye,
-  MousePointerClick,
   Info,
-  Clock,
   BookOpen,
   Award,
   Compass,
-  Box,
-  CheckCircle,
-  Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // Loaded on demand. This viewer pulls in Three.js plus the GLTF, FBX and
@@ -359,133 +349,214 @@ export function AboutUsPage() {
       {/* 2. Scroll-choreographed WebGL build sequence */}
       <CakeScrollStory />
 
-      {/* 3. Central 3D Hero Cake Explorer ("The Core Wellness Cake") */}
-      <section className="py-6 px-4 sm:px-6 max-w-6xl mx-auto">
+      {/* 3. Signature cake, angle by angle */}
+      {/* Rebuilt as a photographer's contact sheet: the four angles are real
+          thumbnails down the side rather than four words in a pill group, so
+          the choice is made by looking. The macro figures moved onto a single
+          strip under the photograph, where they read as one set of numbers
+          about one slice instead of four disconnected tiles. */}
+      <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
         <div
           ref={heroCardRef}
-          className="relative rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-b from-[#1C120C] via-[#2A1810] to-[#180E08] text-white p-6 sm:p-10 shadow-2xl overflow-hidden group select-none"
+          className="film-grain group relative overflow-hidden rounded-[2.5rem] border-[3.5px] border-[#2C1810] bg-gradient-to-b from-[#1C120C] via-[#2A1810] to-[#180E08] text-white shadow-2xl select-none"
         >
-          {/* Ambient Lighting & Glows */}
-          <div className="absolute -top-24 -left-24 size-96 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 size-96 rounded-full bg-rose-500/15 blur-3xl pointer-events-none" />
+          {/* Ambient lighting */}
+          <div className="pointer-events-none absolute -top-24 -left-24 size-96 rounded-full bg-amber-500/15 blur-3xl" />
+          <div className="pointer-events-none absolute -right-24 -bottom-24 size-96 rounded-full bg-rose-500/15 blur-3xl" />
 
-          {/* Top Bar inside the Hero Canvas */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 border-b border-white/10 pb-5">
+          {/* Top bar */}
+          <div className="relative z-10 flex flex-col justify-between gap-3 border-b border-white/10 p-5 sm:flex-row sm:items-center sm:p-7">
             <div className="flex items-center gap-2.5">
-              <span className="flex size-3 rounded-full bg-amber-400 animate-ping" />
-              <span className="font-nimbus text-lg sm:text-xl text-amber-300 uppercase tracking-wide">
+              <span className="relative grid size-3 place-items-center">
+                <span className="absolute inset-0 animate-halo-pulse rounded-full bg-amber-400/70" />
+                <span className="relative size-1.5 rounded-full bg-amber-300" />
+              </span>
+              <span className="font-nimbus text-lg tracking-wide text-amber-300 uppercase sm:text-xl">
                 {siteContent.about_3d.title || "Interactive 3D Cake Atelier"}
               </span>
             </div>
 
-            {/* Angle Navigation Pills */}
-            <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-md p-1 rounded-full border border-white/15">
-              {(["front", "orbit", "crumb", "top"] as CakeAngle[]).map((angle) => (
-                <button
-                  key={angle}
-                  type="button"
-                  onClick={() => snapToAngle(angle)}
-                  className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                    activeAngle === angle
-                      ? "bg-amber-400 text-black shadow-xs font-black scale-[1.03]"
-                      : "text-white/70 hover:text-white hover:bg-white/10"
-                  }`}
-                >
-                  {angle}
-                </button>
-              ))}
-            </div>
+            <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase">
+              4 angles · 1 recipe
+            </span>
           </div>
 
-          {/* Center Stage: 3D Cake Canvas & Floating Glowing Die-Cut Stickers */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center mt-6 relative z-10">
-            {/* Cake Visual Stage (7 Columns)
-                This was a drag-to-rotate turntable built from four photographs.
-                With a real WebGL build sequence now opening the page, a second
-                simulated 3D interaction was the same idea done less well — so
-                the angle pills above simply switch the photograph and its spec,
-                which is what they were really for. */}
-            <div className="relative flex flex-col items-center justify-center lg:col-span-7">
-              <figure className="relative w-full overflow-hidden rounded-[2rem] border border-white/15 bg-black/30 shadow-2xl">
-                <img
-                  key={activeAngle}
-                  src={currentCakeSpec.image}
-                  alt={currentCakeSpec.title}
-                  loading="lazy"
-                  decoding="async"
-                  className="aspect-4/3 w-full object-cover"
-                />
+          <div className="relative z-10 grid grid-cols-1 gap-6 p-5 sm:p-7 lg:grid-cols-12 lg:gap-8">
+            {/* Contact sheet + photograph */}
+            <div className="lg:col-span-7">
+              <div className="flex gap-3">
+                {/* Angle thumbnails. A rail on desktop, a strip under the
+                    photograph on phones. */}
+                <ul
+                  aria-label="Choose an angle"
+                  className="hidden w-20 shrink-0 flex-col gap-2 sm:flex"
+                >
+                  {(["front", "orbit", "crumb", "top"] as CakeAngle[]).map((angle) => {
+                    const spec = CAKE_SPECS[angle];
+                    const selected = activeAngle === angle;
+                    return (
+                      <li key={angle}>
+                        <button
+                          type="button"
+                          onClick={() => snapToAngle(angle)}
+                          aria-pressed={selected}
+                          className={`block w-full cursor-pointer overflow-hidden rounded-2xl border-2 transition-all ${
+                            selected
+                              ? "border-amber-400 opacity-100 shadow-lg"
+                              : "border-white/10 opacity-55 hover:opacity-100"
+                          }`}
+                        >
+                          <img
+                            src={spec.image}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            className="aspect-square w-full object-cover"
+                          />
+                          <span
+                            className={`block py-1 text-center font-mono text-[9px] font-bold tracking-wider uppercase ${
+                              selected ? "bg-amber-400 text-black" : "bg-black/50 text-white/70"
+                            }`}
+                          >
+                            {angle}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
 
-                {/* The labelled details for this angle, shown as captions rather
-                    than hotspots that had to be hunted for. */}
-                <figcaption className="absolute inset-x-0 bottom-0 flex flex-wrap gap-1.5 bg-gradient-to-t from-black/85 to-transparent p-3.5 pt-10">
-                  {currentCakeSpec.hotspots.map((spot) => (
-                    <span
-                      key={spot.label}
-                      className={`rounded-full px-2.5 py-1 text-[11px] font-bold shadow-sm ${spot.bg}`}
-                    >
-                      {spot.label}
-                    </span>
-                  ))}
-                </figcaption>
-              </figure>
+                <figure className="relative min-w-0 flex-1 overflow-hidden rounded-[2rem] border border-white/15 bg-black/30 shadow-2xl">
+                  <img
+                    key={activeAngle}
+                    src={currentCakeSpec.image}
+                    alt={currentCakeSpec.title}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-4/3 w-full object-cover"
+                    style={{ animation: "scale-in 500ms cubic-bezier(0.16,1,0.3,1) both" }}
+                  />
+
+                  {/* The labelled details for this angle, shown as captions
+                      rather than hotspots that had to be hunted for. */}
+                  <figcaption className="absolute inset-x-0 bottom-0 flex flex-wrap gap-1.5 bg-gradient-to-t from-black/90 to-transparent p-3.5 pt-12">
+                    {currentCakeSpec.hotspots.map((spot) => (
+                      <span
+                        key={spot.label}
+                        className={`rounded-full px-2.5 py-1 text-[11px] font-bold shadow-sm ${spot.bg}`}
+                      >
+                        {spot.label}
+                      </span>
+                    ))}
+                  </figcaption>
+                </figure>
+              </div>
+
+              {/* Phone-width angle strip */}
+              <ul aria-label="Choose an angle" className="mt-3 grid grid-cols-4 gap-2 sm:hidden">
+                {(["front", "orbit", "crumb", "top"] as CakeAngle[]).map((angle) => {
+                  const spec = CAKE_SPECS[angle];
+                  const selected = activeAngle === angle;
+                  return (
+                    <li key={angle}>
+                      <button
+                        type="button"
+                        onClick={() => snapToAngle(angle)}
+                        aria-pressed={selected}
+                        className={`block w-full cursor-pointer overflow-hidden rounded-xl border-2 transition-all ${
+                          selected ? "border-amber-400 opacity-100" : "border-white/10 opacity-55"
+                        }`}
+                      >
+                        <img
+                          src={spec.image}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="aspect-square w-full object-cover"
+                        />
+                        <span
+                          className={`block py-0.5 text-center font-mono text-[9px] font-bold tracking-wider uppercase ${
+                            selected ? "bg-amber-400 text-black" : "bg-black/50 text-white/70"
+                          }`}
+                        >
+                          {angle}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
 
-            {/* Spec Sheet & Macro Breakdown (5 Columns) */}
-            <div className="lg:col-span-5 space-y-4">
+            {/* Spec sheet */}
+            <div className="space-y-4 lg:col-span-5">
               <div className="space-y-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider">
-                  Pure Craft Architecture · {activeAngle.toUpperCase()}
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/20 px-3 py-0.5 font-mono text-[11px] font-black tracking-wider text-amber-300 uppercase">
+                  Pure craft architecture · {activeAngle}
                 </span>
-                <h2 className="font-nimbus text-2xl sm:text-3xl text-white leading-tight">
+                <h2
+                  key={`${activeAngle}-title`}
+                  className="font-nimbus text-2xl leading-tight text-white sm:text-3xl"
+                  style={{ animation: "fade-up 500ms cubic-bezier(0.16,1,0.3,1) both" }}
+                >
                   {currentCakeSpec.title}
                 </h2>
-                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                <p className="text-xs leading-relaxed text-zinc-300 sm:text-sm">
                   {currentCakeSpec.description}
                 </p>
               </div>
 
-              {/* 4 Macro Breakdown Cards */}
-              <div className="grid grid-cols-2 gap-2.5 pt-2">
-                <div className="rounded-2xl bg-white/5 border border-white/10 p-3 text-center">
-                  <p className="text-[10px] uppercase font-bold text-zinc-400">Calories / Slice</p>
-                  <p className="font-sans font-black text-xl sm:text-2xl text-amber-300 mt-0.5 tracking-tight">
-                    {currentCakeSpec.macros.calories}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-white/5 border border-white/10 p-3 text-center">
-                  <p className="text-[10px] uppercase font-bold text-zinc-400">Clean Protein</p>
-                  <p className="font-sans font-black text-xl sm:text-2xl text-rose-300 mt-0.5 tracking-tight">
-                    {currentCakeSpec.macros.protein}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-white/5 border border-white/10 p-3 text-center">
-                  <p className="text-[10px] uppercase font-bold text-zinc-400">Refined Sugars</p>
-                  <p className="font-sans font-black text-xl sm:text-2xl text-emerald-300 mt-0.5 tracking-tight">
-                    {currentCakeSpec.macros.sugar}
-                  </p>
-                </div>
-                <div className="rounded-2xl bg-white/5 border border-white/10 p-3 text-center">
-                  <p className="text-[10px] uppercase font-bold text-zinc-400">Dairy Butter</p>
-                  <p className="font-sans font-black text-xl sm:text-2xl text-amber-200 mt-0.5 tracking-tight">
-                    {currentCakeSpec.macros.butterfat}
-                  </p>
-                </div>
-              </div>
+              {/* One strip of macros for one slice, rather than four cards that
+                  read as four unrelated claims. */}
+              <dl className="grid grid-cols-4 divide-x divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                {[
+                  {
+                    label: "Kcal",
+                    value: currentCakeSpec.macros.calories.replace(" kcal", ""),
+                    tone: "text-amber-300",
+                  },
+                  {
+                    label: "Protein",
+                    value: currentCakeSpec.macros.protein,
+                    tone: "text-rose-300",
+                  },
+                  {
+                    label: "Refined",
+                    value: currentCakeSpec.macros.sugar.replace(" Refined", ""),
+                    tone: "text-emerald-300",
+                  },
+                  {
+                    label: "Butterfat",
+                    value: currentCakeSpec.macros.butterfat.replace(" French", ""),
+                    tone: "text-amber-200",
+                  },
+                ].map((macro) => (
+                  <div key={macro.label} className="px-2 py-3 text-center">
+                    <dt className="font-mono text-[9px] font-bold tracking-[0.14em] text-zinc-400 uppercase">
+                      {macro.label}
+                    </dt>
+                    <dd
+                      className={`mt-0.5 font-sans text-lg font-black tracking-tight sm:text-xl ${macro.tone}`}
+                    >
+                      {macro.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
 
-              <p className="pt-1 text-[11px] leading-relaxed text-zinc-400">
+              <p className="text-[11px] leading-relaxed text-zinc-400">
                 Indicative values for a standard slice of our signature recipe. Exact figures vary
                 by size and finish — ask us for the specifics on any bake.
               </p>
 
               {/* CTA buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col gap-2 pt-1 sm:flex-row">
                 <Button
                   asChild
-                  className="flex-1 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs sm:text-sm h-11 shadow-lift cursor-pointer"
+                  className="h-11 flex-1 cursor-pointer rounded-2xl bg-amber-400 text-xs font-black text-black shadow-lift hover:bg-amber-300 sm:text-sm"
                 >
                   <Link to="/" className="flex items-center justify-center gap-2">
-                    <span>Customize This Cake in Studio</span>
+                    <span>Customise this cake in studio</span>
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
@@ -495,7 +566,7 @@ export function AboutUsPage() {
                     setIs3dStudioOpen(true);
                     studio3dRef.current?.scrollIntoView({ behavior: "smooth" });
                   }}
-                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-amber-300 font-bold text-xs sm:text-sm h-11 transition-all cursor-pointer"
+                  className="inline-flex h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 text-xs font-bold text-amber-300 transition-all hover:bg-white/20 sm:text-sm"
                 >
                   <Compass className="size-4" />
                   <span>Open the 3D studio</span>

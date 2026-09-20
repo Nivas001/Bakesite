@@ -20,6 +20,17 @@ const MIME: Record<string, string> = {
 };
 
 /**
+ * Containers no mainstream browser will decode.
+ *
+ * The `.mov` files here are HEVC in a QuickTime wrapper, which only Safari
+ * plays. Offering one as a `<source>` elsewhere does not fail silently: once
+ * every source has been rejected the element paints the browser's broken-media
+ * placeholder — a grey box with a crossed-out play button — right on top of
+ * these transparent illustrations. They are dropped rather than listed.
+ */
+const UNPLAYABLE = new Set(["mov"]);
+
+/**
  * A decorative looping clip that costs nothing until it is actually on screen.
  *
  * The `<video>` element itself is only mounted once the wrapper scrolls into
@@ -42,7 +53,10 @@ export function LazyVideo({
   const wrapRef = useRef<HTMLSpanElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [load, setLoad] = useState(false);
+  const [failed, setFailed] = useState(false);
   const reduced = usePrefersReducedMotion();
+
+  const playable = formats.filter((format) => !UNPLAYABLE.has(format));
 
   useEffect(() => {
     if (reduced) return;
@@ -77,7 +91,9 @@ export function LazyVideo({
     };
   }, [reduced]);
 
-  if (reduced) {
+  // Reduced motion, nothing playable to offer, or a decode that failed anyway:
+  // fall back to the poster, or to empty space. Never to a broken-media box.
+  if (reduced || failed || playable.length === 0) {
     return poster ? (
       <img src={poster} alt={alt} className={className} loading="lazy" decoding="async" />
     ) : (
@@ -96,11 +112,14 @@ export function LazyVideo({
           playsInline
           preload="auto"
           poster={poster}
+          // Fires once every `<source>` has been rejected. Without it the
+          // element keeps its box and paints the browser's placeholder.
+          onError={() => setFailed(true)}
           aria-hidden={alt === "" ? true : undefined}
           aria-label={alt || undefined}
           className="size-full object-contain"
         >
-          {formats.map((format) => (
+          {playable.map((format) => (
             <source key={format} src={`${src}.${format}`} type={MIME[format]} />
           ))}
         </video>

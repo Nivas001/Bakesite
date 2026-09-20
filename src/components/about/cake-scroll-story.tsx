@@ -275,6 +275,39 @@ export function CakeScrollStory() {
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#FFF3E2] from-0% via-[#FFF3E2]/80 via-25% to-transparent to-55% lg:bg-gradient-to-r lg:via-[#FFF3E2]/70 lg:via-22% lg:to-45% dark:from-[#150B05] dark:via-[#150B05]/80 lg:dark:via-[#150B05]/70"
         />
 
+        {/* Chapter ticks down the right edge — a table of contents for the
+            sequence, so its length is legible before committing to the scroll.
+            Desktop only: on a phone the cake already fills the stage. */}
+        <ol
+          aria-hidden
+          className="absolute top-1/2 right-5 z-10 hidden -translate-y-1/2 flex-col gap-3 lg:flex"
+        >
+          {CHAPTERS.map((chapter, i) => (
+            <li key={chapter.kicker} className="flex items-center justify-end gap-2.5">
+              <span
+                className={cn(
+                  "font-mono text-[10px] font-bold tracking-[0.18em] uppercase transition-all duration-300",
+                  i === active
+                    ? "translate-x-0 text-cocoa opacity-100 dark:text-foreground"
+                    : "translate-x-1 text-cocoa/40 opacity-0 dark:text-foreground/40",
+                )}
+              >
+                {chapter.title}
+              </span>
+              <span
+                className={cn(
+                  "block rounded-full transition-all duration-300",
+                  i === active
+                    ? "size-2.5 bg-berry"
+                    : i < active
+                      ? "size-1.5 bg-berry/50"
+                      : "size-1.5 bg-cocoa/20 dark:bg-white/25",
+                )}
+              />
+            </li>
+          ))}
+        </ol>
+
         {/* Copy rail */}
         <div className="relative z-10 mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-12 lg:items-center lg:px-6">
           {/* Below lg the cake fills the stage behind this, so the copy needs
@@ -297,20 +330,29 @@ export function CakeScrollStory() {
                       : "pointer-events-none translate-y-3 opacity-0",
                   )}
                 >
-                  <p className="font-sans text-[10px] font-black uppercase tracking-[0.24em] text-berry-deep">
-                    {chapter.kicker}
-                  </p>
-                  <h3 className="mt-1.5 font-nimbus text-3xl font-bold leading-tight text-cocoa sm:text-5xl">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] font-black tracking-[0.24em] text-berry-deep uppercase">
+                      {chapter.kicker}
+                    </span>
+                    <span
+                      aria-hidden
+                      className="h-px flex-1 bg-linear-to-r from-berry/40 to-transparent"
+                    />
+                  </div>
+                  <h3 className="mt-1.5 font-nimbus text-3xl leading-tight font-bold text-cocoa sm:text-5xl dark:text-foreground">
                     {chapter.title}
                   </h3>
                   <p className="mt-3 max-w-md text-sm leading-relaxed text-cocoa/75 sm:text-base dark:text-muted-foreground">
                     {chapter.body}
                   </p>
-                  <p className="mt-4 flex items-baseline gap-2">
-                    <span className="font-nimbus text-3xl font-bold text-cocoa sm:text-4xl">
+                  {/* The number is the take-away from each chapter, so it gets
+                      a plate of its own rather than sitting as one more line of
+                      running text under the body copy. */}
+                  <p className="mt-4 inline-flex items-baseline gap-2 rounded-2xl border border-cocoa/12 bg-card/70 px-3.5 py-2 backdrop-blur-sm dark:border-white/10">
+                    <span className="font-nimbus text-3xl font-bold text-cocoa sm:text-4xl dark:text-foreground">
                       {chapter.stat}
                     </span>
-                    <span className="font-sans text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">
+                    <span className="font-mono text-[10px] font-black tracking-[0.18em] text-muted-foreground uppercase">
                       {chapter.statLabel}
                     </span>
                   </p>
@@ -318,36 +360,43 @@ export function CakeScrollStory() {
               ))}
             </div>
 
-            {/* Chapter rail doubles as a progress indicator. */}
-            <ol className="mt-6 flex items-center gap-2" aria-hidden>
-              {CHAPTERS.map((chapter, i) => (
-                <li key={chapter.kicker} className="flex-1">
-                  <span
-                    className={cn(
-                      "block h-1 rounded-full transition-colors duration-300",
-                      i < active
-                        ? "bg-berry"
-                        : i === active
-                          ? "bg-berry/40"
-                          : "bg-cocoa/15 dark:bg-white/15",
-                    )}
-                  >
-                    {i === active && (
-                      <span
-                        className="block h-full rounded-full bg-berry transition-[width] duration-150"
-                        style={{
-                          width: `${((progress * CHAPTERS.length) % 1) * 100}%`,
-                        }}
-                      />
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ol>
+            {/* Chapter rail doubles as a progress indicator, and now says how
+                far through the sequence the visitor actually is. */}
+            <div className="mt-6">
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-muted-foreground uppercase">
+                  Chapter {active + 1} of {CHAPTERS.length}
+                </span>
+                <span className="font-mono text-[10px] font-bold text-muted-foreground tabular-nums">
+                  {Math.round(progress * 100)}%
+                </span>
+              </div>
+              <ol className="flex items-center gap-2" aria-hidden>
+                {CHAPTERS.map((chapter, i) => (
+                  <li key={chapter.kicker} className="flex-1">
+                    <span
+                      className={cn(
+                        "block h-1 overflow-hidden rounded-full transition-colors duration-300",
+                        i < active ? "bg-berry" : "bg-cocoa/15 dark:bg-white/15",
+                      )}
+                    >
+                      {i === active && (
+                        <span
+                          className="block h-full rounded-full bg-berry transition-[width] duration-150"
+                          style={{
+                            width: `${((progress * CHAPTERS.length) % 1) * 100}%`,
+                          }}
+                        />
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
 
             <p
               className={cn(
-                "mt-5 inline-flex items-center gap-1.5 rounded-full border border-cocoa/15 bg-card/70 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-cocoa/70 backdrop-blur transition-opacity duration-500",
+                "mt-5 inline-flex items-center gap-1.5 rounded-full border border-cocoa/15 bg-card/70 px-3 py-1 font-mono text-[10px] font-bold tracking-[0.18em] text-cocoa/70 uppercase backdrop-blur transition-opacity duration-500 dark:text-foreground/70",
                 progress > 0.04 ? "opacity-0" : "opacity-100",
               )}
             >
@@ -367,10 +416,14 @@ export function CakeScrollStory() {
 function StoryHeading() {
   return (
     <div>
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-berry/25 bg-berry/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-berry-deep">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-berry/25 bg-berry/10 px-3 py-1 font-mono text-[10px] font-black tracking-[0.2em] text-berry-deep uppercase">
+        <span className="relative grid size-2 place-items-center">
+          <span className="absolute inset-0 animate-halo-pulse rounded-full bg-berry/70" />
+          <span className="relative size-1 rounded-full bg-berry-deep" />
+        </span>
         Built in five steps
       </span>
-      <h2 className="mt-2.5 font-blogh text-2xl font-bold uppercase leading-tight tracking-wide text-cocoa sm:text-3xl">
+      <h2 className="mt-2.5 font-blogh text-2xl leading-tight font-bold tracking-wide text-cocoa uppercase sm:text-3xl dark:text-foreground">
         One cake, start to finish
       </h2>
     </div>

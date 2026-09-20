@@ -388,8 +388,12 @@ function OrderCardItem({
       toast.success(res.message);
       setRejectModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["my-orders"] });
-    } catch (err: any) {
-      toast.error(err.message || "Failed to cancel order. Please try again.");
+    } catch (err) {
+      toast.error(
+        err instanceof Error && err.message
+          ? err.message
+          : "Failed to cancel order. Please try again.",
+      );
     } finally {
       setIsRejecting(false);
     }
@@ -805,94 +809,112 @@ function OrdersPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
-      {/* Page header — the three numbers a customer opens this page for sit
-          beside the title instead of being buried in the filter labels. */}
-      <header className="relative overflow-hidden rounded-3xl border border-border/70 bg-linear-to-br from-card via-card to-secondary/40 p-5 shadow-soft sm:rounded-4xl sm:p-7">
+      {/* Page header, built as a bakery docket: the title on the paper, the
+          three numbers a customer opens this page for on a torn-off strip along
+          the bottom. The previous version floated a stat block to the right,
+          which collapsed under the title on anything narrower than a laptop and
+          left the numbers stranded mid-page. */}
+      <header className="relative overflow-hidden rounded-3xl border border-border/70 bg-linear-to-br from-card via-card to-secondary/40 shadow-soft sm:rounded-4xl">
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-24 -right-20 size-60 rounded-full bg-amber-400/10 blur-3xl"
+          className="pointer-events-none absolute -top-24 -right-20 size-60 rounded-full bg-amber-400/12 blur-3xl"
         />
-        <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div
+          aria-hidden
+          className="worktop-grid pointer-events-none absolute inset-0 opacity-55 [mask-image:radial-gradient(110%_80%_at_50%_0%,black,transparent_72%)]"
+        />
+
+        <div className="relative z-10 flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between sm:p-7">
           <div className="min-w-0">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-3 py-0.5 text-[11px] font-bold tracking-wider text-amber-900 uppercase sm:text-xs dark:text-amber-300">
-              <Sparkles className="size-3.5" />
+              {/* A live pulse rather than a static sparkle: this page really is
+                  tracking something that changes. */}
+              <span className="relative grid size-2.5 place-items-center">
+                <span className="absolute inset-0 animate-halo-pulse rounded-full bg-amber-500/70" />
+                <span className="relative size-1.5 rounded-full bg-amber-600 dark:bg-amber-300" />
+              </span>
               <span>Live order tracking</span>
             </span>
-            <h1 className="mt-1.5 font-blogh text-3xl leading-tight font-bold tracking-wide text-cocoa uppercase sm:text-4xl lg:text-5xl">
+            <h1 className="mt-2 font-blogh text-[clamp(1.75rem,6vw,3.25rem)] leading-[1.03] font-bold tracking-wide text-cocoa uppercase">
               Your orders
             </h1>
-            <p className="mt-1 text-xs text-muted-foreground sm:text-sm">
-              Handcrafted in small batches every dawn from 4:00 AM.
+            <p className="mt-1.5 text-xs text-muted-foreground sm:text-sm">
+              Handcrafted in small batches every dawn from 4:00&nbsp;AM.
             </p>
           </div>
 
-          <div className="flex flex-col items-stretch gap-3 lg:items-end">
-            <dl className="grid grid-cols-3 gap-2 lg:w-80">
-              {[
-                { label: "In the queue", value: String(activeCount) },
-                { label: "Delivered", value: String(completedCount) },
-                { label: "Spent with us", value: formatCurrency(lifetimeSpend) },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-2xl border border-border/70 bg-card/80 p-2.5 text-center shadow-2xs"
-                >
-                  <dt className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                    {stat.label}
-                  </dt>
-                  <dd className="mt-0.5 font-blogh text-base font-bold text-cocoa tabular-nums sm:text-lg">
-                    {stat.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleOpenSupport()}
-              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full border-cocoa/30 bg-card px-4 text-xs font-bold text-cocoa shadow-2xs hover:bg-cocoa/10 lg:w-fit"
-            >
-              <HelpCircle className="size-4 text-berry-deep" />
-              <span>Help &amp; Support</span>
-            </Button>
-          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => handleOpenSupport()}
+            className="flex h-9 w-fit shrink-0 cursor-pointer items-center gap-1.5 rounded-full border-cocoa/30 bg-card px-4 text-xs font-bold text-cocoa shadow-2xs hover:bg-cocoa/10"
+          >
+            <HelpCircle className="size-4 text-berry-deep" />
+            <span>Help &amp; support</span>
+          </Button>
         </div>
+
+        <dl className="relative z-10 grid grid-cols-3 divide-x divide-border/60 border-t border-dashed border-border/70 bg-card/65 backdrop-blur-sm">
+          {[
+            { label: "In the queue", value: String(activeCount), tone: "text-amber-700" },
+            { label: "Delivered", value: String(completedCount), tone: "text-emerald-700" },
+            { label: "Spent with us", value: formatCurrency(lifetimeSpend), tone: "text-cocoa" },
+          ].map((stat) => (
+            <div key={stat.label} className="px-3 py-3 text-center">
+              <dt className="font-mono text-[9.5px] font-bold tracking-[0.16em] text-muted-foreground uppercase sm:text-[10px]">
+                {stat.label}
+              </dt>
+              <dd
+                className={`mt-0.5 font-blogh text-lg font-bold tabular-nums sm:text-2xl dark:text-foreground ${stat.tone}`}
+              >
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </header>
 
-      {/* Filter tabs */}
-      <div className="no-scrollbar -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <div className="inline-flex items-center gap-1.5 rounded-2xl border border-border/60 bg-secondary/50 p-1">
-          {(
-            [
-              { id: "all", label: "All orders", count: orders.length },
-              { id: "active", label: "In the queue", count: activeCount },
-              { id: "completed", label: "Delivered", count: completedCount },
-            ] as const
-          ).map((tab) => (
+      {/* Filter tabs — full width on phones so all three are reachable without
+          a sideways scroll, and a sliding indicator so the current one reads as
+          a position rather than as a separate colour. */}
+      <div
+        role="tablist"
+        aria-label="Filter orders"
+        className="grid grid-cols-3 gap-1 rounded-2xl border border-border/60 bg-secondary/50 p-1 sm:inline-grid sm:w-auto sm:grid-flow-col sm:auto-cols-max"
+      >
+        {(
+          [
+            { id: "all", label: "All orders", count: orders.length },
+            { id: "active", label: "In the queue", count: activeCount },
+            { id: "completed", label: "Delivered", count: completedCount },
+          ] as const
+        ).map((tab) => {
+          const selected = filter === tab.id;
+          return (
             <button
               key={tab.id}
               type="button"
+              role="tab"
+              aria-selected={selected}
               onClick={() => setFilter(tab.id)}
-              aria-pressed={filter === tab.id}
-              className={`flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold whitespace-nowrap transition-all ${
-                filter === tab.id
+              className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-bold whitespace-nowrap transition-all sm:px-4 ${
+                selected
                   ? "bg-cocoa text-background shadow-2xs"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:bg-card/70 hover:text-foreground"
               }`}
             >
-              {tab.label}
+              <span className="truncate">{tab.label}</span>
               <span
                 className={`rounded-full px-1.5 text-[10px] tabular-nums ${
-                  filter === tab.id ? "bg-white/20" : "bg-card text-cocoa"
+                  selected ? "bg-white/20" : "bg-card text-cocoa dark:text-foreground"
                 }`}
               >
                 {tab.count}
               </span>
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
       {/* Orders Grid (1 Col Mobile, 2 Cols Tablet & Desktop) */}

@@ -4,6 +4,7 @@ import { getCatalog } from "@/lib/catalog.functions";
 import { HeroRevampSection } from "@/components/hero-revamp-section";
 import { AssuranceStrip } from "@/components/home/assurance-strip";
 import { CravingExplorer } from "@/components/home/craving-explorer";
+import { ProductFilm } from "@/components/home/product-film";
 import { DailyCounter } from "@/components/home/daily-counter";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { CraftPromise } from "@/components/home/craft-promise";
@@ -49,6 +50,10 @@ export const Route = createFileRoute("/")({
  * order below answers a first-time visitor's questions in the order they ask
  * them: can I trust this, what do you sell, what is good today, how do I order,
  * can you do my cake, why you, who else buys here.
+ *
+ * The film sits after the explorer: by then a visitor knows what is sold, so a
+ * pinned four-screen sequence reads as an invitation to linger rather than as
+ * an obstacle between them and the menu.
  */
 function Home() {
   const { data } = useSuspenseQuery(catalogQuery);
@@ -60,6 +65,7 @@ function Home() {
       <div className="w-full space-y-10 pt-6 sm:space-y-16 sm:pt-10">
         <AssuranceStrip />
         <CravingExplorer categories={data.categories} products={data.products} />
+        <ProductFilm products={data.products} />
         <DailyCounter products={data.products} />
         <HowItWorks />
         <CakeStudioCarousel />

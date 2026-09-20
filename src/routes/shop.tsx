@@ -13,6 +13,7 @@ import {
   Store,
   Tag,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { getCatalog } from "@/lib/catalog.functions";
 import { ProductCard } from "@/components/product-card";
@@ -357,6 +358,20 @@ function Shop() {
     return prices.length ? Math.min(...prices) : 0;
   }, [data.products]);
 
+  // Three shots from the live catalogue, one per lane where possible, so the
+  // header shows today's counter rather than a fixed stock photograph.
+  const heroShots = useMemo(() => {
+    const seen = new Set<string>();
+    const picks: string[] = [];
+    for (const product of data.products) {
+      if (!product.image_url || seen.has(product.category_slug ?? "")) continue;
+      seen.add(product.category_slug ?? "");
+      picks.push(product.image_url);
+      if (picks.length === 3) break;
+    }
+    return picks;
+  }, [data.products]);
+
   const activeCategory = category
     ? (data.categories.find((c) => c.slug === category) ?? null)
     : null;
@@ -371,142 +386,146 @@ function Shop() {
     setDraftQuery("");
   }
 
-  const categoryRail = (
-    <ul className="flex items-center gap-1.5 lg:flex-wrap">
+  // `wrap` because the rail is rendered in two places with opposite needs: the
+  // desktop toolbar scrolls it sideways on one line, while the mobile filter
+  // sheet has to wrap it or the counters run off the edge of the sheet.
+  const renderCategoryRail = (wrap: boolean) => (
+    <ul className={`flex items-center gap-1.5 ${wrap ? "flex-wrap" : ""}`}>
       <li>
-        <button
-          type="button"
+        <CounterPill
+          icon={Store}
+          label="All"
+          count={data.products.length}
+          selected={!category}
           onClick={() => openCategory(null)}
-          aria-current={!category ? "true" : undefined}
-          className={`flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
-            !category
-              ? "border-cocoa bg-cocoa text-background shadow-xs"
-              : "border-border/70 bg-card text-cocoa hover:border-cocoa/40 hover:bg-secondary/60"
-          }`}
-        >
-          <Store className="size-3.5 shrink-0" />
-          All
-          <span className="rounded-full bg-black/10 px-1.5 text-[10px] tabular-nums dark:bg-white/15">
-            {data.products.length}
-          </span>
-        </button>
+        />
       </li>
-      {lanes.map(({ category: c, products }) => {
-        const Icon = categoryVisual(c.slug).icon;
-        const selected = category === c.slug;
-        return (
-          <li key={c.id}>
-            <button
-              type="button"
-              onClick={() => openCategory(c.slug)}
-              aria-current={selected ? "true" : undefined}
-              className={`flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
-                selected
-                  ? "border-cocoa bg-cocoa text-background shadow-xs"
-                  : "border-border/70 bg-card text-cocoa hover:border-cocoa/40 hover:bg-secondary/60"
-              }`}
-            >
-              <Icon className="size-3.5 shrink-0" />
-              {c.name}
-              <span
-                className={`rounded-full px-1.5 text-[10px] tabular-nums ${
-                  selected ? "bg-white/20" : "bg-secondary"
-                }`}
-              >
-                {products.length}
-              </span>
-            </button>
-          </li>
-        );
-      })}
+      {lanes.map(({ category: c, products }) => (
+        <li key={c.id}>
+          <CounterPill
+            icon={categoryVisual(c.slug).icon}
+            label={c.name}
+            count={products.length}
+            selected={category === c.slug}
+            onClick={() => openCategory(c.slug)}
+          />
+        </li>
+      ))}
     </ul>
   );
 
+  // A segmented control rather than four loose pills: the price bands are one
+  // exclusive choice, and reading them as a single switch makes that obvious.
   const priceRail = (
-    <ul className="flex flex-wrap items-center gap-1.5">
+    <div
+      role="group"
+      aria-label="Filter by price"
+      className="inline-flex items-center gap-0.5 rounded-full border border-border/70 bg-card p-0.5"
+    >
       {PRICE_BANDS.map((band) => {
         const selected = priceBand === band.id;
         return (
-          <li key={band.id}>
-            <button
-              type="button"
-              onClick={() => patch({ price: band.id === "all" ? undefined : band.id })}
-              aria-pressed={selected}
-              className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-bold transition-all ${
-                selected
-                  ? "border-berry bg-berry/15 text-berry-deep"
-                  : "border-border/70 bg-card text-cocoa hover:bg-secondary/60"
-              }`}
-            >
-              {band.label}
-            </button>
-          </li>
+          <button
+            key={band.id}
+            type="button"
+            onClick={() => patch({ price: band.id === "all" ? undefined : band.id })}
+            aria-pressed={selected}
+            className={`cursor-pointer rounded-full px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all ${
+              selected
+                ? "bg-berry/20 text-berry-deep shadow-2xs"
+                : "text-muted-foreground hover:bg-secondary/70 hover:text-cocoa"
+            }`}
+          >
+            {band.label}
+          </button>
         );
       })}
-    </ul>
+    </div>
   );
 
   return (
     <div className="w-full pb-10">
       <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-6 sm:space-y-7 sm:py-10">
         {/* ── Counter header ─────────────────────────────────────────── */}
-        <header className="relative overflow-hidden rounded-3xl border border-border/70 bg-linear-to-br from-card via-card to-secondary/40 p-5 shadow-soft sm:rounded-4xl sm:p-8">
+        {/* Built as a shopfront: the counter's own photography runs behind the
+            title, the three numbers a browser actually wants sit on a docket
+            strip along the bottom, and the whole thing is one band rather than
+            a panel with a floating stat block beside it. */}
+        <header className="relative overflow-hidden rounded-3xl border border-border/70 bg-cocoa shadow-lift sm:rounded-4xl">
+          {/* Counter photography, dimmed to a backdrop. */}
+          {heroShots.length > 0 && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 grid grid-cols-2 sm:grid-cols-3"
+            >
+              {heroShots.map((shot, index) => (
+                <img
+                  key={shot}
+                  src={shot}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className={`size-full object-cover ${index === 2 ? "hidden sm:block" : ""}`}
+                />
+              ))}
+            </div>
+          )}
           <div
             aria-hidden
-            className="pointer-events-none absolute -top-24 -right-20 size-64 rounded-full bg-berry/10 blur-3xl"
+            className="pointer-events-none absolute inset-0 bg-linear-to-r from-cocoa via-cocoa/92 via-55% to-cocoa/70"
           />
-          <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="min-w-0">
-              <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-berry/30 bg-berry/10 px-3.5 py-1 text-[10.5px] font-bold tracking-wider text-berry-deep uppercase sm:text-xs">
-                <Sparkles className="size-3.5" />
-                <span>Fresh small-batch counter</span>
-              </span>
-              <TextAnimate
-                as="h1"
-                animation="blurInUp"
-                by="word"
-                className="mt-1.5 font-blogh text-3xl leading-tight font-bold tracking-wide text-cocoa uppercase sm:text-5xl lg:text-6xl"
-              >
-                The bakery counter
-              </TextAnimate>
-              <p className="mt-1.5 max-w-xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                Everything here is baked the morning of your slot. Browse a counter below, or search
-                for something specific.
-              </p>
-            </div>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-24 -right-20 size-64 rounded-full bg-berry/25 blur-3xl"
+          />
 
-            {/* At a glance — answers "what is actually available" before scrolling. */}
-            <dl className="grid shrink-0 grid-cols-3 gap-2 lg:w-72">
-              {[
-                { label: "Bakes today", value: String(data.products.length) },
-                { label: "Counters", value: String(lanes.length) },
-                { label: "Starting at", value: formatCurrency(counterFloor) },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-2xl border border-border/70 bg-card/80 p-2.5 text-center shadow-2xs"
-                >
-                  <dt className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                    {stat.label}
-                  </dt>
-                  <dd className="mt-0.5 font-blogh text-base font-bold text-cocoa tabular-nums sm:text-lg">
-                    {stat.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+          <div className="relative z-10 p-5 sm:p-8">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-300/15 px-3.5 py-1 text-[10.5px] font-black tracking-wider text-amber-200 uppercase sm:text-xs">
+              <Sparkles className="size-3.5" />
+              <span>Fresh small-batch counter</span>
+            </span>
+            <TextAnimate
+              as="h1"
+              animation="blurInUp"
+              by="word"
+              className="mt-2 font-blogh text-[clamp(1.85rem,7vw,4.25rem)] leading-[1.02] font-bold tracking-wide text-white uppercase"
+            >
+              The bakery counter
+            </TextAnimate>
+            <p className="mt-2 max-w-md text-xs leading-relaxed text-white/65 sm:text-sm">
+              Everything here is baked the morning of your slot. Browse a counter below, or search
+              for something specific.
+            </p>
           </div>
+
+          {/* At a glance — answers "what is actually available" before scrolling. */}
+          <dl className="relative z-10 grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 bg-black/25 backdrop-blur-sm">
+            {[
+              { label: "Bakes today", value: String(data.products.length) },
+              { label: "Counters", value: String(lanes.length) },
+              { label: "Starting at", value: formatCurrency(counterFloor) },
+            ].map((stat) => (
+              <div key={stat.label} className="px-3 py-3 text-center sm:py-3.5">
+                <dt className="font-mono text-[9.5px] font-bold tracking-[0.16em] text-white/45 uppercase sm:text-[10px]">
+                  {stat.label}
+                </dt>
+                <dd className="mt-0.5 font-blogh text-lg font-bold text-amber-200 tabular-nums sm:text-2xl">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </header>
 
         {/* ── Sticky toolbar ─────────────────────────────────────────── */}
         <div className="sticky top-16 z-30 -mx-4 border-y border-border/60 bg-background/85 px-4 py-2.5 backdrop-blur-xl sm:mx-0 sm:rounded-3xl sm:border sm:px-4 sm:shadow-2xs">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 max-md:flex-wrap">
             {/* Desktop category rail */}
             <nav
               aria-label="Filter by category"
               className="no-scrollbar hidden min-w-0 flex-1 overflow-x-auto md:block"
             >
-              {categoryRail}
+              {renderCategoryRail(false)}
             </nav>
 
             {/* Mobile: filters trigger */}
@@ -530,7 +549,7 @@ function Shop() {
                     <p className="mb-2 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
                       Counter
                     </p>
-                    <div className="flex flex-wrap gap-1.5">{categoryRail}</div>
+                    {renderCategoryRail(true)}
                   </div>
                   <div>
                     <p className="mb-2 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
@@ -732,6 +751,55 @@ function Shop() {
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * One counter in the filter rail.
+ *
+ * Extracted because the rail is rendered twice — inline on desktop and inside
+ * the mobile filter sheet — and the two copies had drifted apart.
+ */
+function CounterPill({
+  icon: Icon,
+  label,
+  count,
+  selected,
+  onClick,
+}: {
+  icon: LucideIcon;
+  label: string;
+  count: number;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-current={selected ? "true" : undefined}
+      className={`group relative flex min-h-9 shrink-0 cursor-pointer items-center gap-1.5 overflow-hidden rounded-full border px-3.5 text-xs font-bold whitespace-nowrap transition-all ${
+        selected
+          ? "border-cocoa bg-cocoa text-background shadow-xs"
+          : "border-border/70 bg-card text-cocoa hover:border-cocoa/40 hover:bg-secondary/60"
+      }`}
+    >
+      <Icon className="size-3.5 shrink-0" />
+      {label}
+      <span
+        className={`rounded-full px-1.5 text-[10px] tabular-nums ${
+          selected ? "bg-white/20" : "bg-secondary text-muted-foreground"
+        }`}
+      >
+        {count}
+      </span>
+      {selected && (
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 animate-sheen-sweep bg-white/25"
+        />
+      )}
+    </button>
   );
 }
 

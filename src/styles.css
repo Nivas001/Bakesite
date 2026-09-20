@@ -612,3 +612,171 @@
 @utility animate-magic-input-spin {
   animation: magic-input-spin 0.8s linear infinite;
 }
+
+/* ============================================================
+   Revamp primitives — shared by the rebuilt sections
+   ============================================================ */
+
+/* Slow horizontal pan, for film frames and hero photography. */
+@keyframes ken-burns {
+  from {
+    transform: scale(1.04) translate3d(-1.2%, 0.8%, 0);
+  }
+  to {
+    transform: scale(1.14) translate3d(1.2%, -0.8%, 0);
+  }
+}
+
+/* A light sweeping across a surface — used on selected cards and CTAs. */
+@keyframes sheen-sweep {
+  0% {
+    transform: translateX(-130%) skewX(-18deg);
+  }
+  60%,
+  100% {
+    transform: translateX(230%) skewX(-18deg);
+  }
+}
+
+/* Continuous left-drift for ticker rails. Pairs with a duplicated track. */
+@keyframes rail-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* An expanding halo behind a live indicator. */
+@keyframes halo-pulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+
+/* Gentle vertical bob for stickers and floating chips. */
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Dashes travelling along a progress track. */
+@keyframes stripe-slide {
+  to {
+    background-position: 2rem 0;
+  }
+}
+
+/* A bar filling left to right, for autoplay hold indicators. Transform-based
+   so it animates on the compositor and works on a solid colour. */
+@keyframes progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility animate-progress-fill {
+  animation: progress-fill var(--progress-duration, 6s) linear both;
+  transform-origin: left center;
+}
+
+@utility animate-ken-burns {
+  animation: ken-burns 14s ease-in-out infinite alternate;
+}
+
+@utility animate-sheen-sweep {
+  animation: sheen-sweep 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@utility animate-rail-scroll {
+  animation: rail-scroll var(--rail-duration, 40s) linear infinite;
+}
+
+@utility animate-halo-pulse {
+  animation: halo-pulse 2s ease-out infinite;
+}
+
+@utility animate-bob {
+  animation: bob var(--bob-duration, 4s) ease-in-out infinite;
+}
+
+/* Fine film grain, so the dark cinematic panels do not band on gradients. */
+@utility film-grain {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+}
+
+/* The perforated edge of a cinema ticket / bakery coupon. */
+@utility ticket-notch {
+  --notch: color-mix(in oklab, var(--background) 100%, transparent);
+  position: relative;
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 1.15rem;
+    height: 1.15rem;
+    translate: 0 -50%;
+    border-radius: 999px;
+    background: var(--notch);
+    pointer-events: none;
+  }
+  &::before {
+    left: -0.6rem;
+  }
+  &::after {
+    right: -0.6rem;
+  }
+}
+
+/* Hairline grid, for the "worktop" backdrop behind the builder and studio. */
+@utility worktop-grid {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--cocoa) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--cocoa) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 2.25rem 2.25rem;
+}
+
+/* Every revamp animation stops for visitors who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns,
+  .animate-sheen-sweep,
+  .animate-rail-scroll,
+  .animate-halo-pulse,
+  .animate-bob,
+  .animate-progress-fill {
+    animation: none !important;
+  }
+}
