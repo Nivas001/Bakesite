@@ -5,6 +5,7 @@ import { HeroRevampSection } from "@/components/hero-revamp-section";
 import { AssuranceStrip } from "@/components/home/assurance-strip";
 import { CravingExplorer } from "@/components/home/craving-explorer";
 import { ProductFilm } from "@/components/home/product-film";
+import { BakeSequence } from "@/components/home/bake-sequence";
 import { DailyCounter } from "@/components/home/daily-counter";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { CraftPromise } from "@/components/home/craft-promise";
@@ -66,6 +67,7 @@ function Home() {
         <AssuranceStrip />
         <CravingExplorer categories={data.categories} products={data.products} />
         <ProductFilm />
+        <BakeSequence />
         <DailyCounter products={data.products} />
         <HowItWorks />
         <CakeStudioCarousel />
